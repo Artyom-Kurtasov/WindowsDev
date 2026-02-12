@@ -1,3 +1,5 @@
 <Solution>
+  <Project Path="WindowsDev.Businnes/WindowsDev.Businnes.csproj" />
+  <Project Path="WindowsDev.Domain/WindowsDev.Domain.csproj" />
   <Project Path="WindowsDev/WindowsDev.csproj" />
 </Solution>
