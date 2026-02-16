@@ -29,7 +29,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMarginProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMaxWidthProperty = DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(250.0));
+        public static readonly DependencyProperty FieldMaxWidthProperty = DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
 
         public double FieldMaxWidth
         {
@@ -37,6 +37,14 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMaxWidthProperty, value);
         }
 
+        public static readonly DependencyProperty FieldMinWidthProperty = DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
+
+        public double FieldMinWidth
+        {
+            get => (double)GetValue(FieldMinWidthProperty);
+            set => SetValue(FieldMinWidthProperty, value);
+        }
+        
         public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBlock), new PropertyMetadata(new CornerRadius(0)));
 
         public CornerRadius CornerRadius

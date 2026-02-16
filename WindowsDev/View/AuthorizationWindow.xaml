@@ -8,31 +8,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowsDev.View"
         mc:Ignorable="d"
-        Title="Authorization" Height="450" Width="800" MinWidth="252">
+        Title="Authorization" MinWidth="252">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="0.5*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" 
+        <StackPanel Grid.Row="1" 
                     HorizontalAlignment="Center" 
-                    Margin="0,20,0,0">
-            <iconPacks:PackIconMaterialDesign Kind="TaskRound" 
-                                              HorizontalAlignment="Center" 
-                                              Width="70" Height="70"/>
+                    Margin="20,20,20,0" >
+            <Viewbox Width="70" Height="70">
+                <iconPacks:PackIconMaterialDesign Kind="TaskRound"/>
+            </Viewbox>
             <TextBlock x:Name="SigninTextBlock"
                        Text="Sign in to TaskManager" FontSize="14"/>
         </StackPanel>
 
-        <UserCtrl:AdvancedTextBlock Grid.Row="1" Margin="0,20,0,0" 
+        <UserCtrl:AdvancedTextBlock Grid.Row="2"
                                     Header="Username"
                                     CornerRadius="8"
-                                    HorizontalAlignment="Center"/>
+                                    HorizontalAlignment="Stretch"
+                                    FieldMinWidth="200" FieldMaxWidth="400"
+                                    Margin="20,20,20,0" />
 
-        <Grid Grid.Row="2" HorizontalAlignment="Center" Width="250" Margin="0,20,0,0">
+        <Grid Grid.Row="3"
+              HorizontalAlignment="Stretch" 
+              MinWidth="200" MaxWidth="400"
+              Margin="20,20,20,0" >
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -56,11 +63,14 @@
 
             <PasswordBox Grid.Row="1"
                  mah:ControlsHelper.CornerRadius="8"
-                 Width="250"/>
+                 MinWidth="200" MaxWidth="400"
+                         HorizontalAlignment="Stretch"/>
         </Grid>
 
-        <Button mah:ControlsHelper.CornerRadius="8" Margin="0,20,0,0" 
-                Grid.Row="3" Width="250" >
+        <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0" 
+                Grid.Row="4"
+                MinWidth="200" MaxWidth="400"
+                HorizontalAlignment="Stretch">
             <WrapPanel>
                 <TextBlock Text="Sign in" FontSize="12" FontWeight="Bold"/>
                 <iconPacks:PackIconLucide Kind="LogIn" Margin="5,0,0,0" Height="13" FontSize="10" 

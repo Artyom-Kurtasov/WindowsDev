@@ -2,6 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Businnes.DataBase;
 using WindowsDev.Businnes.Services.PasswordManager;
+using WindowsDev.Commands;
+using WindowsDev.Infrastructure;
 
 namespace WindowsDev.Settings
 {
@@ -15,8 +17,13 @@ namespace WindowsDev.Settings
             services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
-
+            //PasswordManager
             services.AddTransient<PasswordHasher>();
+
+            //commands
+            services.AddTransient<RelayCommand>();
+            services.AddTransient<RegistrationCommands>();
+            services.AddTransient<AuthorizationCommands>();
         }
     }
 }

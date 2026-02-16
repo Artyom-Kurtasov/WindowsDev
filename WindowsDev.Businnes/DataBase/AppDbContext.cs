@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Domain.UsersLoginAndPasswords;
+using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.DataBase
 {
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-        public DbSet<UsersLoginAndPasswords> usersLoginAndPasswords { get; set; }
+        public DbSet<UsersAuthInfo> usersLoginAndPasswords { get; set; }
     }
 }

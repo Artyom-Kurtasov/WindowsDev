@@ -8,21 +8,27 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource AncestorType=UserControl}}">
+    <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"
+          HorizontalAlignment="Stretch">
+        
         <mah:MetroHeader 
-        Header="{Binding Header, RelativeSource={RelativeSource AncestorType=UserControl}}"
-        MaxWidth="{Binding FieldMaxWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
-        HorizontalContentAlignment="Stretch">
+            Header="{Binding Header, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            MaxWidth="{Binding FieldMaxWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            MinWidth="{Binding FieldMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}">
 
             <TextBox 
-            mah:ControlsHelper.CornerRadius="{Binding CornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            TextWrapping="{Binding TextWrapping, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            AcceptsReturn="True"
-            VerticalScrollBarVisibility="{Binding ScrollBarVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            Height="{Binding FieldHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            MaxWidth="{Binding FieldMaxWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
-            HorizontalAlignment="Stretch">
+                mah:ControlsHelper.CornerRadius="{Binding CornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                TextWrapping="{Binding TextWrapping, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                AcceptsReturn="True"
+                VerticalScrollBarVisibility="{Binding ScrollBarVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Height="{Binding FieldHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                HorizontalAlignment="Stretch"
+                MaxWidth="{Binding FieldMaxWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                MinWidth="{Binding FieldMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}">
             </TextBox>
+            
         </mah:MetroHeader>
     </Grid>
 
