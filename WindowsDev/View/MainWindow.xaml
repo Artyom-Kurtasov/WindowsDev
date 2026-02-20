@@ -1,0 +1,26 @@
+﻿<mah:MetroWindow x:Class="WindowsDev.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:UserCtrl="clr-namespace:WindowsDev.View.Controls"
+        xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+        xmlns:simpleChildWindow="clr-namespace:MahApps.Metro.SimpleChildWindow;assembly=MahApps.Metro.SimpleChildWindow"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WindowsDev"
+        xmlns:ViewModels="clr-namespace:WindowsDev.ViewModels"
+        xmlns:Views="clr-namespace:WindowsDev.View.Controls.WindowsContent"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" MinWidth="252">
+    
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type ViewModels:AuthorizationViewModel}">
+        <Views:AuthorizationView/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type ViewModels:RegistrationViewModel}">
+        <Views:RegistrationView/>
+    </DataTemplate>
+    </Window.Resources>
+
+    <ContentControl Content="{Binding CurrentViewModel}"/>
+</mah:MetroWindow>
