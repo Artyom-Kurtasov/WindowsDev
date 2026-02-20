@@ -1,4 +1,5 @@
 ﻿using MahApps.Metro.Controls;
+using WindowsDev.ViewModels;
 
 namespace WindowsDev
 {
@@ -7,10 +8,13 @@ namespace WindowsDev
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        public MainWindow()
+        private readonly MainWindowViewModel _mainWindowViewModel;
+        public MainWindow(MainWindowViewModel mainWindowViewModel)
         {
             InitializeComponent();
+            _mainWindowViewModel = mainWindowViewModel;
+            DataContext = _mainWindowViewModel;
         }
-
     }
+
 }

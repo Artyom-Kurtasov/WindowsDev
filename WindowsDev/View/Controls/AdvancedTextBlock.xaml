@@ -19,6 +19,8 @@
             MinWidth="{Binding FieldMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}">
 
             <TextBox 
+                mah:TextBoxHelper.UseFloatingWatermark="{Binding UseWatermark, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                mah:TextBoxHelper.Watermark="{Binding Watermark, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 mah:ControlsHelper.CornerRadius="{Binding CornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 TextWrapping="{Binding TextWrapping, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 AcceptsReturn="True"

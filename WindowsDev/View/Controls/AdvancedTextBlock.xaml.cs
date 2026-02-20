@@ -44,8 +44,8 @@ namespace WindowsDev.View.Controls
             get => (double)GetValue(FieldMinWidthProperty);
             set => SetValue(FieldMinWidthProperty, value);
         }
-        
-        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBlock), new PropertyMetadata(new CornerRadius(0)));
+
+        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBlock));
 
         public CornerRadius CornerRadius
         {
@@ -75,6 +75,22 @@ namespace WindowsDev.View.Controls
         {
             get => (double)GetValue(FieldHeightProperty);
             set => SetValue(FieldHeightProperty, value); 
+        }
+
+        public static readonly DependencyProperty UseWatermarkProperty = DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(AdvancedTextBlock));
+
+        public bool UseWatermark
+        {
+            get => (bool)GetValue(UseWatermarkProperty);
+            set => SetValue(UseWatermarkProperty, value);
+        }
+
+        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(AdvancedTextBlock));
+
+        public string Watermark
+        {
+            get => (string)GetValue(WatermarkProperty);
+            set => SetValue(WatermarkProperty, value);
         }
     }
 }

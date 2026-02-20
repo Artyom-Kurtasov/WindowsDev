@@ -10,55 +10,6 @@
         xmlns:local="clr-namespace:WindowsDev"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800" MinWidth="252">
-    <mah:MetroWindow.Flyouts>
-        <mah:FlyoutsControl>
-            <mah:Flyout Header="Create project"
-                        Position="Right"
-                        IsOpen="True"
-                        Width="{Binding ActualWidth, RelativeSource={RelativeSource AncestorType=mah:MetroWindow}}">
 
-                <Grid Margin="20,0,20,0">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <UserCtrl:AdvancedTextBlock Header="Project Name" Grid.Row="0"
-                                                FieldMaxWidth="500"
-                                                HorizontalAlignment="Stretch"/>
-                    <UserCtrl:AdvancedTextBlock Header="Description" Grid.Row="1"
-                                                ScrollBarVisibility="Auto"
-                                                FieldMaxWidth="500" FieldHeight="200"
-                                                TextWrapping="Wrap"
-                                                Margin="0,20,0,0" HorizontalAlignment="Stretch"/>
-                    
-                </Grid>
-            </mah:Flyout>
-        </mah:FlyoutsControl>
-    </mah:MetroWindow.Flyouts>
-
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-
-        <mah:MetroAnimatedTabControl Grid.Row="0">
-            <TabItem Header="Projects">
-                <Grid>
-                    <ToolBar>
-                        <Button Content="Create Project"/>
-                        <Button Content="Delete Project"/>
-                    </ToolBar>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Settings">
-
-            </TabItem>
-            <TabItem Header="Profile">
-
-            </TabItem>
-        </mah:MetroAnimatedTabControl>
-    </Grid>
+    <ContentControl Content="{Binding CurrentViewModel}"/>
 </mah:MetroWindow>
