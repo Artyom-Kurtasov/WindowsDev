@@ -92,5 +92,13 @@ namespace WindowsDev.View.Controls
             get => (string)GetValue(WatermarkProperty);
             set => SetValue(WatermarkProperty, value);
         }
+
+        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(AdvancedTextBlock));
+
+        public string Text
+        {
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
+        }
     }
 }

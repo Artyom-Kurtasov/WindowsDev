@@ -9,6 +9,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="ViewModels\Commands\**" />
+	  <EmbeddedResource Remove="ViewModels\Commands\**" />
+	  <None Remove="ViewModels\Commands\**" />
+	  <Page Remove="ViewModels\Commands\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="MahApps.Metro" Version="2.4.11" />
 		<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
 		<PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.2.1" />
@@ -22,7 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="ViewModels\Commands\" />
+		<Folder Include="View\ContentControls\" />
 	</ItemGroup>
 
 </Project>

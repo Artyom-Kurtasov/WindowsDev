@@ -9,5 +9,6 @@ namespace WindowsDev.Domain.UsersAuthInfo
         public required string UserLogin {  get; set; }
         public required string UserPasswordHash { get; set; }
         public required string UserEmail { get; set; }
+        public required string UserPasswordSalt { get; set; }
     }
 }

@@ -8,6 +8,10 @@ namespace WindowsDev.ViewModels
     {
         private readonly INavigationService _navigationService;
 
+        public string Username {  get; set; }
+        public string Password {  get; set; }
+        public string Email {  get; set; }
+
         public ICommand SwitchToAuthView {  get; } //Command to switch main window datacontext to authorizationview content
 
         public RegistrationViewModel(INavigationService navigationStore)

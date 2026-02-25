@@ -10,6 +10,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -24,7 +25,8 @@
             <UserCtrl:AdvancedTextBlock CornerRadius="8" Margin="0,20,0,0"
                                         Header="Username"
                                         UseWatermark="True" Watermark="Username"
-                                        FieldMaxWidth="400"/>
+                                        FieldMaxWidth="400"
+                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
 
             <StackPanel MaxWidth="400" HorizontalAlignment="Stretch">
 
@@ -46,6 +48,12 @@
                     <Run Text="Use a symbols" Foreground="Gray"/>
                 </TextBlock>
             </StackPanel>
+
+            <UserCtrl:AdvancedTextBlock CornerRadius="8" Margin="0,20,0,0"
+                                        Header="Email"
+                                        UseWatermark="True" Watermark="example@gmail.com"
+                                        FieldMaxWidth="400"
+                                        Text="{Binding Email, UpdateSourceTrigger=PropertyChanged}"/>
 
             <Button Margin="0,20,0,0"
                     mah:ControlsHelper.CornerRadius="8"

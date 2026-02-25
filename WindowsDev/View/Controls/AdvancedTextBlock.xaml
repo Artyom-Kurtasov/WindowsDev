@@ -28,7 +28,8 @@
                 Height="{Binding FieldHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 HorizontalAlignment="Stretch"
                 MaxWidth="{Binding FieldMaxWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                MinWidth="{Binding FieldMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                MinWidth="{Binding FieldMinWidth, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}}">
             </TextBox>
             
         </mah:MetroHeader>
