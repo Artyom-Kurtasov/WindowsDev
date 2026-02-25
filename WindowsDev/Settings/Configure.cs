@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Businnes.DataBase;
+using WindowsDev.Businnes.Services;
 using WindowsDev.Businnes.Services.PasswordManager;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
@@ -17,6 +18,7 @@ namespace WindowsDev.Settings
             services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
+            services.AddSingleton<Registration>();
             //PasswordManager
             services.AddTransient<PasswordHasher>();
 

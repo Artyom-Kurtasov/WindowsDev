@@ -13,7 +13,8 @@ namespace WindowsDev.View.Controls
             InitializeComponent();
         }
 
-        public static DependencyProperty HeaderProperty = DependencyProperty.Register(nameof(Header), typeof(string), typeof(PasswordBox), new PropertyMetadata(null));
+        public static DependencyProperty HeaderProperty = 
+            DependencyProperty.Register(nameof(Header), typeof(string), typeof(PasswordBox), new PropertyMetadata(null));
 
         public string Header
         {
@@ -21,7 +22,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(HeaderProperty, value);
         }
 
-        public static DependencyProperty HeaderFontSizeProperty = DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(PasswordBox));
+        public static DependencyProperty HeaderFontSizeProperty = 
+            DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(PasswordBox));
     
         public int HeaderFontSize
         {
@@ -29,7 +31,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(HeaderFontSizeProperty, value);
         }
 
-        public static DependencyProperty HorizontalAlignmentHyperlinkProperty = DependencyProperty.Register(nameof(HorizontalAlignmentHyperlink), typeof(HorizontalAlignment), typeof(PasswordBox));
+        public static DependencyProperty HorizontalAlignmentHyperlinkProperty = 
+            DependencyProperty.Register(nameof(HorizontalAlignmentHyperlink), typeof(HorizontalAlignment), typeof(PasswordBox));
 
         public HorizontalAlignment HorizontalAlignmentHyperlink
         {
@@ -37,7 +40,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(HorizontalAlignmentHyperlinkProperty, value);
         }
 
-        public static DependencyProperty LinkTextProperty = DependencyProperty.Register(nameof(LinkText), typeof(string), typeof(PasswordBox));
+        public static DependencyProperty LinkTextProperty = 
+            DependencyProperty.Register(nameof(LinkText), typeof(string), typeof(PasswordBox));
 
         public string LinkText
         {
@@ -45,7 +49,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(LinkTextProperty, value);
         }
 
-        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(PasswordBox));
+        public static readonly DependencyProperty CornerRadiusProperty = 
+            DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(PasswordBox));
 
         public CornerRadius CornerRadius
         {
@@ -53,7 +58,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(CornerRadiusProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMaxWidthProperty = DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
+        public static readonly DependencyProperty FieldMaxWidthProperty = 
+            DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
 
         public double FieldMaxWidth
         {
@@ -61,7 +67,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMaxWidthProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMinWidthProperty = DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
+        public static readonly DependencyProperty FieldMinWidthProperty = 
+            DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
 
         public double FieldMinWidth
         {
@@ -69,7 +76,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMinWidthProperty, value);
         }
 
-        public static readonly DependencyProperty UseWatermarkProperty = DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(PasswordBox));
+        public static readonly DependencyProperty UseWatermarkProperty = 
+            DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(PasswordBox));
 
         public bool UseWatermark
         {
@@ -77,12 +85,22 @@ namespace WindowsDev.View.Controls
             set => SetValue(UseWatermarkProperty, value);
         }
 
-        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(PasswordBox));
+        public static readonly DependencyProperty WatermarkProperty = 
+            DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(PasswordBox));
 
         public string Watermark
         {
             get => (string)GetValue(WatermarkProperty);
             set => SetValue(WatermarkProperty, value);
+        }
+
+        public static readonly DependencyProperty PasswordProperty =
+            DependencyProperty.Register(nameof(Password), typeof(string), typeof(PasswordBox), new PropertyMetadata(string.Empty));
+
+        public string Password
+        {
+            get => (string)GetValue(PasswordProperty);
+            set => SetValue(PasswordProperty, value);
         }
     }
 }

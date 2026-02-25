@@ -13,7 +13,8 @@ namespace WindowsDev.View.Controls
             InitializeComponent();
         }
 
-        public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(nameof(Header), typeof(string), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty HeaderProperty = 
+            DependencyProperty.Register(nameof(Header), typeof(string), typeof(AdvancedTextBlock));
 
         public string Header
         {
@@ -21,7 +22,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(HeaderProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMarginProperty = DependencyProperty.Register(nameof(FieldMargin), typeof(double), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty FieldMarginProperty = 
+            DependencyProperty.Register(nameof(FieldMargin), typeof(double), typeof(AdvancedTextBlock));
 
         public Thickness FieldMargin
         {
@@ -29,7 +31,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMarginProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMaxWidthProperty = DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
+        public static readonly DependencyProperty FieldMaxWidthProperty = 
+            DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
 
         public double FieldMaxWidth
         {
@@ -37,7 +40,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMaxWidthProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMinWidthProperty = DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
+        public static readonly DependencyProperty FieldMinWidthProperty = 
+            DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(AdvancedTextBlock), new PropertyMetadata(200.0));
 
         public double FieldMinWidth
         {
@@ -45,7 +49,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMinWidthProperty, value);
         }
 
-        public static readonly DependencyProperty CornerRadiusProperty = DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty CornerRadiusProperty = 
+            DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBlock));
 
         public CornerRadius CornerRadius
         {
@@ -53,7 +58,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(CornerRadiusProperty, value);
         }
 
-        public static readonly DependencyProperty TextWrappingProperty = DependencyProperty.Register(nameof(TextWrapping), typeof(TextWrapping), typeof(AdvancedTextBlock), new PropertyMetadata(TextWrapping.NoWrap));
+        public static readonly DependencyProperty TextWrappingProperty = 
+            DependencyProperty.Register(nameof(TextWrapping), typeof(TextWrapping), typeof(AdvancedTextBlock), new PropertyMetadata(TextWrapping.NoWrap));
 
         public TextWrapping TextWrapping
         {
@@ -61,7 +67,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(TextWrappingProperty, value);
         }
 
-        public static readonly DependencyProperty ScrollBarVisibilityProperty = DependencyProperty.Register(nameof(ScrollBarVisibility),typeof(ScrollBarVisibility), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty ScrollBarVisibilityProperty = 
+            DependencyProperty.Register(nameof(ScrollBarVisibility),typeof(ScrollBarVisibility), typeof(AdvancedTextBlock));
 
         public ScrollBarVisibility ScrollBarVisibility
         {
@@ -69,7 +76,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(ScrollBarVisibilityProperty, value);
         }
 
-        public static readonly DependencyProperty FieldHeightProperty = DependencyProperty.Register(nameof(FieldHeight), typeof(double), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty FieldHeightProperty = 
+            DependencyProperty.Register(nameof(FieldHeight), typeof(double), typeof(AdvancedTextBlock));
 
         public double FieldHeight
         {
@@ -77,7 +85,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldHeightProperty, value); 
         }
 
-        public static readonly DependencyProperty UseWatermarkProperty = DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty UseWatermarkProperty =
+            DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(AdvancedTextBlock));
 
         public bool UseWatermark
         {
@@ -85,7 +94,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(UseWatermarkProperty, value);
         }
 
-        public static readonly DependencyProperty WatermarkProperty = DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty WatermarkProperty = 
+            DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(AdvancedTextBlock));
 
         public string Watermark
         {
@@ -93,7 +103,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(WatermarkProperty, value);
         }
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(AdvancedTextBlock));
+        public static readonly DependencyProperty TextProperty = 
+            DependencyProperty.Register(nameof(Text), typeof(string), typeof(AdvancedTextBlock));
 
         public string Text
         {

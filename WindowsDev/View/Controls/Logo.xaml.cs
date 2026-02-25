@@ -14,7 +14,8 @@ namespace WindowsDev.View.Controls
             InitializeComponent();
         }
 
-        public static DependencyProperty ViewBoxWidthProperty = DependencyProperty.Register(nameof(ViewBoxWidth), typeof(double), typeof(Logo), new PropertyMetadata(null));
+        public static DependencyProperty ViewBoxWidthProperty = 
+            DependencyProperty.Register(nameof(ViewBoxWidth), typeof(double), typeof(Logo), new PropertyMetadata(null));
 
         public double ViewBoxWidth
         {
@@ -22,7 +23,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(ViewBoxWidthProperty, value);
         }
 
-        public static DependencyProperty ViewBoxHeightProperty = DependencyProperty.Register(nameof(ViewBoxHeight), typeof(double), typeof(Logo), new PropertyMetadata(null));
+        public static DependencyProperty ViewBoxHeightProperty = 
+            DependencyProperty.Register(nameof(ViewBoxHeight), typeof(double), typeof(Logo), new PropertyMetadata(null));
 
         public double ViewBoxHeight
         {
@@ -30,7 +32,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(ViewBoxHeightProperty, value);
         }
 
-        public static DependencyProperty TextProperty = DependencyProperty.Register(nameof(Text), typeof(string), typeof(Logo), new PropertyMetadata(null));
+        public static DependencyProperty TextProperty = 
+            DependencyProperty.Register(nameof(Text), typeof(string), typeof(Logo), new PropertyMetadata(null));
 
         public string Text
         {
@@ -38,7 +41,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(TextProperty, value);
         }
 
-        public static DependencyProperty KindProperty = DependencyProperty.Register(nameof(Kind), typeof(PackIconMaterialDesignKind), typeof(Logo));
+        public static DependencyProperty KindProperty = 
+            DependencyProperty.Register(nameof(Kind), typeof(PackIconMaterialDesignKind), typeof(Logo));
 
         public PackIconMaterialDesignKind Kind
         {

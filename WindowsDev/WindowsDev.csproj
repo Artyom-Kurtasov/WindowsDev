@@ -10,9 +10,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="ViewModels\Commands\**" />
+	  <Compile Remove="View\ContentControls\**" />
 	  <EmbeddedResource Remove="ViewModels\Commands\**" />
+	  <EmbeddedResource Remove="View\ContentControls\**" />
 	  <None Remove="ViewModels\Commands\**" />
+	  <None Remove="View\ContentControls\**" />
 	  <Page Remove="ViewModels\Commands\**" />
+	  <Page Remove="View\ContentControls\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -26,10 +30,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Businnes.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="View\ContentControls\" />
 	</ItemGroup>
 
 </Project>
