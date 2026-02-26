@@ -6,6 +6,6 @@ namespace WindowsDev.Businnes.DataBase
     public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
-        public DbSet<UsersAuthInfo> UsersAuthInfo { get; set; }
+        public DbSet<UserAuthInfo> UserAuthInfo { get; set; }
     }
 }

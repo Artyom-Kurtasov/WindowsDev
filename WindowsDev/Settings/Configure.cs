@@ -5,6 +5,7 @@ using WindowsDev.Businnes.Services;
 using WindowsDev.Businnes.Services.PasswordManager;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Infrastructure;
 using WindowsDev.ViewModels;
 
@@ -14,7 +15,7 @@ namespace WindowsDev.Settings
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            string connectionString = "Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=q29384756K5";
+            string connectionString = "Host=localhost;Port=5432;Database=WindowsDev;Username=postgres;Password=q29384756";
             services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString), ServiceLifetime.Transient);
 
@@ -35,6 +36,9 @@ namespace WindowsDev.Settings
 
             //Window
             services.AddSingleton<MainWindow>();
+
+            //Models
+            services.AddSingleton<UserAuthInfo>();
         }
     }
 }
