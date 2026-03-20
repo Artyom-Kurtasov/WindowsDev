@@ -9,7 +9,7 @@
              xmlns:local="clr-namespace:WindowsDev.View.Controls.WindowsContent"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid MaxWidth="400">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -29,57 +29,30 @@
                            HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
 
             <!--Username-->
-            <UserCtrl:AdvancedTextBlock
+            <UserCtrl:AdvancedTextBox
                 Header="Username"
                 CornerRadius="8"
-                FieldMaxWidth="400"
-                Margin="20,20,20,0" />
+                Margin="20,20,20,0"
+                Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <!--Password-->
-            <Grid
-                MaxWidth="400"
-                Margin="20,20,20,0" >
+            <UserCtrl:PasswordBox
+                Header="Password"
+                HeaderFontSize="14"
+                Margin="20,20,20,0"
+                CornerRadius="8"
+                Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                </Grid.RowDefinitions>
-
-                <Grid Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="Password"
-                   FontSize="14"/>
-
-                    <TextBlock
-                   Grid.Column="1"
-                   HorizontalAlignment="Right">
-                        <Hyperlink>
-                            Forgot password?
-                        </Hyperlink>
-                    </TextBlock>
-                </Grid>
-
-                <PasswordBox Grid.Row="1"
-                 mah:ControlsHelper.CornerRadius="8"
-                 MinWidth="200" MaxWidth="400"
-                 HorizontalAlignment="Stretch"/>
-            </Grid>
-
-            <!--SIGN IN BUTTON-->
-            <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0" 
-                    MaxWidth="400" MinWidth="200">
+                <!--SIGN IN BUTTON-->
+            <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0"
+                    Command="{Binding AuthorizeCommand}">
                 <TextBlock Text="Sign in" FontSize="12" FontWeight="Bold"/>
             </Button>
 
             <!--LINK TO REGISTRATION-->
-            <TextBlock HorizontalAlignment="Center"
-                       MaxWidth="400">
+            <TextBlock HorizontalAlignment="Center">
                     <Run Text="New to TaskManager? "/>
-                    <Hyperlink Command="{Binding SwitchToRegView}">
+                    <Hyperlink Command="{Binding SwitchToRegViewCommand}">
                             Sign up
                     </Hyperlink>
             </TextBlock>

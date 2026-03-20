@@ -10,24 +10,45 @@ namespace WindowsDev.ViewModels
         private readonly INavigationService _navigationService;
         private readonly Registration _registration;
 
-        public required string Username {  get; set; }
-        public  required string Password {  get; set; }
-        public required string Email {  get; set; }
+        private string _userName;
+        public required string Username
+        {
+            get => _userName;
+            set
+            {
+                _userName = value;
+                OnPropertyChanged(nameof(Username));
+            }
+        }
 
-        public ICommand SignUp { get; }
-        public ICommand SwitchToAuthView {  get; } //Command to switch main window datacontext to authorizationview content
+        private string _password;
+        public required string Password
+        {
+            get => _password;
+            set
+            {
+                _password = value;
+                OnPropertyChanged(nameof(Password));
+            }
+        }
+
+        public ICommand SignUpCommand { get; }
+        public ICommand SwitchToAuthViewCommand { get; }
 
         public RegistrationViewModel(INavigationService navigationStore, Registration registration)
         {
             _navigationService = navigationStore;
             _registration = registration;
 
-            SwitchToAuthView = new RelayCommand(ToAuthView, CanToAuthView);
-            SignUp = new RelayCommand(Sign, CanSign);
+            SwitchToAuthViewCommand = new RelayCommand(ToAuthView, CanToAuthView);
+            SignUpCommand = new RelayCommand(Sign, CanSign);
         }
-
         private void ToAuthView() => _navigationService.NavigateTo<AuthorizationViewModel>();
-        private void Sign() => _registration.Adds(Password, Email, Username);
+        private void Sign()
+        {
+            _registration.Registrate(_password, _userName);
+            _navigationService.NavigateTo<MainWindowViewModel>();
+        }
         private bool CanToAuthView() => true;
         private bool CanSign() => true;
     }

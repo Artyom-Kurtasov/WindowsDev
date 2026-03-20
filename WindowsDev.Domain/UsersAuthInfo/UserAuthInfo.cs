@@ -8,7 +8,6 @@ namespace WindowsDev.Domain.UsersAuthInfo
         public int UserID { get; set; }
         public required string Login {  get; set; }
         public required string PasswordHash { get; set; }
-        public required string Email { get; set; }
-        public required string Salt { get; set; }
+        public required byte[] Salt { get; set; }
     }
 }

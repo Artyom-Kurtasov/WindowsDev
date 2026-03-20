@@ -3,6 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:Dialog="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+        Dialog:DialogParticipation.Register="{Binding CurrentViewModel}"
         xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:ViewModels="clr-namespace:WindowsDev.ViewModels"
         xmlns:Views="clr-namespace:WindowsDev.View.Controls.WindowsContent"
@@ -18,6 +20,14 @@
 
                 <DataTemplate DataType="{x:Type ViewModels:RegistrationViewModel}">
                     <Views:RegistrationView/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type ViewModels:MainWindowViewModel}">
+                    <Views:MainView/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type ViewModels:ProjectViewModel}">
+                    <Views:ProjectView/>
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

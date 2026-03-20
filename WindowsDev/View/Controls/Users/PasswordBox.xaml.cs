@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 
 namespace WindowsDev.View.Controls
 {
@@ -23,7 +24,7 @@ namespace WindowsDev.View.Controls
         }
 
         public static DependencyProperty HeaderFontSizeProperty = 
-            DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(PasswordBox));
+            DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(PasswordBox), new PropertyMetadata(12));
     
         public int HeaderFontSize
         {
@@ -58,24 +59,6 @@ namespace WindowsDev.View.Controls
             set => SetValue(CornerRadiusProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMaxWidthProperty = 
-            DependencyProperty.Register(nameof(FieldMaxWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
-
-        public double FieldMaxWidth
-        {
-            get => (double)GetValue(FieldMaxWidthProperty);
-            set => SetValue(FieldMaxWidthProperty, value);
-        }
-
-        public static readonly DependencyProperty FieldMinWidthProperty = 
-            DependencyProperty.Register(nameof(FieldMinWidth), typeof(double), typeof(PasswordBox), new PropertyMetadata(200.0));
-
-        public double FieldMinWidth
-        {
-            get => (double)GetValue(FieldMinWidthProperty);
-            set => SetValue(FieldMinWidthProperty, value);
-        }
-
         public static readonly DependencyProperty UseWatermarkProperty = 
             DependencyProperty.Register(nameof(UseWatermark), typeof(bool), typeof(PasswordBox));
 
@@ -95,12 +78,53 @@ namespace WindowsDev.View.Controls
         }
 
         public static readonly DependencyProperty PasswordProperty =
-            DependencyProperty.Register(nameof(Password), typeof(string), typeof(PasswordBox), new PropertyMetadata(string.Empty));
+            DependencyProperty.Register(nameof(Password), typeof(string), typeof(PasswordBox), 
+                new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnPasswordChanged));
 
         public string Password
         {
             get => (string)GetValue(PasswordProperty);
             set => SetValue(PasswordProperty, value);
+        }
+
+        public static readonly DependencyProperty IsValidationEnabledProperty =
+            DependencyProperty.Register(nameof(IsValidationEnabled), typeof(bool), typeof(PasswordBox));
+
+        public bool IsValidationEnabled
+        {
+            get => (bool)GetValue(IsValidationEnabledProperty);
+            set => SetValue(IsValidationEnabledProperty, value);
+        }
+
+        private static void OnPasswordChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = (PasswordBox)d;
+
+            if (!control.IsLoaded) return;
+
+            if (control.IsValidationEnabled)
+            {
+                control.Validate();
+            }
+        }
+
+        private void Validate()
+        {
+            if (PART_PasswordBox == null) return;
+
+            var binding = BindingOperations.GetBindingExpression(PART_PasswordBox, PasswordBox.PasswordProperty);
+            if (binding == null) return;  
+
+            if (!Password.Any(char.IsDigit))
+            {
+                Validation.MarkInvalid(
+                    binding,
+                    new ValidationError(new ExceptionValidationRule(), binding, "Any Numbers!", null));
+            }
+            else
+            {
+                Validation.ClearInvalid(binding);
+            }
         }
     }
 }

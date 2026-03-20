@@ -8,7 +8,7 @@
              xmlns:local="clr-namespace:WindowsDev.View.Controls.WindowsContent"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+    <Grid MaxWidth="400">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -22,19 +22,18 @@
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch"/>
 
-            <UserCtrl:AdvancedTextBlock CornerRadius="8" Margin="0,20,0,0"
+            <UserCtrl:AdvancedTextBox CornerRadius="8" Margin="0,20,0,0"
                                         Header="Username"
-                                        FieldMaxWidth="400"
-                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                        IsValidationEnabled="True"/>
 
-            <StackPanel MaxWidth="400" HorizontalAlignment="Stretch">
+            <StackPanel HorizontalAlignment="Stretch">
 
                 <UserCtrl:PasswordBox
                     Header="Password"
                     HeaderFontSize="14"
                     Margin="0,20,0,0"
                     CornerRadius="8"
-                    FieldMaxWidth="400"
                     Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <TextBlock FontSize="10" Margin="0,5,0,0">
@@ -48,15 +47,12 @@
                 </TextBlock>
             </StackPanel>
 
-            <UserCtrl:AdvancedTextBlock CornerRadius="8" Margin="0,20,0,0"
-                                        Header="Email"
-                                        FieldMaxWidth="400"
-                                        Text="{Binding Email, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <UserCtrl:PasswordBox CornerRadius="8" Margin="0,20,0,0"
+                                  Header="Confirm Password"/>
 
             <Button Margin="0,20,0,0"
                     mah:ControlsHelper.CornerRadius="8"
-                    MaxWidth="400"
-                    Command="{Binding SignUp}">
+                    Command="{Binding SignUpCommand}">
                 Sign up
             </Button>
 
@@ -64,7 +60,7 @@
                        MaxWidth="400">
                 
                 <Run Text="Already have an account? "/>
-                <Hyperlink Command="{Binding SwitchToAuthView}">
+                <Hyperlink Command="{Binding SwitchToAuthViewCommand}">
                     Sign in
                 </Hyperlink>
             </TextBlock>

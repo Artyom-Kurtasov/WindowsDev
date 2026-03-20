@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MahApps.Metro.Controls.Dialogs;
 using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
 
 namespace WindowsDev.Commands.NavigationManager
@@ -7,19 +8,18 @@ namespace WindowsDev.Commands.NavigationManager
     public class NavigationService : INavigationService
     {
         private readonly NavigationStore _navigationStore;
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IViewModelFactory _viewModelFactory;
 
-        public NavigationService(NavigationStore navigationStore, IServiceProvider serviceProvider)
+        public NavigationService(NavigationStore navigationStore, IViewModelFactory viewModelFactory)
         {
             _navigationStore = navigationStore;
-            _serviceProvider = serviceProvider;
+            _viewModelFactory = viewModelFactory;
         }
 
-        public void NavigateTo<TViewModel>() where TViewModel : ViewModelBase
+        public void NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
         {
-            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
-
-            _navigationStore.CurrentViewModel = viewModel;
+            var vm = _viewModelFactory.Create<TViewModel>(args);
+            _navigationStore.CurrentViewModel = vm;
         }
     }
 }
