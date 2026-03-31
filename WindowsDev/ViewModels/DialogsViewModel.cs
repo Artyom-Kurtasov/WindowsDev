@@ -1,6 +1,5 @@
 ﻿using System.Windows.Input;
 using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.ProjectService;
 using WindowsDev.Businnes.Services.ProjectService.Interfaces;
 using WindowsDev.Infrastructure;
 
@@ -9,7 +8,7 @@ namespace WindowsDev.ViewModels
     public class DialogsViewModel : ViewModelBase, IProjectDialogCreator
     {
         private readonly SharedDataService _sharedDataService;
-        private readonly ProjectLoader _projectLoader;
+        private readonly IProjectLoader _projectLoader;
         private readonly IProjectCreator _projectCreator;
 
         public event Func<Task> Close;
@@ -34,8 +33,8 @@ namespace WindowsDev.ViewModels
                 OnPropertyChanged();
             }
         }
-        public ICommand CreateProject {  get; }
-        public DialogsViewModel(IProjectCreator projectCreator, ProjectLoader projectLoader, SharedDataService sharedDataService)
+        public ICommand CreateProject { get; }
+        public DialogsViewModel(IProjectCreator projectCreator, IProjectLoader projectLoader, SharedDataService sharedDataService)
         {
             _projectCreator = projectCreator;
             _projectLoader = projectLoader;
@@ -46,14 +45,14 @@ namespace WindowsDev.ViewModels
 
         public async Task CreateProjectExecute()
         {
-            await _projectCreator.CreateProject(_projectName, _projectDescription);
+            await _projectCreator.CreateProject(_projectName, _projectDescription, 1);
 
             if (Close != null)
             {
                 await Close.Invoke();
             }
 
-           _sharedDataService.ProjectList = await _projectLoader.LoadProjectAsync();
+            _sharedDataService.ProjectList = await _projectLoader.LoadProjectAsync();
         }
     }
 }

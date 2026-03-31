@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
 

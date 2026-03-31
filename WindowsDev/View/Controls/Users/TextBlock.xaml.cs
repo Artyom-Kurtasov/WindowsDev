@@ -49,7 +49,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(TextProperty, value);
         }
 
-        public static new readonly DependencyProperty BorderBrushProperty = 
+        public static new readonly DependencyProperty BorderBrushProperty =
             DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(TextBlock));
 
         public new Brush BorderBrush
@@ -67,7 +67,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(BorderThicknessProperty, value);
         }
 
-        public static new readonly DependencyProperty TextWrappingProperty = 
+        public static new readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(nameof(Wrapping), typeof(TextWrapping), typeof(TextBlock));
 
         public new TextWrapping Wrapping

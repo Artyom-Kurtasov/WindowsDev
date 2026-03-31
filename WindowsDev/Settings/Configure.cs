@@ -6,8 +6,14 @@ using WindowsDev.Businnes.Services;
 using WindowsDev.Businnes.Services.PasswordManager;
 using WindowsDev.Businnes.Services.ProjectService;
 using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+using WindowsDev.Businnes.Services.Registration;
+using WindowsDev.Businnes.Services.Registration.Validation;
+using WindowsDev.Businnes.Services.TaskService;
+using WindowsDev.Businnes.Services.TaskService.Interfaces;
+using WindowsDev.Businnes.Services.UserManager;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Factories;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
@@ -39,12 +45,25 @@ namespace WindowsDev.Settings
             services.AddTransient<PasswordHasher>();
             services.AddSingleton<DialogShowingService>();
             services.AddSingleton<SharedDataService>();
+            services.AddSingleton<CurrentUserData>();
+            services.AddTransient<AddComment>();
+            services.AddSingleton<PasswordColorValidationConvert>();
+            services.AddSingleton<LoginColorValidationConverter>();
+            services.AddSingleton<UsernameColorValidationConverter>();
+            services.AddSingleton<UserFieldValidator>();
+            services.AddSingleton<CurrentUserService>();
 
             // Project services
             services.AddTransient<IProjectReader, ProjectReader>();
             services.AddTransient<IProjectWriter, ProjectWriter>();
             services.AddTransient<IProjectCreator, ProjectCreator>();
-            services.AddTransient<ProjectLoader>();
+            services.AddTransient<IProjectLoader, ProjectLoader>();
+
+            // Task services
+            services.AddTransient<ITaskReader, TaskReader>();
+            services.AddTransient<ITaskCreator, TaskCreator>();
+            services.AddTransient<ITaskWriter, TaskWriter>();
+            services.AddTransient<ITaskLoader, TaskLoader>();
 
             // Business services
             services.AddTransient<Authorization>();
@@ -54,11 +73,15 @@ namespace WindowsDev.Settings
             services.AddTransient<RegistrationViewModel>();
             services.AddTransient<ProjectViewModel>();
             services.AddTransient<DialogsViewModel>();
+            services.AddTransient<TaskDialogViewModel>();
 
             services.AddSingleton<MainWindowViewModel>();
 
             // Windows
             services.AddSingleton<MainWindow>();
+
+            //DTO
+            services.AddTransient<TaskDTO>();
         }
     }
 }

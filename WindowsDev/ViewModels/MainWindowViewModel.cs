@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
 using WindowsDev.Businnes.Services;
+using WindowsDev.Businnes.Services.TaskService;
+using WindowsDev.Businnes.Services.TaskService.Interfaces;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
@@ -15,8 +17,9 @@ namespace WindowsDev.ViewModels
         private readonly DialogShowingService _creator;
         private readonly NavigationStore _navigationStore;
         private readonly INavigationService _navigationService;
+        private readonly ITaskLoader _taskLoader;
 
-        public ObservableCollection<Project>? ProjectList => _sharedDataService.ProjectList;
+        public ObservableCollection<ProjectsInfo>? ProjectList => _sharedDataService.ProjectList;
         public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
 
         public ICommand OpenDialogCommand { get; }
@@ -26,12 +29,14 @@ namespace WindowsDev.ViewModels
             NavigationStore navigationStore,
             DialogShowingService projectDialogCreator,
             INavigationService navigationService,
-            SharedDataService sharedDataService)
+            SharedDataService sharedDataService,
+            ITaskLoader taskLoader)
         {
             _navigationStore = navigationStore;
             _creator = projectDialogCreator;
             _navigationService = navigationService;
             _sharedDataService = sharedDataService;
+            _taskLoader = taskLoader;
 
             _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
 
@@ -40,17 +45,17 @@ namespace WindowsDev.ViewModels
                 nameof(ProjectList));
 
             OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialog);
-
-            OpenProjectCommand = new RelayCommandWithParam<Project>(OpenProject, _ => true);
+            OpenProjectCommand = new RelayCommandWithParam<ProjectsInfo>(OpenProject, _ => true);
         }
-        public void OpenProject(Project project)
+        public async void OpenProject(ProjectsInfo project)
         {
+            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync();
             _navigationService.NavigateTo<ProjectViewModel>(project);
         }
 
         private async Task ShowCreateProjectDialog()
         {
-            await _creator.ShowCreateProjectDialogAsync<CreateProjectDialogView,
+            await _creator.ShowCreateDialogAsync<CreateProjectDialogView,
                 DialogsViewModel>(this);
         }
 

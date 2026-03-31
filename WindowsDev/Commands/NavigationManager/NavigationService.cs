@@ -1,5 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using WindowsDev.Commands.NavigationManager.Interfaces;
+﻿using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
 

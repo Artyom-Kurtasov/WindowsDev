@@ -8,13 +8,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="control">
-    <UserControl.Resources>
-        <ControlTemplate x:Key="RoundedErrorTemplate">
-            <Border BorderBrush="Red" BorderThickness="2" CornerRadius="8">
-                <AdornedElementPlaceholder/>
-            </Border>
-        </ControlTemplate>
-    </UserControl.Resources>
 
     <Grid HorizontalAlignment="Stretch"
           Margin="{Binding FieldMargin, RelativeSource={RelativeSource AncestorType=UserControl}}">
@@ -30,8 +23,7 @@
                      TextWrapping="{Binding TextWrapping, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      VerticalScrollBarVisibility="{Binding ScrollBarVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      Height="{Binding FieldHeight, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                     Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                     Validation.ErrorTemplate="{StaticResource RoundedErrorTemplate}"
+                     Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                      mah:TextBoxHelper.UseFloatingWatermark="{Binding UseWatermark, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      mah:TextBoxHelper.Watermark="{Binding Watermark, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      mah:ControlsHelper.CornerRadius="{Binding CornerRadius, RelativeSource={RelativeSource AncestorType=UserControl}}"/>

@@ -1,5 +1,4 @@
 ﻿using MahApps.Metro.Controls;
-using WindowsDev.ViewModels;
 
 namespace WindowsDev
 {

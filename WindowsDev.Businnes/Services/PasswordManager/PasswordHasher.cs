@@ -1,5 +1,4 @@
-﻿using System.CodeDom;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace WindowsDev.Businnes.Services.PasswordManager

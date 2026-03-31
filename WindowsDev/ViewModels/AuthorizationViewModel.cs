@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
 using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.ProjectService;
+using WindowsDev.Businnes.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
 
@@ -10,7 +10,7 @@ namespace WindowsDev.ViewModels
     {
         private readonly Authorization _authorization;
         private readonly INavigationService _navigationService;
-        private readonly ProjectLoader _projectLoader;
+        private readonly IProjectLoader _projectLoader;
 
         private SharedDataService _sharedDataService;
 
@@ -38,7 +38,7 @@ namespace WindowsDev.ViewModels
         public ICommand AuthorizeCommand { get; }
         public ICommand SwitchToRegViewCommand { get; }
         public AuthorizationViewModel(INavigationService navigationService, Authorization authorization, SharedDataService sharedDataService,
-            ProjectLoader projectLoader)
+            IProjectLoader projectLoader)
         {
             _navigationService = navigationService;
             _authorization = authorization;
@@ -48,7 +48,7 @@ namespace WindowsDev.ViewModels
             SwitchToRegViewCommand = new RelayCommand(SwitchToRegView, CanSwitchToRegView);
             AuthorizeCommand = new AsyncRelayCommand(Authorize, CanAuthorize);
         }
-        
+
         private void SwitchToRegView() => _navigationService.NavigateTo<RegistrationViewModel>();
         private bool CanSwitchToRegView() => true;
         private async Task Authorize()

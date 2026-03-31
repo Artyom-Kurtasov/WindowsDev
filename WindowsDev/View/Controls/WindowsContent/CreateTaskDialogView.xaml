@@ -1,0 +1,87 @@
+﻿<UserControl x:Class="WindowsDev.View.Controls.WindowsContent.CreateTaskDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:UserCtrl="clr-namespace:WindowsDev.View.Controls"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d">
+
+    <Grid MaxWidth="400" Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Name -->
+        <UserCtrl:AdvancedTextBox Grid.Row="0"
+                                 Header="Name"
+                                 Margin="0,0,0,10"
+                                 CornerRadius="8"
+                                 Text="{Binding Name}"/>
+
+        <!-- Deadline -->
+        <DatePicker Grid.Row="1"
+                    Margin="0,0,0,10"
+                    Height="35"
+                    mah:ControlsHelper.CornerRadius="8"
+                    Text="{Binding DeadLine}"/>
+
+        <!-- Priority + Progress -->
+        <Grid Grid.Row="2" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Progress -->
+            <ComboBox Grid.Column="0" Text="{Binding Progress}">
+                <ComboBoxItem Content="0%"/>
+                <ComboBoxItem Content="10%"/>
+                <ComboBoxItem Content="20%"/>
+                <ComboBoxItem Content="30%"/>
+                <ComboBoxItem Content="40%"/>
+                <ComboBoxItem Content="50%"/>
+                <ComboBoxItem Content="60%"/>
+                <ComboBoxItem Content="70%"/>
+                <ComboBoxItem Content="80%"/>
+                <ComboBoxItem Content="90%"/>
+                <ComboBoxItem Content="100%"/>
+            </ComboBox>
+
+            <!-- Priority -->
+            <ComboBox Grid.Column="2" Text="{Binding Priority}">
+                <ComboBoxItem Content="Normal"/>
+                <ComboBoxItem Content="Critical"/>
+            </ComboBox>
+
+            <ComboBox Grid.Column="4" Text="{Binding Status}">
+                <ComboBoxItem Content="In progress"/>
+                <ComboBoxItem Content="Done"/>
+                <ComboBoxItem Content="Closed"/>
+            </ComboBox>
+        </Grid>
+
+        <!-- Description -->
+        <UserCtrl:AdvancedTextBox Grid.Row="3"
+                                 Header="Description"
+                                 CornerRadius="8"
+                                 FieldHeight="100"
+                                 ScrollBarVisibility="Auto"
+                                 Text="{Binding Description}"/>
+        
+        <StackPanel Grid.Row="4" Orientation="Horizontal">
+            <Button Content="Create"
+                    Command="{Binding CreateTaskCommand}"
+                    mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6"/>
+            <Button Content="Cancle"
+                    mah:ControlsHelper.CornerRadius="8" Padding="10,6,5,6"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

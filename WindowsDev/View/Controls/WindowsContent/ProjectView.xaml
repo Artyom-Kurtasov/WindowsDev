@@ -5,69 +5,108 @@
              xmlns:UserCtrl="clr-namespace:WindowsDev.View.Controls"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:local="clr-namespace:WindowsDev.View.Controls.WindowsContent"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
-    <Grid>
+             mc:Ignorable="d">
+
+    <Grid Margin="15">
         <TabControl>
+
+            <!-- PROJECT -->
             <TabItem Header="Project">
-                <Grid>
+                <Grid Margin="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid Grid.Column="0">
+                    <!-- LEFT -->
+                    <Grid Grid.Column="0" Margin="0,0,10,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        
-                        <Button mah:ControlsHelper.CornerRadius="8" Grid.Row="0"
+
+                        <Button Grid.Row="0"
                                 Content="Back"
+                                Width="100"
+                                Margin="0,0,0,15"
+                                HorizontalAlignment="Left"
+                                mah:ControlsHelper.CornerRadius="8"
                                 Command="{Binding SwitchToMainViewCommand}"/>
-                        
-                        <UserCtrl:TextBlock BorderBrush="Aqua" BorderThickness="1" CornerRadius="8" Grid.Row="1"
-                                            Header="Project's Name"
+
+                        <UserCtrl:TextBlock Grid.Row="1"
+                                            Margin="0,0,0,10"
+                                            CornerRadius="8"
+                                            Header="Project Name"
                                             Text="{Binding Name}"/>
-                        <UserCtrl:TextBlock BorderBrush="Aqua" BorderThickness="1" CornerRadius="8" Grid.Row="2"
-                                            Header="Project's Description"
+
+                        <UserCtrl:TextBlock Grid.Row="2"
+                                            CornerRadius="8"
+                                            Header="Description"
                                             Text="{Binding Description}"/>
                     </Grid>
 
-                    <DataGrid Grid.Column="1" Margin="5,0,0,0" >
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Id"/>
-                            <DataGridTemplateColumn Header="Name">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                            <Hyperlink>
-                                                <Run Text="{Binding Name}" Foreground="White"/>
+                    <!-- RIGHT -->
+                    <StackPanel Grid.Column="1">
+                        <Button Content="Add"
+                                mah:ControlsHelper.CornerRadius="8"
+                                Command="{Binding OpenDialogCommand}"/>
+                        <DataGrid AutoGenerateColumns="False"
+                                  CanUserAddRows="False"
+                                  ItemsSource="{Binding TaskItem}">
+
+                            <DataGrid.Columns>
+
+                                <DataGridTextColumn Header="Id"
+                                                Binding="{Binding Id}"
+                                                Width="Auto"/>
+
+                                <DataGridTemplateColumn Header="Name" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock TextTrimming="CharacterEllipsis">
+                                            <Hyperlink Command="{Binding DataContext.OpenTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
+                                                       CommandParameter="{Binding}">
+                                                <Run Text="{Binding Name}"/>
                                             </Hyperlink>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            
-                            <DataGridTemplateColumn Width="3*" Header="Description" >
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Description}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
-                            
-                                <DataGridTextColumn Header="Deadline"/>
-                            <DataGridTextColumn Header="Created"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+
+                                <DataGridTemplateColumn Header="Description" Width="2*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Description}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="NoWrap"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="Deadline"
+                                                Binding="{Binding DeadLine, StringFormat=d}"
+                                                Width="*"/>
+
+                                <DataGridTextColumn Header="Created"
+                                                Binding="{Binding CreatedAt, StringFormat=d}"
+                                                Width="*"/>
+
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
                 </Grid>
             </TabItem>
-            <TabItem Header="Project's settings"/>
+
+            <!-- SETTINGS -->
+            <TabItem Header="Project Settings">
+                <Grid Margin="15">
+                    <TextBlock Text="Settings will be here"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                </Grid>
+            </TabItem>
+
         </TabControl>
-        
-        
     </Grid>
 </UserControl>

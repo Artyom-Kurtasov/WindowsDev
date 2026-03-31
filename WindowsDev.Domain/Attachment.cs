@@ -9,6 +9,6 @@ namespace WindowsDev.Domain
         public required string Path { get; set; }
         public required string FileName { get; set; }
         public required int TaskId { get; set; }
-        public required TaskItem Task { get; set; }
+        public required TasksInfo Task { get; set; }
     }
 }

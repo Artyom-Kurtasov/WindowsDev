@@ -13,7 +13,7 @@ namespace WindowsDev.Businnes.Services.ProjectService
             _appDbContext = appDbContext;
         }
 
-        public async Task AddAsync(Project project)
+        public async Task AddAsync(ProjectsInfo project)
         {
             await _appDbContext.AddAsync(project);
             await _appDbContext.SaveChangesAsync();
@@ -21,18 +21,18 @@ namespace WindowsDev.Businnes.Services.ProjectService
 
         public async Task DeleteAsync(int id)
         {
-            var project = await _appDbContext.Project.FindAsync(id);
+            var project = await _appDbContext.ProjectsInfo.FindAsync(id);
 
             if (project != null)
             {
-                _appDbContext.Project.Remove(project);
+                _appDbContext.ProjectsInfo.Remove(project);
                 await _appDbContext.SaveChangesAsync();
             }
         }
 
-        public async Task UpdateAsync(Project project)
+        public async Task UpdateAsync(ProjectsInfo project)
         {
-            _appDbContext.Project.Update(project);
+            _appDbContext.ProjectsInfo.Update(project);
             await _appDbContext.SaveChangesAsync();
         }
     }

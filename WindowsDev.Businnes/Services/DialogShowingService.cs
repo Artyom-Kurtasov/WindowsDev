@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
 using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services
 {
@@ -18,12 +19,14 @@ namespace WindowsDev.Businnes.Services
             _dialogCoordinator = dialogCoordinator;
         }
 
-        public async Task ShowCreateProjectDialogAsync<TView, TViewModel>(object Context)
+        public async Task ShowCreateDialogAsync<TView, TViewModel>(object Context)
             where TView : UserControl, new()
             where TViewModel : class, IProjectDialogCreator
         {
             var view = new TView();
-            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>(); 
+
             view.DataContext = viewModel;
 
             _dialog = new CustomDialog
@@ -33,7 +36,7 @@ namespace WindowsDev.Businnes.Services
 
             Func<Task>? handler = null;
             handler = async () =>
-            {   
+            {
                 await _dialogCoordinator.HideMetroDialogAsync(Context, _dialog);
 
                 viewModel.Close -= handler;

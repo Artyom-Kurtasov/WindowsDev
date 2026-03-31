@@ -28,7 +28,8 @@
                    Padding="16,8" 
                    Margin="0,0,8,0"
                    FontWeight="SemiBold"
-                   ToolTip="Update task details"/>
+                   ToolTip="Update task details"
+                    Command="{Binding EditTaskCommand}"/>
 
             <Button Content="Delete task" 
                    mah:ControlsHelper.CornerRadius="6"
@@ -89,7 +90,7 @@
             Grid.Row="3" 
             mah:ControlsHelper.CornerRadius="8"
             Margin="0,0,0,20" 
-            BorderBrush="Gray" BorderThickness="1" CornerRadius="8" 
+            CornerRadius="8" 
             Wrapping="Wrap"
             Text="{Binding Description}"/>
 
@@ -195,7 +196,7 @@
                                               Margin="0,0,8,4"/>
 
                                     <TextBlock Grid.Row="0" Grid.Column="1"
-                                              Text="{Binding Date}" 
+                                              Text="{Binding CreatedAt}" 
                                               FontSize="11"
                                               Foreground="#757575"
                                               HorizontalAlignment="Right"/>
@@ -222,13 +223,13 @@
                         mah:TextBoxHelper.Watermark="Add a comment..."
                         Margin="0,0,8,0"
                         Padding="8"
-                        Text="{Binding NewComment}"/>
+                        Text="{Binding NewComment, Mode=TwoWay}"/>
 
                 <Button Grid.Column="1" 
                        Content="Post"
                        mah:ControlsHelper.CornerRadius="6"
                        Padding="16,8"
-                       Command="{Binding PostCommentCommand}"/>
+                       Command="{Binding AddCommentCommand}"/>
             </Grid>
         </Grid>
     </Grid>

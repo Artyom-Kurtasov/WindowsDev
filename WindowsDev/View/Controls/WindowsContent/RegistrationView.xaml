@@ -5,66 +5,88 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:WindowsDev.Businnes.Services.Registration.Validation;assembly=WindowsDev.Businnes"
              xmlns:local="clr-namespace:WindowsDev.View.Controls.WindowsContent"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid MaxWidth="400">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <UserControl.Resources>
+        <converters:PasswordColorValidationConvert x:Key="PasswordColorValidationConvert"/>
+        <converters:LoginColorValidationConverter x:Key="LoginColorValidationConverter"/>
+        <converters:UsernameColorValidationConverter x:Key="UsernameColorValidationConverter"/>
+    </UserControl.Resources>
 
-        <StackPanel Grid.Row="1" Margin="10,0,10,0">
-            <UserCtrl:Logo Kind="TaskRound"
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid MaxWidth="400">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="1" Margin="10,0,10,0">
+                <UserCtrl:Logo Kind="TaskRound"
                            ViewBoxHeight="70" ViewBoxWidth="70"
                            Text="Sign up to TaskManager"
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch"/>
 
-            <UserCtrl:AdvancedTextBox CornerRadius="8" Margin="0,20,0,0"
-                                        Header="Username"
-                                        Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                        IsValidationEnabled="True"/>
+                <UserCtrl:AdvancedTextBox CornerRadius="8" Margin="0,20,0,0"
+                                        Header="Login"
+                                        Text="{Binding Login, Mode=TwoWay}"/>
 
-            <StackPanel HorizontalAlignment="Stretch">
+                <TextBlock mah:VisibilityHelper.IsCollapsed="False"
+                       Text="{Binding LoginValidationMessage}"
+                       Foreground="{Binding LoginValidationMessage, Converter={StaticResource LoginColorValidationConverter}}" Margin="5,5,0,0"/>
 
-                <UserCtrl:PasswordBox
+                <UserCtrl:AdvancedTextBox CornerRadius="8"
+                                      Header="Username" Margin="0,20,0,0"
+                                      Text="{Binding Username, Mode=TwoWay}"/>
+
+                <TextBlock mah:VisibilityHelper.IsCollapsed="False"
+                           Text="{Binding UsernameValidationMessage}"
+                           Foreground="{Binding UsernameValidationMessage, Converter={StaticResource UsernameColorValidationConverter}}" 
+                           Margin="5,5,0,0"/>
+
+                <StackPanel HorizontalAlignment="Stretch">
+
+                    <UserCtrl:PasswordBox
                     Header="Password"
                     HeaderFontSize="14"
                     Margin="0,20,0,0"
                     CornerRadius="8"
                     Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                <TextBlock FontSize="10" Margin="0,5,0,0">
-                    <Run Text="At least 12 characters" Foreground="Gray"/>
+                    <TextBlock FontSize="10" Margin="0,5,0,0">
+                    <Run Text="At least 12 characters" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Length'}"/>
                     <LineBreak/>
-                    <Run Text="Use a numbers" Foreground="Gray"/>
+                    <Run Text="Use a numbers" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Number'}"/>
                     <LineBreak/>
-                    <Run Text="Use a lowercase letters" Foreground="Gray"/>
+                    <Run Text="Use a uppercase letters" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Uppercase'}"/>
                     <LineBreak/>
-                    <Run Text="Use a symbols" Foreground="Gray"/>
-                </TextBlock>
-            </StackPanel>
+                    <Run Text="Use a symbols" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Symbol'}"/>
+                    </TextBlock>
+                </StackPanel>
 
-            <UserCtrl:PasswordBox CornerRadius="8" Margin="0,20,0,0"
-                                  Header="Confirm Password"/>
+                <UserCtrl:PasswordBox CornerRadius="8" Margin="0,20,0,0"
+                                  Header="Confirm Password"
+                                  Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-            <Button Margin="0,20,0,0"
+                <Button Margin="0,20,0,0"
                     mah:ControlsHelper.CornerRadius="8"
                     Command="{Binding SignUpCommand}">
-                Sign up
-            </Button>
+                    Sign up
+                </Button>
 
-            <TextBlock HorizontalAlignment="Center"
+                <TextBlock HorizontalAlignment="Center"
                        MaxWidth="400">
                 
                 <Run Text="Already have an account? "/>
                 <Hyperlink Command="{Binding SwitchToAuthViewCommand}">
                     Sign in
                 </Hyperlink>
-            </TextBlock>
+                </TextBlock>
 
-        </StackPanel>
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </ScrollViewer>
 </UserControl>

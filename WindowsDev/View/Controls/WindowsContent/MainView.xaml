@@ -28,7 +28,7 @@
                                     <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
                                                             EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"/>
                                     
-                                    <DataGridTextColumn Header="ID" Binding="{Binding ID}"/>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
                                     
                                     <DataGridTemplateColumn Header="Name" Width="1*">
                                         <DataGridTemplateColumn.CellTemplate>
@@ -51,7 +51,7 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
                                                         
-                                    <DataGridTextColumn Header="Created" Binding="{Binding Created}"/>
+                                    <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>

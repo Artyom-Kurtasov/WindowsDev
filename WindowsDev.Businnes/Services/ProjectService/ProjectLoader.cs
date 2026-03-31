@@ -4,7 +4,7 @@ using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services.ProjectService
 {
-    public class ProjectLoader
+    public class ProjectLoader : IProjectLoader
     {
         private readonly IProjectReader _projectReader;
 
@@ -12,10 +12,10 @@ namespace WindowsDev.Businnes.Services.ProjectService
         {
             _projectReader = projectReader;
         }
-        public async Task<ObservableCollection<Project>> LoadProjectAsync()
+        public async Task<ObservableCollection<ProjectsInfo>> LoadProjectAsync()
         {
             var projectsList = await _projectReader.GetProjectsAsync();
-            return new ObservableCollection<Project>(projectsList);
+            return new ObservableCollection<ProjectsInfo>(projectsList);
         }
     }
 }

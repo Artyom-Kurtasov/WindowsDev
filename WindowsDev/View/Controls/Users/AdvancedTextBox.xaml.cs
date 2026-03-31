@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 
 namespace WindowsDev.View.Controls
 {
@@ -14,7 +13,7 @@ namespace WindowsDev.View.Controls
             InitializeComponent();
         }
 
-        public static readonly DependencyProperty HeaderProperty = 
+        public static readonly DependencyProperty HeaderProperty =
             DependencyProperty.Register(nameof(Header), typeof(string), typeof(AdvancedTextBox));
 
         public string Header
@@ -23,7 +22,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(HeaderProperty, value);
         }
 
-        public static readonly DependencyProperty FieldMarginProperty = 
+        public static readonly DependencyProperty FieldMarginProperty =
             DependencyProperty.Register(nameof(FieldMargin), typeof(double), typeof(AdvancedTextBox));
 
         public Thickness FieldMargin
@@ -32,7 +31,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(FieldMarginProperty, value);
         }
 
-        public static readonly DependencyProperty CornerRadiusProperty = 
+        public static readonly DependencyProperty CornerRadiusProperty =
             DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(AdvancedTextBox));
 
         public CornerRadius CornerRadius
@@ -41,7 +40,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(CornerRadiusProperty, value);
         }
 
-        public static readonly DependencyProperty TextWrappingProperty = 
+        public static readonly DependencyProperty TextWrappingProperty =
             DependencyProperty.Register(nameof(TextWrapping), typeof(TextWrapping), typeof(AdvancedTextBox), new PropertyMetadata(TextWrapping.NoWrap));
 
         public TextWrapping TextWrapping
@@ -50,8 +49,8 @@ namespace WindowsDev.View.Controls
             set => SetValue(TextWrappingProperty, value);
         }
 
-        public static readonly DependencyProperty ScrollBarVisibilityProperty = 
-            DependencyProperty.Register(nameof(ScrollBarVisibility),typeof(ScrollBarVisibility), typeof(AdvancedTextBox));
+        public static readonly DependencyProperty ScrollBarVisibilityProperty =
+            DependencyProperty.Register(nameof(ScrollBarVisibility), typeof(ScrollBarVisibility), typeof(AdvancedTextBox));
 
         public ScrollBarVisibility ScrollBarVisibility
         {
@@ -59,13 +58,13 @@ namespace WindowsDev.View.Controls
             set => SetValue(ScrollBarVisibilityProperty, value);
         }
 
-        public static readonly DependencyProperty FieldHeightProperty = 
+        public static readonly DependencyProperty FieldHeightProperty =
             DependencyProperty.Register(nameof(FieldHeight), typeof(double), typeof(AdvancedTextBox));
 
         public double FieldHeight
         {
             get => (double)GetValue(FieldHeightProperty);
-            set => SetValue(FieldHeightProperty, value); 
+            set => SetValue(FieldHeightProperty, value);
         }
 
         public static readonly DependencyProperty UseWatermarkProperty =
@@ -77,7 +76,7 @@ namespace WindowsDev.View.Controls
             set => SetValue(UseWatermarkProperty, value);
         }
 
-        public static readonly DependencyProperty WatermarkProperty = 
+        public static readonly DependencyProperty WatermarkProperty =
             DependencyProperty.Register(nameof(Watermark), typeof(string), typeof(AdvancedTextBox));
 
         public string Watermark
@@ -88,51 +87,11 @@ namespace WindowsDev.View.Controls
 
         public static readonly DependencyProperty TextProperty =
                 DependencyProperty.Register(nameof(Text), typeof(string), typeof(AdvancedTextBox),
-                    new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnTextChanged));
+                    new FrameworkPropertyMetadata(string.Empty, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
         public string Text
         {
-            get => (string)GetValue(TextProperty); 
-            set => SetValue(TextProperty, value); 
-        }
-
-        public static readonly DependencyProperty IsValidationEnabledProperty =
-            DependencyProperty.Register(nameof(IsValidationEnabled), typeof(bool), typeof(AdvancedTextBox));
-
-        public bool IsValidationEnabled
-        {
-            get => (bool)GetValue(IsValidationEnabledProperty);
-            set => SetValue(IsValidationEnabledProperty, value);
-        }
-
-        private static void OnTextChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = (AdvancedTextBox)d;
-
-            if (!control.IsLoaded) return;
-             
-            if (control.IsValidationEnabled)
-            {
-                control.Validate();
-            }
-        }
-
-        private void Validate()
-        {
-            if (PART_TextBox ==  null) return;
-
-            var binding = BindingOperations.GetBindingExpression(PART_TextBox, TextBox.TextProperty);
-            if (binding == null) return;
-
-            if (!Text.Any(char.IsDigit))
-            {
-                Validation.MarkInvalid(
-                    binding,
-                    new ValidationError(new ExceptionValidationRule(), binding, "Any numbers!", null));
-            }
-            else
-            {
-                Validation.ClearInvalid(binding);
-            }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
     }
 }

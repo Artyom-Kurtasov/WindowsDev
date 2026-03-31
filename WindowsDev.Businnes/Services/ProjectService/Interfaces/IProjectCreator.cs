@@ -2,6 +2,6 @@
 {
     public interface IProjectCreator
     {
-        Task CreateProject(string name, string description);
+        Task CreateProject(string name, string description, int userId);
     }
 }

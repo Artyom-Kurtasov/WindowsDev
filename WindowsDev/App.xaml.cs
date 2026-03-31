@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using WindowsDev.Businnes.DataBase;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Settings;
@@ -22,6 +23,8 @@ namespace WindowsDev
             configure.ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
+            WarmUpTables();
+
             var navigationStore = ServiceProvider.GetRequiredService<NavigationStore>();
             var navigationService = ServiceProvider.GetRequiredService<INavigationService>();
 
@@ -34,7 +37,17 @@ namespace WindowsDev
             main.Show();
         }
 
+        private void WarmUpTables()
+        {
+            using (var scope = App.ServiceProvider.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
+                dbContext.UsersInfo.Any();
+                dbContext.ProjectsInfo.Any();
+                dbContext.TasksInfo.Any();
+            }
+        }
     }
 
 }

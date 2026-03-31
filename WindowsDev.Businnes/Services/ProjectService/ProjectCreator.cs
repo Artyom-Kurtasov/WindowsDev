@@ -11,13 +11,14 @@ namespace WindowsDev.Businnes.Services.ProjectService
         {
             _projectWriter = projectWriter;
         }
-        public async Task CreateProject(string name, string description)
+        public async Task CreateProject(string name, string description, int userId)
         {
-            Project project = new Project
+            ProjectsInfo project = new ProjectsInfo
             {
                 Name = name,
                 Description = description,
-                Created = DateTime.Now.ToString("dd.MM.yyyy"),
+                CreatedAt = DateTime.Now.ToUniversalTime(),
+                UserId = userId
             };
             await _projectWriter.AddAsync(project);
         }

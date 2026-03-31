@@ -14,7 +14,7 @@ namespace WindowsDev.Infrastructure
             _canExecute = canExecute;
         }
 
-        public bool CanExecute(object? parameter) => 
+        public bool CanExecute(object? parameter) =>
             !_isExecuting && (_canExecute?.Invoke() ?? true);
 
         public async void Execute(object? parameter)

@@ -1,5 +1,6 @@
 ﻿using WindowsDev.Businnes.DataBase;
 using WindowsDev.Businnes.Services.PasswordManager;
+using WindowsDev.Businnes.Services.UserManager;
 using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services
@@ -9,54 +10,42 @@ namespace WindowsDev.Businnes.Services
         private readonly PasswordHasher _passwordHasher;
         private readonly AppDbContext _appDbContext;
 
+        private CurrentUserService _currentUserService;
+        private UsersInfo? _user;
+
         private byte[] _salt;
         private ulong _passwordHash;
         private string _passwordHashHex;
-        private UserAuthInfo? _user;
 
-        public Authorization(PasswordHasher passwordHasher, AppDbContext appDbContext)
+        public Authorization(PasswordHasher passwordHasher, AppDbContext appDbContext, CurrentUserService currentUserService)
         {
             _passwordHasher = passwordHasher;
             _appDbContext = appDbContext;
+            _currentUserService = currentUserService;
         }
 
-        public bool Authorize(string username, string password)
+        public bool Authorize(string login, string password)
         {
-            if (SearchUserInDatabase(username))
-            {
-                ConvertPasswordToHash(username, password);
+            _user = _appDbContext.UsersInfo.FirstOrDefault(x => x.Login == login);
 
-                if (CheckPasswordHash())
+            if (_user != null)
+            {
+                if (CheckPasswordHash(password))
                 {
+                    _currentUserService.setUser(_user.Id, _user.Login, _user.Username);
                     return true;
                 }
             }
             return false;
         }
-        private void ConvertPasswordToHash(string username, string password)
-        {
-                _user = _appDbContext.UserAuthInfo.FirstOrDefault(x => x.Login == username);
 
-                _salt = _user.Salt;
+        private bool CheckPasswordHash(string password)
+        {
+            _salt = _user.Salt;
+            _passwordHash = _passwordHasher.HashPassword(password, _salt);
+            _passwordHashHex = _passwordHash.ToString("x16");
 
-                _passwordHash = _passwordHasher.HashPassword(password, _salt);
-                _passwordHashHex = _passwordHash.ToString("x16");
-        }
-        private bool CheckPasswordHash()
-        {
-            if (_passwordHashHex == _user.PasswordHash)
-            {
-                return true;
-            }
-            return false;
-        }
-        private bool SearchUserInDatabase(string username)
-        {
-            if (_appDbContext.UserAuthInfo.Any(x => x.Login == username))
-            {
-                return true;
-            }
-            return false;
+            return _passwordHashHex == _user.PasswordHash;
         }
     }
 }
