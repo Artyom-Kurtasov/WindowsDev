@@ -29,8 +29,18 @@ namespace WindowsDev.Businnes.Services
             }
         }
 
+        private TasksInfo _currentTask;
+        public TasksInfo CurrentTask
+        {
+            get => _currentTask;
+            set
+            {
+                _currentTask = value;
+                OnPropertyChanged();
+            }
+        }
         public event PropertyChangedEventHandler? PropertyChanged;
-        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        public void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

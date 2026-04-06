@@ -30,14 +30,14 @@
 
             <!--Username-->
             <UserCtrl:AdvancedTextBox
-                Header="Username"
+                Header="{DynamicResource UsernameLabel}"
                 CornerRadius="8"
                 Margin="20,20,20,0"
                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <!--Password-->
             <UserCtrl:PasswordBox
-                Header="Password"
+                Header="{DynamicResource PasswordLabel}"
                 HeaderFontSize="14"
                 Margin="20,20,20,0"
                 CornerRadius="8"
@@ -46,14 +46,14 @@
                 <!--SIGN IN BUTTON-->
             <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0"
                     Command="{Binding AuthorizeCommand}">
-                <TextBlock Text="Sign in" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{DynamicResource SignInButton}" FontSize="12" FontWeight="Bold"/>
             </Button>
 
             <!--LINK TO REGISTRATION-->
             <TextBlock HorizontalAlignment="Center">
-                    <Run Text="New to TaskManager? "/>
+                    <Run Text="{DynamicResource NewToTaskManager}"/>
                     <Hyperlink Command="{Binding SwitchToRegViewCommand}">
-                            Sign up
+                            <TextBlock Text="{DynamicResource SignUpButton}"/>
                     </Hyperlink>
             </TextBlock>
         </StackPanel>

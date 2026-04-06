@@ -11,5 +11,6 @@ namespace WindowsDev.Businnes.DataBase
         public DbSet<ProjectsInfo> ProjectsInfo { get; set; }
         public DbSet<TasksInfo> TasksInfo { get; set; }
         public DbSet<Comments> Comments { get; set; }
+        public DbSet<TaskAttachment> Attachments { get; set; }
     }
 }

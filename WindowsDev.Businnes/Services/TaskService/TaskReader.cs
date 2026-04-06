@@ -5,6 +5,9 @@ using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services.TaskService
 {
+    /// <summary>
+    /// Reads tasks from the database.
+    /// </summary>
     public class TaskReader : ITaskReader
     {
         private readonly AppDbContext _appDbContext;
@@ -14,6 +17,9 @@ namespace WindowsDev.Businnes.Services.TaskService
             _appDbContext = appDbContext;
         }
 
+        /// <summary>
+        /// Returns all tasks from the database asynchronously.
+        /// </summary>
         public async Task<List<TasksInfo>> GetTasksAsync()
         {
             return await _appDbContext.TasksInfo.ToListAsync();

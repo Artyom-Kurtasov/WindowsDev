@@ -36,12 +36,17 @@
                    Padding="16,8"
                    FontWeight="SemiBold"
                    ToolTip="Delete current task"/>
+
+            <Button Content="Back"
+                    mah:ControlsHelper.CornerRadius="8"
+                    Padding="16, 8"
+                    Command="{Binding SwitchToProjectCommand}"/>
         </StackPanel>
 
         <Border Grid.Row="1" 
                 Padding="16" 
                 Margin="0,0,0,20">
-            <TextBlock Text="{Binding Name}" 
+            <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                       FontSize="24" 
                       FontWeight="Bold" 
                       TextWrapping="Wrap"/>
@@ -62,25 +67,25 @@
 
             <UserCtrl:TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
                                    Header="Status"
-                                   Text="{Binding Status}" 
+                                   Text="{Binding Status, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                    FontSize="16" 
                                    FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
                                 Header="Priority"   
-                                Text="{Binding Priority}" 
+                                Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
                                 Header="Progress"
-                                Text="{Binding Progress}" 
+                                Text="{Binding Progress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
                                 Header="Created"
-                                Text="{Binding Created}" 
+                                Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
         </Grid>
@@ -92,7 +97,7 @@
             Margin="0,0,0,20" 
             CornerRadius="8" 
             Wrapping="Wrap"
-            Text="{Binding Description}"/>
+            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
         <StackPanel Grid.Row="4" 
                    mah:ControlsHelper.CornerRadius="8"
@@ -130,7 +135,7 @@
                                     <TextBlock Text="{Binding FileName}" 
                                               FontWeight="Medium"
                                               Margin="0,0,8,0"/>
-                                    <TextBlock Text="{Binding Size}" 
+                                    <TextBlock Text="{Binding FileSize}" 
                                               FontSize="11"
                                               Foreground="#757575"/>
                                 </StackPanel>
@@ -141,7 +146,8 @@
                                        Padding="8,4"
                                        FontSize="14"
                                        ToolTip="Download"
-                                       Command="{Binding DownloadCommand}"/>
+                                       Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                       CommandParameter="{Binding}"/>
                             </Grid>
                         </Border>
                     </DataTemplate>

@@ -3,6 +3,9 @@ using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services.TaskService
 {
+    /// <summary>
+    /// Handles task creation and storing it via TaskWriter.
+    /// </summary>
     public class TaskCreator : ITaskCreator
     {
         private readonly ITaskWriter _taskWriter;
@@ -12,21 +15,25 @@ namespace WindowsDev.Businnes.Services.TaskService
             _taskWriter = taskWriter;
         }
 
-        public async Task CreateTask(TaskDTO taskDTO)
+        /// <summary>
+        /// Creates a new task from the provided TaskDTO.
+        /// </summary>
+        public async Task CreateTask(TaskDTO taskDto)
         {
-            TasksInfo task = new TasksInfo
+            var task = new TasksInfo
             {
-                Id = taskDTO.Id,
-                Name = taskDTO.Name,
-                Description = taskDTO.Description,
-                Priority = taskDTO.Priority,
-                Progress = taskDTO.Progress,
-                Status = taskDTO.Status,
-                CreatedAt = DateTime.Now.ToUniversalTime(),
-                DeadLine = taskDTO.DeadLine,
-                Comments = taskDTO.Comments,
-                Attachments = taskDTO.Attachments
+                Id = taskDto.Id,
+                Name = taskDto.Name,
+                Description = taskDto.Description,
+                Priority = taskDto.Priority,
+                Progress = taskDto.Progress,
+                Status = taskDto.Status,
+                CreatedAt = DateTime.UtcNow,
+                DeadLine = taskDto.DeadLine,
+                Comments = taskDto.Comments,
+                Attachments = taskDto.Attachments
             };
+
             await _taskWriter.AddAsync(task);
         }
     }

@@ -17,8 +17,9 @@ namespace WindowsDev.Commands.NavigationManager
 
         public void NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
         {
-            var vm = _viewModelFactory.Create<TViewModel>(args);
-            _navigationStore.CurrentViewModel = vm;
+            TViewModel viewModel = _viewModelFactory.Create<TViewModel>(args);
+
+            _navigationStore.CurrentViewModel = viewModel;
         }
     }
 }

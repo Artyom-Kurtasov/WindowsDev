@@ -6,11 +6,13 @@ using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services
 {
+    /// <summary>
+    /// Service responsible for showing custom dialogs using MahApps.Metro.
+    /// </summary>
     public class DialogShowingService
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IDialogCoordinator _dialogCoordinator;
-
         private CustomDialog? _dialog;
 
         public DialogShowingService(IServiceProvider serviceProvider, IDialogCoordinator dialogCoordinator)
@@ -19,13 +21,22 @@ namespace WindowsDev.Businnes.Services
             _dialogCoordinator = dialogCoordinator;
         }
 
-        public async Task ShowCreateDialogAsync<TView, TViewModel>(object Context)
+        /// <summary>
+        /// Shows a dialog with a specified view and ViewModel.
+        /// Supports optional data editing if the ViewModel implements IProjectDialogCreator.
+        /// </summary>
+        public async Task ShowCreateDialogAsync<TView, TViewModel>(object context, object? data)
             where TView : UserControl, new()
             where TViewModel : class, IProjectDialogCreator
         {
             var view = new TView();
 
-            var viewModel = _serviceProvider.GetRequiredService<TViewModel>(); 
+            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
+            if (data is TasksInfo task)
+            {
+                viewModel.Edit(task);
+            }
 
             view.DataContext = viewModel;
 
@@ -34,17 +45,16 @@ namespace WindowsDev.Businnes.Services
                 Content = view
             };
 
-            Func<Task>? handler = null;
-            handler = async () =>
+            Func<Task>? closeHandler = null;
+            closeHandler = async () =>
             {
-                await _dialogCoordinator.HideMetroDialogAsync(Context, _dialog);
-
-                viewModel.Close -= handler;
+                await _dialogCoordinator.HideMetroDialogAsync(context, _dialog);
+                viewModel.Close -= closeHandler;
             };
 
-            viewModel.Close += handler;
+            viewModel.Close += closeHandler;
 
-            await _dialogCoordinator.ShowMetroDialogAsync(Context, _dialog);
+            await _dialogCoordinator.ShowMetroDialogAsync(context, _dialog);
         }
     }
 }

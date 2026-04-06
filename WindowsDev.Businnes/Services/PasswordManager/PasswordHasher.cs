@@ -3,26 +3,33 @@ using System.Text;
 
 namespace WindowsDev.Businnes.Services.PasswordManager
 {
+    /// <summary>
+    /// Provides methods for hashing passwords and generating salts.
+    /// </summary>
     public class PasswordHasher
     {
-        private const ulong _mixingConstant = 1415926535;
-        private const ulong _hashSeed = 2687232455;
+        private const ulong HASH_SEED = 2687232455;
+        private const ulong MIXING_CONSTANT = 1415926535;
 
+        /// <summary>
+        /// Hashes a password with the given salt using a custom iterative algorithm.
+        /// </summary>
         public ulong HashPassword(string password, byte[] salt)
         {
-            ulong hash = _hashSeed;
-            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
-            byte[] data = new byte[passwordBytes.Length + salt.Length];
+            ulong hash = HASH_SEED;
 
-            Buffer.BlockCopy(passwordBytes, 0, data, 0, passwordBytes.Length);
-            Buffer.BlockCopy(salt, 0, data, passwordBytes.Length, salt.Length);
+            byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+            byte[] combinedData = new byte[passwordBytes.Length + salt.Length];
+
+            Buffer.BlockCopy(passwordBytes, 0, combinedData, 0, passwordBytes.Length);
+            Buffer.BlockCopy(salt, 0, combinedData, passwordBytes.Length, salt.Length);
 
             for (int i = 0; i < 10000; i++)
             {
-                foreach (byte b in data)
+                foreach (byte b in combinedData)
                 {
                     hash ^= b;
-                    hash *= _mixingConstant;
+                    hash *= MIXING_CONSTANT;
                     hash = (hash << 13) | (hash >> 51);
                 }
             }
@@ -30,16 +37,18 @@ namespace WindowsDev.Businnes.Services.PasswordManager
             return hash;
         }
 
+        /// <summary>
+        /// Generates a cryptographically secure 16-byte salt.
+        /// </summary>
+        /// <returns>Random salt as byte array.</returns>
         public byte[] GenerateSalt()
         {
-            byte[] salt = new byte[16];
+            byte[] _salt = new byte[16];
 
-            using (var random = RandomNumberGenerator.Create())
-            {
-                random.GetBytes(salt);
-            }
+            using var _random = RandomNumberGenerator.Create();
+            _random.GetBytes(_salt);
 
-            return salt;
+            return _salt;
         }
     }
 }

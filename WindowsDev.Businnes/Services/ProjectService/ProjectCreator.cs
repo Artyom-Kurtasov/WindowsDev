@@ -3,6 +3,9 @@ using WindowsDev.Domain.UsersAuthInfo;
 
 namespace WindowsDev.Businnes.Services.ProjectService
 {
+    /// <summary>
+    /// Responsible for creating new projects and saving them via IProjectWriter.
+    /// </summary>
     public class ProjectCreator : IProjectCreator
     {
         private readonly IProjectWriter _projectWriter;
@@ -11,15 +14,20 @@ namespace WindowsDev.Businnes.Services.ProjectService
         {
             _projectWriter = projectWriter;
         }
+
+        /// <summary>
+        /// Creates a new project and saves it to the database.
+        /// </summary>
         public async Task CreateProject(string name, string description, int userId)
         {
-            ProjectsInfo project = new ProjectsInfo
+            var project = new ProjectsInfo
             {
                 Name = name,
                 Description = description,
-                CreatedAt = DateTime.Now.ToUniversalTime(),
+                CreatedAt = DateTime.UtcNow,
                 UserId = userId
             };
+
             await _projectWriter.AddAsync(project);
         }
     }

@@ -9,7 +9,7 @@
             _currentUserData = currentUserData;
         }
 
-        public void setUser(int id, string login, string username)
+        public void SetUser(int id, string login, string username)
         {
             _currentUserData.Login = login;
             _currentUserData.UserId = id;

@@ -9,6 +9,7 @@ using WindowsDev.Businnes.Services.ProjectService.Interfaces;
 using WindowsDev.Businnes.Services.Registration;
 using WindowsDev.Businnes.Services.Registration.Validation;
 using WindowsDev.Businnes.Services.TaskService;
+using WindowsDev.Businnes.Services.TaskService.Attachment;
 using WindowsDev.Businnes.Services.TaskService.Interfaces;
 using WindowsDev.Businnes.Services.UserManager;
 using WindowsDev.Commands.NavigationManager;
@@ -20,17 +21,27 @@ using WindowsDev.ViewModels;
 
 namespace WindowsDev.Settings
 {
+    /// <summary>
+    /// Configures application services and dependency injection.
+    /// </summary>
     public class Configure
     {
+        /// <summary>
+        /// Registers services and dependencies into the IServiceCollection.
+        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+            // Database connection string
             string connectionString =
                 "Host=localhost;Port=5432;Database=WindowsDev;Username=postgres;Password=q29384756";
 
+            // DbContext
             services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
 
+            // ===============================
             // Infrastructure
+            // ===============================
             services.AddSingleton<NavigationStore>();
             services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
 
@@ -40,7 +51,7 @@ namespace WindowsDev.Settings
             // Navigation
             services.AddSingleton<INavigationService, NavigationService>();
 
-            // Services
+            // Core Services
             services.AddSingleton<Registration>();
             services.AddTransient<PasswordHasher>();
             services.AddSingleton<DialogShowingService>();
@@ -52,6 +63,8 @@ namespace WindowsDev.Settings
             services.AddSingleton<UsernameColorValidationConverter>();
             services.AddSingleton<UserFieldValidator>();
             services.AddSingleton<CurrentUserService>();
+            services.AddSingleton<FileReader>();
+            services.AddSingleton<FileWriter>();
 
             // Project services
             services.AddTransient<IProjectReader, ProjectReader>();
@@ -74,13 +87,12 @@ namespace WindowsDev.Settings
             services.AddTransient<ProjectViewModel>();
             services.AddTransient<DialogsViewModel>();
             services.AddTransient<TaskDialogViewModel>();
-
             services.AddSingleton<MainWindowViewModel>();
 
             // Windows
             services.AddSingleton<MainWindow>();
 
-            //DTO
+            // DTOs
             services.AddTransient<TaskDTO>();
         }
     }

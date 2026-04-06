@@ -78,9 +78,19 @@
         
         <StackPanel Grid.Row="4" Orientation="Horizontal">
             <Button Content="Create"
-                    Command="{Binding CreateTaskCommand}"
-                    mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6"/>
-            <Button Content="Cancle"
+                    mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Command" Value="{Binding CreateTaskCommand}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsEditMode}" Value="True">
+                                <Setter Property="Command" Value="{Binding EditTaskCommand}"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Content="Cancle" Command="{Binding CancelCommand}"
                     mah:ControlsHelper.CornerRadius="8" Padding="10,6,5,6"/>
         </StackPanel>
     </Grid>

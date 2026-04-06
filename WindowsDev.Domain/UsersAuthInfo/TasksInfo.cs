@@ -15,6 +15,6 @@ namespace WindowsDev.Domain.UsersAuthInfo
         public required DateTime CreatedAt { get; set; }
         public required DateTime DeadLine { get; set; }
         public ObservableCollection<Comments>? Comments { get; set; }
-        public ObservableCollection<Attachment>? Attachments { get; set; }
+        public ObservableCollection<TaskAttachment>? Attachments { get; set; }
     }
 }
