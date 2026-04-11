@@ -9,10 +9,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel MaxWidth="400">
-        <UserCtrl:AdvancedTextBox Header="Name"
+        <UserCtrl:AdvancedTextBox Header="{DynamicResource NameLabel}"
                                   CornerRadius="8"
                                   Text="{Binding ProjectName, Mode=TwoWay}"/>
-        <UserCtrl:AdvancedTextBox Header="Description"
+        <UserCtrl:AdvancedTextBox Header="{DynamicResource DescriptionLabel}"
                                   CornerRadius="8"
                                   FieldHeight="100"
                                   ScrollBarVisibility="Auto"
@@ -25,11 +25,11 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0"
-                    Content="Create"
+                    Content="{DynamicResource CreateButton}"
                     mah:ControlsHelper.CornerRadius="8" Margin="0,0,10,0"
                     Command="{Binding CreateProject}"/>
             <Button Grid.Column="1"
-                    Content="Cancle"
+                    Content="{DynamicResource CancelButton}"
                     mah:ControlsHelper.CornerRadius="8" Margin="10,0,0,0"/>
         </Grid>
     </StackPanel>

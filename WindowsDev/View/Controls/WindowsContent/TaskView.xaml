@@ -8,8 +8,8 @@
              xmlns:local="clr-namespace:WindowsDev.View.Controls.WindowsContent"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="800">
-
-    <Grid>
+    <ScrollViewer>
+        <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -18,12 +18,11 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
         <StackPanel Grid.Row="0" 
                    Orientation="Horizontal" 
                    Margin="0,0,0,20">
 
-            <Button Content="Update task" 
+            <Button Content="{DynamicResource EditButton}" 
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8" 
                    Margin="0,0,8,0"
@@ -31,13 +30,13 @@
                    ToolTip="Update task details"
                     Command="{Binding EditTaskCommand}"/>
 
-            <Button Content="Delete task" 
+            <Button Content="{DynamicResource DeleteButton}" 
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8"
                    FontWeight="SemiBold"
                    ToolTip="Delete current task"/>
 
-            <Button Content="Back"
+            <Button Content="{DynamicResource BackButton}"
                     mah:ControlsHelper.CornerRadius="8"
                     Padding="16, 8"
                     Command="{Binding SwitchToProjectCommand}"/>
@@ -66,32 +65,32 @@
             </Grid.ColumnDefinitions>
 
             <UserCtrl:TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
-                                   Header="Status"
+                                   Header="{DynamicResource StatusLabel}"
                                    Text="{Binding Status, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                    FontSize="16" 
                                    FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
-                                Header="Priority"   
+                                Header="{DynamicResource PriorityLabel}"   
                                 Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
-                                Header="Progress"
+                                Header="{DynamicResource ProgressLabel}"
                                 Text="{Binding Progress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
             <UserCtrl:TextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
-                                Header="Created"
+                                Header="{DynamicResource CreatedAtLabel}"
                                 Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
         </Grid>
 
         <UserCtrl:TextBlock 
-            Header="Description"
+            Header="{DynamicResource DescriptionLabel}"
             Grid.Row="3" 
             mah:ControlsHelper.CornerRadius="8"
             Margin="0,0,0,20" 
@@ -103,7 +102,7 @@
                    mah:ControlsHelper.CornerRadius="8"
                    Margin="0,0,0,20">
 
-            <TextBlock Text="Attachments" 
+            <TextBlock Text="{DynamicResource AttachmentsLabel}" 
                       FontSize="16" 
                       FontWeight="SemiBold" 
                       Foreground="#2196F3" 
@@ -154,7 +153,7 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
 
-            <Button Content="+ Add attachment"
+            <Button Content="{DynamicResource AddAttachmentButton}"
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8"
                    HorizontalAlignment="Left"
@@ -169,7 +168,7 @@
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" 
-                      Text="Comments" 
+                      Text="{DynamicResource CommentsLabel}" 
                       FontSize="16" 
                       FontWeight="SemiBold" 
                       Foreground="#2196F3" 
@@ -232,11 +231,12 @@
                         Text="{Binding NewComment, Mode=TwoWay}"/>
 
                 <Button Grid.Column="1" 
-                       Content="Post"
+                       Content="{DynamicResource PostCommentButton}"
                        mah:ControlsHelper.CornerRadius="6"
                        Padding="16,8"
                        Command="{Binding AddCommentCommand}"/>
             </Grid>
         </Grid>
     </Grid>
+    </ScrollViewer>
 </UserControl>

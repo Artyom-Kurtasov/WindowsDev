@@ -14,3 +14,4 @@ namespace WindowsDev.Domain
         public TasksInfo? Task { get; set; }
     }
 }
+

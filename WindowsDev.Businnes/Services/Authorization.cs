@@ -1,17 +1,17 @@
-﻿using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.PasswordManager;
-using WindowsDev.Businnes.Services.UserManager;
+﻿using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.PasswordManager;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services
+namespace WindowsDev.Business.Services
 {
     /// <summary>
     /// Handles user authorization by verifying login credentials.
     /// </summary>
     public class Authorization
     {
+        private readonly DbManager _dbManager;
         private readonly PasswordHasher _passwordHasher;
-        private readonly AppDbContext _appDbContext;
         private CurrentUserService _currentUserService;
 
         private UsersInfo? _user;
@@ -21,12 +21,12 @@ namespace WindowsDev.Businnes.Services
 
         public Authorization(
             PasswordHasher passwordHasher,
-            AppDbContext appDbContext,
-            CurrentUserService currentUserService)
+            CurrentUserService currentUserService,
+            DbManager dbManager)
         {
             _passwordHasher = passwordHasher;
-            _appDbContext = appDbContext;
             _currentUserService = currentUserService;
+            _dbManager = dbManager;
         }
 
         /// <summary>
@@ -34,7 +34,10 @@ namespace WindowsDev.Businnes.Services
         /// </summary>
         public bool Authorize(string login, string password)
         {
-            _user = _appDbContext.UsersInfo.FirstOrDefault(u => u.Login == login);
+            using var dbContext = _dbManager.Create();
+            {
+                _user = dbContext.UsersInfo.FirstOrDefault(u => u.Login == login);
+            }
 
             if (_user != null && CheckPasswordHash(password))
             {

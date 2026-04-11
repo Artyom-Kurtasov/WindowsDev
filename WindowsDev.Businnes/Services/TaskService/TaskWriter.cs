@@ -1,19 +1,19 @@
-﻿using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.TaskService.Interfaces;
+﻿using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.TaskService
+namespace WindowsDev.Business.Services.TaskService
 {
     /// <summary>
     /// Handles writing, updating, and deleting tasks in the database.
     /// </summary>
     public class TaskWriter : ITaskWriter
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public TaskWriter(AppDbContext appDbContext)
+        public TaskWriter(DbManager dbManager)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
         }
 
         /// <summary>
@@ -21,8 +21,10 @@ namespace WindowsDev.Businnes.Services.TaskService
         /// </summary>
         public async Task AddAsync(TasksInfo task)
         {
-            await _appDbContext.AddAsync(task);
-            await _appDbContext.SaveChangesAsync();
+            using var dbContext = _dbManager.Create();
+
+            await dbContext.AddAsync(task);
+            await dbContext.SaveChangesAsync();
         }
 
         /// <summary>
@@ -30,12 +32,13 @@ namespace WindowsDev.Businnes.Services.TaskService
         /// </summary>
         public async Task DeleteAsync(int id)
         {
-            var task = await _appDbContext.TasksInfo.FindAsync(id);
+            using var dbContext = _dbManager.Create();
+            var task = await dbContext.TasksInfo.FindAsync(id);
 
             if (task != null)
             {
-                _appDbContext.TasksInfo.Remove(task);
-                await _appDbContext.SaveChangesAsync();
+                dbContext.TasksInfo.Remove(task);
+                await dbContext.SaveChangesAsync();
             }
         }
 
@@ -44,7 +47,8 @@ namespace WindowsDev.Businnes.Services.TaskService
         /// </summary>
         public async Task UpdateAsync(TasksInfo task)
         {
-            var existingTask = await _appDbContext.TasksInfo.FindAsync(task.Id);
+            using var dbContext = _dbManager.Create();
+            var existingTask = await dbContext.TasksInfo.FindAsync(task.Id);
 
             if (existingTask != null)
             {
@@ -55,7 +59,7 @@ namespace WindowsDev.Businnes.Services.TaskService
                 existingTask.Status = task.Status;
                 existingTask.DeadLine = task.DeadLine;
 
-                await _appDbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
             }
         }
     }

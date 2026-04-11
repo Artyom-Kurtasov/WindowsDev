@@ -1,6 +1,6 @@
 ﻿using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService.Interfaces
+namespace WindowsDev.Business.Services.ProjectService.Interfaces
 {
     public interface IProjectWriter
     {
@@ -9,3 +9,4 @@ namespace WindowsDev.Businnes.Services.ProjectService.Interfaces
         Task DeleteAsync(int id);
     }
 }
+

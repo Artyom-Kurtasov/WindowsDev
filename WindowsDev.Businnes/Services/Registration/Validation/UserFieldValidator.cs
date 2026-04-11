@@ -1,20 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Businnes.DataBase;
+using WindowsDev.Business.DataBase;
 
-namespace WindowsDev.Businnes.Services.Registration.Validation
+namespace WindowsDev.Business.Services.Registration.Validation
 {
     public class UserFieldValidator
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public UserFieldValidator(AppDbContext appDbContext)
+        public UserFieldValidator(DbManager dbManager)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
         }
 
         public async Task<string> IsLoginTakenAsync(string login)
         {
-            if (await _appDbContext.UsersInfo.AnyAsync(u => u.Login == login))
+            using var dbContext = _dbManager.Create();
+
+            if (await dbContext.UsersInfo.AnyAsync(u => u.Login == login))
             {
                 return "User with this login already exist";
             }
@@ -24,7 +26,8 @@ namespace WindowsDev.Businnes.Services.Registration.Validation
 
         public async Task<string> IsUsernameTakenAsync(string username)
         {
-            if (await _appDbContext.UsersInfo.AnyAsync(u => u.Username == username))
+            using var dbContext = _dbManager.Create();
+            if (await dbContext.UsersInfo.AnyAsync(u => u.Username == username))
             {
                 return "Username already taken";
             }
@@ -33,3 +36,4 @@ namespace WindowsDev.Businnes.Services.Registration.Validation
         }
     }
 }
+

@@ -1,11 +1,16 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.TaskService.Interfaces;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.Localization;
+using WindowsDev.Business.Services.ProjectService;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Infrastructure;
+using WindowsDev.Settings;
 using WindowsDev.View.Controls.Users;
 
 namespace WindowsDev.ViewModels
@@ -19,8 +24,33 @@ namespace WindowsDev.ViewModels
         private readonly SharedDataService _sharedDataService;
         private readonly DialogShowingService _creator;
         private readonly NavigationStore _navigationStore;
+        private readonly LanguageChanger _languageChanger;
         private readonly INavigationService _navigationService;
         private readonly ITaskLoader _taskLoader;
+        private readonly DbManager _dbManager;
+        private readonly IProjectWriter _projectWriter;
+        private string _newConnectionString;
+        public string NewConnectionString
+        {
+            get => _newConnectionString;
+            set
+            {
+                _newConnectionString = value;
+                OnPropertyChanged();
+            }
+        }
+        private string _selectedLang;
+        public string SelectedLang
+        {
+            get => _selectedLang;
+            set
+            {
+                _selectedLang = value;
+                _languageChanger.ChangeLanguage(_selectedLang);
+                UserSettings.Default.LanguageCode = _selectedLang;
+                UserSettings.Default.Save();
+            }
+        }
 
         /// <summary>
         /// Observable collection of projects from shared data.
@@ -42,6 +72,8 @@ namespace WindowsDev.ViewModels
         /// </summary>
         public ICommand OpenProjectCommand { get; }
 
+        public ICommand SetNewConnectionStringCommand { get; }
+        public ICommand DeleteSelectedProjectsCommand { get; }
         /// <summary>
         /// Constructor for MainWindowViewModel.
         /// </summary>
@@ -50,13 +82,19 @@ namespace WindowsDev.ViewModels
             DialogShowingService projectDialogCreator,
             INavigationService navigationService,
             SharedDataService sharedDataService,
-            ITaskLoader taskLoader)
+            ITaskLoader taskLoader,
+            LanguageChanger languageChanger,
+            DbManager dbManager,
+            IProjectWriter projectWriter)
         {
             _navigationStore = navigationStore;
             _creator = projectDialogCreator;
             _navigationService = navigationService;
             _sharedDataService = sharedDataService;
             _taskLoader = taskLoader;
+            _languageChanger = languageChanger;
+            _dbManager = dbManager;
+            _projectWriter = projectWriter;
 
             _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
 
@@ -65,6 +103,8 @@ namespace WindowsDev.ViewModels
                 nameof(_sharedDataService.ProjectList),
                 nameof(ProjectList));
 
+            DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjects);
+            SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionString);
             OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialog);
             OpenProjectCommand = new AsyncRelayCommand<ProjectsInfo>(OpenProject, _ => true);
         }
@@ -72,9 +112,17 @@ namespace WindowsDev.ViewModels
         /// <summary>
         /// Opens the selected project and loads tasks async.
         /// </summary>
+        public async Task SetNewConnectionString()
+        {
+          if (await _dbManager.SetConnection(NewConnectionString))
+            {
+                UserSettings.Default.ConnectionString = NewConnectionString;
+                UserSettings.Default.Save();
+            }
+        }
         public async Task OpenProject(ProjectsInfo project)
         {
-            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync();
+            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync(project.Id);
             _navigationService.NavigateTo<ProjectViewModel>(project);
         }
 
@@ -84,6 +132,21 @@ namespace WindowsDev.ViewModels
         private async Task ShowCreateProjectDialog()
         {
             await _creator.ShowCreateDialogAsync<CreateProjectDialogView, DialogsViewModel>(this, null);
+        }
+
+        private async Task DeleteSelectedProjects()
+        {
+            var projectsToDelete = ProjectList?.Where(x => x.IsSelected).ToList();
+
+            if (projectsToDelete != null && projectsToDelete.Any())
+            {
+                foreach (var project in projectsToDelete)
+                {
+                    await _projectWriter.DeleteAsync(project.Id);
+
+                    ProjectList?.Remove(project);
+                }
+            }
         }
 
         /// <summary>

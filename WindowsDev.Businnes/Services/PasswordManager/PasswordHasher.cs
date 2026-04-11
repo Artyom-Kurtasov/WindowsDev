@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace WindowsDev.Businnes.Services.PasswordManager
+namespace WindowsDev.Business.Services.PasswordManager
 {
     /// <summary>
     /// Provides methods for hashing passwords and generating salts.

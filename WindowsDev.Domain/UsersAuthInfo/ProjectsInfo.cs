@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WindowsDev.Domain.UsersAuthInfo
 {
@@ -10,5 +12,9 @@ namespace WindowsDev.Domain.UsersAuthInfo
         public string? Description { get; set; }
         public required DateTime CreatedAt { get; set; }
         public required int UserId { get; set; }
+
+        [NotMapped]
+        public bool IsSelected { get; set; }
     }
 }
+

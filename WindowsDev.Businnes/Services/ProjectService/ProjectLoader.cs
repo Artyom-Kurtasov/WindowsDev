@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService
+namespace WindowsDev.Business.Services.ProjectService
 {
     /// <summary>
     /// Loads projects via IProjectReader and wraps them in an ObservableCollection.

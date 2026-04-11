@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
-using WindowsDev.Businnes.Services.Registration;
-using WindowsDev.Businnes.Services.Registration.Validation;
+using WindowsDev.Business.Services.Registration;
+using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
 
@@ -28,7 +28,7 @@ namespace WindowsDev.ViewModels
                 _login = value;
                 OnPropertyChanged(nameof(Login));
                 CheckLoginAvailabilityAsyncCommand.Execute(null);
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -41,7 +41,7 @@ namespace WindowsDev.ViewModels
                 _username = value;
                 OnPropertyChanged(nameof(Username));
                 CheckUsernameAvailabilityAsyncCommand.Execute(null);
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -53,7 +53,7 @@ namespace WindowsDev.ViewModels
             {
                 _password = value;
                 OnPropertyChanged(nameof(Password));
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -65,7 +65,7 @@ namespace WindowsDev.ViewModels
             {
                 _confirmPassword = value;
                 OnPropertyChanged(nameof(ConfirmPassword));
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -77,7 +77,7 @@ namespace WindowsDev.ViewModels
             {
                 _usernameValidationMessage = value;
                 OnPropertyChanged();
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 
@@ -89,7 +89,7 @@ namespace WindowsDev.ViewModels
             {
                 _loginValidationMessage = value;
                 OnPropertyChanged();
-                ((RelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
 

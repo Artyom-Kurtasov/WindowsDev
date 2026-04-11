@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="AddAttachmentButton">Anhang hinzufügen</sys:String>
+    <sys:String x:Key="AddButton">Hinzufügen</sys:String>
+    <sys:String x:Key="BackButton">Zurück</sys:String>
+
+    <sys:String x:Key="ConfirmPasswordLabel">Passwort bestätigen</sys:String>
+    <sys:String x:Key="CreatedAtLabel">Erstellt am</sys:String>
+    <sys:String x:Key="DeadlineLabel">Frist</sys:String>
+    <sys:String x:Key="DescriptionLabel">Beschreibung</sys:String>
+    <sys:String x:Key="IdLabel">Nr.</sys:String>
+    <sys:String x:Key="NameLabel">Name</sys:String>
+
+    <sys:String x:Key="DeleteButton">Löschen</sys:String>
+    <sys:String x:Key="EditButton">Bearbeiten</sys:String>
+
+    <sys:String x:Key="LoginLabel">Login</sys:String>
+    <sys:String x:Key="UsernameLabel">Benutzername</sys:String>
+    <sys:String x:Key="PasswordLabel">Passwort</sys:String>
+
+    <sys:String x:Key="NewUserText">Neu bei TaskManager?</sys:String>
+    <sys:String x:Key="ExistingUserText">Bereits ein Konto?</sys:String>
+
+    <sys:String x:Key="SignInButton">Anmelden</sys:String>
+    <sys:String x:Key="SignUpButton">Registrieren</sys:String>
+
+    <sys:String x:Key="ProjectsLabel">Projekte</sys:String>
+    <sys:String x:Key="SettingsLabel">Einstellungen</sys:String>
+    <sys:String x:Key="CommentsLabel">Kommentare</sys:String>
+    <sys:String x:Key="AttachmentsLabel">Anhänge</sys:String>
+
+    <sys:String x:Key="PriorityLabel">Priorität</sys:String>
+    <sys:String x:Key="ProgressLabel">Fortschritt</sys:String>
+    <sys:String x:Key="StatusLabel">Status</sys:String>
+
+    <sys:String x:Key="AuthTitle">Anmeldung bei TaskManager</sys:String>
+    <sys:String x:Key="RegTitle">Registrierung</sys:String>
+
+    <sys:String x:Key="CreateButton">Erstellen</sys:String>
+    <sys:String x:Key="CancelButton">Abbrechen</sys:String>
+    <sys:String x:Key="PostCommentButton">Senden</sys:String>
+    <sys:String x:Key="SaveTaskButton">Speichern</sys:String>
+
+</ResourceDictionary>

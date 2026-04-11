@@ -1,7 +1,7 @@
-﻿using WindowsDev.Businnes.Services.TaskService.Interfaces;
+﻿using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.TaskService
+namespace WindowsDev.Business.Services.TaskService
 {
     /// <summary>
     /// Handles task creation and storing it via TaskWriter.
@@ -31,7 +31,8 @@ namespace WindowsDev.Businnes.Services.TaskService
                 CreatedAt = DateTime.UtcNow,
                 DeadLine = taskDto.DeadLine,
                 Comments = taskDto.Comments,
-                Attachments = taskDto.Attachments
+                Attachments = taskDto.Attachments,
+                ProjectId = taskDto.ProjectId
             };
 
             await _taskWriter.AddAsync(task);

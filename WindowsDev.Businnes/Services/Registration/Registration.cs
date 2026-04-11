@@ -1,17 +1,17 @@
-﻿using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.PasswordManager;
-using WindowsDev.Businnes.Services.UserManager;
+﻿using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.PasswordManager;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Domain.UsersAuthInfo;
 using System.Linq;
 
-namespace WindowsDev.Businnes.Services.Registration
+namespace WindowsDev.Business.Services.Registration
 {
     /// <summary>
     /// Handles user registration, password hashing, and storing users in the database.
     /// </summary>
     public class Registration
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
         private readonly PasswordHasher _passwordHasher;
         private readonly CurrentUserService _currentUserService;
 
@@ -19,9 +19,9 @@ namespace WindowsDev.Businnes.Services.Registration
         private ulong _passwordHash;
         private UsersInfo? _userInfo;
 
-        public Registration(AppDbContext appDbContext, PasswordHasher passwordHasher, CurrentUserService currentUserService)
+        public Registration(DbManager dbManager, PasswordHasher passwordHasher, CurrentUserService currentUserService)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
             _passwordHasher = passwordHasher;
             _currentUserService = currentUserService;
         }
@@ -56,7 +56,9 @@ namespace WindowsDev.Businnes.Services.Registration
         /// </summary>
         private bool AddUserToDatabase(string login, string username)
         {
-            _userInfo = _appDbContext.UsersInfo.FirstOrDefault(x => x.Login == login);
+            using var dbContext = _dbManager.Create();
+
+            _userInfo = dbContext.UsersInfo.FirstOrDefault(x => x.Login == login);
 
             if (_userInfo == null)
             {
@@ -68,8 +70,8 @@ namespace WindowsDev.Businnes.Services.Registration
                     Login = login
                 };
 
-                _appDbContext.Add(_userInfo);
-                _appDbContext.SaveChanges();
+                dbContext.Add(_userInfo);
+                dbContext.SaveChanges();
 
                 return true;
             }

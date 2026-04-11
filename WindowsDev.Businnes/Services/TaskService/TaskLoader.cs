@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using WindowsDev.Businnes.Services.TaskService.Interfaces;
+using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.TaskService
+namespace WindowsDev.Business.Services.TaskService
 {
     /// <summary>
     /// Loads tasks via TaskReader and returns as ObservableCollection.
@@ -19,9 +19,9 @@ namespace WindowsDev.Businnes.Services.TaskService
         /// <summary>
         /// Loads all tasks asynchronously.
         /// </summary>
-        public async Task<ObservableCollection<TasksInfo>> LoadTaskAsync()
+        public async Task<ObservableCollection<TasksInfo>> LoadTaskAsync(int id)
         {
-            var taskList = await _taskReader.GetTasksAsync();
+            var taskList = await _taskReader.GetTasksAsync(id);
             return new ObservableCollection<TasksInfo>(taskList);
         }
     }

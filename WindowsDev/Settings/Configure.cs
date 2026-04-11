@@ -1,17 +1,18 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.PasswordManager;
-using WindowsDev.Businnes.Services.ProjectService;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
-using WindowsDev.Businnes.Services.Registration;
-using WindowsDev.Businnes.Services.Registration.Validation;
-using WindowsDev.Businnes.Services.TaskService;
-using WindowsDev.Businnes.Services.TaskService.Attachment;
-using WindowsDev.Businnes.Services.TaskService.Interfaces;
-using WindowsDev.Businnes.Services.UserManager;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.Localization;
+using WindowsDev.Business.Services.PasswordManager;
+using WindowsDev.Business.Services.ProjectService;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.Registration;
+using WindowsDev.Business.Services.Registration.Validation;
+using WindowsDev.Business.Services.TaskService;
+using WindowsDev.Business.Services.TaskService.Attachment;
+using WindowsDev.Business.Services.TaskService.Interfaces;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
@@ -31,17 +32,7 @@ namespace WindowsDev.Settings
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Database connection string
-            string connectionString =
-                "Host=localhost;Port=5432;Database=WindowsDev;Username=postgres;Password=q29384756";
-
-            // DbContext
-            services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(connectionString));
-
-            // ===============================
             // Infrastructure
-            // ===============================
             services.AddSingleton<NavigationStore>();
             services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
 
@@ -50,6 +41,9 @@ namespace WindowsDev.Settings
 
             // Navigation
             services.AddSingleton<INavigationService, NavigationService>();
+
+            // Database
+            services.AddSingleton<DbManager>();
 
             // Core Services
             services.AddSingleton<Registration>();
@@ -65,6 +59,7 @@ namespace WindowsDev.Settings
             services.AddSingleton<CurrentUserService>();
             services.AddSingleton<FileReader>();
             services.AddSingleton<FileWriter>();
+            services.AddSingleton<LanguageChanger>();
 
             // Project services
             services.AddTransient<IProjectReader, ProjectReader>();

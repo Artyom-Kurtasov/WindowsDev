@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services
+namespace WindowsDev.Business.Services
 {
     public class SharedDataService : INotifyPropertyChanged
     {
@@ -46,3 +46,4 @@ namespace WindowsDev.Businnes.Services
         }
     }
 }
+

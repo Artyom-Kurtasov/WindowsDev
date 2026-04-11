@@ -1,4 +1,4 @@
-﻿namespace WindowsDev.Businnes.Services.UserManager
+﻿namespace WindowsDev.Business.Services.UserManager
 {
     public class CurrentUserData
     {
@@ -24,3 +24,4 @@
         }
     }
 }
+

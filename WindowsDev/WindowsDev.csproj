@@ -28,22 +28,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Businnes.csproj" />
+		<ProjectReference Include="..\WindowsDev.Business\WindowsDev.Business.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Localization\Resources.Designer.cs">
-	    <DesignTime>True</DesignTime>
+	  <Compile Update="Settings\UserSettings.Designer.cs">
+	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
 	    <AutoGen>True</AutoGen>
-	    <DependentUpon>Resources.resx</DependentUpon>
+	    <DependentUpon>UserSettings.settings</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Localization\Resources.resx">
-	    <Generator>PublicResXFileCodeGenerator</Generator>
-	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
+	  <None Update="Settings\UserSettings.settings">
+	    <Generator>PublicSettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>

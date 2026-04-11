@@ -1,19 +1,20 @@
-﻿using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService
+namespace WindowsDev.Business.Services.ProjectService
 {
     /// <summary>
     /// Writes project data to the database and manages CRUD operations.
     /// </summary>
     public class ProjectWriter : IProjectWriter
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public ProjectWriter(AppDbContext appDbContext)
+        public ProjectWriter(DbManager dbManager)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
         }
 
         /// <summary>
@@ -21,8 +22,9 @@ namespace WindowsDev.Businnes.Services.ProjectService
         /// </summary>
         public async Task AddAsync(ProjectsInfo project)
         {
-            await _appDbContext.AddAsync(project);
-            await _appDbContext.SaveChangesAsync();
+            using var dbContext = _dbManager.Create();
+            await dbContext.AddAsync(project);
+            await dbContext.SaveChangesAsync();
         }
 
         /// <summary>
@@ -30,13 +32,20 @@ namespace WindowsDev.Businnes.Services.ProjectService
         /// </summary>
         public async Task DeleteAsync(int id)
         {
-            var project = await _appDbContext.ProjectsInfo.FindAsync(id);
+            using var dbContext = _dbManager.Create();
+            var project = await dbContext.ProjectsInfo.FindAsync(id);
+            var relatedTasks = await dbContext.TasksInfo
+                .Where(x => x.ProjectId == id)
+                .ToListAsync();
 
-            if (project != null)
+            if (relatedTasks.Any())
             {
-                _appDbContext.ProjectsInfo.Remove(project);
-                await _appDbContext.SaveChangesAsync();
+                dbContext.TasksInfo.RemoveRange(relatedTasks);
+                await dbContext.SaveChangesAsync();
             }
+
+            dbContext.ProjectsInfo.Remove(project);
+            await dbContext.SaveChangesAsync();
         }
 
         /// <summary>
@@ -44,8 +53,9 @@ namespace WindowsDev.Businnes.Services.ProjectService
         /// </summary>
         public async Task UpdateAsync(ProjectsInfo project)
         {
-            _appDbContext.ProjectsInfo.Update(project);
-            await _appDbContext.SaveChangesAsync();
+            using var dbContext = _dbManager.Create();
+            dbContext.ProjectsInfo.Update(project);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

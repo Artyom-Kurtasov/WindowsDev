@@ -1,10 +1,10 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services
+namespace WindowsDev.Business.Services
 {
     /// <summary>
     /// Service responsible for showing custom dialogs using MahApps.Metro.
@@ -35,7 +35,11 @@ namespace WindowsDev.Businnes.Services
 
             if (data is TasksInfo task)
             {
-                viewModel.Edit(task);
+                viewModel.SetEditDialog(task);
+            }
+            if (data is int projectId)
+            {
+                viewModel.SetProjectId(projectId);
             }
 
             view.DataContext = viewModel;

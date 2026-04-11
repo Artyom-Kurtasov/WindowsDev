@@ -12,3 +12,4 @@ namespace WindowsDev.Domain.UsersAuthInfo
         public required byte[] Salt { get; set; }
     }
 }
+

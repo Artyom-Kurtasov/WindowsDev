@@ -1,22 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
-using WindowsDev.Businnes.Services.UserManager;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService
+namespace WindowsDev.Business.Services.ProjectService
 {
     /// <summary>
     /// Reads projects from the database for the current user.
     /// </summary>
     public class ProjectReader : IProjectReader
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
         private readonly CurrentUserData _currentUserData;
 
-        public ProjectReader(AppDbContext appDbContext, CurrentUserData currentUserData)
+        public ProjectReader(DbManager dbManager, CurrentUserData currentUserData)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
             _currentUserData = currentUserData;
         }
 
@@ -25,7 +25,9 @@ namespace WindowsDev.Businnes.Services.ProjectService
         /// </summary>
         public async Task<List<ProjectsInfo>> GetProjectsAsync()
         {
-            return await _appDbContext.ProjectsInfo
+            using var dbContext = _dbManager.Create();
+
+            return await dbContext.ProjectsInfo
                 .Where(x => x.UserId == _currentUserData.UserId)
                 .ToListAsync();
         }

@@ -23,14 +23,14 @@
             <!-- Logo -->
             <UserCtrl:Logo Kind="TaskRound"
                            ViewBoxHeight="70" ViewBoxWidth="70"
-                           Text="Sign up to TaskManager"
+                           Text="{DynamicResource AuthTitle}"
                            FontSize="14"
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
 
             <!--Username-->
             <UserCtrl:AdvancedTextBox
-                Header="{DynamicResource UsernameLabel}"
+                Header="{DynamicResource LoginLabel}"
                 CornerRadius="8"
                 Margin="20,20,20,0"
                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
@@ -51,7 +51,7 @@
 
             <!--LINK TO REGISTRATION-->
             <TextBlock HorizontalAlignment="Center">
-                    <Run Text="{DynamicResource NewToTaskManager}"/>
+                    <Run Text="{DynamicResource NewUserText}"/>
                     <Hyperlink Command="{Binding SwitchToRegViewCommand}">
                             <TextBlock Text="{DynamicResource SignUpButton}"/>
                     </Hyperlink>

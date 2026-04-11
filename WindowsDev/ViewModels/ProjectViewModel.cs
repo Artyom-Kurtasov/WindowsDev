@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.TaskService;
-using WindowsDev.Businnes.Services.TaskService.Attachment;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.TaskService;
+using WindowsDev.Business.Services.TaskService.Attachment;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Infrastructure;
@@ -110,7 +110,7 @@ namespace WindowsDev.ViewModels
         /// </summary>
         private async Task OpenDialog()
         {
-            await _dialogShowingService.ShowCreateDialogAsync<CreateTaskDialogView, TaskDialogViewModel>(this, null);
+            await _dialogShowingService.ShowCreateDialogAsync<CreateTaskDialogView, TaskDialogViewModel>(this, CurrentProject.Id);
         }
     }
 }

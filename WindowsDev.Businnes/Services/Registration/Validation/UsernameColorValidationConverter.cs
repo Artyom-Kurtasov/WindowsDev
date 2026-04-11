@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace WindowsDev.Businnes.Services.Registration.Validation
+namespace WindowsDev.Business.Services.Registration.Validation
 {
     public class UsernameColorValidationConverter : IValueConverter
     {
@@ -29,3 +29,4 @@ namespace WindowsDev.Businnes.Services.Registration.Validation
         }
     }
 }
+

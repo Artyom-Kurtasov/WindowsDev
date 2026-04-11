@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using System.ServiceProcess;
 using System.Windows;
-using WindowsDev.Businnes.DataBase;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.Localization;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Settings;
@@ -14,7 +16,7 @@ namespace WindowsDev
     public partial class App : Application
     {
         public static ServiceProvider? ServiceProvider { get; private set; }
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
@@ -23,10 +25,13 @@ namespace WindowsDev
             configure.ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
 
-            WarmUpTables();
+            await WarmUpTables();
 
+            var language = ServiceProvider.GetRequiredService<LanguageChanger>();
             var navigationStore = ServiceProvider.GetRequiredService<NavigationStore>();
             var navigationService = ServiceProvider.GetRequiredService<INavigationService>();
+
+            language.ChangeLanguage(UserSettings.Default.LanguageCode);
 
             navigationService.NavigateTo<AuthorizationViewModel>();
 
@@ -37,11 +42,16 @@ namespace WindowsDev
             main.Show();
         }
 
-        private void WarmUpTables()
+        private async Task WarmUpTables()
         {
-            using (var scope = App.ServiceProvider.CreateScope())
+            if (ServiceProvider != null)
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var dbManager = ServiceProvider.GetRequiredService<DbManager>();
+
+                var connectionString = UserSettings.Default.ConnectionString;
+                await dbManager.SetConnection(connectionString);
+
+                using var dbContext = dbManager.Create();
 
                 dbContext.UsersInfo.Any();
                 dbContext.ProjectsInfo.Any();
@@ -51,3 +61,4 @@ namespace WindowsDev
     }
 
 }
+

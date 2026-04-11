@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
-using WindowsDev.Businnes.Services.TaskService.Interfaces;
+﻿using System.Windows.Input;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Infrastructure;
 
@@ -23,10 +21,15 @@ namespace WindowsDev.ViewModels
         public event Func<Task> Close;
 
         private bool _isEditMode;
+        private int _projectId;
         public bool IsEditMode
         {
             get => _isEditMode;
-            set { _isEditMode = value; OnPropertyChanged(nameof(IsEditMode)); }
+            set 
+            {
+                _isEditMode = value;
+                OnPropertyChanged(nameof(IsEditMode)); 
+            }
         }
 
         private int _taskId;
@@ -70,7 +73,11 @@ namespace WindowsDev.ViewModels
         public DateTime DeadLine
         {
             get => _deadLine;
-            set { _deadLine = value; OnPropertyChanged(nameof(DeadLine)); }
+            set 
+            {
+                _deadLine = value; 
+                OnPropertyChanged(nameof(DeadLine)); 
+            }
         }
 
         public ICommand CancelCommand { get; }
@@ -84,7 +91,8 @@ namespace WindowsDev.ViewModels
             ITaskCreator taskCreator,
             ITaskLoader taskLoader,
             SharedDataService sharedDataService,
-            ITaskWriter taskWriter)
+            ITaskWriter taskWriter
+            )
         {
             _taskCreator = taskCreator;
             _taskLoader = taskLoader;
@@ -108,13 +116,14 @@ namespace WindowsDev.ViewModels
                 Priority = Priority,
                 Progress = Progress,
                 Status = Status,
-                DeadLine = DeadLine
+                DeadLine = DeadLine.ToUniversalTime(),
+                ProjectId = _projectId
             });
 
             if (Close != null)
                 await Close.Invoke();
 
-            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync();
+            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync(_projectId);
         }
 
         /// <summary>
@@ -132,7 +141,7 @@ namespace WindowsDev.ViewModels
                 existedTask.Priority = Priority;
                 existedTask.Progress = Progress;
                 existedTask.Status = Status;
-                existedTask.DeadLine = DeadLine;
+                existedTask.DeadLine = DeadLine.ToUniversalTime();
 
                 await _taskWriter.UpdateAsync(existedTask);
 
@@ -157,7 +166,7 @@ namespace WindowsDev.ViewModels
         /// <summary>
         /// Populate the ViewModel with existing task data for editing.
         /// </summary>
-        public void Edit(object? taskObj)
+        public void SetEditDialog(object? taskObj)
         {
             if (taskObj is not TasksInfo task)
                 return;
@@ -171,6 +180,11 @@ namespace WindowsDev.ViewModels
             DeadLine = task.DeadLine;
 
             IsEditMode = true;
+        }
+
+        public void SetProjectId(int id)
+        {
+            _projectId = id;
         }
     }
 }

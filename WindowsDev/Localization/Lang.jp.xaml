@@ -1,0 +1,46 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="AddAttachmentButton">添付ファイルを追加</sys:String>
+    <sys:String x:Key="AddButton">追加</sys:String>
+    <sys:String x:Key="BackButton">戻る</sys:String>
+
+    <sys:String x:Key="ConfirmPasswordLabel">パスワード確認</sys:String>
+    <sys:String x:Key="CreatedAtLabel">作成日</sys:String>
+    <sys:String x:Key="DeadlineLabel">期限</sys:String>
+    <sys:String x:Key="DescriptionLabel">説明</sys:String>
+    <sys:String x:Key="IdLabel">番号</sys:String>
+    <sys:String x:Key="NameLabel">名前</sys:String>
+
+    <sys:String x:Key="DeleteButton">削除</sys:String>
+    <sys:String x:Key="EditButton">編集</sys:String>
+
+    <sys:String x:Key="LoginLabel">ログイン</sys:String>
+    <sys:String x:Key="UsernameLabel">ユーザー名</sys:String>
+    <sys:String x:Key="PasswordLabel">パスワード</sys:String>
+
+    <sys:String x:Key="NewUserText">TaskManagerを初めてご利用ですか？</sys:String>
+    <sys:String x:Key="ExistingUserText">すでにアカウントをお持ちですか？</sys:String>
+
+    <sys:String x:Key="SignInButton">ログイン</sys:String>
+    <sys:String x:Key="SignUpButton">新規登録</sys:String>
+
+    <sys:String x:Key="ProjectsLabel">プロジェクト</sys:String>
+    <sys:String x:Key="SettingsLabel">設定</sys:String>
+    <sys:String x:Key="CommentsLabel">コメント</sys:String>
+    <sys:String x:Key="AttachmentsLabel">添付ファイル</sys:String>
+
+    <sys:String x:Key="PriorityLabel">優先度</sys:String>
+    <sys:String x:Key="ProgressLabel">進捗</sys:String>
+    <sys:String x:Key="StatusLabel">ステータス</sys:String>
+
+    <sys:String x:Key="AuthTitle">TaskManagerにログイン</sys:String>
+    <sys:String x:Key="RegTitle">新規登録</sys:String>
+
+    <sys:String x:Key="CreateButton">作成</sys:String>
+    <sys:String x:Key="CancelButton">キャンセル</sys:String>
+    <sys:String x:Key="PostCommentButton">投稿</sys:String>
+    <sys:String x:Key="SaveTaskButton">保存</sys:String>
+
+</ResourceDictionary>

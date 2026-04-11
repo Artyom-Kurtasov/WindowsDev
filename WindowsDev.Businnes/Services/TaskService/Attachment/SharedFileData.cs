@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WindowsDev.Businnes.Services.TaskService.Attachment
+namespace WindowsDev.Business.Services.TaskService.Attachment
 {
     public class SharedFileData : INotifyPropertyChanged
     {
@@ -34,3 +34,4 @@ namespace WindowsDev.Businnes.Services.TaskService.Attachment
         }
     }
 }
+

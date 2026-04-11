@@ -1,7 +1,7 @@
-﻿using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+﻿using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService
+namespace WindowsDev.Business.Services.ProjectService
 {
     /// <summary>
     /// Responsible for creating new projects and saving them via IProjectWriter.

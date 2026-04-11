@@ -27,7 +27,7 @@
                         </Grid.RowDefinitions>
 
                         <Button Grid.Row="0"
-                                Content="Back"
+                                Content="{DynamicResource BackButton}"
                                 Width="100"
                                 Margin="0,0,0,15"
                                 HorizontalAlignment="Left"
@@ -37,12 +37,12 @@
                         <UserCtrl:TextBlock Grid.Row="1"
                                             Margin="0,0,0,10"
                                             CornerRadius="8"
-                                            Header="Project Name"
+                                            Header="{DynamicResource NameLabel}"
                                             Text="{Binding Name}"/>
 
                         <UserCtrl:TextBlock Grid.Row="2"
                                             CornerRadius="8"
-                                            Header="Description"
+                                            Header="{DynamicResource DescriptionLabel}"
                                             Text="{Binding Description}"/>
                     </Grid>
 
@@ -57,11 +57,11 @@
 
                             <DataGrid.Columns>
 
-                                <DataGridTextColumn Header="Id"
+                                <DataGridTextColumn Header="{DynamicResource IdLabel}"
                                                 Binding="{Binding Id}"
                                                 Width="Auto"/>
 
-                                <DataGridTemplateColumn Header="Name" Width="*">
+                                <DataGridTemplateColumn Header="{DynamicResource NameLabel}" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock TextTrimming="CharacterEllipsis">
@@ -74,7 +74,7 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Header="Description" Width="2*">
+                                <DataGridTemplateColumn Header="{DynamicResource DescriptionLabel}" Width="2*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Description}"
@@ -84,11 +84,11 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="Deadline"
+                                <DataGridTextColumn Header="{DynamicResource DeadlineLabel}"
                                                 Binding="{Binding DeadLine, StringFormat=d}"
                                                 Width="*"/>
 
-                                <DataGridTextColumn Header="Created"
+                                <DataGridTextColumn Header="{DynamicResource CreatedAtLabel}"
                                                 Binding="{Binding CreatedAt, StringFormat=d}"
                                                 Width="*"/>
 

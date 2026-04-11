@@ -1,7 +1,7 @@
 ﻿using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
-using WindowsDev.Businnes.Services.UserManager;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Infrastructure;
 
 namespace WindowsDev.ViewModels

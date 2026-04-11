@@ -18,17 +18,20 @@
 
         <!-- Name -->
         <UserCtrl:AdvancedTextBox Grid.Row="0"
-                                 Header="Name"
+                                 Header="{DynamicResource NameLabel}"
                                  Margin="0,0,0,10"
                                  CornerRadius="8"
                                  Text="{Binding Name}"/>
 
         <!-- Deadline -->
-        <DatePicker Grid.Row="1"
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="{DynamicResource DeadlineLabel}" />
+            <DatePicker
                     Margin="0,0,0,10"
                     Height="35"
                     mah:ControlsHelper.CornerRadius="8"
-                    Text="{Binding DeadLine}"/>
+                    Text="{Binding DeadLine, Mode=TwoWay}"/>
+        </StackPanel>
 
         <!-- Priority + Progress -->
         <Grid Grid.Row="2" Margin="0,0,0,10">
@@ -41,7 +44,9 @@
             </Grid.ColumnDefinitions>
 
             <!-- Progress -->
-            <ComboBox Grid.Column="0" Text="{Binding Progress}">
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{DynamicResource ProgressLabel}"/>
+                <ComboBox Text="{Binding Progress}">
                 <ComboBoxItem Content="0%"/>
                 <ComboBoxItem Content="10%"/>
                 <ComboBoxItem Content="20%"/>
@@ -54,37 +59,45 @@
                 <ComboBoxItem Content="90%"/>
                 <ComboBoxItem Content="100%"/>
             </ComboBox>
+            </StackPanel>
 
             <!-- Priority -->
-            <ComboBox Grid.Column="2" Text="{Binding Priority}">
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="{DynamicResource PriorityLabel}"/>
+                <ComboBox Text="{Binding Priority}">
                 <ComboBoxItem Content="Normal"/>
                 <ComboBoxItem Content="Critical"/>
             </ComboBox>
+            </StackPanel>
 
-            <ComboBox Grid.Column="4" Text="{Binding Status}">
+            <StackPanel Grid.Column="4">
+                <TextBlock Text="{DynamicResource StatusLabel}"/>
+                <ComboBox Text="{Binding Status}">
                 <ComboBoxItem Content="In progress"/>
                 <ComboBoxItem Content="Done"/>
                 <ComboBoxItem Content="Closed"/>
             </ComboBox>
+            </StackPanel>
         </Grid>
 
         <!-- Description -->
         <UserCtrl:AdvancedTextBox Grid.Row="3"
-                                 Header="Description"
+                                 Header="{DynamicResource DescriptionLabel}"
                                  CornerRadius="8"
                                  FieldHeight="100"
                                  ScrollBarVisibility="Auto"
                                  Text="{Binding Description}"/>
-        
+
         <StackPanel Grid.Row="4" Orientation="Horizontal">
-            <Button Content="Create"
-                    mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6">
+            <Button mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6">
                 <Button.Style>
-                    <Style TargetType="Button">
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
                         <Setter Property="Command" Value="{Binding CreateTaskCommand}"/>
+                        <Setter Property="Content" Value="{DynamicResource CreateButton}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsEditMode}" Value="True">
                                 <Setter Property="Command" Value="{Binding EditTaskCommand}"/>
+                                <Setter Property="Content" Value="{DynamicResource SaveTaskButton}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>

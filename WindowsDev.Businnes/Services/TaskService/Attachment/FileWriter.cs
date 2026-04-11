@@ -1,18 +1,18 @@
-﻿using WindowsDev.Businnes.DataBase;
+﻿using WindowsDev.Business.DataBase;
 using WindowsDev.Domain;
 
 
-namespace WindowsDev.Businnes.Services.TaskService.Attachment
+namespace WindowsDev.Business.Services.TaskService.Attachment
 {
     public class FileWriter
     {
         private readonly SharedDataService _sharedDataService;
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public FileWriter(AppDbContext appDbContext,
+        public FileWriter(DbManager dbManager,
             SharedDataService sharedDataService)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
             _sharedDataService = sharedDataService;
         }
 
@@ -24,7 +24,9 @@ namespace WindowsDev.Businnes.Services.TaskService.Attachment
             {
                 if (fileInfo.Exists)
                 {
-                    await _appDbContext.AddAsync(new TaskAttachment
+                    using var dbContext = _dbManager.Create();
+
+                    await dbContext.AddAsync(new TaskAttachment
                     {
                         FileName = fileInfo.Name,
                         FilePath = filePath,
@@ -33,9 +35,10 @@ namespace WindowsDev.Businnes.Services.TaskService.Attachment
                         TaskId = _sharedDataService.CurrentTask.Id
                     });
 
-                    await _appDbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                 }
             }
         }
     }
 }
+

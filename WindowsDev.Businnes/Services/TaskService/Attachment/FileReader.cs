@@ -1,23 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
-using WindowsDev.Businnes.DataBase;
+using WindowsDev.Business.DataBase;
 using WindowsDev.Domain;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.TaskService.Attachment
+namespace WindowsDev.Business.Services.TaskService.Attachment
 {
     public class FileReader
     {
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public FileReader(AppDbContext appDbContext)
+        public FileReader(DbManager dbManager)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
         }
 
         public async Task<ObservableCollection<TaskAttachment>> GetAttachmentsAsync(TasksInfo taskInfo)
         {
-            var attacments = await _appDbContext.Attachments
+            using var dbContext = _dbManager.Create();
+
+            var attacments = await dbContext.Attachments
                  .Where(x => x.TaskId == taskInfo.Id)
                  .ToListAsync();
 
@@ -25,3 +27,4 @@ namespace WindowsDev.Businnes.Services.TaskService.Attachment
         }
     }
 }
+

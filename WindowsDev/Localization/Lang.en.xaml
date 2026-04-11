@@ -2,31 +2,45 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <sys:String x:Key="AddAttacmentButton">Add Attachment</sys:String>
+    <sys:String x:Key="AddAttachmentButton">Add Attachment</sys:String>
     <sys:String x:Key="AddButton">Add</sys:String>
     <sys:String x:Key="BackButton">Back</sys:String>
+
     <sys:String x:Key="ConfirmPasswordLabel">Confirm Password</sys:String>
     <sys:String x:Key="CreatedAtLabel">Created At</sys:String>
-    <sys:String x:Key="DeadLineLabel">DeadLine</sys:String>
-    <sys:String x:Key="DescriptionLable">Description</sys:String>
-    <sys:String x:Key="IdLable">#</sys:String>
+    <sys:String x:Key="DeadlineLabel">Deadline</sys:String>
+    <sys:String x:Key="DescriptionLabel">Description</sys:String>
+    <sys:String x:Key="IdLabel">#</sys:String>
     <sys:String x:Key="NameLabel">Name</sys:String>
+
     <sys:String x:Key="DeleteButton">Delete</sys:String>
     <sys:String x:Key="EditButton">Edit</sys:String>
+
     <sys:String x:Key="LoginLabel">Login</sys:String>
-    <sys:String x:Key="NewToTaskManager">New to TaskManager?</sys:String>
+    <sys:String x:Key="UsernameLabel">Username</sys:String>
     <sys:String x:Key="PasswordLabel">Password</sys:String>
-    <sys:String x:Key="PostCommentButton">Post</sys:String>
-    <sys:String x:Key="AlreadyHaveAnAccount">Already have an account?</sys:String>
+
+    <sys:String x:Key="NewUserText">New to TaskManager?</sys:String>
+    <sys:String x:Key="ExistingUserText">Already have an account?</sys:String>
+
     <sys:String x:Key="SignInButton">Sign In</sys:String>
-    <sys:String x:Key="SignUpButton">SignUp</sys:String>
+    <sys:String x:Key="SignUpButton">Sign Up</sys:String>
+
     <sys:String x:Key="ProjectsLabel">Projects</sys:String>
     <sys:String x:Key="SettingsLabel">Settings</sys:String>
     <sys:String x:Key="CommentsLabel">Comments</sys:String>
     <sys:String x:Key="AttachmentsLabel">Attachments</sys:String>
+
     <sys:String x:Key="PriorityLabel">Priority</sys:String>
     <sys:String x:Key="ProgressLabel">Progress</sys:String>
     <sys:String x:Key="StatusLabel">Status</sys:String>
-    <sys:String x:Key="UsernameLabel">Username</sys:String>
-    
+
+    <sys:String x:Key="AuthTitle">Sign In to TaskManager</sys:String>
+    <sys:String x:Key="RegTitle">Create Account</sys:String>
+
+    <sys:String x:Key="CreateButton">Create</sys:String>
+    <sys:String x:Key="CancelButton">Cancel</sys:String>
+    <sys:String x:Key="PostCommentButton">Post</sys:String>
+    <sys:String x:Key="SaveTaskButton">Save</sys:String>
+
 </ResourceDictionary>

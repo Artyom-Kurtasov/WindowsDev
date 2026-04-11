@@ -1,12 +1,11 @@
 ﻿using Microsoft.Win32;
-using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.TaskService;
-using WindowsDev.Businnes.Services.TaskService.Attachment;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.TaskService;
+using WindowsDev.Business.Services.TaskService.Attachment;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Domain;
 using WindowsDev.Domain.UsersAuthInfo;
@@ -27,14 +26,10 @@ namespace WindowsDev.ViewModels
         private readonly FileWriter _fileWriter;
         private readonly AddComment _addComment;
 
-        /// <summary>
-        /// Project associated with the current task.
-        /// </summary>
+        // Project associated with the current task.
         public ProjectsInfo Project { get; }
 
-        /// <summary>
-        /// Current task being displayed or edited.
-        /// </summary>
+        // Current task being displayed or edited.
         public TasksInfo CurrentTask
         {
             get => _sharedDataService.CurrentTask;
@@ -56,7 +51,7 @@ namespace WindowsDev.ViewModels
             set
             {
                 _newComment = value;
-                OnPropertyChanged();
+                OnPropertyChanged(nameof(NewComment));
             }
         }
 
@@ -71,7 +66,7 @@ namespace WindowsDev.ViewModels
                 if (CurrentTask != null && CurrentTask.Name != value)
                 {
                     CurrentTask.Name = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Name));
                 }
             }
         }
@@ -87,7 +82,7 @@ namespace WindowsDev.ViewModels
                 if (CurrentTask != null && CurrentTask.Description != value)
                 {
                     CurrentTask.Description = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Description));
                 }
             }
         }
@@ -103,7 +98,7 @@ namespace WindowsDev.ViewModels
                 if (CurrentTask != null && CurrentTask.Priority != value)
                 {
                     CurrentTask.Priority = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Priority));
                 }
             }
         }
@@ -119,7 +114,7 @@ namespace WindowsDev.ViewModels
                 if (CurrentTask != null && CurrentTask.Progress != value)
                 {
                     CurrentTask.Progress = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Progress));
                 }
             }
         }
@@ -127,15 +122,15 @@ namespace WindowsDev.ViewModels
         /// <summary>
         /// Task status property.
         /// </summary>
-        public string? Status
+        public string Status
         {
-            get => CurrentTask?.Status;
+            get => CurrentTask.Status;
             set
             {
                 if (CurrentTask != null && CurrentTask.Status != value)
                 {
                     CurrentTask.Status = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(Status));
                 }
             }
         }
@@ -151,54 +146,36 @@ namespace WindowsDev.ViewModels
                 if (CurrentTask != null && CurrentTask.DeadLine != value)
                 {
                     CurrentTask.DeadLine = value;
-                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(DeadLine));
                 }
             }
         }
 
-        /// <summary>
-        /// Task creation date.
-        /// </summary>
+        // Task creation date.
         public DateTime CreatedAt => CurrentTask.CreatedAt;
 
-        /// <summary>
-        /// Collection of comments associated with the task.
-        /// </summary>
-        public ObservableCollection<Comments>? Comments => CurrentTask?.Comments;
+        // Collection of comments associated with the task.
+        public ObservableCollection<Comments>? Comments => CurrentTask.Comments;
 
-        /// <summary>
-        /// Collection of attachments associated with the task.
-        /// </summary>
+        // Collection of attachments associated with the task.
         public ObservableCollection<TaskAttachment>? Attachments => CurrentTask?.Attachments;
 
-        /// <summary>
-        /// Command to switch back to the project view.
-        /// </summary>
+        // Command to switch back to the project view.
         public ICommand SwitchToProjectCommand { get; }
 
-        /// <summary>
-        /// Command to open the task editing dialog.
-        /// </summary>
+        // Command to open the task editing dialog.
         public ICommand EditTaskCommand { get; }
 
-        /// <summary>
-        /// Command to add a new comment to the task.
-        /// </summary>
+        // Command to add a new comment to the task.
         public ICommand AddCommentCommand { get; }
 
-        /// <summary>
-        /// Command to add a file attachment to the task.
-        /// </summary>
+        // Command to add a file attachment to the task.
         public ICommand AddAttachmentCommand { get; }
 
-        /// <summary>
-        /// Command to open an attachment file.
-        /// </summary>
+        // Command to open an attachment file.
         public ICommand OpenAttachmentCommand { get; }
 
-        /// <summary>
-        /// Constructor for TaskViewModel. Initializes services, commands, and subscribes to property changes.
-        /// </summary>
+        // Constructor for TaskViewModel. Initializes services, commands, and subscribes to property changes.
         public TaskViewModel(
             AddComment addComment,
             DialogShowingService dialogShowingService,
@@ -275,7 +252,8 @@ namespace WindowsDev.ViewModels
         {
             if (!string.IsNullOrWhiteSpace(_newComment))
             {
-                await _addComment.AddComments(CurrentTask, _newComment);
+                var comment = await _addComment.AddComments(CurrentTask, _newComment);
+                CurrentTask?.Comments?.Add(comment);
             }
         }
 

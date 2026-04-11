@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
-using WindowsDev.Businnes.DataBase;
-using WindowsDev.Businnes.Services.UserManager;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Domain;
 using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.TaskService
+namespace WindowsDev.Business.Services.TaskService
 {
     /// <summary>
     /// Handles adding and retrieving comments for tasks.
@@ -13,11 +13,11 @@ namespace WindowsDev.Businnes.Services.TaskService
     public class AddComment
     {
         private readonly CurrentUserData _currentUserData;
-        private readonly AppDbContext _appDbContext;
+        private readonly DbManager _dbManager;
 
-        public AddComment(AppDbContext appDbContext, CurrentUserData currentUserData)
+        public AddComment(DbManager dbManager, CurrentUserData currentUserData)
         {
-            _appDbContext = appDbContext;
+            _dbManager = dbManager;
             _currentUserData = currentUserData;
         }
 
@@ -30,12 +30,14 @@ namespace WindowsDev.Businnes.Services.TaskService
             {
                 Text = commentText,
                 CreatedAt = DateTime.UtcNow,
-                Author = _currentUserData.Login,
+                Author = _currentUserData.Username,
                 TaskId = taskItem.Id
             };
 
-            await _appDbContext.Comments.AddAsync(comment);
-            await _appDbContext.SaveChangesAsync();
+            using var dbContext = _dbManager.Create();
+
+            await dbContext.Comments.AddAsync(comment);
+            await dbContext.SaveChangesAsync();
 
             return comment;
         }
@@ -45,7 +47,9 @@ namespace WindowsDev.Businnes.Services.TaskService
         /// </summary>
         public async Task<ObservableCollection<Comments>> GetComments(TasksInfo taskItem)
         {
-            var comments = await _appDbContext.Comments
+            using var dbContext = _dbManager.Create();
+
+            var comments = await dbContext.Comments
                 .Where(x => x.TaskId == taskItem.Id)
                 .ToListAsync();
 

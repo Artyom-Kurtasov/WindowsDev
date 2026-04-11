@@ -1,6 +1,6 @@
 ﻿using System.Windows.Input;
-using WindowsDev.Businnes.Services;
-using WindowsDev.Businnes.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
 

@@ -10,13 +10,14 @@
     <Grid>
         <StackPanel>
             <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
-                <TabItem Header="Projects">
+                <TabItem Header="{DynamicResource ProjectsLabel}">
                     <Grid>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
-                                <Button Content="Add" Background="Transparent" BorderBrush="Transparent"
+                                <Button Content="{DynamicResource AddButton}" Background="Transparent" BorderBrush="Transparent"
                                         Command="{Binding OpenDialogCommand}"/>
-                                <Button Content="Delete" Background="Transparent" BorderBrush="Transparent"/>
+                                <Button Content="{DynamicResource DeleteButton}" Background="Transparent" BorderBrush="Transparent"
+                                        Command="{Binding DeleteSelectedProjectsCommand}"/>
                             </StackPanel>
 
                             <DataGrid ItemsSource="{Binding ProjectList}"
@@ -25,12 +26,25 @@
                                       SelectionUnit="Cell"
                                       CanUserAddRows="False">
                                 <DataGrid.Columns>
-                                    <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
-                                                            EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"/>
-                                    
-                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}"/>
-                                    
-                                    <DataGridTemplateColumn Header="Name" Width="1*">
+                                    <DataGridTemplateColumn>
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
+                      Style="{DynamicResource MetroDataGridCheckBox}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTextColumn Binding="{Binding Id}">
+                                        <DataGridTextColumn.Header>
+                                            <TextBlock Text="{DynamicResource IdLabel}"/>
+                                        </DataGridTextColumn.Header>
+                                    </DataGridTextColumn>
+
+                                    <DataGridTemplateColumn Width="1*">
+                                        <DataGridTemplateColumn.Header>
+                                            <TextBlock Text="{DynamicResource NameLabel}"/>
+                                        </DataGridTemplateColumn.Header>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock>
@@ -42,23 +56,45 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    
-                                    <DataGridTemplateColumn Width="3*" Header="Description" >
+
+                                    <DataGridTemplateColumn Width="3*">
+                                        <DataGridTemplateColumn.Header>
+                                            <TextBlock Text="{DynamicResource DescriptionLabel}"/>
+                                        </DataGridTemplateColumn.Header>
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Description}" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                                        
-                                    <DataGridTextColumn Header="Created" Binding="{Binding CreatedAt}"/>
+
+                                    <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}">
+                                        <DataGridTextColumn.Header>
+                                            <TextBlock Text="{DynamicResource CreatedAtLabel}"/>
+                                        </DataGridTextColumn.Header>
+                                    </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
                     </Grid>
                 </TabItem>
-                
-                <TabItem Header="Settings"/>
+
+                <TabItem Header="{DynamicResource SettingsLabel}">
+                    <Grid>
+                        <StackPanel>
+                            <ComboBox SelectedValuePath="Tag"
+                              SelectedValue="{Binding SelectedLang}">
+                                <ComboBoxItem Content="English" Tag="en"/>
+                                <ComboBoxItem Content="Русский" Tag="ru"/>
+                                <ComboBoxItem Content="Deutsch" Tag="de"/>
+                                <ComboBoxItem Content="日本語" Tag="jp"/>
+                            </ComboBox>
+
+                            <TextBox Text="{Binding NewConnectionString, Mode=TwoWay}"/>
+                            <Button Content="apply" Command="{Binding SetNewConnectionStringCommand}"/>
+                        </StackPanel>
+                    </Grid>
+                </TabItem>
             </TabControl>
         </StackPanel>
 

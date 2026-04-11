@@ -1,11 +1,12 @@
 ﻿using WindowsDev.Domain.UsersAuthInfo;
 
-namespace WindowsDev.Businnes.Services.ProjectService.Interfaces
+namespace WindowsDev.Business.Services.ProjectService.Interfaces
 {
     public interface IProjectDialogCreator
     {
         event Func<Task> Close;
-
-        void Edit(object? task) { }
+        void SetEditDialog(object? task) { }
+        void SetProjectId(int  projectId) { }
     }
 }
+
