@@ -100,3 +100,4 @@ namespace WindowsDev.ViewModels
         private bool CanAuthorize() => true;
     }
 }
+

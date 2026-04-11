@@ -24,3 +24,4 @@ namespace WindowsDev.Commands.NavigationManager
     }
 }
 
+

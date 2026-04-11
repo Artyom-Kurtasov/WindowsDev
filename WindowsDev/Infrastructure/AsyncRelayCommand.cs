@@ -48,3 +48,4 @@ namespace WindowsDev.Infrastructure
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
+

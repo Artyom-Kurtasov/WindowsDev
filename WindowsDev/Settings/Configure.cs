@@ -92,3 +92,4 @@ namespace WindowsDev.Settings
         }
     }
 }
+
