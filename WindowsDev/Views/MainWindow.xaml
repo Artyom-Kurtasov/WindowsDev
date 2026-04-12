@@ -1,0 +1,48 @@
+﻿<mah:MetroWindow x:Class="WindowsDev.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+                 xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+                 xmlns:authVm="clr-namespace:WindowsDev.ViewModels.Auth"
+                 xmlns:mainVm="clr-namespace:WindowsDev.ViewModels.Main"
+                 xmlns:projectVm="clr-namespace:WindowsDev.ViewModels.Projects"
+                 xmlns:taskVm="clr-namespace:WindowsDev.ViewModels.Tasks"
+                 xmlns:authViews="clr-namespace:WindowsDev.Views.Auth"
+                 xmlns:mainViews="clr-namespace:WindowsDev.Views.Main"
+                 xmlns:projectViews="clr-namespace:WindowsDev.Views.Projects"
+                 xmlns:taskViews="clr-namespace:WindowsDev.Views.Tasks"
+                 dialogs:DialogParticipation.Register="{Binding CurrentViewModel}"
+                 mc:Ignorable="d"
+                 Title="TaskManager"
+                 Height="450"
+                 Width="800"
+                 MinWidth="252">
+
+    <Grid>
+        <ContentControl Content="{Binding CurrentViewModel}">
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type authVm:AuthorizationViewModel}">
+                    <authViews:AuthorizationView />
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type authVm:RegistrationViewModel}">
+                    <authViews:RegistrationView />
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type mainVm:MainWindowViewModel}">
+                    <mainViews:MainView />
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type projectVm:ProjectViewModel}">
+                    <projectViews:ProjectView />
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type taskVm:TaskViewModel}">
+                    <taskViews:TaskView />
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</mah:MetroWindow>

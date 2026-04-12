@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Win32;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
 

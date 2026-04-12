@@ -18,7 +18,7 @@ namespace WindowsDev.ViewModels
         private readonly ITaskCreator _taskCreator;
         private readonly ITaskWriter _taskWriter;
 
-        public event Func<Task> Close;
+        public event Func<Task> CloseRequested;
 
         private bool _isEditMode;
         private int _projectId;
@@ -120,10 +120,8 @@ namespace WindowsDev.ViewModels
                 ProjectId = _projectId
             });
 
-            if (Close != null)
-                await Close.Invoke();
-
-            _sharedDataService.TaskList = await _taskLoader.LoadTaskAsync(_projectId);
+            if (CloseRequested != null)
+                await CloseRequested.Invoke();
         }
 
         /// <summary>
@@ -147,8 +145,8 @@ namespace WindowsDev.ViewModels
 
                 _sharedDataService.OnPropertyChanged(nameof(SharedDataService.CurrentTask));
 
-                if (Close != null)
-                    await Close.Invoke();
+                if (CloseRequested != null)
+                    await CloseRequested.Invoke();
 
                 IsEditMode = false;
             }
@@ -159,8 +157,8 @@ namespace WindowsDev.ViewModels
         /// </summary>
         public async Task Cancel()
         {
-            if (Close != null)
-                await Close.Invoke();
+            if (CloseRequested != null)
+                await CloseRequested.Invoke();
         }
 
         /// <summary>

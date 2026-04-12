@@ -1,5 +1,4 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Business.DataBase;
 using WindowsDev.Business.Services;
@@ -19,6 +18,11 @@ using WindowsDev.Domain.UsersAuthInfo;
 using WindowsDev.Factories;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
+using WindowsDev.ViewModels.Auth;
+using WindowsDev.ViewModels.Main;
+using WindowsDev.ViewModels.Main.Tabs;
+using WindowsDev.ViewModels.Projects;
+using WindowsDev.ViewModels.Tasks;
 
 namespace WindowsDev.Settings
 {
@@ -76,6 +80,7 @@ namespace WindowsDev.Settings
             // Business services
             services.AddTransient<Authorization>();
 
+
             // ViewModels
             services.AddTransient<AuthorizationViewModel>();
             services.AddTransient<RegistrationViewModel>();
@@ -83,6 +88,9 @@ namespace WindowsDev.Settings
             services.AddTransient<DialogsViewModel>();
             services.AddTransient<TaskDialogViewModel>();
             services.AddSingleton<MainWindowViewModel>();
+            services.AddSingleton<ProjectsViewModel>();
+            services.AddSingleton<SettingsViewModel>();
+            services.AddSingleton<TaskViewModel>();
 
             // Windows
             services.AddSingleton<MainWindow>();

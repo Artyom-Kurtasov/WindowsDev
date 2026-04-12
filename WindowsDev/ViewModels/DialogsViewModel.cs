@@ -18,13 +18,14 @@ namespace WindowsDev.ViewModels
         private readonly IProjectCreator _projectCreator;
 
         /// <summary>
-        /// Event triggered to close the dialog.
+        /// Event triggered when the dialog should be closed.
         /// </summary>
-        public event Func<Task>? Close;
+        public event Func<Task>? CloseRequested;
 
         private string _projectName = string.Empty;
         /// <summary>
         /// Name of the project entered by the user.
+        /// This is bound to the UI input field for project name.
         /// </summary>
         public string ProjectName
         {
@@ -39,6 +40,7 @@ namespace WindowsDev.ViewModels
         private string _projectDescription = string.Empty;
         /// <summary>
         /// Description of the project entered by the user.
+        /// This is bound to the UI input field for project description.
         /// </summary>
         public string ProjectDescription
         {
@@ -73,14 +75,17 @@ namespace WindowsDev.ViewModels
         }
 
         /// <summary>
-        /// Executes project creation and updates shared project list.
+        /// Executes the project creation workflow:
+        /// 1. Creates the project in the data source with user's name and description
+        /// 2. Closes the dialog if the CloseRequested event is subscribed
+        /// 3. Reloads the shared project list to reflect the newly created project
         /// </summary>
         public async Task CreateProjectExecute()
         {
             await _projectCreator.CreateProject(_projectName, _projectDescription, _currentUserData.UserId);
 
-            if (Close != null)
-                await Close.Invoke();
+            if (CloseRequested != null)
+                await CloseRequested.Invoke();
 
             _sharedDataService.ProjectList = await _projectLoader.LoadProjectAsync();
         }

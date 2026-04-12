@@ -1,12 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System.ServiceProcess;
 using System.Windows;
 using WindowsDev.Business.DataBase;
 using WindowsDev.Business.Services.Localization;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Settings;
-using WindowsDev.ViewModels;
+using WindowsDev.ViewModels.Auth;
+using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev
 {
@@ -33,7 +33,7 @@ namespace WindowsDev
 
             language.ChangeLanguage(UserSettings.Default.LanguageCode);
 
-            navigationService.NavigateTo<AuthorizationViewModel>();
+            await navigationService.NavigateTo<AuthorizationViewModel>();
 
             var main = ServiceProvider.GetRequiredService<MainWindow>();
 

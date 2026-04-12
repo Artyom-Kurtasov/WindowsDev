@@ -1,0 +1,36 @@
+﻿<UserControl x:Class="WindowsDev.Views.Projects.CreateProjectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:WindowsDev.Controls.Users"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel MaxWidth="400">
+        <UserCtrl:AdvancedTextBox Header="{DynamicResource NameLabel}"
+                                  CornerRadius="8"
+                                  Text="{Binding ProjectName, Mode=TwoWay}"/>
+        <UserCtrl:AdvancedTextBox Header="{DynamicResource DescriptionLabel}"
+                                  CornerRadius="8"
+                                  FieldHeight="100"
+                                  ScrollBarVisibility="Auto"
+                                  Text="{Binding ProjectDescription, Mode=TwoWay}"/>
+
+        <Grid Margin="0,20,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Button Grid.Column="0"
+                    Content="{DynamicResource CreateButton}"
+                    mah:ControlsHelper.CornerRadius="8" Margin="0,0,10,0"
+                    Command="{Binding CreateProject}"/>
+            <Button Grid.Column="1"
+                    Content="{DynamicResource CancelButton}"
+                    mah:ControlsHelper.CornerRadius="8" Margin="10,0,0,0"/>
+        </Grid>
+    </StackPanel>
+</UserControl>

@@ -9,14 +9,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="ViewModels\Commands\**" />
-	  <Compile Remove="View\ContentControls\**" />
-	  <EmbeddedResource Remove="ViewModels\Commands\**" />
-	  <EmbeddedResource Remove="View\ContentControls\**" />
-	  <None Remove="ViewModels\Commands\**" />
-	  <None Remove="View\ContentControls\**" />
-	  <Page Remove="ViewModels\Commands\**" />
-	  <Page Remove="View\ContentControls\**" />
+		<Compile Remove="ViewModels\Commands\**" />
+		<Compile Remove="Views\ContentControls\**" />
+		<EmbeddedResource Remove="ViewModels\Commands\**" />
+		<EmbeddedResource Remove="Views\ContentControls\**" />
+		<None Remove="ViewModels\Commands\**" />
+		<None Remove="Views\ContentControls\**" />
+		<Page Remove="ViewModels\Commands\**" />
+		<Page Remove="Views\ContentControls\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -28,23 +28,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WindowsDev.Business\WindowsDev.Business.csproj" />
+		<ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Business.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Settings\UserSettings.Designer.cs">
-	    <DesignTimeSharedInput>True</DesignTimeSharedInput>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>UserSettings.settings</DependentUpon>
-	  </Compile>
+		<Compile Update="Localization\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Settings\UserSettings.settings">
-	    <Generator>PublicSettingsSingleFileGenerator</Generator>
-	    <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
-	  </None>
+		<EmbeddedResource Update="Localization\Resources.resx">
+			<Generator>PublicResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
 	</ItemGroup>
 
 </Project>
-

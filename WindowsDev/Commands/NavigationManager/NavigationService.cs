@@ -1,6 +1,7 @@
 ﻿using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
+using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.Commands.NavigationManager
 {
@@ -15,9 +16,14 @@ namespace WindowsDev.Commands.NavigationManager
             _viewModelFactory = viewModelFactory;
         }
 
-        public void NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
+        public async Task NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
         {
             TViewModel viewModel = _viewModelFactory.Create<TViewModel>(args);
+
+            if (viewModel is IInitializableAsync initializableAsync)
+            {
+                await initializableAsync.InitializationAsync();
+            }
 
             _navigationStore.CurrentViewModel = viewModel;
         }
