@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService.Interfaces
 {

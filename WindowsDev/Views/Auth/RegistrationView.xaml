@@ -5,14 +5,15 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:converters="clr-namespace:WindowsDev.Business.Services.Registration.Validation;assembly=WindowsDev.Business"
+             xmlns:converters="clr-namespace:WindowsDev.Business.Services.Registration.Validation.Converters;assembly=WindowsDev.Business"
              xmlns:local="clr-namespace:WindowsDev.Controls.Users"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <converters:PasswordColorValidationConvert x:Key="PasswordColorValidationConvert"/>
-        <converters:LoginColorValidationConverter x:Key="LoginColorValidationConverter"/>
-        <converters:UsernameColorValidationConverter x:Key="UsernameColorValidationConverter"/>
+        <converters:StringToVisibilityConverter x:Key="VisibilityConverter"/>
+        <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        <converters:LoginAvailabilityToBrushConverter x:Key="LoginAvailabilityConverter"/>
+        <converters:UsernameAvailabilityToBrushConverter x:Key="UsernameAvailabilityConverter"/>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -34,18 +35,42 @@
                                         Header="{DynamicResource LoginLabel}"
                                         Text="{Binding Login, Mode=TwoWay}"/>
 
-                <TextBlock mah:VisibilityHelper.IsCollapsed="False"
-                       Text="{Binding LoginValidationMessage}"
-                       Foreground="{Binding LoginValidationMessage, Converter={StaticResource LoginColorValidationConverter}}" Margin="5,5,0,0"/>
+                <TextBlock Visibility="{Binding Login, Converter={StaticResource StringToVisibilityConverter}}"
+                       Foreground="{Binding IsLoginAvailable, Converter={StaticResource BoolToBrushConverter}}" Margin="5,5,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsLoginAvailable}" Value="True">
+                                    <Setter Property="Text" Value="{DynamicResource LoginAvailable}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsLoginAvailable}" Value="False">
+                                    <Setter Property="Text" Value="{DynamicResource LoginTaken}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
                 <UserCtrl:AdvancedTextBox CornerRadius="8"
                                       Header="{DynamicResource UsernameLabel}" Margin="0,20,0,0"
                                       Text="{Binding Username, Mode=TwoWay}"/>
 
-                <TextBlock mah:VisibilityHelper.IsCollapsed="False"
-                           Text="{Binding UsernameValidationMessage}"
-                           Foreground="{Binding UsernameValidationMessage, Converter={StaticResource UsernameColorValidationConverter}}" 
-                           Margin="5,5,0,0"/>
+                <TextBlock Visibility="{Binding Username, Converter={StaticResource StringToVisibilityConverter}}"
+                           Foreground="{Binding IsUsernameAvailable, Converter={StaticResource BoolToBrushConverter}}" 
+                           Margin="5,5,0,0">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsUsernameAvailable}" Value="True">
+                                    <Setter Property="Text" Value="{DynamicResource UsernameAvailable}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsUsernameAvailable}" Value="False">
+                                    <Setter Property="Text" Value="{DynamicResource UsernameTaken}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
 
                 <StackPanel HorizontalAlignment="Stretch">
 
@@ -56,14 +81,21 @@
                     CornerRadius="8"
                     Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
-                    <TextBlock FontSize="10" Margin="0,5,0,0">
-                    <Run Text="At least 12 characters" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Length'}"/>
+                    <TextBlock FontSize="10" Margin="0,5,0,0" Visibility="{Binding Password, Converter={StaticResource StringToVisibilityConverter}}">
+                    <Run Text="At least 12 characters" 
+                         Foreground="{Binding HasMinimumLength , Converter={StaticResource BoolToBrushConverter}}"/>
                     <LineBreak/>
-                    <Run Text="Use a numbers" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Number'}"/>
+                        
+                    <Run Text="Use a numbers" 
+                         Foreground="{Binding HasNumber, Converter={StaticResource BoolToBrushConverter}}"/>
                     <LineBreak/>
-                    <Run Text="Use a uppercase letters" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Uppercase'}"/>
+                        
+                    <Run Text="Use a uppercase letters" 
+                         Foreground="{Binding HasUppercase, Converter={StaticResource BoolToBrushConverter}}"/>
                     <LineBreak/>
-                    <Run Text="Use a symbols" Foreground="{Binding Password, Converter={StaticResource PasswordColorValidationConvert}, ConverterParameter='Symbol'}"/>
+                        
+                    <Run Text="Use a symbols" 
+                         Foreground="{Binding HasSymbol, Converter={StaticResource BoolToBrushConverter}}"/>
                     </TextBlock>
                 </StackPanel>
 

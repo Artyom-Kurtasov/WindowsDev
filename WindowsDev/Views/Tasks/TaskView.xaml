@@ -64,32 +64,32 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <UserCtrl:TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
+            <UserCtrl:MyTextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
                                    Header="{DynamicResource StatusLabel}"
                                    Text="{Binding Status, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                    FontSize="16" 
                                    FontWeight="SemiBold"/>
 
-            <UserCtrl:TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
+            <UserCtrl:MyTextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
                                 Header="{DynamicResource PriorityLabel}"   
                                 Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
-            <UserCtrl:TextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
+            <UserCtrl:MyTextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
                                 Header="{DynamicResource ProgressLabel}"
                                 Text="{Binding Progress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
-            <UserCtrl:TextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
+            <UserCtrl:MyTextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
                                 Header="{DynamicResource CreatedAtLabel}"
                                 Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
         </Grid>
 
-        <UserCtrl:TextBlock 
+        <UserCtrl:MyTextBlock 
             Header="{DynamicResource DescriptionLabel}"
             Grid.Row="3" 
             mah:ControlsHelper.CornerRadius="8"

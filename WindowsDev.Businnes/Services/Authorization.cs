@@ -1,7 +1,7 @@
 ﻿using WindowsDev.Business.DataBase;
 using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.UserManager;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.UsersModels;
 
 namespace WindowsDev.Business.Services
 {

@@ -1,6 +1,4 @@
-﻿using WindowsDev.Domain.UsersAuthInfo;
-
-namespace WindowsDev.Domain
+﻿namespace WindowsDev.Domain.TasksModels
 {
     public class TaskAttachment
     {

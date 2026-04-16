@@ -2,14 +2,14 @@
 
 namespace WindowsDev.Infrastructure
 {
-    public class AsyncRelayCommand<T> : ICommand
+    public class AsyncRelayCommandT<T> : ICommand
     {
         private readonly Func<T, Task> _execute;
         private readonly Func<T, bool>? _canExecute;
 
         public event EventHandler? CanExecuteChanged;
 
-        public AsyncRelayCommand(Func<T, Task> execute, Func<T, bool>? canExecute = null)
+        public AsyncRelayCommandT(Func<T, Task> execute, Func<T, bool>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;

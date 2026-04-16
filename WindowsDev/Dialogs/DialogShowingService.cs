@@ -2,47 +2,45 @@
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows.Controls;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Factories.Interfaces;
+using WindowsDev.ViewModels.Interfaces;
 
-namespace WindowsDev.Business.Services
+namespace WindowsDev.Dialogs
 {
     /// <summary>
     /// Service responsible for showing custom dialogs using MahApps.Metro.
     /// </summary>
     public class DialogShowingService
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly IViewModelFactory _viewModelFactory;
         private readonly IDialogCoordinator _dialogCoordinator;
         private CustomDialog? _dialog;
 
-        public DialogShowingService(IServiceProvider serviceProvider, IDialogCoordinator dialogCoordinator)
+        public DialogShowingService(IDialogCoordinator dialogCoordinator,
+            IViewModelFactory viewModelFactory)
         {
-            _serviceProvider = serviceProvider;
             _dialogCoordinator = dialogCoordinator;
+            _viewModelFactory = viewModelFactory;
         }
 
         /// <summary>
         /// Shows a dialog with a specified view and ViewModel.
         /// Supports optional data editing if the ViewModel implements IProjectDialogCreator.
         /// </summary>
-        public async Task ShowCreateDialogAsync<TView, TViewModel>(object context, object? data)
+        public async Task ShowTaskDialogAsync<TView, TViewModel>(object context, params object[] args)
             where TView : UserControl, new()
             where TViewModel : class, IProjectDialogCreator
         {
             var view = new TView();
 
-            var viewModel = _serviceProvider.GetRequiredService<TViewModel>();
+            var viewModel = _viewModelFactory.Create<TViewModel>();
 
-            if (data is TasksInfo task)
+            if (viewModel is IInitializableAsync init)
             {
-                viewModel.SetEditDialog(task);
-            }
-            if (data is int projectId)
-            {
-                viewModel.SetProjectId(projectId);
+                await init.InitializationAsync(args);
             }
 
-            view.DataContext = viewModel;
+            view.DataContext = viewModel;   
 
             _dialog = new CustomDialog
             {

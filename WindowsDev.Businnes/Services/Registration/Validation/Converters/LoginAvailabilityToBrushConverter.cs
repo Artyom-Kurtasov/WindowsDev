@@ -3,9 +3,9 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace WindowsDev.Business.Services.Registration.Validation
+namespace WindowsDev.Business.Services.Registration.Validation.Converters
 {
-    public class LoginColorValidationConverter : IValueConverter
+    public class LoginAvailabilityToBrushConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo cultureInfo)
         {

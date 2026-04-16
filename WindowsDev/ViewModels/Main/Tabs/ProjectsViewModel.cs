@@ -1,9 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Business.Services;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Dialogs;
+using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
@@ -45,7 +45,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
             DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjects);
             OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialog);
-            OpenProjectCommand = new AsyncRelayCommand<ProjectsInfo>(OpenProject, _ => true);
+            OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProject, _ => true);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
         /// </summary>
         private async Task ShowCreateProjectDialog()
         {
-            await _dialogShowingService.ShowCreateDialogAsync<CreateProjectView, DialogsViewModel>(this, null);
+            await _dialogShowingService.ShowTaskDialogAsync<CreateProjectView, DialogsViewModel>(this);
         }
     }
 }

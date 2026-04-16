@@ -43,4 +43,12 @@
     <sys:String x:Key="PostCommentButton">Post</sys:String>
     <sys:String x:Key="SaveTaskButton">Save</sys:String>
 
+    <sys:String x:Key="LoginTaken">Login is already taken</sys:String>
+    <sys:String x:Key="LoginAvailable">Login is available</sys:String>
+
+    <sys:String x:Key="UsernameTaken">Username is already taken</sys:String>
+    <sys:String x:Key="UsernameAvailable">Username is available</sys:String>
+
+    <sys:String x:Key="UserNotExists">A user with this login or password does not exist</sys:String>
+
 </ResourceDictionary>

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WindowsDev.Domain.UsersAuthInfo
+namespace WindowsDev.Domain.UsersModels
 {
     public class UsersInfo
     {

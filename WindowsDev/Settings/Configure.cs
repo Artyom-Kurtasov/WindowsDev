@@ -8,13 +8,15 @@ using WindowsDev.Business.Services.ProjectService;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.Registration;
 using WindowsDev.Business.Services.Registration.Validation;
+using WindowsDev.Business.Services.Registration.Validation.Converters;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Attachment;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Dialogs;
+using WindowsDev.Domain.TasksModels;
 using WindowsDev.Factories;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels;
@@ -23,6 +25,7 @@ using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Main.Tabs;
 using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Tasks;
+using WindowsDev.ViewModels.Tasks.Dialog;
 
 namespace WindowsDev.Settings
 {
@@ -56,9 +59,9 @@ namespace WindowsDev.Settings
             services.AddSingleton<SharedDataService>();
             services.AddSingleton<CurrentUserData>();
             services.AddTransient<AddComment>();
-            services.AddSingleton<PasswordColorValidationConvert>();
-            services.AddSingleton<LoginColorValidationConverter>();
-            services.AddSingleton<UsernameColorValidationConverter>();
+            services.AddSingleton<BoolToBrushConverter>();
+            services.AddSingleton<LoginAvailabilityToBrushConverter>();
+            services.AddSingleton<UsernameAvailabilityToBrushConverter>();
             services.AddSingleton<UserFieldValidator>();
             services.AddSingleton<CurrentUserService>();
             services.AddSingleton<FileReader>();
@@ -86,11 +89,15 @@ namespace WindowsDev.Settings
             services.AddTransient<RegistrationViewModel>();
             services.AddTransient<ProjectViewModel>();
             services.AddTransient<DialogsViewModel>();
-            services.AddTransient<TaskDialogViewModel>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<ProjectsViewModel>();
             services.AddSingleton<SettingsViewModel>();
             services.AddSingleton<TaskViewModel>();
+            services.AddSingleton<EditTaskViewModel>();
+            services.AddSingleton<CreateTaskViewModel>();
+
+            // Validators
+            services.AddTransient<PasswordValidator>();
 
             // Windows
             services.AddSingleton<MainWindow>();

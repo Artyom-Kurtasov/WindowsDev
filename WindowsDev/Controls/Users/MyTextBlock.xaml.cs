@@ -7,15 +7,15 @@ namespace WindowsDev.Controls.Users
     /// <summary>
     /// Interaction logic for TextBlock.xaml
     /// </summary>
-    public partial class TextBlock : UserControl
+    public partial class MyTextBlock : UserControl
     {
-        public TextBlock()
+        public MyTextBlock()
         {
             InitializeComponent();
         }
 
         public static readonly DependencyProperty HeaderProperty =
-               DependencyProperty.Register(nameof(Header), typeof(string), typeof(TextBlock));
+               DependencyProperty.Register(nameof(Header), typeof(string), typeof(MyTextBlock));
 
         public string Header
         {
@@ -24,7 +24,7 @@ namespace WindowsDev.Controls.Users
         }
 
         public static readonly DependencyProperty FieldMarginProperty =
-            DependencyProperty.Register(nameof(FieldMargin), typeof(double), typeof(TextBlock));
+            DependencyProperty.Register(nameof(FieldMargin), typeof(double), typeof(MyTextBlock));
 
         public Thickness FieldMargin
         {
@@ -33,7 +33,7 @@ namespace WindowsDev.Controls.Users
         }
 
         public static readonly DependencyProperty CornerRadiusProperty =
-            DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(TextBlock));
+            DependencyProperty.Register(nameof(CornerRadius), typeof(CornerRadius), typeof(MyTextBlock));
 
         public CornerRadius CornerRadius
         {
@@ -42,7 +42,7 @@ namespace WindowsDev.Controls.Users
         }
 
         public static readonly DependencyProperty TextProperty =
-            DependencyProperty.Register(nameof(Text), typeof(string), typeof(TextBlock));
+            DependencyProperty.Register(nameof(Text), typeof(string), typeof(MyTextBlock));
         public string Text
         {
             get => (string)GetValue(TextProperty);
@@ -50,7 +50,7 @@ namespace WindowsDev.Controls.Users
         }
 
         public static new readonly DependencyProperty BorderBrushProperty =
-            DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(TextBlock));
+            DependencyProperty.Register(nameof(BorderBrush), typeof(Brush), typeof(MyTextBlock));
 
         public new Brush BorderBrush
         {
@@ -58,22 +58,13 @@ namespace WindowsDev.Controls.Users
             set => SetValue(BorderBrushProperty, value);
         }
 
-        public static new readonly DependencyProperty BorderThicknessProperty =
-            DependencyProperty.Register(nameof(BorderThickness), typeof(Thickness), typeof(TextBlock));
+        public static readonly DependencyProperty WrappingProperty =
+            DependencyProperty.Register(nameof(Wrapping), typeof(TextWrapping), typeof(MyTextBlock));
 
-        public new Thickness BorderThickness
+        public TextWrapping Wrapping
         {
-            get => (Thickness)GetValue(BorderThicknessProperty);
-            set => SetValue(BorderThicknessProperty, value);
-        }
-
-        public static new readonly DependencyProperty TextWrappingProperty =
-            DependencyProperty.Register(nameof(Wrapping), typeof(TextWrapping), typeof(TextBlock));
-
-        public new TextWrapping Wrapping
-        {
-            get => (TextWrapping)GetValue(TextWrappingProperty);
-            set => SetValue(TextWrappingProperty, value);
+            get => (TextWrapping)GetValue(WrappingProperty);
+            set => SetValue(WrappingProperty, value);
         }
     }
 }

@@ -13,12 +13,15 @@ namespace WindowsDev.ViewModels.Auth
     /// </summary>
     public class RegistrationViewModel : ViewModelBase
     {
+        private readonly PasswordValidator _passwordValidator;
         private readonly INavigationService _navigationService;
         private readonly Registration _registration;
         private readonly UserFieldValidator _userFieldValidator;
 
-        private CancellationTokenSource _loginCts;
-        private CancellationTokenSource _usernameCts;
+        public bool HasMinimumLength => _passwordValidator.HasMinimumLength(Password);
+        public bool HasNumber => _passwordValidator.HasNumber(Password);
+        public bool HasUppercase => _passwordValidator.HasUppercase(Password);
+        public bool HasSymbol => _passwordValidator.HasSymbol(Password); 
 
         private string _login;
         public string Login
@@ -28,7 +31,7 @@ namespace WindowsDev.ViewModels.Auth
             {
                 _login = value;
                 OnPropertyChanged(nameof(Login));
-                CheckLoginAvailabilityAsyncCommand.Execute(null);
+                _ = CheckLoginAvailabilityAsync();
                 ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
@@ -41,7 +44,7 @@ namespace WindowsDev.ViewModels.Auth
             {
                 _username = value;
                 OnPropertyChanged(nameof(Username));
-                CheckUsernameAvailabilityAsyncCommand.Execute(null);
+                _ = CheckUsernameAvailabilityAsync();
                 ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
@@ -54,6 +57,10 @@ namespace WindowsDev.ViewModels.Auth
             {
                 _password = value;
                 OnPropertyChanged(nameof(Password));
+                OnPropertyChanged(nameof(HasMinimumLength));
+                OnPropertyChanged(nameof(HasNumber));
+                OnPropertyChanged(nameof(HasUppercase));
+                OnPropertyChanged(nameof(HasSymbol));
                 ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
             }
         }
@@ -70,32 +77,28 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-        private string _usernameValidationMessage;
-        public string UsernameValidationMessage
+        private bool _isLoginAvailable;
+        public bool IsLoginAvailable
         {
-            get => _usernameValidationMessage;
+            get => _isLoginAvailable;
             set
             {
-                _usernameValidationMessage = value;
-                OnPropertyChanged();
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                _isLoginAvailable = value;
+                OnPropertyChanged(nameof(IsLoginAvailable));
             }
         }
 
-        private string _loginValidationMessage;
-        public string LoginValidationMessage
+        private bool _isUsernameAvailable;
+        public bool IsUsernameAvailable
         {
-            get => _loginValidationMessage;
+            get => _isUsernameAvailable;
             set
             {
-                _loginValidationMessage = value;
-                OnPropertyChanged();
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                _isUsernameAvailable = value;
+                OnPropertyChanged(nameof(IsUsernameAvailable));
             }
         }
 
-        public ICommand CheckLoginAvailabilityAsyncCommand { get; }
-        public ICommand CheckUsernameAvailabilityAsyncCommand { get; }
         public ICommand SignUpCommand { get; }
         public ICommand SwitchToAuthViewCommand { get; }
 
@@ -106,17 +109,16 @@ namespace WindowsDev.ViewModels.Auth
         public RegistrationViewModel(
             INavigationService navigationService,
             Registration registration,
-            UserFieldValidator userFieldValidator)
+            UserFieldValidator userFieldValidator,
+            PasswordValidator passwordValidator)
         {
             _navigationService = navigationService;
             _registration = registration;
             _userFieldValidator = userFieldValidator;
+            _passwordValidator = passwordValidator;
 
             SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView, CanSwitchToAuthView);
             SignUpCommand = new AsyncRelayCommand(SignUp, CanSignUp);
-
-            CheckLoginAvailabilityAsyncCommand = new AsyncRelayCommand(CheckLoginAvailabilityAsync);
-            CheckUsernameAvailabilityAsyncCommand = new AsyncRelayCommand(CheckUsernameAvailabilityAsync);
         }
 
         /// <summary>
@@ -140,10 +142,13 @@ namespace WindowsDev.ViewModels.Auth
         /// Determines if registration can be executed (all fields must be filled).
         /// </summary>
         private bool CanSignUp() =>
-            !string.IsNullOrEmpty(Login) &&
-            !string.IsNullOrEmpty(Username) &&
+            IsLoginAvailable && IsUsernameAvailable &&
+            Password == ConfirmPassword &&
+            HasMinimumLength && HasNumber &&
+            HasSymbol && HasUppercase &&
             !string.IsNullOrEmpty(Password) &&
-            !string.IsNullOrEmpty(ConfirmPassword);
+            !string.IsNullOrEmpty(Login) &&
+            !string.IsNullOrEmpty(Username);
 
         /// <summary>
         /// Always allow switching to authorization view.
@@ -155,16 +160,8 @@ namespace WindowsDev.ViewModels.Auth
         /// </summary>
         private async Task CheckLoginAvailabilityAsync()
         {
-            _loginCts?.Cancel();
-            _loginCts = new CancellationTokenSource();
-            var token = _loginCts.Token;
-
-            await Task.Delay(500, token); // debounce
-
-            if (token.IsCancellationRequested)
-                return;
-
-            LoginValidationMessage = await _userFieldValidator.IsLoginTakenAsync(Login);
+            IsLoginAvailable = await _userFieldValidator.IsLoginAvailableAsync(Login);
+            ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
         }
 
         /// <summary>
@@ -172,16 +169,8 @@ namespace WindowsDev.ViewModels.Auth
         /// </summary>
         private async Task CheckUsernameAvailabilityAsync()
         {
-            _usernameCts?.Cancel();
-            _usernameCts = new CancellationTokenSource();
-            var token = _usernameCts.Token;
-
-            await Task.Delay(500, token); // debounce
-
-            if (token.IsCancellationRequested)
-                return;
-
-            UsernameValidationMessage = await _userFieldValidator.IsUsernameTakenAsync(Username);
+            IsUsernameAvailable = await _userFieldValidator.IsUsernameAvailableAsync(Username);
+            ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
         }
     }
 }

@@ -43,4 +43,12 @@
     <sys:String x:Key="PostCommentButton">投稿</sys:String>
     <sys:String x:Key="SaveTaskButton">保存</sys:String>
 
+    <sys:String x:Key="LoginTaken">ログインはすでに使用されています</sys:String>
+    <sys:String x:Key="LoginAvailable">ログインは利用可能です</sys:String>
+
+    <sys:String x:Key="UsernameTaken">ユーザー名はすでに使用されています</sys:String>
+    <sys:String x:Key="UsernameAvailable">ユーザー名は利用可能です</sys:String>
+
+    <sys:String x:Key="UserNotExists">このログインまたはパスワードのユーザーは存在しません</sys:String>
+
 </ResourceDictionary>

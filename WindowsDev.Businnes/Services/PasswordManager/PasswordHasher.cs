@@ -8,15 +8,15 @@ namespace WindowsDev.Business.Services.PasswordManager
     /// </summary>
     public class PasswordHasher
     {
-        private const ulong HASH_SEED = 2687232455;
-        private const ulong MIXING_CONSTANT = 1415926535;
+        private const ulong HashSeed = 2687232455;
+        private const ulong MixingConstant = 1415926535;
 
         /// <summary>
         /// Hashes a password with the given salt using a custom iterative algorithm.
         /// </summary>
         public ulong HashPassword(string password, byte[] salt)
         {
-            ulong hash = HASH_SEED;
+            ulong hash = HashSeed;
 
             byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
             byte[] combinedData = new byte[passwordBytes.Length + salt.Length];
@@ -29,7 +29,7 @@ namespace WindowsDev.Business.Services.PasswordManager
                 foreach (byte b in combinedData)
                 {
                     hash ^= b;
-                    hash *= MIXING_CONSTANT;
+                    hash *= MixingConstant;
                     hash = (hash << 13) | (hash >> 51);
                 }
             }

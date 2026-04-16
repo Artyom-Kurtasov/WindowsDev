@@ -2,7 +2,7 @@
 using WindowsDev.Business.DataBase;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.ProjectsModels;
 
 namespace WindowsDev.Business.Services.ProjectService
 {

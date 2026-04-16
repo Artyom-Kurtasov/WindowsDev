@@ -1,8 +1,8 @@
 ﻿using WindowsDev.Business.DataBase;
 using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.UserManager;
-using WindowsDev.Domain.UsersAuthInfo;
 using System.Linq;
+using WindowsDev.Domain.UsersModels;
 
 namespace WindowsDev.Business.Services.Registration
 {

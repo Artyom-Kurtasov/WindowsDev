@@ -18,11 +18,11 @@ namespace WindowsDev.Commands.NavigationManager
 
         public async Task NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
         {
-            TViewModel viewModel = _viewModelFactory.Create<TViewModel>(args);
+            TViewModel viewModel = _viewModelFactory.Create<TViewModel>();
 
             if (viewModel is IInitializableAsync initializableAsync)
             {
-                await initializableAsync.InitializationAsync();
+                await initializableAsync.InitializationAsync(args);
             }
 
             _navigationStore.CurrentViewModel = viewModel;

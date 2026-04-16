@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Collections.ObjectModel;
 using WindowsDev.Business.DataBase;
-using WindowsDev.Domain;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService.Attachment
 {

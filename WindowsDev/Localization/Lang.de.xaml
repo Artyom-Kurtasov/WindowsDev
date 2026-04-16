@@ -43,4 +43,12 @@
     <sys:String x:Key="PostCommentButton">Senden</sys:String>
     <sys:String x:Key="SaveTaskButton">Speichern</sys:String>
 
+    <sys:String x:Key="LoginTaken">Login ist bereits vergeben</sys:String>
+    <sys:String x:Key="LoginAvailable">Login ist verfügbar</sys:String>
+
+    <sys:String x:Key="UsernameTaken">Benutzername ist bereits vergeben</sys:String>
+    <sys:String x:Key="UsernameAvailable">Benutzername ist verfügbar</sys:String>
+
+    <sys:String x:Key="UserNotExists">Ein Benutzer mit diesem Login oder Passwort existiert nicht</sys:String>
+
 </ResourceDictionary>

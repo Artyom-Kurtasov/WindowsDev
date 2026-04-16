@@ -12,27 +12,49 @@ namespace WindowsDev.Business.Services.Registration.Validation
             _dbManager = dbManager;
         }
 
-        public async Task<string> IsLoginTakenAsync(string login)
+        public Task<bool> IsLoginAvailableAsync(string login)
         {
-            using var dbContext = _dbManager.Create();
-
-            if (await dbContext.UsersInfo.AnyAsync(u => u.Login == login))
+            var debounced = Debounce(async () =>
             {
-                return "User with this login already exist";
-            }
+                using var dbContext = _dbManager.Create();
 
-            return "Login is available";
+                var exists = await dbContext.UsersInfo
+                .AnyAsync(l => l.Login  == login);
+
+                return !exists;
+            });
+
+            return debounced();
         }
 
-        public async Task<string> IsUsernameTakenAsync(string username)
+        public Task<bool> IsUsernameAvailableAsync(string username)
         {
-            using var dbContext = _dbManager.Create();
-            if (await dbContext.UsersInfo.AnyAsync(u => u.Username == username))
+           var debounced = Debounce(async () =>
             {
-                return "Username already taken";
-            }
+                using var dbContext = _dbManager.Create();
 
-            return "Username is available";
+                var exists = await dbContext.UsersInfo
+                .AnyAsync(u => u.Username == username);
+
+                return !exists;
+            });
+
+            return debounced();
+        }
+
+        private Func<Task<bool>> Debounce(Func<Task<bool>> action)
+        {
+            CancellationTokenSource Cts = new CancellationTokenSource();
+
+            return async () =>
+            {
+                Cts.Cancel();
+                Cts = new CancellationTokenSource();
+
+               await Task.Delay(500, Cts.Token);
+
+               return await action();
+            };
         }
     }
 }

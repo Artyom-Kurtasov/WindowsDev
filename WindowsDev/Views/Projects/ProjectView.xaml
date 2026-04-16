@@ -34,13 +34,13 @@
                                 mah:ControlsHelper.CornerRadius="8"
                                 Command="{Binding SwitchToMainViewCommand}"/>
 
-                        <UserCtrl:TextBlock Grid.Row="1"
+                        <UserCtrl:MyTextBlock Grid.Row="1"
                                             Margin="0,0,0,10"
                                             CornerRadius="8"
                                             Header="{DynamicResource NameLabel}"
                                             Text="{Binding Name}"/>
 
-                        <UserCtrl:TextBlock Grid.Row="2"
+                        <UserCtrl:MyTextBlock Grid.Row="2"
                                             CornerRadius="8"
                                             Header="{DynamicResource DescriptionLabel}"
                                             Text="{Binding Description}"/>

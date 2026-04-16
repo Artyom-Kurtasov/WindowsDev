@@ -35,6 +35,21 @@
                 Margin="20,20,20,0"
                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
+            <TextBlock Foreground="Red" Margin="20,0,20,0">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLoginFailed}" Value="True">
+                                <Setter Property="Text" Value="{DynamicResource UserNotExists}"/>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
             <!--Password-->
             <UserCtrl:PasswordBox
                 Header="{DynamicResource PasswordLabel}"

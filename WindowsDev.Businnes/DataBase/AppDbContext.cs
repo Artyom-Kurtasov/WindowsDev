@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Domain;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.ProjectsModels;
+using WindowsDev.Domain.TasksModels;
+using WindowsDev.Domain.UsersModels;
 
 namespace WindowsDev.Business.DataBase
 {

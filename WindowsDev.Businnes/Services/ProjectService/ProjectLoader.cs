@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Domain.UsersAuthInfo;
+using WindowsDev.Domain.ProjectsModels;
 
 namespace WindowsDev.Business.Services.ProjectService
 {

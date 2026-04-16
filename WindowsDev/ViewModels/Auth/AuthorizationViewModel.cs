@@ -42,6 +42,17 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
+        private bool _isLoginFailed;
+        public bool IsLoginFailed
+        {
+            get => _isLoginFailed;
+            set
+            {
+                _isLoginFailed = value;
+                OnPropertyChanged(nameof(IsLoginFailed));
+            }
+        }
+
         /// <summary>
         /// Command to perform authorization.
         /// </summary>
@@ -81,10 +92,12 @@ namespace WindowsDev.ViewModels.Auth
         /// </summary>
         private async Task Authorize()
         {
-            if (_authorization.Authorize(_username, _password))
-            {
+            var success = _authorization.Authorize(_username, _password);
+
+            IsLoginFailed = !success;
+
+            if (success)
                 await _navigationService.NavigateTo<MainWindowViewModel>();
-            }
         }
 
         /// <summary>

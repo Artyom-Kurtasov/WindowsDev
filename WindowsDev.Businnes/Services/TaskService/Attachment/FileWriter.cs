@@ -1,43 +1,43 @@
-﻿using WindowsDev.Business.DataBase;
-using WindowsDev.Domain;
+﻿using System.Windows.Documents;
+using WindowsDev.Business.DataBase;
+using WindowsDev.Domain.TasksModels;
 
 
 namespace WindowsDev.Business.Services.TaskService.Attachment
 {
     public class FileWriter
     {
-        private readonly SharedDataService _sharedDataService;
         private readonly DbManager _dbManager;
 
-        public FileWriter(DbManager dbManager,
-            SharedDataService sharedDataService)
+        public FileWriter(DbManager dbManager)
         {
             _dbManager = dbManager;
-            _sharedDataService = sharedDataService;
         }
 
-        public async Task AddFileInfoToDatavase(string filePath)
+        public async Task<TaskAttachment?> AddFileInfoToDatabase(string filePath, int taskId)
         {
             FileInfo fileInfo = new FileInfo(filePath);
 
-            if (filePath != null)
+            if (fileInfo.Exists)
             {
-                if (fileInfo.Exists)
+                using var dbContext = _dbManager.Create();
+
+                TaskAttachment attachment = new TaskAttachment
                 {
-                    using var dbContext = _dbManager.Create();
+                    FileName = fileInfo.Name,
+                    FilePath = filePath,
+                    FileExtension = fileInfo.Extension,
+                    FileSize = fileInfo.Length,
+                    TaskId = taskId
+                };
 
-                    await dbContext.AddAsync(new TaskAttachment
-                    {
-                        FileName = fileInfo.Name,
-                        FilePath = filePath,
-                        FileExtension = fileInfo.Extension,
-                        FileSize = fileInfo.Length,
-                        TaskId = _sharedDataService.CurrentTask.Id
-                    });
+                await dbContext.AddAsync(attachment);
+                await dbContext.SaveChangesAsync();
 
-                    await dbContext.SaveChangesAsync();
-                }
+                return attachment;
             }
+
+            return null;
         }
     }
 }
