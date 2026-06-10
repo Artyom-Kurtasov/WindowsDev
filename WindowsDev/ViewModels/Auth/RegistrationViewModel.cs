@@ -1,5 +1,6 @@
-﻿using System.Windows.Input;
-using WindowsDev.Business.Services.Registration;
+﻿using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Input;
+using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
@@ -7,82 +8,105 @@ using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.ViewModels.Auth
 {
-    /// <summary>
-    /// ViewModel for user registration.
-    /// Handles field validation, availability checks, and navigation.
-    /// </summary>
     public class RegistrationViewModel : ViewModelBase
     {
-        private readonly PasswordValidator _passwordValidator;
+        IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
-        private readonly Registration _registration;
+        private readonly IRegistration _registration;
         private readonly UserFieldValidator _userFieldValidator;
 
-        public bool HasMinimumLength => _passwordValidator.HasMinimumLength(Password);
-        public bool HasNumber => _passwordValidator.HasNumber(Password);
-        public bool HasUppercase => _passwordValidator.HasUppercase(Password);
-        public bool HasSymbol => _passwordValidator.HasSymbol(Password); 
+        private CancellationTokenSource? _loginCts;
+        private CancellationTokenSource? _usernameCts;
 
-        private string _login;
+        public RegistrationViewModel(INavigationService navigationService,
+                                     IRegistration registration,
+                                     IDialogCoordinator dialogCoordinator,
+                                     UserFieldValidator userFieldValidator)
+        {
+            _dialogCoordinator = dialogCoordinator;
+            _navigationService = navigationService;
+            _registration = registration;
+            _userFieldValidator = userFieldValidator;
+
+            SignUpCommand = new AsyncRelayCommand(SignUp, CanSignUp);
+            SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView);
+        }
+
+        // Commands
+        public ICommand SignUpCommand { get; }
+        public ICommand SwitchToAuthViewCommand { get; }
+
+        // Inputs
+        private string _login = string.Empty;
         public string Login
         {
             get => _login;
             set
             {
+                if (_login == value) return;
+
                 _login = value;
                 OnPropertyChanged(nameof(Login));
+
                 _ = CheckLoginAvailabilityAsync();
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                UpdateState();
             }
         }
 
-        private string _username;
+        private string _username = string.Empty;
         public string Username
         {
             get => _username;
             set
             {
+                if (_username == value) return;
+
                 _username = value;
                 OnPropertyChanged(nameof(Username));
+
                 _ = CheckUsernameAvailabilityAsync();
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+                UpdateState();
             }
         }
 
-        private string _password;
+        private string _password = string.Empty;
         public string Password
         {
             get => _password;
             set
             {
+                if (_password == value) return;
+
                 _password = value;
                 OnPropertyChanged(nameof(Password));
-                OnPropertyChanged(nameof(HasMinimumLength));
-                OnPropertyChanged(nameof(HasNumber));
-                OnPropertyChanged(nameof(HasUppercase));
-                OnPropertyChanged(nameof(HasSymbol));
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+
+                OnPasswordChanged();
             }
         }
 
-        private string _confirmPassword;
+        private string _confirmPassword = string.Empty;
         public string ConfirmPassword
         {
             get => _confirmPassword;
             set
             {
+                if (_confirmPassword == value) return;
+
                 _confirmPassword = value;
                 OnPropertyChanged(nameof(ConfirmPassword));
-                ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+
+                UpdateState();
             }
         }
 
+        // Availability
         private bool _isLoginAvailable;
         public bool IsLoginAvailable
         {
             get => _isLoginAvailable;
-            set
+            internal set
             {
+                if (_isLoginAvailable == value) return;
                 _isLoginAvailable = value;
                 OnPropertyChanged(nameof(IsLoginAvailable));
             }
@@ -92,86 +116,98 @@ namespace WindowsDev.ViewModels.Auth
         public bool IsUsernameAvailable
         {
             get => _isUsernameAvailable;
-            set
+            internal set
             {
+                if (_isUsernameAvailable == value) return;
                 _isUsernameAvailable = value;
                 OnPropertyChanged(nameof(IsUsernameAvailable));
             }
         }
 
-        public ICommand SignUpCommand { get; }
-        public ICommand SwitchToAuthViewCommand { get; }
-
-
-        /// <summary>
-        /// Constructor for RegistrationViewModel.
-        /// </summary>
-        public RegistrationViewModel(
-            INavigationService navigationService,
-            Registration registration,
-            UserFieldValidator userFieldValidator,
-            PasswordValidator passwordValidator)
+        private bool _isRegistrationFailed;
+        public bool IsRegistrationFailed
         {
-            _navigationService = navigationService;
-            _registration = registration;
-            _userFieldValidator = userFieldValidator;
-            _passwordValidator = passwordValidator;
-
-            SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView, CanSwitchToAuthView);
-            SignUpCommand = new AsyncRelayCommand(SignUp, CanSignUp);
+            get => _isRegistrationFailed;
+            set
+            {
+                _isRegistrationFailed = value;
+                OnPropertyChanged(nameof(IsRegistrationFailed));
+            }
         }
 
-        /// <summary>
-        /// Navigate to the authorization view.
-        /// </summary>
-        private void SwitchToAuthView() => _navigationService.NavigateTo<AuthorizationViewModel>();
+        private bool _isFormFilled =>
+            !string.IsNullOrWhiteSpace(Login) &&
+            !string.IsNullOrWhiteSpace(Username) &&
+            !string.IsNullOrWhiteSpace(Password);
 
-        /// <summary>
-        /// Perform user registration if passwords match and required fields are filled.
-        /// </summary>
+        // Commands logic
+        private void SwitchToAuthView()
+        {
+            _navigationService.NavigateTo<AuthorizationViewModel>();
+        }
+
         private async Task SignUp()
         {
-            if (string.IsNullOrEmpty(Password) || Password != ConfirmPassword)
+            if (!IsLoginAvailable || !IsUsernameAvailable ||
+                Password != ConfirmPassword || !PasswordValidator.IsValid(Password) || !_isFormFilled)
+            {
+                IsRegistrationFailed = true;
                 return;
+            }
 
-            if (_registration.Registrate(Password, Login, Username))
+            var success = await _registration.Register(Password, Login, Username);
+            IsRegistrationFailed = !success.Item1;
+
+            if (success.Item1)
+            {
+                await _dialogCoordinator.ShowMessageAsync(this, "information", $"{success.Item2}", MessageDialogStyle.Affirmative);
                 await _navigationService.NavigateTo<MainWindowViewModel>();
+            }
         }
 
-        /// <summary>
-        /// Determines if registration can be executed (all fields must be filled).
-        /// </summary>
-        private bool CanSignUp() =>
-            IsLoginAvailable && IsUsernameAvailable &&
-            Password == ConfirmPassword &&
-            HasMinimumLength && HasNumber &&
-            HasSymbol && HasUppercase &&
-            !string.IsNullOrEmpty(Password) &&
-            !string.IsNullOrEmpty(Login) &&
-            !string.IsNullOrEmpty(Username);
+        private bool CanSignUp() => true;
 
-        /// <summary>
-        /// Always allow switching to authorization view.
-        /// </summary>
-        private bool CanSwitchToAuthView() => true;
-
-        /// <summary>
-        /// Checks if the login is already taken asynchronously with debounce.
-        /// </summary>
+        // Async validation
         private async Task CheckLoginAvailabilityAsync()
         {
-            IsLoginAvailable = await _userFieldValidator.IsLoginAvailableAsync(Login);
+            _loginCts?.Cancel();
+            _loginCts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(500, _loginCts.Token);
+
+                IsLoginAvailable =
+                    await _userFieldValidator.IsLoginAvailableAsync(Login);
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        private async Task CheckUsernameAvailabilityAsync()
+        {
+            _usernameCts?.Cancel();
+            _usernameCts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(500, _usernameCts.Token);
+
+                IsUsernameAvailable =
+                    await _userFieldValidator.IsUsernameAvailableAsync(Username);
+            }
+            catch (TaskCanceledException) { }
+        }
+
+        // Helpers
+        private void UpdateState()
+        {
+            _isRegistrationFailed = false;
             ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
         }
 
-        /// <summary>
-        /// Checks if the username is already taken async with debounce.
-        /// </summary>
-        private async Task CheckUsernameAvailabilityAsync()
+        private void OnPasswordChanged()
         {
-            IsUsernameAvailable = await _userFieldValidator.IsUsernameAvailableAsync(Username);
-            ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
+            UpdateState();
         }
     }
 }
-

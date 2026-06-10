@@ -25,6 +25,11 @@ namespace WindowsDev.Infrastructure
 
         public async void Execute(object? parameter)
         {
+            await ExecuteAsync(parameter);
+        }
+
+        public async Task ExecuteAsync(object? parameter = null)
+        {
             if (parameter is not T param)
                 return;
 

@@ -24,6 +24,11 @@ namespace WindowsDev.Infrastructure
 
         public async void Execute(object? parameter)
         {
+            await ExecuteAsync(parameter);
+        }
+
+        public async Task ExecuteAsync(object? parameter = null)
+        {
             if (!CanExecute(parameter))
                 return;
 
@@ -40,10 +45,6 @@ namespace WindowsDev.Infrastructure
                 RaiseCanExecuteChanged();
             }
         }
-
-        /// <summary>
-        /// Notifies the UI that the execution status has changed.
-        /// </summary>
         public void RaiseCanExecuteChanged() =>
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }

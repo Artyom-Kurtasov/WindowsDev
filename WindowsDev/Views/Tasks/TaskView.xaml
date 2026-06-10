@@ -5,6 +5,8 @@
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}"
              xmlns:local="clr-namespace:WindowsDev.Views.Tasks"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="800">
@@ -64,32 +66,32 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <UserCtrl:MyTextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
+            <UserCtrl:HeaderTextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,8,16"
                                    Header="{DynamicResource StatusLabel}"
                                    Text="{Binding Status, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                    FontSize="16" 
                                    FontWeight="SemiBold"/>
 
-            <UserCtrl:MyTextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
+            <UserCtrl:HeaderTextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,8,0"
                                 Header="{DynamicResource PriorityLabel}"   
                                 Text="{Binding Priority, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
-            <UserCtrl:MyTextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
+            <UserCtrl:HeaderTextBlock Grid.Row="0" Grid.Column="1" Margin="8,0,0,16"
                                 Header="{DynamicResource ProgressLabel}"
                                 Text="{Binding Progress, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
 
-            <UserCtrl:MyTextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
+            <UserCtrl:HeaderTextBlock Grid.Row="1" Grid.Column="1" Margin="8,0,0,0"
                                 Header="{DynamicResource CreatedAtLabel}"
                                 Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy HH:mm}'}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
         </Grid>
 
-        <UserCtrl:MyTextBlock 
+        <UserCtrl:HeaderTextBlock 
             Header="{DynamicResource DescriptionLabel}"
             Grid.Row="3" 
             mah:ControlsHelper.CornerRadius="8"

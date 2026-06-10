@@ -29,6 +29,7 @@
     <sys:String x:Key="ProjectsLabel">プロジェクト</sys:String>
     <sys:String x:Key="SettingsLabel">設定</sys:String>
     <sys:String x:Key="CommentsLabel">コメント</sys:String>
+
     <sys:String x:Key="AttachmentsLabel">添付ファイル</sys:String>
 
     <sys:String x:Key="PriorityLabel">優先度</sys:String>
@@ -51,4 +52,15 @@
 
     <sys:String x:Key="UserNotExists">このログインまたはパスワードのユーザーは存在しません</sys:String>
 
+    <sys:String x:Key="TaskStatus_Done">未着手</sys:String>
+    <sys:String x:Key="TaskStatus_InProgress">進行中</sys:String>
+    <sys:String x:Key="TaskStatus_Closed">完了</sys:String>
+
+    <sys:String x:Key="TaskPriority_Normal">通常</sys:String>
+    <sys:String x:Key="TaskPriority_Critical">重大</sys:String>
+
+    <sys:String x:Key="Error_Critical">重大なエラー</sys:String>
+    <sys:String x:Key="Error_DatabaseFatal">データベースに接続できませんでした。アプリケーションを終了します。</sys:String>
+
+    <sys:String x:Key="Registration_Failed">すべての項目を正しく入力してください。</sys:String>
 </ResourceDictionary>

@@ -6,13 +6,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:local="clr-namespace:WindowsDev.Controls.Users"
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel MaxWidth="400">
-        <UserCtrl:AdvancedTextBox Header="{DynamicResource NameLabel}"
+        <UserCtrl:HeaderTextBox Header="{DynamicResource NameLabel}"
                                   CornerRadius="8"
                                   Text="{Binding ProjectName, Mode=TwoWay}"/>
-        <UserCtrl:AdvancedTextBox Header="{DynamicResource DescriptionLabel}"
+        <UserCtrl:HeaderTextBox Header="{DynamicResource DescriptionLabel}"
                                   CornerRadius="8"
                                   FieldHeight="100"
                                   ScrollBarVisibility="Auto"
@@ -26,11 +28,12 @@
 
             <Button Grid.Column="0"
                     Content="{DynamicResource CreateButton}"
-                    mah:ControlsHelper.CornerRadius="8" Margin="0,0,10,0"
-                    Command="{Binding CreateProject}"/>
+                    mah:ControlsHelper.CornerRadius="8" Margin="0,0,10,5"
+                    Command="{Binding CreateProjectCommand}"/>
             <Button Grid.Column="1"
                     Content="{DynamicResource CancelButton}"
-                    mah:ControlsHelper.CornerRadius="8" Margin="10,0,0,0"/>
+                    mah:ControlsHelper.CornerRadius="8" Margin="10,0,0,5"
+                    Command="{Binding CloseDialogCommand}"/>
         </Grid>
     </StackPanel>
 </UserControl>

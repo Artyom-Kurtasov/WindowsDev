@@ -15,15 +15,18 @@
         <DataTemplate DataType="{x:Type tabVM:SettingsViewModel}">
             <local:SettingsTabView />
         </DataTemplate>
+
+        <DataTemplate DataType="{x:Type tabVM:ProfileViewModel}">
+            <local:ProfileTabView/>
+        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
-        <StackPanel>
-            <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
-                <TabItem Header="{DynamicResource ProjectsLabel}" Content="{Binding Projects}"/>
-                <TabItem Header="{DynamicResource SettingsLabel}" Content="{Binding Settings}"/>
-            </TabControl>
-        </StackPanel>
+        <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
+            <TabItem Header="{DynamicResource ProjectsLabel}" Content="{Binding Projects}"/>
+            <TabItem Header="{DynamicResource SettingsLabel}" Content="{Binding Settings}"/>
+            <TabItem Header="Profile" Content="{Binding Profile}"/>
+        </TabControl>
 
     </Grid>
 </UserControl>

@@ -28,12 +28,12 @@
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
 
-            <!--Username-->
-            <UserCtrl:AdvancedTextBox
+            <!--Login-->
+            <UserCtrl:HeaderTextBox
                 Header="{DynamicResource LoginLabel}"
                 CornerRadius="8"
                 Margin="20,20,20,0"
-                Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <TextBlock Foreground="Red" Margin="20,0,20,0">
                 <TextBlock.Style>
@@ -51,12 +51,14 @@
             </TextBlock>
 
             <!--Password-->
-            <UserCtrl:PasswordBox
+            <UserCtrl:HeaderPasswordBox
                 Header="{DynamicResource PasswordLabel}"
                 HeaderFontSize="14"
                 Margin="20,20,20,0"
                 CornerRadius="8"
-                Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                LinkText="Forgot password?"
+                LinkCommand="{Binding PasswordRecoveryCommand}"/>
 
                 <!--SIGN IN BUTTON-->
             <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0"

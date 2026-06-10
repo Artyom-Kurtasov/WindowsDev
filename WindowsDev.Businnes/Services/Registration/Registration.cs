@@ -1,82 +1,63 @@
-﻿using WindowsDev.Business.DataBase;
-using WindowsDev.Business.Services.PasswordManager;
-using WindowsDev.Business.Services.UserManager;
-using System.Linq;
+﻿using WindowsDev.Business.Repositories.Interfaces;
+using WindowsDev.Business.Services.PasswordManager.Hasher;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Business.Services.Registration.Interfaces;
+using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.UsersModels;
+using WindowsDev.Domain.UsersModels.Enums;
 
 namespace WindowsDev.Business.Services.Registration
 {
-    /// <summary>
-    /// Handles user registration, password hashing, and storing users in the database.
-    /// </summary>
-    public class Registration
+
+    public class Registration : IRegistration
     {
-        private readonly DbManager _dbManager;
-        private readonly PasswordHasher _passwordHasher;
-        private readonly CurrentUserService _currentUserService;
+        private readonly IUserRepository _userRepository;
+        private readonly ICurrentUserService _currentUserService;
+        private readonly DefaultPasswordHasher _defaultPasswordHasher;
+        private readonly IPasswordRecoveryService _passwordRecoveryService;
 
-        private byte[] _salt;
-        private ulong _passwordHash;
-        private UsersInfo? _userInfo;
-
-        public Registration(DbManager dbManager, PasswordHasher passwordHasher, CurrentUserService currentUserService)
+        public Registration(IUserRepository userRepository,
+                            ICurrentUserService currentUserService,
+                            DefaultPasswordHasher defaultPasswordHasher,
+                            IPasswordRecoveryService passwordRecoveryService)
         {
-            _dbManager = dbManager;
-            _passwordHasher = passwordHasher;
+            _passwordRecoveryService = passwordRecoveryService;
+            _userRepository = userRepository;
+            _defaultPasswordHasher = defaultPasswordHasher;
             _currentUserService = currentUserService;
         }
 
-        /// <summary>
-        /// Registers a new user with the provided login, username, and password.
-        /// </summary>
-        public bool Registrate(string password, string login, string username)
+        public async Task<(bool, int)> Register(string password, string login, string username)
         {
-            GeneratePasswordHash(password);
+            if (string.IsNullOrWhiteSpace(password))
+                return (false, -1);
 
-            if (AddUserToDatabase(login, username))
+            if (await _userRepository.ExistsByLoginAsync(login))
+                return (false, -1);
+
+            var passwordSalt = _defaultPasswordHasher.GenerateSalt();
+            var passwordHash = _defaultPasswordHasher.HashPassword(password, passwordSalt);
+
+            var recoveryCodeSalt = _defaultPasswordHasher.GenerateSalt();
+            var recoveryCode = _passwordRecoveryService.GenerateRecoveryCode();
+            var recoveryCodeHash = _defaultPasswordHasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
+
+            var user = new UsersInfo
             {
-                _currentUserService.SetUser(_userInfo.Id, _userInfo.Login, _userInfo.Username);
-                return true;
-            }
+                Salt = passwordSalt,
+                Username = username,
+                Login = login,
+                PasswordHash = passwordHash.ToString("x16"),
+                HashMethod = (HashMethod)1,
+                RecoveryCodeHash = recoveryCodeHash.ToString("x16"),
+                RecoveryCodeSalt = recoveryCodeSalt
+            };
 
-            return false;
-        }
+            await _userRepository.AddAsync(user);
 
-        /// <summary>
-        /// Generates a salt and password hash for secure storage.
-        /// </summary>
-        private void GeneratePasswordHash(string password)
-        {
-            _salt = _passwordHasher.GenerateSalt();
-            _passwordHash = _passwordHasher.HashPassword(password, _salt);
-        }
+            _currentUserService.SetUser(user.Id, user.Login, user.Username);
 
-        /// <summary>
-        /// Adds a new user to the database if the login is not already taken.
-        /// </summary>
-        private bool AddUserToDatabase(string login, string username)
-        {
-            using var dbContext = _dbManager.Create();
-
-            _userInfo = dbContext.UsersInfo.FirstOrDefault(x => x.Login == login);
-
-            if (_userInfo == null)
-            {
-                _userInfo = new UsersInfo
-                {
-                    Salt = _salt,
-                    Username = username,
-                    PasswordHash = _passwordHash.ToString("x16"),
-                    Login = login
-                };
-
-                dbContext.Add(_userInfo);
-                dbContext.SaveChanges();
-
-                return true;
-            }
-
-            return false;
+            return (true, recoveryCode);
         }
     }
 }

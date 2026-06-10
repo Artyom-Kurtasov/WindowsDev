@@ -7,21 +7,32 @@ namespace WindowsDev.Business.DataBase
 {
     public class AppDbContext : DbContext
     {
-        private string _dbConnectionString;
-        public AppDbContext(string dbConnectionString)
-        {
-            _dbConnectionString = dbConnectionString;
-        }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            optionsBuilder.UseNpgsql(_dbConnectionString);
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TasksInfo>()
+                .Property(x => x.Status)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<TasksInfo>()
+                .Property(x => x.Priority)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<TasksInfo>()
+                .Property(x => x.Progress)
+                .HasConversion<string>();
+            modelBuilder.Entity<UsersInfo>()
+                .Property(x => x.HashMethod)
+                .HasConversion<string>();
         }
-        public DbSet<UsersInfo> UsersInfo { get; set; }
-        public DbSet<ProjectsInfo> ProjectsInfo { get; set; }
-        public DbSet<TasksInfo> TasksInfo { get; set; }
-        public DbSet<Comments> Comments { get; set; }
-        public DbSet<TaskAttachment> Attachments { get; set; }
+        public virtual DbSet<UsersInfo> UsersInfo { get; set; }
+        public virtual DbSet<ProjectsInfo> ProjectsInfo { get; set; }
+        public virtual DbSet<TasksInfo> TasksInfo { get; set; }
+        public virtual DbSet<Comments> Comments { get; set; }
+        public virtual DbSet<TaskAttachment> Attachments { get; set; }
     }
 }
 

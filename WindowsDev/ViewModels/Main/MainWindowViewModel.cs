@@ -1,59 +1,38 @@
 ﻿using WindowsDev.Commands.NavigationManager;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
+using WindowsDev.Factories.Interfaces;
 
 namespace WindowsDev.ViewModels.Main
 {
-    /// <summary>
-    /// ViewModel for the main window, handles navigation, project list, and dialogs.
-    /// Implements IDisposable to unsubscribe from events.
-    /// </summary>
-    public class MainWindowViewModel : ViewModelBase, IDisposable, IInitializableAsync
+    public class MainWindowViewModel : ViewModelBase
     {
+        private readonly IViewModelFactory _factory;
         private readonly NavigationStore _navigationStore;
 
-        /// <summary>
-        /// Current active ViewModel in the navigation store.
-        /// </summary>
-        public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
+        private ProjectsViewModel _projects;
+        private SettingsViewModel _settings;
+        private ProfileViewModel _profile;
 
-        public ProjectsViewModel Projects { get; }
-        public SettingsViewModel Settings { get; }
-
-        /// <summary>
-        /// Initializes MainWindowViewModel with required services and commands.
-        /// </summary>
-        public MainWindowViewModel(NavigationStore navigationStore, ProjectsViewModel projectsViewModel,
-            SettingsViewModel settingsViewModel)
+        public MainWindowViewModel(
+            NavigationStore navigationStore,
+            IViewModelFactory factory)
         {
             _navigationStore = navigationStore;
-
-            Projects = projectsViewModel;
-            Settings = settingsViewModel;
+            _factory = factory;
 
             _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
         }
 
-        /// <summary>
-        /// Handles changes in the current ViewModel of the navigation store.
-        /// </summary>
+        public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
+
+        public ProjectsViewModel Projects => _projects ??= _factory.Create<ProjectsViewModel>();
+        public SettingsViewModel Settings => _settings ??= _factory.Create<SettingsViewModel>();
+        public ProfileViewModel Profile => _profile ??= _factory.Create<ProfileViewModel>();
+
         private void OnCurrentViewModelChanged()
         {
             OnPropertyChanged(nameof(CurrentViewModel));
         }
-
-        /// <summary>
-        /// Unsubscribes from event.
-        /// </summary>
-        public void Dispose()
-        {
-            _navigationStore.CurrentViewModelChanged -= OnCurrentViewModelChanged;
-        }
-
-        public async Task InitializationAsync(params object[] parameters)
-        {
-            await Projects.InitializationAsync();
-        }
     }
 }
-

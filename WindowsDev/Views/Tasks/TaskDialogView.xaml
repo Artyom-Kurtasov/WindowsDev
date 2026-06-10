@@ -3,9 +3,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:converter="clr-namespace:WindowsDev.Business.Services.TaskService.Converters;assembly=WindowsDev.Business"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <converter:TaskStatusToTextConverter x:Key="StatusToText"/>
+        <converter:TaskPriorityToTextConverter x:Key="PriorityToText"/>
+    </UserControl.Resources>
 
     <Grid MaxWidth="400" Margin="20">
         <Grid.RowDefinitions>
@@ -17,7 +24,7 @@
         </Grid.RowDefinitions>
 
         <!-- Name -->
-        <UserCtrl:AdvancedTextBox Grid.Row="0"
+        <UserCtrl:HeaderTextBox Grid.Row="0"
                                  Header="{DynamicResource NameLabel}"
                                  Margin="0,0,0,10"
                                  CornerRadius="8"
@@ -32,7 +39,7 @@
                     mah:ControlsHelper.CornerRadius="8"
                     Text="{Binding DeadLine, Mode=TwoWay}"/>
         </StackPanel>
-
+        
         <!-- Priority + Progress -->
         <Grid Grid.Row="2" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -46,42 +53,40 @@
             <!-- Progress -->
             <StackPanel Grid.Column="0">
                 <TextBlock Text="{DynamicResource ProgressLabel}"/>
-                <ComboBox Text="{Binding Progress}">
-                <ComboBoxItem Content="0%"/>
-                <ComboBoxItem Content="10%"/>
-                <ComboBoxItem Content="20%"/>
-                <ComboBoxItem Content="30%"/>
-                <ComboBoxItem Content="40%"/>
-                <ComboBoxItem Content="50%"/>
-                <ComboBoxItem Content="60%"/>
-                <ComboBoxItem Content="70%"/>
-                <ComboBoxItem Content="80%"/>
-                <ComboBoxItem Content="90%"/>
-                <ComboBoxItem Content="100%"/>
-            </ComboBox>
+                <ComboBox ItemsSource="{Binding Percents}"
+                          SelectedItem="{Binding Progress}"
+                          ItemStringFormat="{}{0}%">
+                </ComboBox>
             </StackPanel>
 
             <!-- Priority -->
             <StackPanel Grid.Column="2">
                 <TextBlock Text="{DynamicResource PriorityLabel}"/>
-                <ComboBox Text="{Binding Priority}">
-                <ComboBoxItem Content="Normal"/>
-                <ComboBoxItem Content="Critical"/>
-            </ComboBox>
+                <ComboBox ItemsSource="{Binding Priorities}"
+                          SelectedItem="{Binding Priority, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource PriorityToText}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
 
             <StackPanel Grid.Column="4">
                 <TextBlock Text="{DynamicResource StatusLabel}"/>
-                <ComboBox Text="{Binding Status}">
-                <ComboBoxItem Content="In progress"/>
-                <ComboBoxItem Content="Done"/>
-                <ComboBoxItem Content="Closed"/>
-            </ComboBox>
+                <ComboBox ItemsSource="{Binding Statuses}"
+                          SelectedItem="{Binding Status, Mode=TwoWay}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource StatusToText}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </StackPanel>
         </Grid>
 
         <!-- Description -->
-        <UserCtrl:AdvancedTextBox Grid.Row="3"
+        <UserCtrl:HeaderTextBox Grid.Row="3"
                                  Header="{DynamicResource DescriptionLabel}"
                                  CornerRadius="8"
                                  FieldHeight="100"

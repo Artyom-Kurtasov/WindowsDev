@@ -1,99 +1,176 @@
-﻿using System.Collections.ObjectModel;
+﻿using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
-using WindowsDev.Dialogs;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
-using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
+using WindowsDev.ViewModels.Projects.Dialogs;
 using WindowsDev.Views.Projects;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProjectsViewModel : ViewModelBase, IInitializableAsync
+    public class ProjectsViewModel : ViewModelBase
     {
-        private readonly IProjectWriter _projectWriter;
-        private readonly IProjectLoader _projectLoader;
+        private readonly IDialogCoordinator _dialogCoordinator;
+        private readonly IProjectService _projectService;
         private readonly INavigationService _navigationService;
-        private readonly DialogShowingService _dialogShowingService;
+        private readonly ILogger<ProjectsViewModel> _logger;
+        private readonly IDialogService _dialogService;
+
+        private int _pageSize = 10;
+
+        public ProjectsViewModel(IDialogCoordinator dialogCoordinator,
+            IProjectService projectService,
+            INavigationService navigationService,
+            ILogger<ProjectsViewModel> logger,
+            IDialogService dialogService)
+        {
+            _navigationService = navigationService;
+            _dialogService = dialogService;
+            _projectService = projectService;
+            _dialogCoordinator = dialogCoordinator;
+            _logger = logger;
+
+
+            DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjectsAsync);
+            OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialogAsync);
+            OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProjectAsync, _ => true);
+
+            SearchCommand = new AsyncRelayCommand(SearchAsync);
+            NextPageCommand = new AsyncRelayCommand(NextPageAsync);
+            PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
+
+            _ = InitializationAsync();
+        }
+
+        // Init
+        public async Task InitializationAsync(params object[] parameters)
+        {
+            _totalCount = await _projectService.GetProjectsCountAsync();
+            await GetPageAsync();
+        }
+
+        // Commands
+        public ICommand DeleteSelectedProjectsCommand { get; }
+        public ICommand OpenDialogCommand { get; }
+        public ICommand OpenProjectCommand { get; }
+        public ICommand NextPageCommand { get; }
+        public ICommand PrevPageCommand { get; }
+        public ICommand SearchCommand { get; }
 
         public ObservableCollection<ProjectsInfo> ProjectsList { get; } = new();
 
-        /// <summary>
-        /// Command to delete all selected projects.
-        /// </summary>
-        public ICommand DeleteSelectedProjectsCommand { get; }
-
-        /// <summary>
-        /// Command to open a project creation dialog.
-        /// </summary>
-        public ICommand OpenDialogCommand { get; }
-
-        /// <summary>
-        /// Command to open a selected project.
-        /// </summary>
-        public ICommand OpenProjectCommand { get; }
-
-        public ProjectsViewModel(DialogShowingService dialogShowingService, INavigationService navigationService,
-            IProjectLoader projectLoader, IProjectWriter projectWriter)
+        // Inputs
+        private string _searchFilter = string.Empty;
+        public string SearchFilter
         {
-            _navigationService = navigationService;
-            _dialogShowingService = dialogShowingService;
-            _projectLoader = projectLoader;
-            _projectWriter = projectWriter;
-
-            DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjects);
-            OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialog);
-            OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProject, _ => true);
+            get => _searchFilter;
+            set
+            {
+                _searchFilter = value;
+                OnPropertyChanged(nameof(SearchFilter));
+            }
         }
 
-        /// <summary>
-        /// Loads the list of projects asynchronously when the ViewModel is initialized.
-        /// </summary>
-        public async Task InitializationAsync(params object[] parameters)
+        private int _currentPage = 1;
+        public int CurrentPage
+        {
+            get => _currentPage;
+            set
+            {
+                _currentPage = value;
+                OnPropertyChanged(nameof(CurrentPage));
+            }
+        }
+
+        private int _totalCount;
+        public int TotalCount =>
+            (int)Math.Ceiling((double)_totalCount / _pageSize);
+
+        // Commands logic
+        private async Task SearchAsync()
+        {
+            CurrentPage = 1;
+            await GetPageAsync(SearchFilter);
+        }
+
+        private async Task DeleteSelectedProjectsAsync()
+        {
+            try
+            {
+                var projectsToDelete = ProjectsList?
+                    .Where(x => x.IsSelected)
+                    .ToList();
+
+                if (projectsToDelete != null && projectsToDelete.Any())
+                {
+                    foreach (var project in projectsToDelete)
+                    {
+                        await _projectService.DeleteAsync(project.Id);
+                        ProjectsList?.Remove(project);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to delete projects");
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    "Error",
+                    "Failed to delete projects",
+                    MessageDialogStyle.Affirmative);
+            }
+        }
+
+        private async Task OpenProjectAsync(ProjectsInfo project) =>
+            await _navigationService.NavigateTo<ProjectViewModel>(project);
+
+        private async Task ShowCreateProjectDialogAsync() =>
+            await _dialogService.ShowTaskDialogAsync<CreateProjectView, CreateProjectDialogViewModel>(this);
+
+        private async Task NextPageAsync()
+        {
+            if (CurrentPage < TotalCount)
+            {
+                CurrentPage++;
+                await GetPageAsync(SearchFilter);
+            }
+        }
+
+        private async Task PrevPageAsync()
+        {
+            if (CurrentPage > 1)
+            {
+                CurrentPage--;
+                await GetPageAsync(SearchFilter);
+            }
+        }
+
+        private async Task GetPageAsync(string searchFilter = "")
         {
             ProjectsList.Clear();
 
-            var projects = await _projectLoader.LoadProjectAsync();
-
-            foreach (var project in projects)
+            try
             {
-                ProjectsList.Add(project);
-            }
-        }
+                var projects = await _projectService
+                    .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
 
-        /// <summary>
-        /// Deletes all selected projects from the project list and database.
-        /// </summary>
-        private async Task DeleteSelectedProjects()
-        {
-            var projectsToDelete = ProjectsList?.Where(x => x.IsSelected).ToList();
-
-            if (projectsToDelete != null && projectsToDelete.Any())
-            {
-                foreach (var project in projectsToDelete)
+                foreach (var project in projects)
                 {
-                    await _projectWriter.DeleteAsync(project.Id);
-                    ProjectsList?.Remove(project);
+                    ProjectsList.Add(project);
                 }
             }
-        }
-
-        /// <summary>
-        /// Opens the selected project and loads its tasks asynchronously.
-        /// </summary>
-        private async Task OpenProject(ProjectsInfo project)
-        {
-            await _navigationService.NavigateTo<ProjectViewModel>(project);
-        }
-
-        /// <summary>
-        /// Shows the dialog to create a new project.
-        /// </summary>
-        private async Task ShowCreateProjectDialog()
-        {
-            await _dialogShowingService.ShowTaskDialogAsync<CreateProjectView, DialogsViewModel>(this);
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to load projects");
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    "Error",
+                    "Failed to load projects",
+                    MessageDialogStyle.Affirmative);
+            }
         }
     }
 }

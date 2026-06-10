@@ -1,19 +1,56 @@
-﻿namespace WindowsDev.Business.Services.UserManager
-{
-    public class CurrentUserService
-    {
-        private readonly CurrentUserData _currentUserData;
+﻿using System.ComponentModel;
+using WindowsDev.Business.Services.UserManager.Interfaces;
 
-        public CurrentUserService(CurrentUserData currentUserData)
+namespace WindowsDev.Business.Services.UserManager
+{
+    public class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
+    {
+
+        private string _login = string.Empty;
+        public string Login
         {
-            _currentUserData = currentUserData;
+            get => _login;
+            set
+            {
+                _login = value;
+                OnPropertyChanged(nameof(Login));
+            }
+        }
+
+        private string _username = string.Empty;
+        public string Username
+        {
+            get => _username;
+            set
+            {
+                _username = value;
+                OnPropertyChanged(nameof(Username));
+            }
+        }
+
+        private int _userId;
+        public int UserId
+        {
+            get => _userId;
+            set
+            {
+                _userId = value;
+                OnPropertyChanged(nameof(UserId));
+            }
         }
 
         public void SetUser(int id, string login, string username)
         {
-            _currentUserData.Login = login;
-            _currentUserData.UserId = id;
-            _currentUserData.Username = username;
+            Login = login;
+            UserId = id;
+            _username = username;
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

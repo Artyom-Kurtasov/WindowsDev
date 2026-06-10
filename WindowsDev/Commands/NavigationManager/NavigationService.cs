@@ -16,6 +16,7 @@ namespace WindowsDev.Commands.NavigationManager
             _viewModelFactory = viewModelFactory;
         }
 
+        
         public async Task NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase
         {
             TViewModel viewModel = _viewModelFactory.Create<TViewModel>();

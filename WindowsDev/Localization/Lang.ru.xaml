@@ -51,4 +51,15 @@
 
     <sys:String x:Key="UserNotExists">Пользователь с таким логином или паролем не существует</sys:String>
 
+    <sys:String x:Key="TaskStatus_Done">Открыта</sys:String>
+    <sys:String x:Key="TaskStatus_InProgress">В работе</sys:String>
+    <sys:String x:Key="TaskStatus_Closed">Закрыта</sys:String>
+
+    <sys:String x:Key="TaskPriority_Normal">Нормальный</sys:String>
+    <sys:String x:Key="TaskPriority_Critical">Критический</sys:String>
+
+    <sys:String x:Key="Error_Critical">Критическая ошибка</sys:String>
+    <sys:String x:Key="Error_DatabaseFatal">Не удалось подключиться к базе данных. Приложение будет закрыто.</sys:String>
+
+    <sys:String x:Key="Registration_Failed">Пожалуйста, заполните все поля правильно.</sys:String>
 </ResourceDictionary>

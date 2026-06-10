@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="WindowsDev.Businnes/WindowsDev.Business.csproj" />
   <Project Path="WindowsDev.Domain/WindowsDev.Domain.csproj" />
+  <Project Path="WindowsDev.Tests/WindowsDev.Tests.csproj" Id="5a5443c3-4d9b-4224-b3d4-6fed4e4ff16f" />
   <Project Path="WindowsDev/WindowsDev.csproj" />
 </Solution>

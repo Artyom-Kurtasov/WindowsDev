@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Business.DataBase;
+using WindowsDev.Business.DataBase.Interfaces;
 
 namespace WindowsDev.Business.Services.Registration.Validation
 {
     public class UserFieldValidator
     {
-        private readonly DbManager _dbManager;
+        private readonly IDbManager _dbManager;
 
-        public UserFieldValidator(DbManager dbManager)
+        public UserFieldValidator(IDbManager dbManager)
         {
             _dbManager = dbManager;
         }
@@ -34,7 +34,7 @@ namespace WindowsDev.Business.Services.Registration.Validation
                 using var dbContext = _dbManager.Create();
 
                 var exists = await dbContext.UsersInfo
-                .AnyAsync(u => u.Username == username);
+                    .AnyAsync(u => u.Username == username);
 
                 return !exists;
             });

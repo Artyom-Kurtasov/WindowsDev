@@ -11,18 +11,6 @@ namespace WindowsDev.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        protected void SubscribeToServiceProperty<T>(T service, string servicePropertyName, string viewModelPropertyName)
-            where T : INotifyPropertyChanged
-        {
-            service.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == servicePropertyName)
-                {
-                    OnPropertyChanged(viewModelPropertyName);
-                }
-            };
-        }
     }
 }
 

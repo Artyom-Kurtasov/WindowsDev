@@ -6,10 +6,7 @@ namespace WindowsDev.Business.Services.Localization
     {
         public void ChangeLanguage(string languageCode)
         {
-            var languageDictionary = new ResourceDictionary
-            {
-                Source = new Uri($"/Localization/Lang.{languageCode}.xaml", UriKind.Relative)
-            };
+            var languageDictionary = LoadDictionary(languageCode) ?? LoadDictionary("en");
 
             var oldDictionaryies = Application.Current.Resources.MergedDictionaries
                 .FirstOrDefault(x => x.Source != null && x.Source.OriginalString.Contains("Lang"));
@@ -20,6 +17,26 @@ namespace WindowsDev.Business.Services.Localization
             }
 
             Application.Current.Resources.MergedDictionaries.Add(languageDictionary);
+        }
+
+        public string Translate(string key)
+        {
+            return Application.Current.TryFindResource(key) as string ?? $"[{key}]";
+        }
+
+        private ResourceDictionary? LoadDictionary(string languageCode)
+        {
+            try
+            {
+                return new ResourceDictionary
+                {
+                    Source = new Uri($"/Localization/Lang.{languageCode}.xaml", UriKind.Relative)
+                };
+            }
+            catch (IOException)
+            {
+                return null;
+            }
         }
     }
 }

@@ -1,37 +1,53 @@
-﻿using System.Windows.Input;
-using WindowsDev.Business.Services;
+﻿using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Input;
+using WindowsDev.Business.Services.Authorization.Interfaces;
+using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.ViewModels.Auth.Dialogs;
 using WindowsDev.ViewModels.Main;
+using WindowsDev.Views.Auth.Dialogs;
 
 namespace WindowsDev.ViewModels.Auth
 {
-    /// <summary>
-    /// ViewModel for user authorization.
-    /// </summary>
-    public class AuthorizationViewModel : ViewModelBase
+    public class AuthorizationViewModel : ViewModelBase, IProjectDialogCreator
     {
-        private readonly Authorization _authorization;
+        private readonly IDialogService _dialogService;
+        private readonly IAuthorization _authorization;
         private readonly INavigationService _navigationService;
 
-        private string _username = string.Empty;
-        /// <summary>
-        /// Username input by the user.
-        /// </summary>
-        public string Username
+        public AuthorizationViewModel(INavigationService navigationService,
+                                      IAuthorization authorization,
+                                      IDialogService dialogService)
         {
-            get => _username;
+            _dialogService = dialogService;
+            _navigationService = navigationService;
+            _authorization = authorization;
+
+            SwitchToRegViewCommand = new AsyncRelayCommand(SwitchToRegViewAsync);
+            AuthorizeCommand = new AsyncRelayCommand(AuthorizeAsync, CanAuthorize);
+            PasswordRecoveryCommand = new AsyncRelayCommand(PasswordRecovery);
+        }
+
+        // Commands
+        public ICommand PasswordRecoveryCommand { get; }
+        public ICommand AuthorizeCommand { get; }
+        public ICommand SwitchToRegViewCommand { get; }
+
+        // Inputs
+        private string _login = string.Empty;
+        public string Login
+        {
+            get => _login;
             set
             {
-                _username = value;
-                OnPropertyChanged(nameof(Username));
+                _login = value;
+                OnPropertyChanged(nameof(Login));
             }
         }
 
         private string _password = string.Empty;
-        /// <summary>
-        /// Password input by the user.
-        /// </summary>
         public string Password
         {
             get => _password;
@@ -42,7 +58,12 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
+        // State
         private bool _isLoginFailed;
+
+        public event Func<Task>? CloseRequested;
+        public event Func<Task>? Completed;
+
         public bool IsLoginFailed
         {
             get => _isLoginFailed;
@@ -53,57 +74,27 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-        /// <summary>
-        /// Command to perform authorization.
-        /// </summary>
-        public ICommand AuthorizeCommand { get; }
+        // Commands logic
+        private async Task SwitchToRegViewAsync() =>
+            await _navigationService.NavigateTo<RegistrationViewModel>();
 
-        /// <summary>
-        /// Command to switch to registration view.
-        /// </summary>
-        public ICommand SwitchToRegViewCommand { get; }
+        private bool CanAuthorize() => true;
 
-        /// <summary>
-        /// Constructor for AuthorizationViewModel.
-        /// </summary>
-        public AuthorizationViewModel(
-            INavigationService navigationService,
-            Authorization authorization)
+        private async Task AuthorizeAsync()
         {
-            _navigationService = navigationService;
-            _authorization = authorization;
 
-            SwitchToRegViewCommand = new RelayCommand(SwitchToRegView, CanSwitchToRegView);
-            AuthorizeCommand = new AsyncRelayCommand(Authorize, CanAuthorize);
-        }
-
-        /// <summary>
-        /// Navigate to the registration view.
-        /// </summary>
-        private void SwitchToRegView() => _navigationService.NavigateTo<RegistrationViewModel>();
-
-        /// <summary>
-        /// Determines if user can switch to registration view.
-        /// </summary>
-        private bool CanSwitchToRegView() => true;
-
-        /// <summary>
-        /// Perform authorization and load user's projects if successful.
-        /// </summary>
-        private async Task Authorize()
-        {
-            var success = _authorization.Authorize(_username, _password);
+            var success = await _authorization.Authorize(_login, _password);
 
             IsLoginFailed = !success;
 
             if (success)
                 await _navigationService.NavigateTo<MainWindowViewModel>();
+            
         }
 
-        /// <summary>
-        /// Determines if authorization can be executed.
-        /// </summary>
-        private bool CanAuthorize() => true;
+        private async Task PasswordRecovery()
+        {
+            await _dialogService.ShowTaskDialogAsync<RecoveryCodeDialogView, RecoveryCodeDialogViewModel>(this);
+        }
     }
 }
-

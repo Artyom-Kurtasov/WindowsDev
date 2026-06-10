@@ -5,28 +5,26 @@
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}"
              mc:Ignorable="d">
 
     <Grid Margin="15">
-        <TabControl>
+        <Grid Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="3*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- PROJECT -->
-            <TabItem Header="Project">
-                <Grid Margin="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="2*"/>
-                        <ColumnDefinition Width="3*"/>
-                    </Grid.ColumnDefinitions>
+            <!-- LEFT -->
+            <Grid Grid.Column="0" Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <!-- LEFT -->
-                    <Grid Grid.Column="0" Margin="0,0,10,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-
-                        <Button Grid.Row="0"
+                <Button Grid.Row="0"
                                 Content="{DynamicResource BackButton}"
                                 Width="100"
                                 Margin="0,0,0,15"
@@ -34,79 +32,117 @@
                                 mah:ControlsHelper.CornerRadius="8"
                                 Command="{Binding SwitchToMainViewCommand}"/>
 
-                        <UserCtrl:MyTextBlock Grid.Row="1"
+                <UserCtrl:HeaderTextBlock Grid.Row="1"
                                             Margin="0,0,0,10"
                                             CornerRadius="8"
                                             Header="{DynamicResource NameLabel}"
                                             Text="{Binding Name}"/>
 
-                        <UserCtrl:MyTextBlock Grid.Row="2"
+                <UserCtrl:HeaderTextBlock Grid.Row="2"
                                             CornerRadius="8"
                                             Header="{DynamicResource DescriptionLabel}"
                                             Text="{Binding Description}"/>
-                    </Grid>
+            </Grid>
 
-                    <!-- RIGHT -->
-                    <StackPanel Grid.Column="1">
-                        <Button Content="Add"
+            <!-- RIGHT -->
+            <StackPanel Grid.Column="1">
+
+                <!-- Top row: Add button -->
+                <Button Content="Add"
                                 mah:ControlsHelper.CornerRadius="8"
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Left"
                                 Command="{Binding OpenDialogCommand}"/>
-                        <DataGrid AutoGenerateColumns="False"
+
+                <Button Content="Delete"
+                                mah:ControlsHelper.CornerRadius="8"
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Left"
+                                Command="{Binding DeleteSelectedTasksCommand}"/>
+
+                <!-- Search and filters row -->
+                <Grid Margin="0,0,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <UserCtrl:HeaderTextBox Grid.Column="0"
+                                                      CornerRadius="8"
+                                                      Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                      Watermark="Search"/>
+
+                    <StackPanel Grid.Column="1" 
+                                        Orientation="Horizontal" 
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center">
+                        <CheckBox Content="All"
+                                          Margin="0,0,10,0"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding ShowAll}"/>
+                        <CheckBox Content="Closed"
+                                          Margin="0,0,10,0"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding ShowClosed}"/>
+                        <CheckBox Content="In Progress"
+                                          VerticalAlignment="Center"
+                                          IsChecked="{Binding ShowInProgress}"/>
+                    </StackPanel>
+                </Grid>
+
+                <DataGrid AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   ItemsSource="{Binding TaskItem}">
 
-                            <DataGrid.Columns>
+                    <DataGrid.Columns>
 
-                                <DataGridTextColumn Header="{DynamicResource IdLabel}"
+                        <DataGridTemplateColumn>
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
+                                      Style="{DynamicResource MetroDataGridCheckBox}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="{DynamicResource IdLabel}"
                                                 Binding="{Binding Id}"
                                                 Width="Auto"/>
 
-                                <DataGridTemplateColumn Header="{DynamicResource NameLabel}" Width="*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock TextTrimming="CharacterEllipsis">
+                        <DataGridTemplateColumn Header="{DynamicResource NameLabel}" Width="*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock TextTrimming="CharacterEllipsis">
                                             <Hyperlink Command="{Binding DataContext.OpenTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
                                                        CommandParameter="{Binding}">
                                                 <Run Text="{Binding Name}"/>
                                             </Hyperlink>
-                                            </TextBlock>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-                                <DataGridTemplateColumn Header="{DynamicResource DescriptionLabel}" Width="2*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Description}"
+                        <DataGridTemplateColumn Header="{DynamicResource DescriptionLabel}" Width="2*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Description}"
                                                    TextTrimming="CharacterEllipsis"
                                                    TextWrapping="NoWrap"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-                                <DataGridTextColumn Header="{DynamicResource DeadlineLabel}"
+                        <DataGridTextColumn Header="{DynamicResource DeadlineLabel}"
                                                 Binding="{Binding DeadLine, StringFormat=d}"
                                                 Width="*"/>
 
-                                <DataGridTextColumn Header="{DynamicResource CreatedAtLabel}"
+                        <DataGridTextColumn Header="{DynamicResource CreatedAtLabel}"
                                                 Binding="{Binding CreatedAt, StringFormat=d}"
                                                 Width="*"/>
 
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
-
-            <!-- SETTINGS -->
-            <TabItem Header="Project Settings">
-                <Grid Margin="15">
-                    <TextBlock Text="Settings will be here"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Center"/>
-                </Grid>
-            </TabItem>
-
-        </TabControl>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

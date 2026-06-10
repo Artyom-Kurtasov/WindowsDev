@@ -12,8 +12,6 @@
     <UserControl.Resources>
         <converters:StringToVisibilityConverter x:Key="VisibilityConverter"/>
         <converters:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
-        <converters:LoginAvailabilityToBrushConverter x:Key="LoginAvailabilityConverter"/>
-        <converters:UsernameAvailabilityToBrushConverter x:Key="UsernameAvailabilityConverter"/>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -31,7 +29,21 @@
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch"/>
 
-                <UserCtrl:AdvancedTextBox CornerRadius="8" Margin="0,20,0,0"
+                <TextBlock Foreground="Red" HorizontalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsRegistrationFailed}" Value="True">
+                                    <Setter Property="Text" Value="{DynamicResource Registration_Failed}"/>
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <UserCtrl:HeaderTextBox CornerRadius="8" Margin="0,20,0,0"
                                         Header="{DynamicResource LoginLabel}"
                                         Text="{Binding Login, Mode=TwoWay}"/>
 
@@ -51,7 +63,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <UserCtrl:AdvancedTextBox CornerRadius="8"
+                <UserCtrl:HeaderTextBox CornerRadius="8"
                                       Header="{DynamicResource UsernameLabel}" Margin="0,20,0,0"
                                       Text="{Binding Username, Mode=TwoWay}"/>
 
@@ -74,32 +86,16 @@
 
                 <StackPanel HorizontalAlignment="Stretch">
 
-                    <UserCtrl:PasswordBox
+                    <UserCtrl:HeaderPasswordBox
                     Header="{DynamicResource PasswordLabel}"
                     HeaderFontSize="14"
                     Margin="0,20,0,0"
+                    ShowRequirements="True"
                     CornerRadius="8"
                     Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-
-                    <TextBlock FontSize="10" Margin="0,5,0,0" Visibility="{Binding Password, Converter={StaticResource StringToVisibilityConverter}}">
-                    <Run Text="At least 12 characters" 
-                         Foreground="{Binding HasMinimumLength , Converter={StaticResource BoolToBrushConverter}}"/>
-                    <LineBreak/>
-                        
-                    <Run Text="Use a numbers" 
-                         Foreground="{Binding HasNumber, Converter={StaticResource BoolToBrushConverter}}"/>
-                    <LineBreak/>
-                        
-                    <Run Text="Use a uppercase letters" 
-                         Foreground="{Binding HasUppercase, Converter={StaticResource BoolToBrushConverter}}"/>
-                    <LineBreak/>
-                        
-                    <Run Text="Use a symbols" 
-                         Foreground="{Binding HasSymbol, Converter={StaticResource BoolToBrushConverter}}"/>
-                    </TextBlock>
                 </StackPanel>
 
-                <UserCtrl:PasswordBox CornerRadius="8" Margin="0,20,0,0"
+                <UserCtrl:HeaderPasswordBox CornerRadius="8" Margin="0,20,0,0"
                                   Header="{DynamicResource ConfirmPasswordLabel}"
                                   Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 

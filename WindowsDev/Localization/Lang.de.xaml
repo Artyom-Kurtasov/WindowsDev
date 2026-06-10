@@ -51,4 +51,15 @@
 
     <sys:String x:Key="UserNotExists">Ein Benutzer mit diesem Login oder Passwort existiert nicht</sys:String>
 
+    <sys:String x:Key="TaskStatus_Done">Offen</sys:String>
+    <sys:String x:Key="TaskStatus_InProgress">In Bearbeitung</sys:String>
+    <sys:String x:Key="TaskStatus_Closed">Geschlossen</sys:String>
+
+    <sys:String x:Key="TaskPriority_Normal">Normal</sys:String>
+    <sys:String x:Key="TaskPriority_Critical">Kritisch</sys:String>
+
+    <sys:String x:Key="Error_Critical">Kritischer Fehler</sys:String>
+    <sys:String x:Key="Error_DatabaseFatal">Keine Verbindung zur Datenbank möglich. Die Anwendung wird geschlossen.</sys:String>
+
+    <sys:String x:Key="Registration_Failed">Bitte füllen Sie alle Felder korrekt aus.</sys:String>
 </ResourceDictionary>

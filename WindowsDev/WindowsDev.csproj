@@ -17,6 +17,7 @@
 		<None Remove="Views\ContentControls\**" />
 		<Page Remove="ViewModels\Commands\**" />
 		<Page Remove="Views\ContentControls\**" />
+	<InternalsVisibleTo Include="WindowsDev.Tests" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -37,6 +38,11 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Resources.resx</DependentUpon>
 		</Compile>
+		<Compile Update="Settings\UserSettings.Designer.cs">
+		  <DesignTimeSharedInput>True</DesignTimeSharedInput>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>UserSettings.settings</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -44,6 +50,13 @@
 			<Generator>PublicResXFileCodeGenerator</Generator>
 			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Settings\UserSettings.settings">
+	    <Generator>PublicSettingsSingleFileGenerator</Generator>
+	    <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
+	  </None>
 	</ItemGroup>
 
 </Project>
