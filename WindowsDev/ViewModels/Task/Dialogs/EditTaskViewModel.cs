@@ -1,50 +1,41 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Business.Services.Logger;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
-using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.ViewModels.Tasks.Dialog
 {
-    public class EditTaskViewModel : TaskDialogViewModelBase, IInitializableAsync, IProjectDialogCreator
+    public class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
     {
         private readonly ITaskService _taskService;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ILogger<EditTaskViewModel> _logger;
 
-        private TasksInfo CurrentTask { get; set; } = null!;
+        private TasksInfo CurrentTask { get; }
 
-        public EditTaskViewModel(ITaskService taskService, IDialogCoordinator dialogCoordinator,
+        public EditTaskViewModel(
+            TasksInfo currentTask,
+            ITaskService taskService,
+            IDialogCoordinator dialogCoordinator,
             ILogger<EditTaskViewModel> logger)
         {
+            CurrentTask = currentTask ?? throw new ArgumentNullException(nameof(currentTask));
             _taskService = taskService;
             _dialogCoordinator = dialogCoordinator;
             _logger = logger;
 
             EditTaskCommand = new AsyncRelayCommand(EditTask);
+            SetEditDialog();
         }
 
-        // Commands
         public ICommand EditTaskCommand { get; }
 
-        // Events
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        // Init
-        public async Task InitializationAsync(params object[] parameter)
-        {
-            CurrentTask = parameter.OfType<TasksInfo>().FirstOrDefault()
-                ?? throw new ArgumentNullException();
-
-                SetEditDialog();
-        }
-
-        // Commands logic
         private async Task EditTask()
         {
             try
@@ -60,14 +51,18 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
 
                     await _taskService.UpdateAsync(CurrentTask);
 
-                    Completed?.Invoke();
+                    if (Completed != null)
+                    {
+                        await Completed.Invoke();
+                    }
+
                     await Close();
                 }
                 else
                 {
                     await _dialogCoordinator.ShowMessageAsync(this,
-                        "Warning",
-                        "Enter a name",
+                        Translate("Warning_Title"),
+                        Translate("Warning_EnterName"),
                         MessageDialogStyle.Affirmative);
                 }
             }
@@ -75,8 +70,8 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             {
                 _logger.LogError(ex, "Failed to edit task {taskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to edit task",
+                    Translate("Error_Title"),
+                    Translate("Error_EditTask"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -96,7 +91,9 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         private async Task Close()
         {
             if (CloseRequested != null)
+            {
                 await CloseRequested.Invoke();
+            }
 
             IsEditMode = false;
         }

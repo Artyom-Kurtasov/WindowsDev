@@ -76,7 +76,7 @@ namespace WindowsDev.Controls.Users
         }
 
         public static readonly DependencyProperty HeaderFontSizeProperty =
-            DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(HeaderTextBlock));
+            DependencyProperty.Register(nameof(HeaderFontSize), typeof(int), typeof(HeaderTextBlock), new PropertyMetadata(14));
 
         public int HeaderFontSize
         {

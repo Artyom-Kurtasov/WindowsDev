@@ -1,4 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
@@ -20,25 +20,30 @@ using WindowsDev.Views.Tasks;
 
 namespace WindowsDev.ViewModels.Tasks
 {
-    public class TaskViewModel : ViewModelBase, IInitializableAsync
+    public class TaskViewModel : ViewModelBase, IRefreshableViewModel
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
         private readonly IDialogService _dialogService;
         private readonly IAttacmentService _attacmentService;
-        private readonly ICommentService _commentService; 
+        private readonly ICommentService _commentService;
         private readonly ILogger<TaskViewModel> _logger;
 
-        private TasksInfo _currentTask = null!;
+        private TasksInfo _currentTask;
         private string? _newComment;
 
-        public TaskViewModel(ICommentService commentService,
+        public TaskViewModel(
+            ProjectsInfo project,
+            TasksInfo currentTask,
+            ICommentService commentService,
             IDialogService dialogService,
             INavigationService navigationService,
             IAttacmentService attacmentService,
             ILogger<TaskViewModel> logger,
             IDialogCoordinator dialogCoordinator)
         {
+            Project = project ?? throw new ArgumentNullException(nameof(project));
+            _currentTask = currentTask ?? throw new ArgumentNullException(nameof(currentTask));
             _commentService = commentService;
             _dialogService = dialogService;
             _navigationService = navigationService;
@@ -51,17 +56,17 @@ namespace WindowsDev.ViewModels.Tasks
             SwitchToProjectCommand = new RelayCommand(SwitchToProject, CanSwitchToProject);
             AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
             OpenAttachmentCommand = new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
+
+            _ = LoadDetailsAsync();
         }
 
-        // Commands
         public ICommand SwitchToProjectCommand { get; }
         public ICommand EditTaskCommand { get; }
         public ICommand AddCommentCommand { get; }
         public ICommand AddAttachmentCommand { get; }
         public ICommand OpenAttachmentCommand { get; }
 
-        // State
-        public ProjectsInfo Project { get; set; } = null!;
+        public ProjectsInfo Project { get; }
 
         public TasksInfo CurrentTask
         {
@@ -84,7 +89,6 @@ namespace WindowsDev.ViewModels.Tasks
         public ObservableCollection<Comments>? Comments { get; private set; } = new();
         public ObservableCollection<TaskAttachment>? Attachments { get; private set; } = new();
 
-        // Inputs
         public string? NewComment
         {
             get => _newComment;
@@ -169,15 +173,14 @@ namespace WindowsDev.ViewModels.Tasks
 
         public DateTime CreatedAt => CurrentTask.CreatedAt;
 
-        // Init
-        public async Task InitializationAsync(params object[] parameters)
+        public Task RefreshAsync()
         {
-            CurrentTask = parameters.OfType<TasksInfo>().FirstOrDefault()
-                ?? throw new ArgumentNullException();
+            RefreshTask();
+            return Task.CompletedTask;
+        }
 
-            Project = parameters.OfType<ProjectsInfo>().FirstOrDefault()
-                ?? throw new ArgumentNullException();
-
+        private async Task LoadDetailsAsync()
+        {
             try
             {
                 Comments = new ObservableCollection<Comments>(
@@ -189,8 +192,8 @@ namespace WindowsDev.ViewModels.Tasks
                 Comments = new ObservableCollection<Comments>();
 
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Comments are null",
+                    Translate("Error_Title"),
+                    Translate("Error_LoadComments"),
                     MessageDialogStyle.Affirmative);
             }
 
@@ -205,13 +208,12 @@ namespace WindowsDev.ViewModels.Tasks
                 Attachments = new ObservableCollection<TaskAttachment>();
 
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Comments are null",
+                    Translate("Error_Title"),
+                    Translate("Error_LoadAttachments"),
                     MessageDialogStyle.Affirmative);
             }
         }
 
-        // Commands logic
         private async Task OpenAttachment(TaskAttachment taskAttachment)
         {
             if (taskAttachment == null || string.IsNullOrWhiteSpace(taskAttachment.FilePath))
@@ -229,16 +231,16 @@ namespace WindowsDev.ViewModels.Tasks
             {
                 _logger.LogError(ex, "File not found {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "File not found",
+                    Translate("Error_Title"),
+                    Translate("Error_FileNotFound"),
                     MessageDialogStyle.Affirmative);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "File error {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "File error",
+                    Translate("Error_Title"),
+                    Translate("Error_File"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -262,8 +264,8 @@ namespace WindowsDev.ViewModels.Tasks
             {
                 _logger.LogError(ex, "Failed to add attachment for task {taskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to add attachment. Try again",
+                    Translate("Error_Title"),
+                    Translate("Error_AddAttachment"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -283,16 +285,16 @@ namespace WindowsDev.ViewModels.Tasks
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to add comment for task {taskId}", CurrentTask.Id);
-                await _dialogCoordinator.ShowMessageAsync(this, 
-                    "Error",
-                    "Failed to add comment. Try again",
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate("Error_Title"),
+                    Translate("Error_AddComment"),
                     MessageDialogStyle.Affirmative);
             }
         }
 
         private async Task EditTask()
         {
-            await _dialogService.ShowTaskDialogAsync<
+            await _dialogService.ShowDialogAsync<
                 TaskDialogView,
                 EditTaskViewModel>(this, CurrentTask);
         }
@@ -302,7 +304,6 @@ namespace WindowsDev.ViewModels.Tasks
 
         private bool CanSwitchToProject() => true;
 
-        // Helpers
         public void RefreshTask()
         {
             OnPropertyChanged(nameof(Name));

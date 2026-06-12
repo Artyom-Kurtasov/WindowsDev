@@ -108,7 +108,7 @@
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Content="Cancle" Command="{Binding CancelCommand}"
+            <Button Content="{DynamicResource CancelButton}" Command="{Binding CancelCommand}"
                     mah:ControlsHelper.CornerRadius="8" Padding="10,6,5,6"/>
         </StackPanel>
     </Grid>

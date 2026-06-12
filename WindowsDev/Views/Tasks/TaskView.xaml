@@ -29,14 +29,14 @@
                    Padding="16,8" 
                    Margin="0,0,8,0"
                    FontWeight="SemiBold"
-                   ToolTip="Update task details"
+                   ToolTip="{DynamicResource EditTaskTooltip}"
                     Command="{Binding EditTaskCommand}"/>
 
             <Button Content="{DynamicResource DeleteButton}" 
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8"
                    FontWeight="SemiBold"
-                   ToolTip="Delete current task"/>
+                   ToolTip="{DynamicResource DeleteTaskTooltip}"/>
 
             <Button Content="{DynamicResource BackButton}"
                     mah:ControlsHelper.CornerRadius="8"
@@ -146,7 +146,7 @@
                                        mah:ControlsHelper.CornerRadius="4"
                                        Padding="8,4"
                                        FontSize="14"
-                                       ToolTip="Download"
+                                       ToolTip="{DynamicResource DownloadTooltip}"
                                        Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                        CommandParameter="{Binding}"/>
                             </Grid>
@@ -227,7 +227,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBox Grid.Column="0" 
-                        mah:TextBoxHelper.Watermark="Add a comment..."
+                        mah:TextBoxHelper.Watermark="{DynamicResource AddCommentWatermark}"
                         Margin="0,0,8,0"
                         Padding="8"
                         Text="{Binding NewComment, Mode=TwoWay}"/>

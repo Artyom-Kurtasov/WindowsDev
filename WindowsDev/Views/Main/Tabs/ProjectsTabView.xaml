@@ -31,10 +31,10 @@
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Right">
                 <UserCtrl:HeaderTextBox   HorizontalAlignment="Right"
-                                          Watermark="Search"
+                                          Watermark="{DynamicResource SearchWatermark}"
                                           Margin="5,0,0,0"
                                           Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Button Content="Search" 
+                <Button Content="{DynamicResource SearchButton}" 
                         Command="{Binding SearchCommand}"/>
             </StackPanel>
         </Grid>
@@ -108,11 +108,11 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"
                     Margin="0,10">
-            <Button Content="Prev" 
+            <Button Content="{DynamicResource PrevButton}" 
                     Command="{Binding PrevPageCommand}" 
                     Margin="0,0,20,0"
                     Style="{DynamicResource MahApps.Styles.Button.Square}"/>
-            <Button Content="Next" 
+            <Button Content="{DynamicResource NextButton}" 
                     Command="{Binding NextPageCommand}" 
                     Margin="20,0,0,0"
                     Style="{DynamicResource MahApps.Styles.Button.Square.Accent}"/>

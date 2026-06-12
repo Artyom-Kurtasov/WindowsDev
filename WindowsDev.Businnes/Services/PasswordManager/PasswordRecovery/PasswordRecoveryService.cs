@@ -1,6 +1,5 @@
 ﻿using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
 
 namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 {
@@ -35,6 +34,30 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
             }
 
             return false;
+        }
+
+        public async Task ChangePasswordAsync(string login, string password)
+        {
+            var user = await _userRepository.GetByLoginAsync(login);
+
+            if (user != null)
+            {
+                var hasher = _passwordHasherFactory.GetHashMethod(user.HashMethod);
+                var passwordSalt = hasher.GenerateSalt();
+                var recoveryCodeSalt = hasher.GenerateSalt();
+
+                var recoveryCode = GenerateRecoveryCode();
+                var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
+                var passwordHash = hasher.HashPassword(password, passwordSalt);
+
+                user.RecoveryCodeHash = recoveryCodeHash.ToString("x16");
+                user.PasswordHash = passwordHash.ToString("x16");
+                user.Salt = passwordSalt;
+                user.RecoveryCodeSalt = recoveryCodeSalt;
+                
+
+               await _userRepository.UpdateAsync(user);
+            }
         }
     }
 }

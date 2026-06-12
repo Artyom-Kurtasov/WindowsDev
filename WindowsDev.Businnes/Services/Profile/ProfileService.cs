@@ -24,10 +24,10 @@ namespace WindowsDev.Business.Services.Profile
         public async Task ChangePassword(string currentPassword, string newPassword, string confirmPassword)
         {
             if (newPassword == currentPassword)
-                throw new Exception("Старый пароль совпадает с новым");
+                throw new Exception("ProfileError_NewPasswordSameAsCurrent");
 
             if (newPassword != confirmPassword)
-                throw new Exception("Passwords do not match"); //change text!!!
+                throw new Exception("ProfileError_PasswordsDoNotMatch");
 
             var user = await _userRepository.GetByLoginAsync(_currentUserService.Login);
 
@@ -36,7 +36,7 @@ namespace WindowsDev.Business.Services.Profile
             var currentHash = hasher.HashPassword(currentPassword, user.Salt);
 
             if (currentHash.ToString("x16") != user.PasswordHash)
-                throw new Exception("Current password is incorrect"); //change text!!!
+                throw new Exception("ProfileError_CurrentPasswordIncorrect");
 
             var newSalt = hasher.GenerateSalt();
             var newHash = hasher.HashPassword(newPassword, newSalt);
@@ -50,11 +50,11 @@ namespace WindowsDev.Business.Services.Profile
         public async Task ChangeUsername(string currentUsername, string newUsername)
         {
             if (currentUsername == newUsername)
-                throw new Exception("Новый юзернейм не должен совпадать со старым!");
+                throw new Exception("ProfileError_NewUsernameSameAsCurrent");
 
             if (await _userRepository.ExistsByLoginAsync(_currentUserService.Login))
             {
-                throw new Exception("User with this username already exist!");
+                throw new Exception("ProfileError_UsernameExists");
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -7,13 +7,14 @@ using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Projects.Dialogs;
 using WindowsDev.Views.Projects;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProjectsViewModel : ViewModelBase
+    public class ProjectsViewModel : ViewModelBase, IRefreshableViewModel
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IProjectService _projectService;
@@ -21,9 +22,13 @@ namespace WindowsDev.ViewModels.Main.Tabs
         private readonly ILogger<ProjectsViewModel> _logger;
         private readonly IDialogService _dialogService;
 
-        private int _pageSize = 10;
+        private readonly int _pageSize = 10;
+        private int _totalCount;
+        private int _currentPage = 1;
+        private string _searchFilter = string.Empty;
 
-        public ProjectsViewModel(IDialogCoordinator dialogCoordinator,
+        public ProjectsViewModel(
+            IDialogCoordinator dialogCoordinator,
             IProjectService projectService,
             INavigationService navigationService,
             ILogger<ProjectsViewModel> logger,
@@ -35,26 +40,16 @@ namespace WindowsDev.ViewModels.Main.Tabs
             _dialogCoordinator = dialogCoordinator;
             _logger = logger;
 
-
             DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjectsAsync);
             OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialogAsync);
             OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProjectAsync, _ => true);
-
             SearchCommand = new AsyncRelayCommand(SearchAsync);
             NextPageCommand = new AsyncRelayCommand(NextPageAsync);
             PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
 
-            _ = InitializationAsync();
+            _ = LoadProjectsAsync();
         }
 
-        // Init
-        public async Task InitializationAsync(params object[] parameters)
-        {
-            _totalCount = await _projectService.GetProjectsCountAsync();
-            await GetPageAsync();
-        }
-
-        // Commands
         public ICommand DeleteSelectedProjectsCommand { get; }
         public ICommand OpenDialogCommand { get; }
         public ICommand OpenProjectCommand { get; }
@@ -64,8 +59,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         public ObservableCollection<ProjectsInfo> ProjectsList { get; } = new();
 
-        // Inputs
-        private string _searchFilter = string.Empty;
         public string SearchFilter
         {
             get => _searchFilter;
@@ -76,7 +69,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-        private int _currentPage = 1;
         public int CurrentPage
         {
             get => _currentPage;
@@ -87,11 +79,20 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-        private int _totalCount;
-        public int TotalCount =>
-            (int)Math.Ceiling((double)_totalCount / _pageSize);
+        public int TotalCount => (int)Math.Ceiling((double)_totalCount / _pageSize);
 
-        // Commands logic
+        public async Task RefreshAsync()
+        {
+            await LoadProjectsAsync();
+        }
+
+        private async Task LoadProjectsAsync()
+        {
+            _totalCount = await _projectService.GetProjectsCountAsync();
+            OnPropertyChanged(nameof(TotalCount));
+            await GetPageAsync();
+        }
+
         private async Task SearchAsync()
         {
             CurrentPage = 1;
@@ -102,25 +103,22 @@ namespace WindowsDev.ViewModels.Main.Tabs
         {
             try
             {
-                var projectsToDelete = ProjectsList?
+                var projectsToDelete = ProjectsList
                     .Where(x => x.IsSelected)
                     .ToList();
 
-                if (projectsToDelete != null && projectsToDelete.Any())
+                foreach (var project in projectsToDelete)
                 {
-                    foreach (var project in projectsToDelete)
-                    {
-                        await _projectService.DeleteAsync(project.Id);
-                        ProjectsList?.Remove(project);
-                    }
+                    await _projectService.DeleteAsync(project.Id);
+                    ProjectsList.Remove(project);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to delete projects");
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to delete projects",
+                    Translate("Error_Title"),
+                    Translate("Error_DeleteProjects"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -129,7 +127,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             await _navigationService.NavigateTo<ProjectViewModel>(project);
 
         private async Task ShowCreateProjectDialogAsync() =>
-            await _dialogService.ShowTaskDialogAsync<CreateProjectView, CreateProjectDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<CreateProjectView, CreateProjectDialogViewModel>(this);
 
         private async Task NextPageAsync()
         {
@@ -167,8 +165,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
             {
                 _logger.LogError(ex, "Failed to load projects");
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to load projects",
+                    Translate("Error_Title"),
+                    Translate("Error_LoadProjects"),
                     MessageDialogStyle.Affirmative);
             }
         }

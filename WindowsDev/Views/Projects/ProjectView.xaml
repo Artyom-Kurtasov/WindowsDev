@@ -48,13 +48,13 @@
             <StackPanel Grid.Column="1">
 
                 <!-- Top row: Add button -->
-                <Button Content="Add"
+                <Button Content="{DynamicResource AddButton}"
                                 mah:ControlsHelper.CornerRadius="8"
                                 Margin="0,0,0,10"
                                 HorizontalAlignment="Left"
                                 Command="{Binding OpenDialogCommand}"/>
 
-                <Button Content="Delete"
+                <Button Content="{DynamicResource DeleteButton}"
                                 mah:ControlsHelper.CornerRadius="8"
                                 Margin="0,0,0,10"
                                 HorizontalAlignment="Left"
@@ -70,21 +70,21 @@
                     <UserCtrl:HeaderTextBox Grid.Column="0"
                                                       CornerRadius="8"
                                                       Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                      Watermark="Search"/>
+                                                      Watermark="{DynamicResource SearchWatermark}"/>
 
                     <StackPanel Grid.Column="1" 
                                         Orientation="Horizontal" 
                                         Margin="10,0,0,0"
                                         VerticalAlignment="Center">
-                        <CheckBox Content="All"
+                        <CheckBox Content="{DynamicResource AllLabel}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowAll}"/>
-                        <CheckBox Content="Closed"
+                        <CheckBox Content="{DynamicResource TaskStatus_Closed}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowClosed}"/>
-                        <CheckBox Content="In Progress"
+                        <CheckBox Content="{DynamicResource TaskStatus_InProgress}"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowInProgress}"/>
                     </StackPanel>

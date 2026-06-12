@@ -42,7 +42,9 @@ namespace WindowsDev.Business.Repositories
         public async Task UpdateAsync(UsersInfo user)
         {
             using var dbContext = _dbManager.Create();
-            var existingUser = await GetByLoginAsync(user.Login);
+
+            var existingUser = await dbContext.UsersInfo
+                .FirstOrDefaultAsync(x => x.Login == user.Login);
 
             if (existingUser != null)
             {
@@ -51,6 +53,8 @@ namespace WindowsDev.Business.Repositories
                 existingUser.Salt = user.Salt;
                 existingUser.HashMethod = user.HashMethod;
                 existingUser.PasswordHash = user.PasswordHash;
+                existingUser.RecoveryCodeHash = user.RecoveryCodeHash;
+                existingUser.RecoveryCodeSalt = user.RecoveryCodeSalt;
 
                 await dbContext.SaveChangesAsync();
             }

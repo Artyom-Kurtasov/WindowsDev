@@ -160,7 +160,7 @@ namespace WindowsDev.ViewModels.Auth
 
             if (success.Item1)
             {
-                await _dialogCoordinator.ShowMessageAsync(this, "information", $"{success.Item2}", MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{success.Item2}", MessageDialogStyle.Affirmative);
                 await _navigationService.NavigateTo<MainWindowViewModel>();
             }
         }

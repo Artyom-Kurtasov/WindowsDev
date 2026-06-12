@@ -4,27 +4,52 @@
 
     <sys:String x:Key="AddAttachmentButton">Anhang hinzufügen</sys:String>
     <sys:String x:Key="AddButton">Hinzufügen</sys:String>
+    <sys:String x:Key="AllLabel">Alle</sys:String>
+    <sys:String x:Key="ApplyButton">Anwenden</sys:String>
     <sys:String x:Key="BackButton">Zurück</sys:String>
 
+    <sys:String x:Key="ChangePasswordLabel">Passwort ändern</sys:String>
     <sys:String x:Key="ConfirmPasswordLabel">Passwort bestätigen</sys:String>
+    <sys:String x:Key="ConnectionStringLabel">Verbindungszeichenfolge</sys:String>
     <sys:String x:Key="CreatedAtLabel">Erstellt am</sys:String>
+    <sys:String x:Key="CurrentPasswordLabel">Aktuelles Passwort</sys:String>
+    <sys:String x:Key="DatabaseLabel">Datenbank</sys:String>
+    <sys:String x:Key="DarkThemeLabel">Dunkel</sys:String>
     <sys:String x:Key="DeadlineLabel">Frist</sys:String>
     <sys:String x:Key="DescriptionLabel">Beschreibung</sys:String>
+    <sys:String x:Key="DownloadTooltip">Herunterladen</sys:String>
+    <sys:String x:Key="EditTaskTooltip">Aufgabendetails aktualisieren</sys:String>
+    <sys:String x:Key="DeleteTaskTooltip">Aktuelle Aufgabe löschen</sys:String>
     <sys:String x:Key="IdLabel">Nr.</sys:String>
+    <sys:String x:Key="LanguageLabel">Sprache</sys:String>
+    <sys:String x:Key="LightThemeLabel">Hell</sys:String>
     <sys:String x:Key="NameLabel">Name</sys:String>
+    <sys:String x:Key="NewPasswordLabel">Neues Passwort</sys:String>
 
     <sys:String x:Key="DeleteButton">Löschen</sys:String>
     <sys:String x:Key="EditButton">Bearbeiten</sys:String>
 
     <sys:String x:Key="LoginLabel">Login</sys:String>
+    <sys:String x:Key="LogoutButton">Abmelden</sys:String>
+    <sys:String x:Key="OkButton">Ok</sys:String>
     <sys:String x:Key="UsernameLabel">Benutzername</sys:String>
     <sys:String x:Key="PasswordLabel">Passwort</sys:String>
+    <sys:String x:Key="ProfileLabel">Profil</sys:String>
+    <sys:String x:Key="RecoveryCodeLabel">Code eingeben</sys:String>
+    <sys:String x:Key="SearchButton">Suchen</sys:String>
+    <sys:String x:Key="SearchWatermark">Suchen</sys:String>
+    <sys:String x:Key="ThemeLabel">Design</sys:String>
+    <sys:String x:Key="UserIdLabel">Benutzer-ID</sys:String>
 
     <sys:String x:Key="NewUserText">Neu bei TaskManager?</sys:String>
     <sys:String x:Key="ExistingUserText">Bereits ein Konto?</sys:String>
+    <sys:String x:Key="ForgotPasswordText">Passwort vergessen?</sys:String>
 
     <sys:String x:Key="SignInButton">Anmelden</sys:String>
     <sys:String x:Key="SignUpButton">Registrieren</sys:String>
+    <sys:String x:Key="SaveButton">Speichern</sys:String>
+    <sys:String x:Key="NextButton">Weiter</sys:String>
+    <sys:String x:Key="PrevButton">Zurück</sys:String>
 
     <sys:String x:Key="ProjectsLabel">Projekte</sys:String>
     <sys:String x:Key="SettingsLabel">Einstellungen</sys:String>
@@ -58,8 +83,45 @@
     <sys:String x:Key="TaskPriority_Normal">Normal</sys:String>
     <sys:String x:Key="TaskPriority_Critical">Kritisch</sys:String>
 
+    <sys:String x:Key="PasswordRequirement_MinLength">Mindestens 12 Zeichen</sys:String>
+    <sys:String x:Key="PasswordRequirement_Number">Zahlen verwenden</sys:String>
+    <sys:String x:Key="PasswordRequirement_Uppercase">Großbuchstaben verwenden</sys:String>
+    <sys:String x:Key="PasswordRequirement_Symbol">Symbole verwenden</sys:String>
+
+    <sys:String x:Key="AddCommentWatermark">Kommentar hinzufügen...</sys:String>
+    <sys:String x:Key="ConfirmPasswordWatermark">Passwort bestätigen</sys:String>
+    <sys:String x:Key="CurrentPasswordWatermark">Aktuelles Passwort eingeben</sys:String>
+    <sys:String x:Key="LoginWatermark">Login eingeben</sys:String>
+    <sys:String x:Key="NewPasswordWatermark">Neues Passwort eingeben</sys:String>
+    <sys:String x:Key="UsernameWatermark">Namen eingeben</sys:String>
+
     <sys:String x:Key="Error_Critical">Kritischer Fehler</sys:String>
     <sys:String x:Key="Error_DatabaseFatal">Keine Verbindung zur Datenbank möglich. Die Anwendung wird geschlossen.</sys:String>
+    <sys:String x:Key="Error_Title">Fehler</sys:String>
+    <sys:String x:Key="Warning_Title">Warnung</sys:String>
+    <sys:String x:Key="Information_Title">Information</sys:String>
+    <sys:String x:Key="Error_Generic">Etwas ist schiefgelaufen. Starten Sie die Anwendung neu. Weitere Informationen finden Sie in der Protokolldatei.</sys:String>
+    <sys:String x:Key="Error_CriticalShutdown">Kritischer Fehler. Die Anwendung wird geschlossen. Starten Sie die Anwendung neu. Wenn das Problem weiterhin besteht, installieren Sie sie neu.</sys:String>
+    <sys:String x:Key="Error_LoadProjects">Projekte konnten nicht geladen werden</sys:String>
+    <sys:String x:Key="Error_DeleteProjects">Projekte konnten nicht gelöscht werden</sys:String>
+    <sys:String x:Key="Error_CreateProject">Projekt konnte nicht erstellt werden</sys:String>
+    <sys:String x:Key="Error_LoadTasks">Seiten konnten nicht geladen werden</sys:String>
+    <sys:String x:Key="Error_DeleteTasks">Aufgaben konnten nicht gelöscht werden</sys:String>
+    <sys:String x:Key="Error_CreateTask">Aufgabe konnte nicht erstellt werden</sys:String>
+    <sys:String x:Key="Error_EditTask">Aufgabe konnte nicht bearbeitet werden</sys:String>
+    <sys:String x:Key="Error_LoadComments">Kommentare konnten nicht geladen werden</sys:String>
+    <sys:String x:Key="Error_LoadAttachments">Anhänge konnten nicht geladen werden</sys:String>
+    <sys:String x:Key="Error_FileNotFound">Datei nicht gefunden</sys:String>
+    <sys:String x:Key="Error_File">Dateifehler</sys:String>
+    <sys:String x:Key="Error_AddAttachment">Anhang konnte nicht hinzugefügt werden. Versuchen Sie es erneut</sys:String>
+    <sys:String x:Key="Error_AddComment">Kommentar konnte nicht hinzugefügt werden. Versuchen Sie es erneut</sys:String>
+    <sys:String x:Key="Warning_EnterName">Geben Sie einen Namen ein</sys:String>
+    <sys:String x:Key="Warning_InvalidConnectionString">Diese Verbindungszeichenfolge konnte nicht angewendet werden</sys:String>
+    <sys:String x:Key="ProfileError_NewPasswordSameAsCurrent">Das neue Passwort muss sich vom aktuellen Passwort unterscheiden</sys:String>
+    <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Passwörter stimmen nicht überein</sys:String>
+    <sys:String x:Key="ProfileError_CurrentPasswordIncorrect">Aktuelles Passwort ist falsch</sys:String>
+    <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">Der neue Benutzername muss sich vom aktuellen unterscheiden</sys:String>
+    <sys:String x:Key="ProfileError_UsernameExists">Ein Benutzer mit diesem Benutzernamen existiert bereits</sys:String>
 
     <sys:String x:Key="Registration_Failed">Bitte füllen Sie alle Felder korrekt aus.</sys:String>
 </ResourceDictionary>

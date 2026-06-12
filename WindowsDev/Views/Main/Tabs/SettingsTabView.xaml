@@ -22,7 +22,7 @@
 
             <!-- LANGUAGE -->
 
-            <TextBlock Text="LANGUAGE"
+            <TextBlock Text="{DynamicResource LanguageLabel}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -59,7 +59,7 @@
 
             <!-- APPEARANCE -->
 
-            <TextBlock Text="THEME"
+            <TextBlock Text="{DynamicResource ThemeLabel}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -80,11 +80,11 @@
                             Margin="0,15,0,5"/>
 
                     <Grid>
-                        <TextBlock Text="Light"
+                        <TextBlock Text="{DynamicResource LightThemeLabel}"
                                    HorizontalAlignment="Left"
                                    Foreground="{DynamicResource MahApps.Brushes.Gray}"/>
 
-                        <TextBlock Text="Dark"
+                        <TextBlock Text="{DynamicResource DarkThemeLabel}"
                                    HorizontalAlignment="Right"
                                    Foreground="{DynamicResource MahApps.Brushes.Gray}"/>
                     </Grid>
@@ -95,7 +95,7 @@
 
             <!-- DATABASE -->
 
-            <TextBlock Text="DATABASE"
+            <TextBlock Text="{DynamicResource DatabaseLabel}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -108,12 +108,12 @@
                 <StackPanel>
 
                     <UserCtrl:HeaderTextBox
-                        Header="Connection String"
+                        Header="{DynamicResource ConnectionStringLabel}"
                         HeaderFontSize="12"
                         Text="{Binding NewConnectionString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                         Watermark="Server=localhost;Database=MyDb;..."/>
 
-                    <Button Content="Apply"
+                    <Button Content="{DynamicResource ApplyButton}"
                             Command="{Binding SetNewConnectionStringCommand}"
                             Style="{DynamicResource MahApps.Styles.Button.Accent}"
                             Width="120"

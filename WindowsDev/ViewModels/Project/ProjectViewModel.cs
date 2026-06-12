@@ -1,4 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
@@ -18,7 +18,7 @@ using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Projects
 {
-    public class ProjectViewModel : ViewModelBase, IInitializableAsync
+    public class ProjectViewModel : ViewModelBase, IRefreshableViewModel
     {
         private readonly IDialogService _dialogService;
         private readonly INavigationService _navigationService;
@@ -26,14 +26,23 @@ namespace WindowsDev.ViewModels.Projects
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ILogger<ProjectViewModel> _logger;
 
-        private int _pageSize = 15;
+        private readonly int _pageSize = 15;
+        private int _currentPage = 1;
+        private int _totalTasks;
+        private string _searchFilter = string.Empty;
+        private bool _showAll = true;
+        private bool _showClosed;
+        private bool _showInProgress;
 
-        public ProjectViewModel(IDialogCoordinator dialogCoordinator,
+        public ProjectViewModel(
+            ProjectsInfo currentProject,
+            IDialogCoordinator dialogCoordinator,
             INavigationService navigationService,
             ITaskService taskService,
             IDialogService dialogService,
             ILogger<ProjectViewModel> logger)
         {
+            CurrentProject = currentProject ?? throw new ArgumentNullException(nameof(currentProject));
             _navigationService = navigationService;
             _dialogService = dialogService;
             _taskService = taskService;
@@ -46,9 +55,10 @@ namespace WindowsDev.ViewModels.Projects
             NextPageCommand = new AsyncRelayCommand(NextPage);
             PrevPageCommand = new AsyncRelayCommand(PrevPage);
             DeleteSelectedTasksCommand = new AsyncRelayCommand(DeleteSelectedTasks);
+
+            _ = LoadTasksAsync();
         }
 
-        // Commands
         public ICommand DeleteSelectedTasksCommand { get; }
         public ICommand SwitchToMainViewCommand { get; }
         public ICommand OpenDialogCommand { get; }
@@ -56,15 +66,12 @@ namespace WindowsDev.ViewModels.Projects
         public ICommand NextPageCommand { get; }
         public ICommand PrevPageCommand { get; }
 
-        // State
-        public ProjectsInfo CurrentProject { get; private set; } = null!;
-
+        public ProjectsInfo CurrentProject { get; }
         public ObservableCollection<TasksInfo> TaskItem { get; } = new();
 
         public string Name => CurrentProject.Name;
         public string? Description => CurrentProject.Description;
 
-        private int _currentPage = 1;
         public int CurrentPage
         {
             get => _currentPage;
@@ -75,24 +82,19 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-        private int _totalTasks;
-        public int TotalPages =>
-            (int)Math.Ceiling((double)_totalTasks / _pageSize);
+        public int TotalPages => (int)Math.Ceiling((double)_totalTasks / _pageSize);
 
-        // Filters
-        private string _seacrhFilter = string.Empty;
         public string SearchFilter
         {
-            get => _seacrhFilter;
+            get => _searchFilter;
             set
             {
-                _seacrhFilter = value;
+                _searchFilter = value;
                 OnPropertyChanged(nameof(SearchFilter));
                 _ = GetPageAsync();
             }
         }
 
-        private bool _showAll = true;
         public bool ShowAll
         {
             get => _showAll;
@@ -104,7 +106,6 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-        private bool _showClosed;
         public bool ShowClosed
         {
             get => _showClosed;
@@ -116,7 +117,6 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-        private bool _showInProgress;
         public bool ShowInProgress
         {
             get => _showInProgress;
@@ -128,17 +128,18 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-        // Init
-        public async Task InitializationAsync(params object[] parameters)
+        public async Task RefreshAsync()
         {
-            CurrentProject = parameters.OfType<ProjectsInfo>().FirstOrDefault()
-                ?? throw new ArgumentNullException(nameof(parameters));
+            await LoadTasksAsync();
+        }
 
+        private async Task LoadTasksAsync()
+        {
             _totalTasks = await _taskService.GetTasksCountAsync(CurrentProject.Id);
+            OnPropertyChanged(nameof(TotalPages));
             await GetPageAsync();
         }
 
-        // Commands logic
         private async Task OpenTask(TasksInfo task)
         {
             await _navigationService.NavigateTo<TaskViewModel>(CurrentProject, task);
@@ -151,7 +152,7 @@ namespace WindowsDev.ViewModels.Projects
 
         private async Task OpenDialog()
         {
-            await _dialogService.ShowTaskDialogAsync<
+            await _dialogService.ShowDialogAsync<
                 TaskDialogView,
                 CreateTaskViewModel>(this, CurrentProject.Id);
         }
@@ -215,8 +216,8 @@ namespace WindowsDev.ViewModels.Projects
             {
                 _logger.LogError(ex, "Failed to tasks for project {projectId}", CurrentProject.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to get pages",
+                    Translate("Error_Title"),
+                    Translate("Error_LoadTasks"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -229,21 +230,18 @@ namespace WindowsDev.ViewModels.Projects
                     .Where(x => x.IsSelected)
                     .ToList();
 
-                if (tasksToDelete != null && tasksToDelete.Any())
+                foreach (var task in tasksToDelete)
                 {
-                    foreach (var project in tasksToDelete)
-                    {
-                        await _taskService.DeleteAsync(project.Id);
-                        TaskItem.Remove(project);
-                    }
+                    await _taskService.DeleteAsync(task.Id);
+                    TaskItem.Remove(task);
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "{mes} {mes2}", ex.Message, ex.InnerException);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to delete tasks",
+                    Translate("Error_Title"),
+                    Translate("Error_DeleteTasks"),
                     MessageDialogStyle.Affirmative);
             }
         }

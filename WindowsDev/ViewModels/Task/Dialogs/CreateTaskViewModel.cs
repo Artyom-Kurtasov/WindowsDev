@@ -1,25 +1,32 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
-using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.ViewModels.Tasks.Dialog
 {
-    public class CreateTaskViewModel : TaskDialogViewModelBase, IInitializableAsync, IProjectDialogCreator
+    public class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
     {
         private readonly ITaskService _taskService;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ILogger<CreateTaskViewModel> _logger;
+        private readonly int _projectId;
 
-        private int _projectId;
-
-        public CreateTaskViewModel(ITaskService taskService, IDialogCoordinator dialogCoordinator,
+        public CreateTaskViewModel(
+            int projectId,
+            ITaskService taskService,
+            IDialogCoordinator dialogCoordinator,
             ILogger<CreateTaskViewModel> logger)
         {
+            if (projectId < 1)
+            {
+                throw new ArgumentOutOfRangeException(nameof(projectId));
+            }
+
+            _projectId = projectId;
             _taskService = taskService;
             _dialogCoordinator = dialogCoordinator;
             _logger = logger;
@@ -28,26 +35,12 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             CancelCommand = new AsyncRelayCommand(Cancel);
         }
 
-        // Commands
         public ICommand CreateTaskCommand { get; }
         public ICommand CancelCommand { get; }
 
-        // Events
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        // Init
-        public async Task InitializationAsync(params object[] args)
-        {
-            var projectId = args.OfType<int>().FirstOrDefault();
-
-            if (projectId < 1)
-                throw new ArgumentNullException();
-
-            _projectId = projectId;
-        }
-
-        // Commands logic
         public async Task CreateTask()
         {
             try
@@ -66,15 +59,18 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
                         ProjectId = _projectId
                     });
 
-                    Completed?.Invoke();
+                    if (Completed != null)
+                    {
+                        await Completed.Invoke();
+                    }
 
                     await Cancel();
                 }
                 else
                 {
                     await _dialogCoordinator.ShowMessageAsync(this,
-                        "Warning",
-                        "Enter a name",
+                        Translate("Warning_Title"),
+                        Translate("Warning_EnterName"),
                         MessageDialogStyle.Affirmative);
                 }
             }
@@ -82,8 +78,8 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             {
                 _logger.LogError(ex, "Failed to create task\n {mes}", ex.Message);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to create task",
+                    Translate("Error_Title"),
+                    Translate("Error_CreateTask"),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -91,7 +87,9 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public async Task Cancel()
         {
             if (CloseRequested != null)
+            {
                 await CloseRequested.Invoke();
+            }
         }
     }
 }

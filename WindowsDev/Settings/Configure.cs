@@ -31,9 +31,12 @@ using WindowsDev.Commands.NavigationManager;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain.PasswordRecoveryModels;
 using WindowsDev.Factories;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels.Auth;
+using WindowsDev.ViewModels.Auth.Dialogs;
+using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Main.Tabs;
 using WindowsDev.ViewModels.Projects;
@@ -86,6 +89,9 @@ namespace WindowsDev.Settings
 
             // Converters
             services.AddSingleton<BoolToBrushConverter>();
+
+            // Password Recovery Data
+            services.AddSingleton<PasswordRecoveryData>();
         }
 
         private static void ConfigureDatabase(IServiceCollection services)
@@ -160,6 +166,12 @@ namespace WindowsDev.Settings
 
             services.AddTransient<EditTaskViewModel>();
             services.AddTransient<CreateTaskViewModel>();
+
+            // Recovery Password
+            services.AddTransient<RecoveryCodeDialogViewModel>();
+            services.AddTransient<FirstStepViewModel>();
+            services.AddTransient<SecondStepViewModel>();
+            services.AddTransient<ThirdStepViewModel>();
         }
 
         private static void ConfigureWindows(IServiceCollection services)

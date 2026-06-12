@@ -119,14 +119,14 @@ namespace WindowsDev
         private void ShowUserMessage(Exception ex, string source, bool isTerminating = false)
         {
             var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
+            var loc = ServiceProvider.GetRequiredService<LanguageChanger>();
             logger.LogError(ex, source);
 
             if (!isTerminating)
             {
                 MessageBox.Show(
-                    "Something went wrong. Try to restart the app.\n\n" +
-                    "More information in log file.",
-                    "Error",
+                    loc.Translate("Error_Generic"),
+                    loc.Translate("Error_Title"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );
@@ -136,9 +136,8 @@ namespace WindowsDev
             else
             {
                 MessageBox.Show(
-                    "Critical error. Application will close.\n\n" +
-                    "Please restart the app. If problem persists, reinstall.",
-                    "Critical Error",
+                    loc.Translate("Error_CriticalShutdown"),
+                    loc.Translate("Error_Critical"),
                     MessageBoxButton.OK,
                     MessageBoxImage.Error
                 );

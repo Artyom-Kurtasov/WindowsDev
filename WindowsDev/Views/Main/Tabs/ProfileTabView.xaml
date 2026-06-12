@@ -10,7 +10,7 @@
                     MaxWidth="600">
 
             <UserCtrl:HeaderTextBlock
-                Header="User Id"
+                Header="{DynamicResource UserIdLabel}"
                 Text="{Binding Id}"
                 HeaderFontSize="12"
                 BorderBrush="{DynamicResource MahApps.Brushes.Gray1}"
@@ -18,47 +18,47 @@
                 Margin="0,0,0,15"/>
 
             <UserCtrl:HeaderTextBox
-                Header="Login"
+                Header="{DynamicResource LoginLabel}"
                 HeaderFontSize="12"
                 Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="Enter login"
+                Watermark="{DynamicResource LoginWatermark}"
                 Margin="0,0,0,15"/>
 
             <UserCtrl:HeaderTextBox
-                Header="Username"
+                Header="{DynamicResource UsernameLabel}"
                 HeaderFontSize="12"
                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="Enter name"
+                Watermark="{DynamicResource UsernameWatermark}"
                 Margin="0,0,0,15"/>
 
             <Separator Margin="0,10,0,20"/>
 
-            <TextBlock Text="CHANGE PASSWORD"
+            <TextBlock Text="{DynamicResource ChangePasswordLabel}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
                        Margin="0,0,0,15"/>
 
             <UserCtrl:HeaderPasswordBox
-                Header="Current Password"
+                Header="{DynamicResource CurrentPasswordLabel}"
                 HeaderFontSize="12"
                 Password="{Binding CurrentPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="Enter current password"
+                Watermark="{DynamicResource CurrentPasswordWatermark}"
                 Margin="0,0,0,15"/>
 
             <UserCtrl:HeaderPasswordBox
-                Header="New Password"
+                Header="{DynamicResource NewPasswordLabel}"
                 HeaderFontSize="12"
                 Password="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 ShowRequirements="True"
-                Watermark="Enter new password"
+                Watermark="{DynamicResource NewPasswordWatermark}"
                 Margin="0,0,0,15"/>
 
             <UserCtrl:HeaderPasswordBox
-                Header="Confirm Password"
+                Header="{DynamicResource ConfirmPasswordLabel}"
                 HeaderFontSize="12"
                 Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="Confirm password"
+                Watermark="{DynamicResource ConfirmPasswordWatermark}"
                 Margin="0,0,0,20"/>
 
             <Grid>
@@ -68,12 +68,12 @@
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0"
-                        Content="Save"
+                        Content="{DynamicResource SaveButton}"
                         Style="{DynamicResource MahApps.Styles.Button.Accent}"
                         Margin="0,0,10,0"/>
 
                 <Button Grid.Column="1"
-                        Content="Logout"
+                        Content="{DynamicResource LogoutButton}"
                         Style="{StaticResource MahApps.Styles.Button}"/>
             </Grid>
 

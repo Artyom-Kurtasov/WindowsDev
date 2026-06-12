@@ -110,7 +110,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
             catch (Exception ex)
             {
-                await _dialogCoordinator.ShowMessageAsync(this, "Warning", ex.Message, MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
             }
         }
 
@@ -122,7 +122,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
             catch (Exception ex)
             {
-                await _dialogCoordinator.ShowMessageAsync(this, "Warning", ex.Message, MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
             }
         }
     }

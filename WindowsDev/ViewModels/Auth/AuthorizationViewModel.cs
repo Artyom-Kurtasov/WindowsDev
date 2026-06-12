@@ -1,7 +1,5 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using WindowsDev.Business.Services.Authorization.Interfaces;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
@@ -11,7 +9,7 @@ using WindowsDev.Views.Auth.Dialogs;
 
 namespace WindowsDev.ViewModels.Auth
 {
-    public class AuthorizationViewModel : ViewModelBase, IProjectDialogCreator
+    public class AuthorizationViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
         private readonly IAuthorization _authorization;
@@ -94,7 +92,7 @@ namespace WindowsDev.ViewModels.Auth
 
         private async Task PasswordRecovery()
         {
-            await _dialogService.ShowTaskDialogAsync<RecoveryCodeDialogView, RecoveryCodeDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<RecoveryCodeDialogView, RecoveryCodeDialogViewModel>(this);
         }
     }
 }

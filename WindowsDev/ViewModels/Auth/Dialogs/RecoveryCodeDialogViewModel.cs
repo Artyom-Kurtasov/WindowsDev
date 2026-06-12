@@ -1,68 +1,134 @@
-﻿using MahApps.Metro.Controls.Dialogs;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
+using WindowsDev.Business.Services.Registration.Validation;
+using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain.PasswordRecoveryModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs
 {
-    public class RecoveryCodeDialogViewModel : ViewModelBase, IProjectDialogCreator
+    public class RecoveryCodeDialogViewModel : ViewModelBase, IDialogViewModel
     {
-        private readonly IDialogCoordinator _dialogCoordinator;
+        private readonly PasswordRecoveryData _passwordRecoveryData;
+        private readonly ThirdStepViewModel _thirdStepVM;
         private readonly IPasswordRecoveryService _passwordRecoveryService;
-        public RecoveryCodeDialogViewModel(IDialogCoordinator dialogCoordinator,
-                                           IPasswordRecoveryService passwordRecoveryService)
-        {
-            _dialogCoordinator = dialogCoordinator;
-            _passwordRecoveryService = passwordRecoveryService;
 
-            CloseDialogCommand = new AsyncRelayCommand(CloseDialogAsync);
-            ConfirmCommand = new AsyncRelayCommand(ConfirmCodeAsync);
+        private readonly List<object> _steps;
+
+        public RecoveryCodeDialogViewModel(
+            IUserRepository userRepository,
+            IPasswordRecoveryService passwordRecoveryService)
+        {
+            _passwordRecoveryService = passwordRecoveryService;
+            _passwordRecoveryData = new PasswordRecoveryData();
+
+            _thirdStepVM = new ThirdStepViewModel(_passwordRecoveryData);
+
+            _steps = new List<object>
+            {
+                new FirstStepViewModel(_passwordRecoveryData, userRepository),
+                new SecondStepViewModel(_passwordRecoveryData, passwordRecoveryService),
+                _thirdStepVM
+            };
+
+            NextStepCommand = new RelayCommand(NextStep, CanNextStep);
+            PrevStepCommand = new RelayCommand(PrevStep, CanBackStep);
+            ChangePasswordCommand = new AsyncRelayCommand(ChangePasswordAsync, CanNextStep);
+            CancelCommand = new AsyncRelayCommand(CancelAsync);
+
+            _passwordRecoveryData.PropertyChanged += (_, _) =>
+            {
+                ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
+            };
+
+            CurrentStep = 0;
+            CurrentStepView = _steps[0];
         }
 
-        private string _recoveryCode;
+        public ICommand CancelCommand { get; }
+        public ICommand ChangePasswordCommand { get; }
+        public ICommand NextStepCommand { get; }
+        public ICommand PrevStepCommand { get; }
+
+        private object _currentStepView = null!;
+
+        public object CurrentStepView
+        {
+            get => _currentStepView;
+            set
+            {
+                _currentStepView = value;
+                OnPropertyChanged(nameof(CurrentStepView));
+            }
+        }
+
+        private int _currentStep;
 
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        public string RecoveryCode
+        public int CurrentStep
         {
-            get => _recoveryCode;
+            get => _currentStep;
             set
             {
-                _recoveryCode = value;
-                OnPropertyChanged(nameof(RecoveryCode));
+                _currentStep = value;
+
+                OnPropertyChanged(nameof(CurrentStep));
+
+                ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
+                ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
+                ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
             }
         }
 
-        private string _login;
-        public string Login
+        public bool CanBackStep() => CurrentStep > 0;
+
+        public bool CanNextStep() => CurrentStep switch
         {
-            get => _login;
-            set
+            0 => _passwordRecoveryData.IsUserExist,
+            1 => _passwordRecoveryData.IsRecoveryCodeCorrect,
+            2 => PasswordValidator.IsValid(_thirdStepVM.NewPassword)
+                 && _thirdStepVM.NewPassword == _thirdStepVM.ConfirmPassword,
+            _ => false
+        };
+
+        private void NextStep()
+        {
+            if (CurrentStep < _steps.Count - 1)
             {
-                _login = value;
-                OnPropertyChanged(nameof(Login));
+                CurrentStep++;
+                CurrentStepView = _steps[CurrentStep];
             }
         }
 
-        public ICommand CloseDialogCommand { get; }
-        public ICommand ConfirmCommand { get; }
-
-        private async Task CloseDialogAsync()
+        private void PrevStep()
         {
-            var dialog = await _dialogCoordinator.GetCurrentDialogAsync<BaseMetroDialog>(this);
-            await _dialogCoordinator.HideMetroDialogAsync(this, dialog);
+            if (CurrentStep > 0)
+            {
+                CurrentStep--;
+                CurrentStepView = _steps[CurrentStep];
+            }
         }
 
-        private async Task ConfirmCodeAsync()
+        private async Task ChangePasswordAsync()
         {
-            if (int.TryParse(RecoveryCode, out int code))
+            await _passwordRecoveryService.ChangePasswordAsync(
+                _passwordRecoveryData.Login!,
+                _passwordRecoveryData.NewPassword!);
+
+            await CancelAsync();
+        }
+
+        private async Task CancelAsync()
+        {
+            if (CloseRequested != null)
             {
-               if (await _passwordRecoveryService.IsRecoverCodeCorrect(code, Login))
-                {
-                    CloseRequested?.Invoke();
-                }
+                await CloseRequested.Invoke();
             }
         }
     }

@@ -21,7 +21,7 @@ namespace WindowsDev.Business.Services.Localization
 
         public string Translate(string key)
         {
-            return Application.Current.TryFindResource(key) as string ?? $"[{key}]";
+            return Application.Current?.TryFindResource(key) as string ?? $"[{key}]";
         }
 
         private ResourceDictionary? LoadDictionary(string languageCode)

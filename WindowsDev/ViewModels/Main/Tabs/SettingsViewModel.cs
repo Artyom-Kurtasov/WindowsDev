@@ -100,7 +100,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
             catch
             {
-                await _dialogCoordinator.ShowMessageAsync(this, "Warning", "Nelza", MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate("Warning_InvalidConnectionString"), MessageDialogStyle.Affirmative);
 
                 _dbManager.ConnectionString = old;
             }

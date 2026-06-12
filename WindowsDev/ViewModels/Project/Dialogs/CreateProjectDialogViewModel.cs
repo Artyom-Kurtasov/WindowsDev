@@ -3,12 +3,13 @@ using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
 
 namespace WindowsDev.ViewModels.Projects.Dialogs
 {
-    public class CreateProjectDialogViewModel : ViewModelBase, IProjectDialogCreator
+    public class CreateProjectDialogViewModel : ViewModelBase, IDialogViewModel
     {
         private readonly ICurrentUserService _currentUserData;
         private readonly IProjectService _projectService;
@@ -81,8 +82,8 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
                 else
                 {
                     await _dialogCoordinator.ShowMessageAsync(this,
-                        "Warning",
-                        "Enter a name",
+                        Translate("Warning_Title"),
+                        Translate("Warning_EnterName"),
                         MessageDialogStyle.Affirmative);
                 }
             }
@@ -90,8 +91,8 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             {
                 _logger.LogError(ex, "Failed to create project");
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    "Error",
-                    "Failed to create project",
+                    Translate("Error_Title"),
+                    Translate("Error_CreateProject"),
                     MessageDialogStyle.Affirmative);
             }
         }

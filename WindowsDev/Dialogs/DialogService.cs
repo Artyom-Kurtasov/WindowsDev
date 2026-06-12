@@ -1,17 +1,15 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
-using WindowsDev.ViewModels.Tasks;
 
 namespace WindowsDev.Dialogs
 {
     public class DialogService : IDialogService
     {
-        private readonly IViewModelFactory _viewModelFactory;
         private readonly IDialogCoordinator _dialogCoordinator;
+        private readonly IViewModelFactory _viewModelFactory;
 
         public DialogService(
             IDialogCoordinator dialogCoordinator,
@@ -21,61 +19,42 @@ namespace WindowsDev.Dialogs
             _viewModelFactory = viewModelFactory;
         }
 
-        public async Task ShowTaskDialogAsync<TView, TViewModel>(object context, params object[] args)
+        public async Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
             where TView : UserControl, new()
-            where TViewModel : class, IProjectDialogCreator
+            where TViewModel : class, IDialogViewModel
         {
             var view = new TView();
+            var viewModel = _viewModelFactory.Create<TViewModel>(args);
 
-            var viewModel = _viewModelFactory.Create<TViewModel>();
-
-            // Initialize ViewModel if it supports async initialization
-            if (viewModel is IInitializableAsync init)
-            {
-                await init.InitializationAsync(args);
-            }
-
-            // Handle completion event (refresh parent context)
-            if (viewModel is IProjectDialogCreator vm)
-            {
-                Func<Task>? completedHandler = null;
-
-                completedHandler = async () =>
-                {
-                    if (context is TaskViewModel taskVm)
-                    {
-                        taskVm.RefreshTask();
-                    }
-                    else if (context is IInitializableAsync parent)
-                    {
-                        await parent.InitializationAsync();
-                    }
-
-                    vm.Completed -= completedHandler;
-                };
-
-                vm.Completed += completedHandler;
-            }
-
-            view.DataContext = viewModel;
-
-            // Wrap view into MahApps dialog container
-            CustomDialog dialog = new CustomDialog
+            var dialog = new CustomDialog
             {
                 Content = view
             };
 
-            // Handle request to close dialog from ViewModel
+            view.DataContext = viewModel;
+
+            Func<Task>? completedHandler = null;
             Func<Task>? closeHandler = null;
+
+            completedHandler = async () =>
+            {
+                if (context is IRefreshableViewModel refreshable)
+                {
+                    await refreshable.RefreshAsync();
+                }
+
+                viewModel.Completed -= completedHandler;
+            };
+
             closeHandler = async () =>
             {
                 await _dialogCoordinator.HideMetroDialogAsync(context, dialog);
                 viewModel.CloseRequested -= closeHandler;
             };
 
+            viewModel.Completed += completedHandler;
             viewModel.CloseRequested += closeHandler;
 
-            // Show dialog
             await _dialogCoordinator.ShowMetroDialogAsync(context, dialog);
         }
     }
