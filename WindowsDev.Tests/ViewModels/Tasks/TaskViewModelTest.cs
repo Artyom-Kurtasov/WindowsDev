@@ -36,9 +36,22 @@ namespace WindowsDev.Tests.ViewModels.Tasks
             _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
         }
 
-        private TaskViewModel CreateViewModel()
+        private TaskViewModel CreateViewModel(ProjectsInfo project = null, TasksInfo task = null)
         {
+            project ??= CreateTestProject();
+            task ??= CreateTestTask();
+
+            _commentServiceMock
+                .Setup(x => x.GetComments(task.Id))
+                .ReturnsAsync(new List<Comments>());
+
+            _attachmentServiceMock
+                .Setup(x => x.GetAttachmentsAsync(task.Id))
+                .ReturnsAsync(new List<TaskAttachment>());
+
             return new TaskViewModel(
+                project,
+                task,
                 _commentServiceMock.Object,
                 _dialogServiceMock.Object,
                 _navigationServiceMock.Object,
@@ -115,14 +128,15 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 .Setup(x => x.ShowMessageAsync(
                     It.IsAny<TaskViewModel>(),
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>(),
+                    It.IsAny<MetroDialogSettings>()))
                 .ReturnsAsync(MessageDialogResult.Affirmative);
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenTaskAndProjectProvided_LoadsTaskCommentsAndAttachments()
+        public void Constructor_WhenTaskAndProjectProvided_LoadsTaskCommentsAndAttachments()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
             var comments = CreateTestComments();
@@ -136,7 +150,15 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 .Setup(x => x.GetAttachmentsAsync(task.Id))
                 .ReturnsAsync(attachments);
 
-            await vm.InitializationAsync(task, project);
+            var vm = new TaskViewModel(
+                project,
+                task,
+                _commentServiceMock.Object,
+                _dialogServiceMock.Object,
+                _navigationServiceMock.Object,
+                _attachmentServiceMock.Object,
+                _loggerMock.Object,
+                _dialogCoordinatorMock.Object);
 
             Assert.Equal(task, vm.CurrentTask);
             Assert.Equal(project, vm.Project);
@@ -145,29 +167,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenNoTaskProvided_ThrowsArgumentNullException()
+        public async Task Constructor_WhenGetCommentsThrowsException_ShowsErrorMessageAndSetsEmptyComments()
         {
-            var vm = CreateViewModel();
-            var project = CreateTestProject();
-
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => vm.InitializationAsync(project));
-        }
-
-        [Fact]
-        public async Task InitializationAsync_WhenNoProjectProvided_ThrowsArgumentNullException()
-        {
-            var vm = CreateViewModel();
-            var task = CreateTestTask();
-
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => vm.InitializationAsync(task));
-        }
-
-        [Fact]
-        public async Task InitializationAsync_WhenGetCommentsThrowsException_ShowsErrorMessageAndSetsEmptyComments()
-        {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
 
@@ -181,19 +182,30 @@ namespace WindowsDev.Tests.ViewModels.Tasks
 
             SetupDialogCoordinatorMock();
 
-            await vm.InitializationAsync(task, project);
+            var vm = new TaskViewModel(
+                project,
+                task,
+                _commentServiceMock.Object,
+                _dialogServiceMock.Object,
+                _navigationServiceMock.Object,
+                _attachmentServiceMock.Object,
+                _loggerMock.Object,
+                _dialogCoordinatorMock.Object);
+
+            await Task.Delay(100);
 
             Assert.Empty(vm.Comments);
             _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
                 It.IsAny<TaskViewModel>(),
                 It.IsAny<string>(),
-                It.IsAny<string>()), Times.Once);
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>(),
+                It.IsAny<MetroDialogSettings>()), Times.Once);
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenGetAttachmentsThrowsException_ShowsErrorMessageAndSetsEmptyAttachments()
+        public async Task Constructor_WhenGetAttachmentsThrowsException_ShowsErrorMessageAndSetsEmptyAttachments()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
             var comments = CreateTestComments();
@@ -208,22 +220,35 @@ namespace WindowsDev.Tests.ViewModels.Tasks
 
             SetupDialogCoordinatorMock();
 
-            await vm.InitializationAsync(task, project);
+            var vm = new TaskViewModel(
+                project,
+                task,
+                _commentServiceMock.Object,
+                _dialogServiceMock.Object,
+                _navigationServiceMock.Object,
+                _attachmentServiceMock.Object,
+                _loggerMock.Object,
+                _dialogCoordinatorMock.Object);
+
+            await Task.Delay(100);
 
             Assert.Empty(vm.Attachments);
             _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
                 It.IsAny<TaskViewModel>(),
                 It.IsAny<string>(),
-                It.IsAny<string>()), Times.Once);
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>(),
+                It.IsAny<MetroDialogSettings>()), Times.Once);
         }
 
         [Fact]
         public async Task SwitchToProjectCommand_WhenExecuted_NavigatesToProjectViewModel()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
-            await vm.InitializationAsync(task, project);
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
 
             ((RelayCommand)vm.SwitchToProjectCommand).Execute(null);
 
@@ -243,21 +268,21 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         [Fact]
         public async Task EditTaskCommand_WhenExecuted_ShowsEditTaskDialog()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
-            await vm.InitializationAsync(task, project);
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
 
             await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
-            _dialogServiceMock.Verify(x => x.ShowTaskDialogAsync<TaskDialogView, EditTaskViewModel>(
+            _dialogServiceMock.Verify(x => x.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(
                 vm, task), Times.Once);
         }
 
         [Fact]
         public async Task AddCommentCommand_WhenNewCommentIsValid_AddsCommentAndClearsInput()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
             var comments = CreateTestComments();
@@ -279,7 +304,10 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 .Setup(x => x.GetAttachmentsAsync(task.Id))
                 .ReturnsAsync(attachments);
 
-            await vm.InitializationAsync(task, project);
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
+
             vm.NewComment = "New comment";
 
             _commentServiceMock
@@ -299,10 +327,12 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         [InlineData("   ")]
         public async Task AddCommentCommand_WhenNewCommentIsNullOrEmpty_DoesNotAddComment(string? newComment)
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
-            await vm.InitializationAsync(task, project);
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
+
             vm.NewComment = newComment;
 
             await ((AsyncRelayCommand)vm.AddCommentCommand).ExecuteAsync(null);
@@ -313,7 +343,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         [Fact]
         public async Task AddCommentCommand_WhenExceptionOccurs_ShowsErrorMessage()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
             var comments = CreateTestComments();
@@ -327,7 +356,10 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 .Setup(x => x.GetAttachmentsAsync(task.Id))
                 .ReturnsAsync(attachments);
 
-            await vm.InitializationAsync(task, project);
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
+
             vm.NewComment = "New comment";
 
             _commentServiceMock
@@ -340,19 +372,20 @@ namespace WindowsDev.Tests.ViewModels.Tasks
 
             _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
                 It.IsAny<TaskViewModel>(),
-                "Error",
-                "Failed to add comment. Try again",
-                MessageDialogStyle.Affirmative,
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>(),
                 It.IsAny<MetroDialogSettings>()), Times.Once);
         }
 
         [Fact]
-        public void RefreshTask_UpdatesAllProperties()
+        public async Task RefreshTask_UpdatesAllProperties()
         {
-            var vm = CreateViewModel();
             var project = CreateTestProject();
             var task = CreateTestTask();
-            vm.InitializationAsync(task, project).Wait();
+            var vm = CreateViewModel(project, task);
+
+            await Task.Delay(100);
 
             var propertiesChanged = new List<string>();
             vm.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName);

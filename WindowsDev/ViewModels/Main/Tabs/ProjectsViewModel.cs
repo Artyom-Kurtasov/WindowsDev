@@ -22,13 +22,9 @@ namespace WindowsDev.ViewModels.Main.Tabs
         private readonly ILogger<ProjectsViewModel> _logger;
         private readonly IDialogService _dialogService;
 
-        private readonly int _pageSize = 10;
-        private int _totalCount;
-        private int _currentPage = 1;
-        private string _searchFilter = string.Empty;
+        private readonly int _pageSize = 15;
 
-        public ProjectsViewModel(
-            IDialogCoordinator dialogCoordinator,
+        public ProjectsViewModel(IDialogCoordinator dialogCoordinator,
             IProjectService projectService,
             INavigationService navigationService,
             ILogger<ProjectsViewModel> logger,
@@ -59,6 +55,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         public ObservableCollection<ProjectsInfo> ProjectsList { get; } = new();
 
+        private string _searchFilter = string.Empty;
         public string SearchFilter
         {
             get => _searchFilter;
@@ -69,6 +66,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
+        private int _currentPage = 1;
         public int CurrentPage
         {
             get => _currentPage;
@@ -79,7 +77,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-        public int TotalCount => (int)Math.Ceiling((double)_totalCount / _pageSize);
+        private int _totalCountOfProjects;
+        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfProjects / _pageSize);
 
         public async Task RefreshAsync()
         {
@@ -88,13 +87,15 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private async Task LoadProjectsAsync()
         {
-            _totalCount = await _projectService.GetProjectsCountAsync();
-            OnPropertyChanged(nameof(TotalCount));
+            _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
+            OnPropertyChanged(nameof(TotalCountOfPages));
             await GetPageAsync();
         }
 
         private async Task SearchAsync()
         {
+            // Reset to first page when search criteria change
+            // otherwise we might land on an empty page
             CurrentPage = 1;
             await GetPageAsync(SearchFilter);
         }
@@ -127,11 +128,11 @@ namespace WindowsDev.ViewModels.Main.Tabs
             await _navigationService.NavigateTo<ProjectViewModel>(project);
 
         private async Task ShowCreateProjectDialogAsync() =>
-            await _dialogService.ShowDialogAsync<CreateProjectView, CreateProjectDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(this);
 
         private async Task NextPageAsync()
         {
-            if (CurrentPage < TotalCount)
+            if (CurrentPage < TotalCountOfPages)
             {
                 CurrentPage++;
                 await GetPageAsync(SearchFilter);
@@ -151,24 +152,14 @@ namespace WindowsDev.ViewModels.Main.Tabs
         {
             ProjectsList.Clear();
 
-            try
-            {
-                var projects = await _projectService
-                    .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
+            var projects = await _projectService
+                .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
 
-                foreach (var project in projects)
-                {
-                    ProjectsList.Add(project);
-                }
-            }
-            catch (Exception ex)
+            foreach (var project in projects)
             {
-                _logger.LogError(ex, "Failed to load projects");
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate("Error_LoadProjects"),
-                    MessageDialogStyle.Affirmative);
+                ProjectsList.Add(project);
             }
+
         }
     }
 }

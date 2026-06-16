@@ -24,6 +24,7 @@
         </DataTemplate>
     </UserControl.Resources>
 
+    <!-- Main Grid -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -31,13 +32,12 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0">
+        <!-- Step Title -->
+        <ContentControl Grid.Row="0" Margin="0,0,0,15">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
+                    <Setter Property="Content" Value="{DynamicResource FirstStepLabel}"/>
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding CurrentStep}" Value="0">
-                            <Setter Property="Content" Value="{DynamicResource FirstStepLabel}"/>
-                        </DataTrigger>
                         <DataTrigger Binding="{Binding CurrentStep}" Value="1">
                             <Setter Property="Content" Value="{DynamicResource SecondStepLabel}"/>
                         </DataTrigger>
@@ -49,9 +49,11 @@
             </ContentControl.Style>
         </ContentControl>
 
-        <ContentControl Grid.Row="1" Content="{Binding CurrentStepView}"/>
+        <!-- Step Content -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentStepView}" Margin="0,0,0,15"/>
 
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center">
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
 
             <Button Content="{DynamicResource CancelButton}" 
                     Margin="10,0,0,0"
@@ -88,7 +90,9 @@
             </Button>
 
             <Button Margin="10,0,0,0"
-                    Command="{Binding NextStepCommand}" Height="35" Width="35">
+                    Command="{Binding NextStepCommand}" Height="35" Width="35"
+                    ToolTipService.ShowOnDisabled="True"
+                    ToolTip="{Binding NextStepToolTip}">
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Calendar.Next}">
                         <Style.Triggers>

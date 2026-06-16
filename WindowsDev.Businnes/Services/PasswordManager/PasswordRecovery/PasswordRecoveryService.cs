@@ -6,12 +6,12 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
     public class PasswordRecoveryService : IPasswordRecoveryService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IPasswordHasherFactory _passwordHasherFactory;
+        private readonly IHasherFactory _hasherFactory;
 
-        public PasswordRecoveryService(IPasswordHasherFactory passwordHasherFactory,
+        public PasswordRecoveryService(IHasherFactory hasherFactory,
                                        IUserRepository userRepository)
         {
-            _passwordHasherFactory = passwordHasherFactory;
+            _hasherFactory = hasherFactory;
             _userRepository = userRepository;
         }
 
@@ -26,7 +26,7 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 
             if (user != null)
             {
-                var hasher = _passwordHasherFactory.GetHashMethod(user.HashMethod);
+                var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
                 var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), user.RecoveryCodeSalt!);
 
                 if (recoveryCodeHash.ToString("x16") == user.RecoveryCodeHash)
@@ -36,13 +36,13 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
             return false;
         }
 
-        public async Task ChangePasswordAsync(string login, string password)
+        public async Task<int> ChangePasswordAsync(string login, string password)
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
             if (user != null)
             {
-                var hasher = _passwordHasherFactory.GetHashMethod(user.HashMethod);
+                var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
                 var passwordSalt = hasher.GenerateSalt();
                 var recoveryCodeSalt = hasher.GenerateSalt();
 
@@ -54,10 +54,14 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
                 user.PasswordHash = passwordHash.ToString("x16");
                 user.Salt = passwordSalt;
                 user.RecoveryCodeSalt = recoveryCodeSalt;
-                
 
-               await _userRepository.UpdateAsync(user);
+
+                await _userRepository.UpdateAsync(user);
+
+                return recoveryCode;
             }
+
+            return -1;
         }
     }
 }

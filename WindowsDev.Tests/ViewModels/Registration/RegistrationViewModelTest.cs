@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using MahApps.Metro.Controls.Dialogs;
+using Moq;
 using WindowsDev.Business.DataBase.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
@@ -9,18 +10,20 @@ using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.Tests.ViewModels.Registration
 {
-    public class RegistrationTest
+    public class RegistrationViewModelTest
     {
         private readonly Mock<INavigationService> _navigationServiceMock;
         private readonly Mock<IRegistration> _registrationMock;
         private readonly Mock<IDbManager> _dbManagerMock;
+        private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
         private readonly UserFieldValidator _userFieldValidator;
 
-        public RegistrationTest()
+        public RegistrationViewModelTest()
         {
             _navigationServiceMock = new Mock<INavigationService>();
             _registrationMock = new Mock<IRegistration>();
             _dbManagerMock = new Mock<IDbManager>();
+            _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
 
             _userFieldValidator = new UserFieldValidator(_dbManagerMock.Object);
         }
@@ -30,6 +33,7 @@ namespace WindowsDev.Tests.ViewModels.Registration
             return new RegistrationViewModel(
                 _navigationServiceMock.Object,
                 _registrationMock.Object,
+                _dialogCoordinatorMock.Object,
                 _userFieldValidator);
         }
 
@@ -38,7 +42,16 @@ namespace WindowsDev.Tests.ViewModels.Registration
         {
             _registrationMock
                 .Setup(x => x.Register("Password123!", "login", "username"))
-                .ReturnsAsync(true);
+                .ReturnsAsync((true, 123456));
+
+            _dialogCoordinatorMock
+                .Setup(x => x.ShowMessageAsync(
+                    It.IsAny<RegistrationViewModel>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>(),
+                    It.IsAny<MetroDialogSettings>()))
+                .ReturnsAsync(MessageDialogResult.Affirmative);
 
             var vm = CreateViewModel();
             vm.Login = "login";
@@ -59,7 +72,7 @@ namespace WindowsDev.Tests.ViewModels.Registration
         {
             _registrationMock
                 .Setup(x => x.Register("Password123!", "login", "username"))
-                .ReturnsAsync(false);
+                .ReturnsAsync((false, -1));
 
             var vm = CreateViewModel();
             vm.Login = "login";

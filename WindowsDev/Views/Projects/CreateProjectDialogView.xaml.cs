@@ -5,9 +5,9 @@ namespace WindowsDev.Views.Projects
     /// <summary>
     /// Interaction logic for CreateProjectDialogView.xaml
     /// </summary>
-    public partial class CreateProjectView : UserControl
+    public partial class CreateProjectDialogView : UserControl
     {
-        public CreateProjectView()
+        public CreateProjectDialogView()
         {
             InitializeComponent();
         }

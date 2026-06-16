@@ -16,8 +16,8 @@ namespace WindowsDev.ViewModels.Auth
         private readonly INavigationService _navigationService;
 
         public AuthorizationViewModel(INavigationService navigationService,
-                                      IAuthorization authorization,
-                                      IDialogService dialogService)
+            IAuthorization authorization,
+            IDialogService dialogService)
         {
             _dialogService = dialogService;
             _navigationService = navigationService;
@@ -28,12 +28,10 @@ namespace WindowsDev.ViewModels.Auth
             PasswordRecoveryCommand = new AsyncRelayCommand(PasswordRecovery);
         }
 
-        // Commands
         public ICommand PasswordRecoveryCommand { get; }
         public ICommand AuthorizeCommand { get; }
         public ICommand SwitchToRegViewCommand { get; }
 
-        // Inputs
         private string _login = string.Empty;
         public string Login
         {
@@ -56,12 +54,7 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-        // State
         private bool _isLoginFailed;
-
-        public event Func<Task>? CloseRequested;
-        public event Func<Task>? Completed;
-
         public bool IsLoginFailed
         {
             get => _isLoginFailed;
@@ -72,7 +65,6 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-        // Commands logic
         private async Task SwitchToRegViewAsync() =>
             await _navigationService.NavigateTo<RegistrationViewModel>();
 
@@ -90,9 +82,7 @@ namespace WindowsDev.ViewModels.Auth
             
         }
 
-        private async Task PasswordRecovery()
-        {
+        private async Task PasswordRecovery() =>
             await _dialogService.ShowDialogAsync<RecoveryCodeDialogView, RecoveryCodeDialogViewModel>(this);
-        }
     }
 }

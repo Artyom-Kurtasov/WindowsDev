@@ -2,7 +2,7 @@
 {
     public interface IProfileService
     {
-        Task ChangePassword(string currentPassword, string newPassword, string confirmPassword);
-        Task ChangeUsername(string currentUsername, string newUsername);
+        Task ChangePasswordAsync(string currentPassword, string newPassword, string confirmPassword);
+        Task ChangeUsernameAsync(string currentUsername, string newUsername);
     }
 }

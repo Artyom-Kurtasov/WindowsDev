@@ -2,7 +2,7 @@
 using System.Text;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.Authorization;
-using WindowsDev.Business.Services.PasswordManager;
+using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.UsersModels;
@@ -14,17 +14,17 @@ namespace WindowsDev.Tests.Business.Auth
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<ICurrentUserService> _currentUserServiceMock;
-        private readonly IPasswordHasherFactory _passwordHasherFactory;
+        private readonly IHasherFactory _hasherFactory;
 
         public AuthorizationTest()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _currentUserServiceMock = new Mock<ICurrentUserService>();
 
-            var defaultHasher = new DefaultPasswordHasher();
-            var simpleHasher = new SimplePasswordHasher();
+            var defaultHasher = new DefaultHasher();
+            var simpleHasher = new SimpleHasher();
 
-            _passwordHasherFactory = new PasswordHasherFactory(defaultHasher, simpleHasher);
+            _hasherFactory = new HasherFactory(defaultHasher, simpleHasher);
         }
 
         private Authorization CreateService()
@@ -32,7 +32,7 @@ namespace WindowsDev.Tests.Business.Auth
             return new Authorization(
                 _userRepositoryMock.Object,
                 _currentUserServiceMock.Object,
-                _passwordHasherFactory);
+                _hasherFactory);
         }
 
         [Theory]
@@ -83,7 +83,7 @@ namespace WindowsDev.Tests.Business.Auth
         {
             var salt = Encoding.UTF8.GetBytes("salt");
 
-            var hasher = _passwordHasherFactory.GetHashMethod(HashMethod.Default);
+            var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
             var correctHash = hasher.HashPassword("correct", salt).ToString("x16");
 
             var user = new UsersInfo
@@ -116,7 +116,7 @@ namespace WindowsDev.Tests.Business.Auth
         {
             var salt = Encoding.UTF8.GetBytes("salt");
 
-            var hasher = _passwordHasherFactory.GetHashMethod(HashMethod.Default);
+            var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
             var hash = hasher.HashPassword("password", salt).ToString("x16");
 
             var user = new UsersInfo

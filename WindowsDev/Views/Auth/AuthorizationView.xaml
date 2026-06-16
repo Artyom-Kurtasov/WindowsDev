@@ -16,6 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
+        <!-- Main Content -->
         <StackPanel Grid.Row="1" 
                     HorizontalAlignment="Stretch"
                     VerticalAlignment="Center">
@@ -28,18 +29,19 @@
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
 
-            <!--Login-->
+            <!-- Login Input -->
             <UserCtrl:HeaderTextBox
                 Header="{DynamicResource LoginLabel}"
                 CornerRadius="8"
                 Margin="20,20,20,0"
                 Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
+            <!-- Login Error Message -->
             <TextBlock Foreground="Red" Margin="20,0,20,0">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
                         <Setter Property="Visibility" Value="Collapsed"/>
-                        
+
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsLoginFailed}" Value="True">
                                 <Setter Property="Text" Value="{DynamicResource UserNotExists}"/>
@@ -50,7 +52,7 @@
                 </TextBlock.Style>
             </TextBlock>
 
-            <!--Password-->
+            <!-- Password Input -->
             <UserCtrl:HeaderPasswordBox
                 Header="{DynamicResource PasswordLabel}"
                 HeaderFontSize="14"
@@ -60,13 +62,13 @@
                 LinkText="{DynamicResource ForgotPasswordText}"
                 LinkCommand="{Binding PasswordRecoveryCommand}"/>
 
-                <!--SIGN IN BUTTON-->
+            <!-- Sign In Button -->
             <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0"
                     Command="{Binding AuthorizeCommand}">
                 <TextBlock Text="{DynamicResource SignInButton}" FontSize="12" FontWeight="Bold"/>
             </Button>
 
-            <!--LINK TO REGISTRATION-->
+            <!-- Registration Link -->
             <TextBlock HorizontalAlignment="Center">
                     <Run Text="{DynamicResource NewUserText}"/>
                     <Hyperlink Command="{Binding SwitchToRegViewCommand}">

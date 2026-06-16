@@ -9,12 +9,12 @@ namespace WindowsDev.Business.Services.TaskService.Comment
     public class CommentsService : ICommentService
     {
         private readonly ICommentRepository _commentRepository;
-        private readonly ICurrentUserService _currentUserData;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CommentsService(ICommentRepository commentRepository, CurrentUserService currentUserData)
+        public CommentsService(ICommentRepository commentRepository, ICurrentUserService currentUserService)
         {
             _commentRepository = commentRepository;
-            _currentUserData = currentUserData;
+            _currentUserService = currentUserService;
         }
 
         public async Task<Comments> AddComment(int taskId, string commentText)
@@ -28,7 +28,7 @@ namespace WindowsDev.Business.Services.TaskService.Comment
             {
                 Text = commentText,
                 CreatedAt = DateTime.UtcNow,
-                Author = _currentUserData.Username,
+                Author = _currentUserService.Username,
                 TaskId = taskId
             };
 

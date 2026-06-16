@@ -16,7 +16,7 @@
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- LEFT -->
+            <!-- Left Panel: Project Info -->
             <Grid Grid.Column="0" Margin="0,0,10,0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -24,6 +24,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
+                <!-- Back Button -->
                 <Button Grid.Row="0"
                                 Content="{DynamicResource BackButton}"
                                 Width="100"
@@ -32,46 +33,51 @@
                                 mah:ControlsHelper.CornerRadius="8"
                                 Command="{Binding SwitchToMainViewCommand}"/>
 
+                <!-- Project Name -->
                 <UserCtrl:HeaderTextBlock Grid.Row="1"
                                             Margin="0,0,0,10"
                                             CornerRadius="8"
                                             Header="{DynamicResource NameLabel}"
                                             Text="{Binding Name}"/>
 
+                <!-- Project Description -->
                 <UserCtrl:HeaderTextBlock Grid.Row="2"
                                             CornerRadius="8"
                                             Header="{DynamicResource DescriptionLabel}"
                                             Text="{Binding Description}"/>
             </Grid>
 
-            <!-- RIGHT -->
-            <StackPanel Grid.Column="1">
+            <!-- Right Panel: Tasks -->
+            <StackPanel Grid.Column="1" >
 
-                <!-- Top row: Add button -->
-                <Button Content="{DynamicResource AddButton}"
-                                mah:ControlsHelper.CornerRadius="8"
-                                Margin="0,0,0,10"
-                                HorizontalAlignment="Left"
-                                Command="{Binding OpenDialogCommand}"/>
+                <!-- Action Buttons Row -->
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <!-- Add Task Button -->
+                    <Button Content="{DynamicResource AddButton}"
+                            mah:ControlsHelper.CornerRadius="8"
+                            Margin="0,0,10,0"
+                            Command="{Binding OpenDialogCommand}"/>
 
-                <Button Content="{DynamicResource DeleteButton}"
-                                mah:ControlsHelper.CornerRadius="8"
-                                Margin="0,0,0,10"
-                                HorizontalAlignment="Left"
-                                Command="{Binding DeleteSelectedTasksCommand}"/>
+                    <!-- Delete Tasks Button -->
+                    <Button Content="{DynamicResource DeleteButton}"
+                            mah:ControlsHelper.CornerRadius="8"
+                            Command="{Binding DeleteSelectedTasksCommand}"/>
+                </StackPanel>
 
-                <!-- Search and filters row -->
+                <!-- Search and Filter Row -->
                 <Grid Margin="0,0,0,10">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
+                    <!-- Search Input -->
                     <UserCtrl:HeaderTextBox Grid.Column="0"
                                                       CornerRadius="8"
                                                       Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                                       Watermark="{DynamicResource SearchWatermark}"/>
 
+                    <!-- Status Filters -->
                     <StackPanel Grid.Column="1" 
                                         Orientation="Horizontal" 
                                         Margin="10,0,0,0"
@@ -90,12 +96,14 @@
                     </StackPanel>
                 </Grid>
 
+                <!-- Tasks Data Grid -->
                 <DataGrid AutoGenerateColumns="False"
                                   CanUserAddRows="False"
                                   ItemsSource="{Binding TaskItem}">
 
                     <DataGrid.Columns>
 
+                        <!-- Selection Checkbox Column -->
                         <DataGridTemplateColumn>
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -105,10 +113,12 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <!-- ID Column -->
                         <DataGridTextColumn Header="{DynamicResource IdLabel}"
                                                 Binding="{Binding Id}"
                                                 Width="Auto"/>
 
+                        <!-- Name Column -->
                         <DataGridTemplateColumn Header="{DynamicResource NameLabel}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -122,6 +132,7 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <!-- Description Column -->
                         <DataGridTemplateColumn Header="{DynamicResource DescriptionLabel}" Width="2*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -132,10 +143,12 @@
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
 
+                        <!-- Deadline Column -->
                         <DataGridTextColumn Header="{DynamicResource DeadlineLabel}"
                                                 Binding="{Binding DeadLine, StringFormat=d}"
                                                 Width="*"/>
 
+                        <!-- Created Date Column -->
                         <DataGridTextColumn Header="{DynamicResource CreatedAtLabel}"
                                                 Binding="{Binding CreatedAt, StringFormat=d}"
                                                 Width="*"/>

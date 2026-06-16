@@ -4,7 +4,7 @@ using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 
 namespace WindowsDev.Business.Services.PasswordManager.Hasher
 {
-    public abstract class PasswordHasherBase : IPasswordHasherBase
+    public abstract class HasherBase : IHasherBase
     {
         public abstract ulong HashSeed { get; }
         public abstract ulong MixingConstant { get; }

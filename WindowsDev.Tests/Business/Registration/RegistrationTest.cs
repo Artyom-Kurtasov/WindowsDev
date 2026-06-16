@@ -2,6 +2,7 @@
 using WindowsDev.Business.Repositories.Interfaces;
 using Service = WindowsDev.Business.Services.Registration;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
 using WindowsDev.Domain.UsersModels;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 
@@ -11,13 +12,15 @@ namespace WindowsDev.Tests.Business.Registration
     {
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<ICurrentUserService> _currentUserServiceMock;
-        private readonly DefaultPasswordHasher _passwordHasher;
+        private readonly DefaultHasher _passwordHasher;
+        private readonly Mock<IPasswordRecoveryService> _passwordRecoveryServiceMock;
 
         public RegistrationTest()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _currentUserServiceMock = new Mock<ICurrentUserService>();
-            _passwordHasher = new DefaultPasswordHasher();
+            _passwordHasher = new DefaultHasher();
+            _passwordRecoveryServiceMock = new Mock<IPasswordRecoveryService>();
         }
 
         private Service.Registration CreateService()
@@ -25,17 +28,21 @@ namespace WindowsDev.Tests.Business.Registration
             return new Service.Registration(
                 _userRepositoryMock.Object,
                 _currentUserServiceMock.Object,
-                _passwordHasher);
+                _passwordHasher,
+                _passwordRecoveryServiceMock.Object);
         }
 
-        [Fact]
-        public async Task Register_WhenPasswordEmpty_ReturnsFalse()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        [InlineData("   ")]
+        public async Task Register_WhenPasswordInvalid_ReturnsFalse(string password)
         {
             var registration = CreateService();
 
-            var result = await registration.Register("", "login", "username");
+            var result = await registration.Register(password, "login", "username");
 
-            Assert.False(result);
+            Assert.False(result.Item1);
 
             _userRepositoryMock.Verify(x =>
                 x.ExistsByLoginAsync(It.IsAny<string>()), Times.Never);
@@ -59,7 +66,7 @@ namespace WindowsDev.Tests.Business.Registration
 
             var result = await registration.Register("password", "login", "username");
 
-            Assert.False(result);
+            Assert.False(result.Item1);
 
             _userRepositoryMock.Verify(x =>
                 x.AddAsync(It.IsAny<UsersInfo>()), Times.Never);
@@ -76,11 +83,15 @@ namespace WindowsDev.Tests.Business.Registration
                 .Setup(x => x.ExistsByLoginAsync("login"))
                 .ReturnsAsync(false);
 
+            _passwordRecoveryServiceMock
+                .Setup(x => x.GenerateRecoveryCode())
+                .Returns(123456);
+
             var registration = CreateService();
 
             var result = await registration.Register("password", "login", "username");
 
-            Assert.True(result);
+            Assert.True(result.Item1);
 
             _userRepositoryMock.Verify(x =>
                 x.ExistsByLoginAsync("login"), Times.Once);

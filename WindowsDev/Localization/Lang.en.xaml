@@ -1,14 +1,32 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <!-- Buttons -->
     <sys:String x:Key="AddAttachmentButton">Add Attachment</sys:String>
     <sys:String x:Key="AddButton">Add</sys:String>
-    <sys:String x:Key="AllLabel">All</sys:String>
     <sys:String x:Key="ApplyButton">Apply</sys:String>
     <sys:String x:Key="BackButton">Back</sys:String>
+    <sys:String x:Key="CancelButton">Cancel</sys:String>
+    <sys:String x:Key="CreateButton">Create</sys:String>
+    <sys:String x:Key="DeleteButton">Delete</sys:String>
+    <sys:String x:Key="EditButton">Edit</sys:String>
+    <sys:String x:Key="LogoutButton">Logout</sys:String>
+    <sys:String x:Key="NextButton">Next</sys:String>
+    <sys:String x:Key="OkButton">Ok</sys:String>
+    <sys:String x:Key="PostCommentButton">Post</sys:String>
+    <sys:String x:Key="PrevButton">Prev</sys:String>
+    <sys:String x:Key="SaveButton">Save</sys:String>
+    <sys:String x:Key="SaveTaskButton">Save</sys:String>
+    <sys:String x:Key="SearchButton">Search</sys:String>
+    <sys:String x:Key="SignInButton">Sign In</sys:String>
+    <sys:String x:Key="SignUpButton">Sign Up</sys:String>
 
+    <!-- Labels -->
+    <sys:String x:Key="AllLabel">All</sys:String>
+    <sys:String x:Key="AttachmentsLabel">Attachments</sys:String>
     <sys:String x:Key="ChangePasswordLabel">Change Password</sys:String>
+    <sys:String x:Key="CommentsLabel">Comments</sys:String>
     <sys:String x:Key="ConfirmPasswordLabel">Confirm Password</sys:String>
     <sys:String x:Key="ConnectionStringLabel">Connection String</sys:String>
     <sys:String x:Key="CreatedAtLabel">Created At</sys:String>
@@ -17,111 +35,114 @@
     <sys:String x:Key="DarkThemeLabel">Dark</sys:String>
     <sys:String x:Key="DeadlineLabel">Deadline</sys:String>
     <sys:String x:Key="DescriptionLabel">Description</sys:String>
-    <sys:String x:Key="DownloadTooltip">Download</sys:String>
-    <sys:String x:Key="EditTaskTooltip">Update task details</sys:String>
-    <sys:String x:Key="DeleteTaskTooltip">Delete current task</sys:String>
+    <sys:String x:Key="EnterLoginLabel">Enter login</sys:String>
+    <sys:String x:Key="FirstStepLabel">Step 1: Enter your login</sys:String>
     <sys:String x:Key="IdLabel">#</sys:String>
     <sys:String x:Key="LanguageLabel">Language</sys:String>
     <sys:String x:Key="LightThemeLabel">Light</sys:String>
+    <sys:String x:Key="LoginLabel">Login</sys:String>
     <sys:String x:Key="NameLabel">Name</sys:String>
     <sys:String x:Key="NewPasswordLabel">New Password</sys:String>
-
-    <sys:String x:Key="DeleteButton">Delete</sys:String>
-    <sys:String x:Key="EditButton">Edit</sys:String>
-
-    <sys:String x:Key="LoginLabel">Login</sys:String>
-    <sys:String x:Key="LogoutButton">Logout</sys:String>
-    <sys:String x:Key="OkButton">Ok</sys:String>
-    <sys:String x:Key="UsernameLabel">Username</sys:String>
     <sys:String x:Key="PasswordLabel">Password</sys:String>
-    <sys:String x:Key="ProfileLabel">Profile</sys:String>
-    <sys:String x:Key="RecoveryCodeLabel">Enter code</sys:String>
-    <sys:String x:Key="SearchButton">Search</sys:String>
-    <sys:String x:Key="SearchWatermark">Search</sys:String>
-    <sys:String x:Key="ThemeLabel">Theme</sys:String>
-    <sys:String x:Key="UserIdLabel">User Id</sys:String>
-
-    <sys:String x:Key="NewUserText">New to TaskManager?</sys:String>
-    <sys:String x:Key="ExistingUserText">Already have an account?</sys:String>
-    <sys:String x:Key="ForgotPasswordText">Forgot password?</sys:String>
-
-    <sys:String x:Key="SignInButton">Sign In</sys:String>
-    <sys:String x:Key="SignUpButton">Sign Up</sys:String>
-    <sys:String x:Key="SaveButton">Save</sys:String>
-    <sys:String x:Key="NextButton">Next</sys:String>
-    <sys:String x:Key="PrevButton">Prev</sys:String>
-
-    <sys:String x:Key="ProjectsLabel">Projects</sys:String>
-    <sys:String x:Key="SettingsLabel">Settings</sys:String>
-    <sys:String x:Key="CommentsLabel">Comments</sys:String>
-    <sys:String x:Key="AttachmentsLabel">Attachments</sys:String>
-
     <sys:String x:Key="PriorityLabel">Priority</sys:String>
+    <sys:String x:Key="ProfileLabel">Profile</sys:String>
     <sys:String x:Key="ProgressLabel">Progress</sys:String>
+    <sys:String x:Key="ProjectsLabel">Projects</sys:String>
+    <sys:String x:Key="RecoveryCodeLabel">Enter code</sys:String>
+    <sys:String x:Key="SecondStepLabel">Step 2: Enter recovery code</sys:String>
+    <sys:String x:Key="SettingsLabel">Settings</sys:String>
     <sys:String x:Key="StatusLabel">Status</sys:String>
+    <sys:String x:Key="ThemeLabel">Theme</sys:String>
+    <sys:String x:Key="ThirdStepLabel">Step 3: Set new password</sys:String>
+    <sys:String x:Key="UserIdLabel">User Id</sys:String>
+    <sys:String x:Key="UsernameLabel">Username</sys:String>
 
+    <!-- Titles -->
     <sys:String x:Key="AuthTitle">Sign In to TaskManager</sys:String>
     <sys:String x:Key="RegTitle">Create Account</sys:String>
 
-    <sys:String x:Key="CreateButton">Create</sys:String>
-    <sys:String x:Key="CancelButton">Cancel</sys:String>
-    <sys:String x:Key="PostCommentButton">Post</sys:String>
-    <sys:String x:Key="SaveTaskButton">Save</sys:String>
-
-    <sys:String x:Key="LoginTaken">Login is already taken</sys:String>
-    <sys:String x:Key="LoginAvailable">Login is available</sys:String>
-
-    <sys:String x:Key="UsernameTaken">Username is already taken</sys:String>
-    <sys:String x:Key="UsernameAvailable">Username is available</sys:String>
-
-    <sys:String x:Key="UserNotExists">A user with this login or password does not exist</sys:String>
-
+    <!-- Status -->
+    <sys:String x:Key="TaskPriority_Critical">Critical</sys:String>
+    <sys:String x:Key="TaskPriority_Normal">Normal</sys:String>
+    <sys:String x:Key="TaskStatus_Closed">Closed</sys:String>
     <sys:String x:Key="TaskStatus_Done">Open</sys:String>
     <sys:String x:Key="TaskStatus_InProgress">In Progress</sys:String>
-    <sys:String x:Key="TaskStatus_Closed">Closed</sys:String>
 
-    <sys:String x:Key="TaskPriority_Normal">Normal</sys:String>
-    <sys:String x:Key="TaskPriority_Critical">Critical</sys:String>
+    <!-- Tooltips -->
+    <sys:String x:Key="DeleteTaskTooltip">Delete current task</sys:String>
+    <sys:String x:Key="DownloadTooltip">Download</sys:String>
+    <sys:String x:Key="EditTaskTooltip">Update task details</sys:String>
+    <sys:String x:Key="Tooltip_InvalidRecoveryCode">Recovery code is incorrect</sys:String>
+    <sys:String x:Key="Tooltip_NextStep">Proceed to the next step</sys:String>
+    <sys:String x:Key="Tooltip_UserNotFound">User with this login was not found</sys:String>
 
-    <sys:String x:Key="PasswordRequirement_MinLength">At least 12 characters</sys:String>
-    <sys:String x:Key="PasswordRequirement_Number">Use numbers</sys:String>
-    <sys:String x:Key="PasswordRequirement_Uppercase">Use uppercase letters</sys:String>
-    <sys:String x:Key="PasswordRequirement_Symbol">Use symbols</sys:String>
-
+    <!-- Watermarks -->
     <sys:String x:Key="AddCommentWatermark">Add a comment...</sys:String>
     <sys:String x:Key="ConfirmPasswordWatermark">Confirm password</sys:String>
     <sys:String x:Key="CurrentPasswordWatermark">Enter current password</sys:String>
     <sys:String x:Key="LoginWatermark">Enter login</sys:String>
     <sys:String x:Key="NewPasswordWatermark">Enter new password</sys:String>
+    <sys:String x:Key="SearchWatermark">Search</sys:String>
     <sys:String x:Key="UsernameWatermark">Enter name</sys:String>
 
-    <sys:String x:Key="Error_Critical">Critical Error</sys:String>
-    <sys:String x:Key="Error_DatabaseFatal">Could not connect to the database. The application will close.</sys:String>
-    <sys:String x:Key="Error_Title">Error</sys:String>
-    <sys:String x:Key="Warning_Title">Warning</sys:String>
-    <sys:String x:Key="Information_Title">Information</sys:String>
-    <sys:String x:Key="Error_Generic">Something went wrong. Try to restart the app. More information in log file.</sys:String>
-    <sys:String x:Key="Error_CriticalShutdown">Critical error. Application will close. Please restart the app. If problem persists, reinstall.</sys:String>
-    <sys:String x:Key="Error_LoadProjects">Failed to load projects</sys:String>
-    <sys:String x:Key="Error_DeleteProjects">Failed to delete projects</sys:String>
-    <sys:String x:Key="Error_CreateProject">Failed to create project</sys:String>
-    <sys:String x:Key="Error_LoadTasks">Failed to get pages</sys:String>
-    <sys:String x:Key="Error_DeleteTasks">Failed to delete tasks</sys:String>
-    <sys:String x:Key="Error_CreateTask">Failed to create task</sys:String>
-    <sys:String x:Key="Error_EditTask">Failed to edit task</sys:String>
-    <sys:String x:Key="Error_LoadComments">Comments are null</sys:String>
-    <sys:String x:Key="Error_LoadAttachments">Attachments are null</sys:String>
-    <sys:String x:Key="Error_FileNotFound">File not found</sys:String>
-    <sys:String x:Key="Error_File">File error</sys:String>
+    <!-- Password Requirements -->
+    <sys:String x:Key="PasswordRequirement_MinLength">At least 12 characters</sys:String>
+    <sys:String x:Key="PasswordRequirement_Number">Use numbers</sys:String>
+    <sys:String x:Key="PasswordRequirement_Symbol">Use symbols</sys:String>
+    <sys:String x:Key="PasswordRequirement_Uppercase">Use uppercase letters</sys:String>
+
+    <!-- Errors -->
     <sys:String x:Key="Error_AddAttachment">Failed to add attachment. Try again</sys:String>
     <sys:String x:Key="Error_AddComment">Failed to add comment. Try again</sys:String>
+    <sys:String x:Key="Error_CreateProject">Failed to create project</sys:String>
+    <sys:String x:Key="Error_CreateTask">Failed to create task</sys:String>
+    <sys:String x:Key="Error_Critical">Critical Error</sys:String>
+    <sys:String x:Key="Error_CriticalShutdown">Critical error. Application will close. Please restart the app. If problem persists, reinstall.</sys:String>
+    <sys:String x:Key="Error_DatabaseFatal">Could not connect to the database. The application will close.</sys:String>
+    <sys:String x:Key="Error_DeleteProjects">Failed to delete projects</sys:String>
+    <sys:String x:Key="Error_DeleteTasks">Failed to delete tasks</sys:String>
+    <sys:String x:Key="Error_EditTask">Failed to edit task</sys:String>
+    <sys:String x:Key="Error_File">File error</sys:String>
+    <sys:String x:Key="Error_FileNotFound">File not found</sys:String>
+    <sys:String x:Key="Error_Generic">Something went wrong. Try to restart the app. More information in log file.</sys:String>
+    <sys:String x:Key="Error_LoadAttachments">Attachments are null</sys:String>
+    <sys:String x:Key="Error_LoadComments">Comments are null</sys:String>
+    <sys:String x:Key="Error_LoadProjects">Failed to load projects</sys:String>
+    <sys:String x:Key="Error_LoadTasks">Failed to get pages</sys:String>
+    <sys:String x:Key="Error_Title">Error</sys:String>
+
+    <!-- Warnings -->
     <sys:String x:Key="Warning_EnterName">Enter a name</sys:String>
     <sys:String x:Key="Warning_InvalidConnectionString">Could not apply this connection string</sys:String>
-    <sys:String x:Key="ProfileError_NewPasswordSameAsCurrent">New password must be different from current password</sys:String>
-    <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Passwords do not match</sys:String>
+    <sys:String x:Key="Warning_Title">Warning</sys:String>
+
+    <!-- Information -->
+    <sys:String x:Key="Information_Title">Information</sys:String>
+
+    <!-- Profile Errors -->
     <sys:String x:Key="ProfileError_CurrentPasswordIncorrect">Current password is incorrect</sys:String>
+    <sys:String x:Key="ProfileError_NewPasswordSameAsCurrent">New password must be different from current password</sys:String>
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">New username must be different from current username</sys:String>
+    <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Passwords do not match</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">User with this username already exists</sys:String>
 
+    <!-- Success Messages -->
+    <sys:String x:Key="Success_PasswordChanged">Password changed successfully</sys:String>
+    <sys:String x:Key="Success_UsernameChanged">Username changed successfully</sys:String>
+
+    <!-- Validation Messages -->
+    <sys:String x:Key="LoginAvailable">Login is available</sys:String>
+    <sys:String x:Key="LoginTaken">Login is already taken</sys:String>
     <sys:String x:Key="Registration_Failed">Please fill in all fields correctly.</sys:String>
+    <sys:String x:Key="UsernameTaken">Username is already taken</sys:String>
+    <sys:String x:Key="UsernameAvailable">Username is available</sys:String>
+    <sys:String x:Key="UserNotExists">A user with this login or password does not exist</sys:String>
+
+    <!-- Misc -->
+    <sys:String x:Key="ExistingUserText">Already have an account?</sys:String>
+    <sys:String x:Key="ForgotPasswordText">Forgot password?</sys:String>
+    <sys:String x:Key="NewUserText">New to TaskManager?</sys:String>
+    <sys:String x:Key="RecoveryKeyMessage">
+        Here is your recovery key. Store it in a safe place. You will need it to recover your password if you lose access to your account: </sys:String>
+
 </ResourceDictionary>

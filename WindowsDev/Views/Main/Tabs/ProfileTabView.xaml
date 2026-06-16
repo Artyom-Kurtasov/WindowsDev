@@ -2,13 +2,16 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users">
+             xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
 
         <StackPanel Margin="30,20"
                     MaxWidth="600">
 
+            <!-- User ID -->
             <UserCtrl:HeaderTextBlock
                 Header="{DynamicResource UserIdLabel}"
                 Text="{Binding Id}"
@@ -17,13 +20,16 @@
                 BorderThickness="1"
                 Margin="0,0,0,15"/>
 
-            <UserCtrl:HeaderTextBox
+            <!-- Login -->
+            <UserCtrl:HeaderTextBlock
                 Header="{DynamicResource LoginLabel}"
                 HeaderFontSize="12"
                 Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="{DynamicResource LoginWatermark}"
+                BorderBrush="{DynamicResource MahApps.Brushes.Gray1}"
+                BorderThickness="1"
                 Margin="0,0,0,15"/>
 
+            <!-- Username -->
             <UserCtrl:HeaderTextBox
                 Header="{DynamicResource UsernameLabel}"
                 HeaderFontSize="12"
@@ -31,14 +37,20 @@
                 Watermark="{DynamicResource UsernameWatermark}"
                 Margin="0,0,0,15"/>
 
+            <!-- Save Username Button -->
+            <Button Content="{DynamicResource SaveButton}"
+                    Command="{Binding SaveNewUsernameCommand}"/>
+
             <Separator Margin="0,10,0,20"/>
 
+            <!-- Change Password Section Header -->
             <TextBlock Text="{DynamicResource ChangePasswordLabel}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
                        Margin="0,0,0,15"/>
 
+            <!-- Current Password -->
             <UserCtrl:HeaderPasswordBox
                 Header="{DynamicResource CurrentPasswordLabel}"
                 HeaderFontSize="12"
@@ -46,6 +58,7 @@
                 Watermark="{DynamicResource CurrentPasswordWatermark}"
                 Margin="0,0,0,15"/>
 
+            <!-- New Password -->
             <UserCtrl:HeaderPasswordBox
                 Header="{DynamicResource NewPasswordLabel}"
                 HeaderFontSize="12"
@@ -54,6 +67,7 @@
                 Watermark="{DynamicResource NewPasswordWatermark}"
                 Margin="0,0,0,15"/>
 
+            <!-- Confirm Password -->
             <UserCtrl:HeaderPasswordBox
                 Header="{DynamicResource ConfirmPasswordLabel}"
                 HeaderFontSize="12"
@@ -61,20 +75,23 @@
                 Watermark="{DynamicResource ConfirmPasswordWatermark}"
                 Margin="0,0,0,20"/>
 
+            <!-- Action Buttons -->
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
+                <!-- Save Password Button -->
                 <Button Grid.Column="0"
                         Content="{DynamicResource SaveButton}"
-                        Style="{DynamicResource MahApps.Styles.Button.Accent}"
+                        Command="{Binding SaveNewPasswordCommand}"
                         Margin="0,0,10,0"/>
 
+                <!-- Logout Button -->
                 <Button Grid.Column="1"
                         Content="{DynamicResource LogoutButton}"
-                        Style="{StaticResource MahApps.Styles.Button}"/>
+                        Command="{Binding LogoutCommand}"/>
             </Grid>
 
         </StackPanel>

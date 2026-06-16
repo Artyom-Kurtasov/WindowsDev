@@ -43,7 +43,14 @@ namespace WindowsDev.Business.Services.UserManager
         {
             Login = login;
             UserId = id;
-            _username = username;
+            Username = username;
+        }
+
+        public void ClearUser()
+        {
+            Login = string.Empty;
+            UserId = -1;
+            Username = string.Empty;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

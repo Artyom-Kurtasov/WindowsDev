@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using WindowsDev.Business.Services.PasswordManager;
+using WindowsDev.Business.Services.PasswordManager.Hasher;
 
 namespace WindowsDev.Tests.Business.PasswordManager
 {
@@ -10,7 +10,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [InlineData("password", "saltsalt")]
         public void HashPassword_WhenInputIsSame_ReturnsSameHash(string testPassword, string testSalt)
         {
-            var passwordHasher = new DefaultPasswordHasher();
+            var passwordHasher = new DefaultHasher();
 
             byte[] salt = Encoding.UTF8.GetBytes(testSalt);
 
@@ -23,7 +23,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [Fact]
         public void HashPassword_WhenInputIsNotSame_ReturnsDifferentHash()
         {
-            var passwordHasher = new DefaultPasswordHasher();
+            var passwordHasher = new DefaultHasher();
 
             byte[] salt = Encoding.UTF8.GetBytes("salt");
 
@@ -36,7 +36,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [Fact]
         public void HashPassword_WhenSaltIsDifferent_ReturnsDifferentHash()
         {
-            var passwordHasher = new DefaultPasswordHasher();
+            var passwordHasher = new DefaultHasher();
 
             byte[] salt1 = Encoding.UTF8.GetBytes("salt1");
             byte[] salt2 = Encoding.UTF8.GetBytes("salt2");
@@ -50,7 +50,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [Fact]
         public void GenerateSalt_WhenCalledTwice_ReturnsDifferentSalt()
         {
-            var hasher = new DefaultPasswordHasher();
+            var hasher = new DefaultHasher();
 
             byte[] salt1 = hasher.GenerateSalt();
             byte[] salt2 = hasher.GenerateSalt();
@@ -61,7 +61,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [Fact]
         public void GenerateSalt_WhenCalled_Returns16Bytes()
         {
-            var hasher = new DefaultPasswordHasher();
+            var hasher = new DefaultHasher();
 
             byte[] salt = hasher.GenerateSalt();
 

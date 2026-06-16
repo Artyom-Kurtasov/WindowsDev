@@ -13,17 +13,17 @@ namespace WindowsDev.Business.Services.Registration
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrentUserService _currentUserService;
-        private readonly DefaultPasswordHasher _defaultPasswordHasher;
+        private readonly DefaultHasher _defaultHasher;
         private readonly IPasswordRecoveryService _passwordRecoveryService;
 
         public Registration(IUserRepository userRepository,
                             ICurrentUserService currentUserService,
-                            DefaultPasswordHasher defaultPasswordHasher,
+                            DefaultHasher defaultHasher,
                             IPasswordRecoveryService passwordRecoveryService)
         {
             _passwordRecoveryService = passwordRecoveryService;
             _userRepository = userRepository;
-            _defaultPasswordHasher = defaultPasswordHasher;
+            _defaultHasher = defaultHasher;
             _currentUserService = currentUserService;
         }
 
@@ -35,12 +35,12 @@ namespace WindowsDev.Business.Services.Registration
             if (await _userRepository.ExistsByLoginAsync(login))
                 return (false, -1);
 
-            var passwordSalt = _defaultPasswordHasher.GenerateSalt();
-            var passwordHash = _defaultPasswordHasher.HashPassword(password, passwordSalt);
+            var passwordSalt = _defaultHasher.GenerateSalt();
+            var passwordHash = _defaultHasher.HashPassword(password, passwordSalt);
 
-            var recoveryCodeSalt = _defaultPasswordHasher.GenerateSalt();
+            var recoveryCodeSalt = _defaultHasher.GenerateSalt();
             var recoveryCode = _passwordRecoveryService.GenerateRecoveryCode();
-            var recoveryCodeHash = _defaultPasswordHasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
+            var recoveryCodeHash = _defaultHasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
 
             var user = new UsersInfo
             {

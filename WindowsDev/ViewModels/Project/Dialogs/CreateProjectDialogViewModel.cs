@@ -30,15 +30,12 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             CreateProjectCommand = new AsyncRelayCommand(CreateProjectExecute);
         }
 
-        // Commands
-        public ICommand CloseDialogCommand { get; }
-        public ICommand CreateProjectCommand { get; }
-
-        // Events
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        // Inputs
+        public ICommand CloseDialogCommand { get; }
+        public ICommand CreateProjectCommand { get; }
+
         private string _projectName = string.Empty;
         public string ProjectName
         {
@@ -61,7 +58,6 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             }
         }
 
-        // Commands logic
         public async Task CreateProjectExecute()
         {
             try
@@ -76,6 +72,7 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
                         CreatedAt = DateTime.Today.Date.ToUniversalTime()
                     });
 
+                    // Notify parent ViewModel to refresh before closing
                     Completed?.Invoke();
                     await CloseDialog();
                 }

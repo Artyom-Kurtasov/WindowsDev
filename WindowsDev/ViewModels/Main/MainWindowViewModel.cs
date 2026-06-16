@@ -9,12 +9,7 @@ namespace WindowsDev.ViewModels.Main
         private readonly IViewModelFactory _factory;
         private readonly NavigationStore _navigationStore;
 
-        private ProjectsViewModel _projects;
-        private SettingsViewModel _settings;
-        private ProfileViewModel _profile;
-
-        public MainWindowViewModel(
-            NavigationStore navigationStore,
+        public MainWindowViewModel(NavigationStore navigationStore,
             IViewModelFactory factory)
         {
             _navigationStore = navigationStore;
@@ -25,8 +20,13 @@ namespace WindowsDev.ViewModels.Main
 
         public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
 
+        private ProjectsViewModel _projects;
         public ProjectsViewModel Projects => _projects ??= _factory.Create<ProjectsViewModel>();
+
+        private SettingsViewModel _settings;
         public SettingsViewModel Settings => _settings ??= _factory.Create<SettingsViewModel>();
+
+        private ProfileViewModel _profile;
         public ProfileViewModel Profile => _profile ??= _factory.Create<ProfileViewModel>();
 
         private void OnCurrentViewModelChanged()

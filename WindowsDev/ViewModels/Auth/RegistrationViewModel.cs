@@ -10,33 +10,32 @@ namespace WindowsDev.ViewModels.Auth
 {
     public class RegistrationViewModel : ViewModelBase
     {
-        IDialogCoordinator _dialogCoordinator;
+        private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
         private readonly IRegistration _registration;
         private readonly UserFieldValidator _userFieldValidator;
 
+        // Used to cancel previous debounced validation requests
         private CancellationTokenSource? _loginCts;
         private CancellationTokenSource? _usernameCts;
 
         public RegistrationViewModel(INavigationService navigationService,
-                                     IRegistration registration,
-                                     IDialogCoordinator dialogCoordinator,
-                                     UserFieldValidator userFieldValidator)
+            IRegistration registration,
+            IDialogCoordinator dialogCoordinator,
+            UserFieldValidator userFieldValidator)
         {
             _dialogCoordinator = dialogCoordinator;
             _navigationService = navigationService;
             _registration = registration;
             _userFieldValidator = userFieldValidator;
 
-            SignUpCommand = new AsyncRelayCommand(SignUp, CanSignUp);
+            SignUpCommand = new AsyncRelayCommand(SignUpAsync, CanSignUp);
             SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView);
         }
 
-        // Commands
         public ICommand SignUpCommand { get; }
         public ICommand SwitchToAuthViewCommand { get; }
 
-        // Inputs
         private string _login = string.Empty;
         public string Login
         {
@@ -99,7 +98,6 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-        // Availability
         private bool _isLoginAvailable;
         public bool IsLoginAvailable
         {
@@ -140,13 +138,12 @@ namespace WindowsDev.ViewModels.Auth
             !string.IsNullOrWhiteSpace(Username) &&
             !string.IsNullOrWhiteSpace(Password);
 
-        // Commands logic
         private void SwitchToAuthView()
         {
             _navigationService.NavigateTo<AuthorizationViewModel>();
         }
-
-        private async Task SignUp()
+        
+        private async Task SignUpAsync()
         {
             if (!IsLoginAvailable || !IsUsernameAvailable ||
                 Password != ConfirmPassword || !PasswordValidator.IsValid(Password) || !_isFormFilled)
@@ -160,14 +157,13 @@ namespace WindowsDev.ViewModels.Auth
 
             if (success.Item1)
             {
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{success.Item2}", MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{Translate("RecoveryKeyMessage")}\n\n {success.Item2}", MessageDialogStyle.Affirmative);
                 await _navigationService.NavigateTo<MainWindowViewModel>();
             }
         }
 
         private bool CanSignUp() => true;
 
-        // Async validation
         private async Task CheckLoginAvailabilityAsync()
         {
             _loginCts?.Cancel();
@@ -198,7 +194,6 @@ namespace WindowsDev.ViewModels.Auth
             catch (TaskCanceledException) { }
         }
 
-        // Helpers
         private void UpdateState()
         {
             _isRegistrationFailed = false;

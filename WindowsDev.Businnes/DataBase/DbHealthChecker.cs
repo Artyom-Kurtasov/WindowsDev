@@ -11,13 +11,21 @@ namespace WindowsDev.Business.DataBase
             _dbManager = dbManager;
         }
 
+        /// <summary>
+        /// Validates both database connectivity and schema compatibility.
+        /// Throws if the database is unreachable or any table has unexpected columns.
+        /// </summary>
         public void Check()
         {
             using var dbContext = _dbManager.Create();
 
+            // First, verify the server is reachable before attempting queries
             if (!dbContext.Database.CanConnect())
                 throw new Exception("Database is not reachable");
 
+            // Query each table with explicit column lists.
+            // If the database schema doesn't match (missing column, wrong type),
+            // EF Core will throw at the first mismatched table
             CheckUsers(dbContext);
             CheckProjects(dbContext);
             CheckAttachments(dbContext);
@@ -25,6 +33,9 @@ namespace WindowsDev.Business.DataBase
             CheckComments(dbContext);
         }
 
+        // Each Check method queries the table with an anonymous type projection.
+        // This forces EF Core to validate that every expected column exists
+        // in the actual database schema — a missing column throws immediately
         private void CheckUsers(AppDbContext appDbContext)
         {
             _ = appDbContext.UsersInfo
@@ -68,7 +79,6 @@ namespace WindowsDev.Business.DataBase
                     t.Status,
                     t.DeadLine,
                     t.CreatedAt
-
                 })
                 .FirstOrDefault();
         }

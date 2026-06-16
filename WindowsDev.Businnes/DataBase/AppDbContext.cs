@@ -13,6 +13,10 @@ namespace WindowsDev.Business.DataBase
         {
             base.OnModelCreating(modelBuilder);
 
+
+            // Enums are stored as strings in the database instead of integers.
+            // This makes the database human-readable and protects against
+            // enum reordering breaking existing data
             modelBuilder.Entity<TasksInfo>()
                 .Property(x => x.Status)
                 .HasConversion<string>();

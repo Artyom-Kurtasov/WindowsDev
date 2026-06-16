@@ -1,14 +1,32 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
+    <!-- Buttons -->
     <sys:String x:Key="AddAttachmentButton">添付ファイルを追加</sys:String>
     <sys:String x:Key="AddButton">追加</sys:String>
-    <sys:String x:Key="AllLabel">すべて</sys:String>
     <sys:String x:Key="ApplyButton">適用</sys:String>
     <sys:String x:Key="BackButton">戻る</sys:String>
+    <sys:String x:Key="CancelButton">キャンセル</sys:String>
+    <sys:String x:Key="CreateButton">作成</sys:String>
+    <sys:String x:Key="DeleteButton">削除</sys:String>
+    <sys:String x:Key="EditButton">編集</sys:String>
+    <sys:String x:Key="LogoutButton">ログアウト</sys:String>
+    <sys:String x:Key="NextButton">次へ</sys:String>
+    <sys:String x:Key="OkButton">OK</sys:String>
+    <sys:String x:Key="PostCommentButton">投稿</sys:String>
+    <sys:String x:Key="PrevButton">前へ</sys:String>
+    <sys:String x:Key="SaveButton">保存</sys:String>
+    <sys:String x:Key="SaveTaskButton">保存</sys:String>
+    <sys:String x:Key="SearchButton">検索</sys:String>
+    <sys:String x:Key="SignInButton">ログイン</sys:String>
+    <sys:String x:Key="SignUpButton">新規登録</sys:String>
 
+    <!-- Labels -->
+    <sys:String x:Key="AllLabel">すべて</sys:String>
+    <sys:String x:Key="AttachmentsLabel">添付ファイル</sys:String>
     <sys:String x:Key="ChangePasswordLabel">パスワード変更</sys:String>
+    <sys:String x:Key="CommentsLabel">コメント</sys:String>
     <sys:String x:Key="ConfirmPasswordLabel">パスワード確認</sys:String>
     <sys:String x:Key="ConnectionStringLabel">接続文字列</sys:String>
     <sys:String x:Key="CreatedAtLabel">作成日</sys:String>
@@ -17,112 +35,114 @@
     <sys:String x:Key="DarkThemeLabel">ダーク</sys:String>
     <sys:String x:Key="DeadlineLabel">期限</sys:String>
     <sys:String x:Key="DescriptionLabel">説明</sys:String>
-    <sys:String x:Key="DownloadTooltip">ダウンロード</sys:String>
-    <sys:String x:Key="EditTaskTooltip">タスク詳細を更新</sys:String>
-    <sys:String x:Key="DeleteTaskTooltip">現在のタスクを削除</sys:String>
+    <sys:String x:Key="EnterLoginLabel">ログインを入力</sys:String>
+    <sys:String x:Key="FirstStepLabel">ステップ1: ログインを入力</sys:String>
     <sys:String x:Key="IdLabel">番号</sys:String>
     <sys:String x:Key="LanguageLabel">言語</sys:String>
     <sys:String x:Key="LightThemeLabel">ライト</sys:String>
+    <sys:String x:Key="LoginLabel">ログイン</sys:String>
     <sys:String x:Key="NameLabel">名前</sys:String>
     <sys:String x:Key="NewPasswordLabel">新しいパスワード</sys:String>
-
-    <sys:String x:Key="DeleteButton">削除</sys:String>
-    <sys:String x:Key="EditButton">編集</sys:String>
-
-    <sys:String x:Key="LoginLabel">ログイン</sys:String>
-    <sys:String x:Key="LogoutButton">ログアウト</sys:String>
-    <sys:String x:Key="OkButton">OK</sys:String>
-    <sys:String x:Key="UsernameLabel">ユーザー名</sys:String>
     <sys:String x:Key="PasswordLabel">パスワード</sys:String>
-    <sys:String x:Key="ProfileLabel">プロフィール</sys:String>
-    <sys:String x:Key="RecoveryCodeLabel">コードを入力</sys:String>
-    <sys:String x:Key="SearchButton">検索</sys:String>
-    <sys:String x:Key="SearchWatermark">検索</sys:String>
-    <sys:String x:Key="ThemeLabel">テーマ</sys:String>
-    <sys:String x:Key="UserIdLabel">ユーザーID</sys:String>
-
-    <sys:String x:Key="NewUserText">TaskManagerを初めてご利用ですか？</sys:String>
-    <sys:String x:Key="ExistingUserText">すでにアカウントをお持ちですか？</sys:String>
-    <sys:String x:Key="ForgotPasswordText">パスワードをお忘れですか？</sys:String>
-
-    <sys:String x:Key="SignInButton">ログイン</sys:String>
-    <sys:String x:Key="SignUpButton">新規登録</sys:String>
-    <sys:String x:Key="SaveButton">保存</sys:String>
-    <sys:String x:Key="NextButton">次へ</sys:String>
-    <sys:String x:Key="PrevButton">前へ</sys:String>
-
-    <sys:String x:Key="ProjectsLabel">プロジェクト</sys:String>
-    <sys:String x:Key="SettingsLabel">設定</sys:String>
-    <sys:String x:Key="CommentsLabel">コメント</sys:String>
-
-    <sys:String x:Key="AttachmentsLabel">添付ファイル</sys:String>
-
     <sys:String x:Key="PriorityLabel">優先度</sys:String>
+    <sys:String x:Key="ProfileLabel">プロフィール</sys:String>
     <sys:String x:Key="ProgressLabel">進捗</sys:String>
+    <sys:String x:Key="ProjectsLabel">プロジェクト</sys:String>
+    <sys:String x:Key="RecoveryCodeLabel">コードを入力</sys:String>
+    <sys:String x:Key="SecondStepLabel">ステップ2: リカバリーコードを入力</sys:String>
+    <sys:String x:Key="SettingsLabel">設定</sys:String>
     <sys:String x:Key="StatusLabel">ステータス</sys:String>
+    <sys:String x:Key="ThemeLabel">テーマ</sys:String>
+    <sys:String x:Key="ThirdStepLabel">ステップ3: 新しいパスワードを設定</sys:String>
+    <sys:String x:Key="UserIdLabel">ユーザーID</sys:String>
+    <sys:String x:Key="UsernameLabel">ユーザー名</sys:String>
 
+    <!-- Titles -->
     <sys:String x:Key="AuthTitle">TaskManagerにログイン</sys:String>
     <sys:String x:Key="RegTitle">新規登録</sys:String>
 
-    <sys:String x:Key="CreateButton">作成</sys:String>
-    <sys:String x:Key="CancelButton">キャンセル</sys:String>
-    <sys:String x:Key="PostCommentButton">投稿</sys:String>
-    <sys:String x:Key="SaveTaskButton">保存</sys:String>
-
-    <sys:String x:Key="LoginTaken">ログインはすでに使用されています</sys:String>
-    <sys:String x:Key="LoginAvailable">ログインは利用可能です</sys:String>
-
-    <sys:String x:Key="UsernameTaken">ユーザー名はすでに使用されています</sys:String>
-    <sys:String x:Key="UsernameAvailable">ユーザー名は利用可能です</sys:String>
-
-    <sys:String x:Key="UserNotExists">このログインまたはパスワードのユーザーは存在しません</sys:String>
-
+    <!-- Status -->
+    <sys:String x:Key="TaskPriority_Critical">重大</sys:String>
+    <sys:String x:Key="TaskPriority_Normal">通常</sys:String>
+    <sys:String x:Key="TaskStatus_Closed">完了</sys:String>
     <sys:String x:Key="TaskStatus_Done">未着手</sys:String>
     <sys:String x:Key="TaskStatus_InProgress">進行中</sys:String>
-    <sys:String x:Key="TaskStatus_Closed">完了</sys:String>
 
-    <sys:String x:Key="TaskPriority_Normal">通常</sys:String>
-    <sys:String x:Key="TaskPriority_Critical">重大</sys:String>
+    <!-- Tooltips -->
+    <sys:String x:Key="DeleteTaskTooltip">現在のタスクを削除</sys:String>
+    <sys:String x:Key="DownloadTooltip">ダウンロード</sys:String>
+    <sys:String x:Key="EditTaskTooltip">タスク詳細を更新</sys:String>
+    <sys:String x:Key="Tooltip_InvalidRecoveryCode">復旧コードが正しくありません</sys:String>
+    <sys:String x:Key="Tooltip_NextStep">次のステップへ進む</sys:String>
+    <sys:String x:Key="Tooltip_UserNotFound">このログイン名のユーザーは見つかりません</sys:String>
 
-    <sys:String x:Key="PasswordRequirement_MinLength">12文字以上</sys:String>
-    <sys:String x:Key="PasswordRequirement_Number">数字を使用</sys:String>
-    <sys:String x:Key="PasswordRequirement_Uppercase">大文字を使用</sys:String>
-    <sys:String x:Key="PasswordRequirement_Symbol">記号を使用</sys:String>
-
+    <!-- Watermarks -->
     <sys:String x:Key="AddCommentWatermark">コメントを追加...</sys:String>
     <sys:String x:Key="ConfirmPasswordWatermark">パスワードを確認</sys:String>
     <sys:String x:Key="CurrentPasswordWatermark">現在のパスワードを入力</sys:String>
     <sys:String x:Key="LoginWatermark">ログインを入力</sys:String>
     <sys:String x:Key="NewPasswordWatermark">新しいパスワードを入力</sys:String>
+    <sys:String x:Key="SearchWatermark">検索</sys:String>
     <sys:String x:Key="UsernameWatermark">名前を入力</sys:String>
 
-    <sys:String x:Key="Error_Critical">重大なエラー</sys:String>
-    <sys:String x:Key="Error_DatabaseFatal">データベースに接続できませんでした。アプリケーションを終了します。</sys:String>
-    <sys:String x:Key="Error_Title">エラー</sys:String>
-    <sys:String x:Key="Warning_Title">警告</sys:String>
-    <sys:String x:Key="Information_Title">情報</sys:String>
-    <sys:String x:Key="Error_Generic">問題が発生しました。アプリケーションを再起動してください。詳細はログファイルを確認してください。</sys:String>
-    <sys:String x:Key="Error_CriticalShutdown">重大なエラーです。アプリケーションを終了します。アプリケーションを再起動してください。問題が続く場合は再インストールしてください。</sys:String>
-    <sys:String x:Key="Error_LoadProjects">プロジェクトを読み込めませんでした</sys:String>
-    <sys:String x:Key="Error_DeleteProjects">プロジェクトを削除できませんでした</sys:String>
-    <sys:String x:Key="Error_CreateProject">プロジェクトを作成できませんでした</sys:String>
-    <sys:String x:Key="Error_LoadTasks">ページを読み込めませんでした</sys:String>
-    <sys:String x:Key="Error_DeleteTasks">タスクを削除できませんでした</sys:String>
-    <sys:String x:Key="Error_CreateTask">タスクを作成できませんでした</sys:String>
-    <sys:String x:Key="Error_EditTask">タスクを編集できませんでした</sys:String>
-    <sys:String x:Key="Error_LoadComments">コメントを読み込めませんでした</sys:String>
-    <sys:String x:Key="Error_LoadAttachments">添付ファイルを読み込めませんでした</sys:String>
-    <sys:String x:Key="Error_FileNotFound">ファイルが見つかりません</sys:String>
-    <sys:String x:Key="Error_File">ファイルエラー</sys:String>
+    <!-- Password Requirements -->
+    <sys:String x:Key="PasswordRequirement_MinLength">12文字以上</sys:String>
+    <sys:String x:Key="PasswordRequirement_Number">数字を使用</sys:String>
+    <sys:String x:Key="PasswordRequirement_Symbol">記号を使用</sys:String>
+    <sys:String x:Key="PasswordRequirement_Uppercase">大文字を使用</sys:String>
+
+    <!-- Errors -->
     <sys:String x:Key="Error_AddAttachment">添付ファイルを追加できませんでした。もう一度お試しください</sys:String>
     <sys:String x:Key="Error_AddComment">コメントを追加できませんでした。もう一度お試しください</sys:String>
+    <sys:String x:Key="Error_CreateProject">プロジェクトを作成できませんでした</sys:String>
+    <sys:String x:Key="Error_CreateTask">タスクを作成できませんでした</sys:String>
+    <sys:String x:Key="Error_Critical">重大なエラー</sys:String>
+    <sys:String x:Key="Error_CriticalShutdown">重大なエラーです。アプリケーションを終了します。アプリケーションを再起動してください。問題が続く場合は再インストールしてください。</sys:String>
+    <sys:String x:Key="Error_DatabaseFatal">データベースに接続できませんでした。アプリケーションを終了します。</sys:String>
+    <sys:String x:Key="Error_DeleteProjects">プロジェクトを削除できませんでした</sys:String>
+    <sys:String x:Key="Error_DeleteTasks">タスクを削除できませんでした</sys:String>
+    <sys:String x:Key="Error_EditTask">タスクを編集できませんでした</sys:String>
+    <sys:String x:Key="Error_File">ファイルエラー</sys:String>
+    <sys:String x:Key="Error_FileNotFound">ファイルが見つかりません</sys:String>
+    <sys:String x:Key="Error_Generic">問題が発生しました。アプリケーションを再起動してください。詳細はログファイルを確認してください。</sys:String>
+    <sys:String x:Key="Error_LoadAttachments">添付ファイルを読み込めませんでした</sys:String>
+    <sys:String x:Key="Error_LoadComments">コメントを読み込めませんでした</sys:String>
+    <sys:String x:Key="Error_LoadProjects">プロジェクトを読み込めませんでした</sys:String>
+    <sys:String x:Key="Error_LoadTasks">ページを読み込めませんでした</sys:String>
+    <sys:String x:Key="Error_Title">エラー</sys:String>
+
+    <!-- Warnings -->
     <sys:String x:Key="Warning_EnterName">名前を入力してください</sys:String>
     <sys:String x:Key="Warning_InvalidConnectionString">この接続文字列を適用できませんでした</sys:String>
-    <sys:String x:Key="ProfileError_NewPasswordSameAsCurrent">新しいパスワードは現在のパスワードと異なる必要があります</sys:String>
-    <sys:String x:Key="ProfileError_PasswordsDoNotMatch">パスワードが一致しません</sys:String>
+    <sys:String x:Key="Warning_Title">警告</sys:String>
+
+    <!-- Information -->
+    <sys:String x:Key="Information_Title">情報</sys:String>
+
+    <!-- Profile Errors -->
     <sys:String x:Key="ProfileError_CurrentPasswordIncorrect">現在のパスワードが正しくありません</sys:String>
+    <sys:String x:Key="ProfileError_NewPasswordSameAsCurrent">新しいパスワードは現在のパスワードと異なる必要があります</sys:String>
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">新しいユーザー名は現在のユーザー名と異なる必要があります</sys:String>
+    <sys:String x:Key="ProfileError_PasswordsDoNotMatch">パスワードが一致しません</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">このユーザー名のユーザーはすでに存在します</sys:String>
 
+    <!-- Success Messages -->
+    <sys:String x:Key="Success_PasswordChanged">パスワードが正常に変更されました</sys:String>
+    <sys:String x:Key="Success_UsernameChanged">ユーザー名が正常に変更されました</sys:String>
+
+    <!-- Validation Messages -->
+    <sys:String x:Key="LoginAvailable">ログインは利用可能です</sys:String>
+    <sys:String x:Key="LoginTaken">ログインはすでに使用されています</sys:String>
     <sys:String x:Key="Registration_Failed">すべての項目を正しく入力してください。</sys:String>
+    <sys:String x:Key="UsernameTaken">ユーザー名はすでに使用されています</sys:String>
+    <sys:String x:Key="UsernameAvailable">ユーザー名は利用可能です</sys:String>
+    <sys:String x:Key="UserNotExists">このログインまたはパスワードのユーザーは存在しません</sys:String>
+
+    <!-- Misc -->
+    <sys:String x:Key="ExistingUserText">すでにアカウントをお持ちですか？</sys:String>
+    <sys:String x:Key="ForgotPasswordText">パスワードをお忘れですか？</sys:String>
+    <sys:String x:Key="NewUserText">TaskManagerを初めてご利用ですか？</sys:String>
+    <sys:String x:Key="RecoveryKeyMessage">
+        これは復旧キーです。安全な場所に保管してください。アカウントへのアクセスを失った場合、パスワードを復旧するために必要になります: </sys:String>
+
 </ResourceDictionary>

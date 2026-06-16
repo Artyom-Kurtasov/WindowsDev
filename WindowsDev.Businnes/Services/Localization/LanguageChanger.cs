@@ -1,8 +1,9 @@
 ﻿using System.Windows;
+using WindowsDev.Business.Services.Localization.Interfaces;
 
 namespace WindowsDev.Business.Services.Localization
 {
-    public class LanguageChanger
+    public class LanguageChanger : ILanguageChanger
     {
         public void ChangeLanguage(string languageCode)
         {

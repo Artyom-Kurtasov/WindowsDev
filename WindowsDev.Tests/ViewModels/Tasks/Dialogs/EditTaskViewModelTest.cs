@@ -26,9 +26,12 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             _loggerMock = new Mock<ILogger<EditTaskViewModel>>();
         }
 
-        private EditTaskViewModel CreateViewModel()
+        private EditTaskViewModel CreateViewModel(TasksInfo task = null)
         {
+            task ??= CreateTestTask();
+
             return new EditTaskViewModel(
+                task,
                 _taskServiceMock.Object,
                 _dialogCoordinatorMock.Object,
                 _loggerMock.Object);
@@ -48,11 +51,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 DeadLine = DateTime.UtcNow.AddDays(7),
                 CreatedAt = DateTime.UtcNow
             };
-        }
-
-        private async Task SetupViewModel(EditTaskViewModel vm, TasksInfo task)
-        {
-            await vm.InitializationAsync(task);
         }
 
         private void SetupEvents(EditTaskViewModel vm)
@@ -79,17 +77,17 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 .Setup(x => x.ShowMessageAsync(
                     It.IsAny<EditTaskViewModel>(),
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>()))
                 .ReturnsAsync(MessageDialogResult.Affirmative);
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenTaskProvided_LoadsTaskData()
+        public void Constructor_WhenTaskProvided_LoadsTaskData()
         {
-            var vm = CreateViewModel();
             var task = CreateTestTask();
 
-            await vm.InitializationAsync(task);
+            var vm = CreateViewModel(task);
 
             Assert.Equal(task.Name, vm.Name);
             Assert.Equal(task.Description, vm.Description);
@@ -101,20 +99,10 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenNoTaskProvided_ThrowsArgumentNullException()
-        {
-            var vm = CreateViewModel();
-
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => vm.InitializationAsync());
-        }
-
-        [Fact]
         public async Task EditTask_WhenSuccessful_UpdatesTask_RaisesEvents_ClosesDialog()
         {
-            var vm = CreateViewModel();
             var task = CreateTestTask();
-            await SetupViewModel(vm, task);
+            var vm = CreateViewModel(task);
             SetupEvents(vm);
 
             vm.Name = "Updated Name";
@@ -147,9 +135,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         [InlineData(" ")]
         public async Task EditTask_WhenTaskNameIncorrect_ShowsWarningMessage(string? taskName)
         {
-            var vm = CreateViewModel();
             var task = CreateTestTask();
-            await SetupViewModel(vm, task);
+            var vm = CreateViewModel(task);
             SetupEvents(vm);
             SetupDialogCoordinatorMock();
 
@@ -175,9 +162,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         [Fact]
         public async Task EditTask_WhenExceptionOccurs_LogsErrorAndShowsErrorMessage()
         {
-            var vm = CreateViewModel();
             var task = CreateTestTask();
-            await SetupViewModel(vm, task);
+            var vm = CreateViewModel(task);
             SetupEvents(vm);
 
             var loggerWasCalled = false;

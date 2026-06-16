@@ -8,5 +8,6 @@ namespace WindowsDev.Business.Services.UserManager.Interfaces
         public string Username { get; set; }
         public int UserId { get; set; }
         void SetUser(int id, string login, string username);
+        void ClearUser();
     }
 }

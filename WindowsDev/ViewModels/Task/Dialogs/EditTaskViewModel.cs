@@ -16,13 +16,12 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
 
         private TasksInfo CurrentTask { get; }
 
-        public EditTaskViewModel(
-            TasksInfo currentTask,
+        public EditTaskViewModel(TasksInfo currentTask,
             ITaskService taskService,
             IDialogCoordinator dialogCoordinator,
             ILogger<EditTaskViewModel> logger)
         {
-            CurrentTask = currentTask ?? throw new ArgumentNullException(nameof(currentTask));
+            CurrentTask = currentTask;
             _taskService = taskService;
             _dialogCoordinator = dialogCoordinator;
             _logger = logger;
@@ -36,6 +35,8 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
+        // Mutate the existing tracked entity directly instead of creating a new one —
+        // UpdateAsync relies on change tracking to detect modified fields
         private async Task EditTask()
         {
             try

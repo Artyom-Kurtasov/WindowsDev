@@ -1,6 +1,7 @@
 ﻿using Moq;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Main;
@@ -11,11 +12,13 @@ namespace WindowsDev.Tests.ViewModels.Authorization
     {
         private readonly Mock<IAuthorization> _authorizationMock;
         private readonly Mock<INavigationService> _navigationServiceMock;
+        private readonly Mock<IDialogService> _dialogServiceMock;
 
         public AuthorizationViewModelTest()
         {
             _authorizationMock = new Mock<IAuthorization>();
             _navigationServiceMock = new Mock<INavigationService>();
+            _dialogServiceMock = new Mock<IDialogService>();
         }
 
         [Fact]
@@ -25,7 +28,10 @@ namespace WindowsDev.Tests.ViewModels.Authorization
                 .Setup(x => x.Authorize("login", "password"))
                 .ReturnsAsync(true);
 
-            var vm = new AuthorizationViewModel(_navigationServiceMock.Object, _authorizationMock.Object)
+            var vm = new AuthorizationViewModel(
+                _navigationServiceMock.Object,
+                _authorizationMock.Object,
+                _dialogServiceMock.Object)
             {
                 Login = "login",
                 Password = "password"
@@ -44,7 +50,10 @@ namespace WindowsDev.Tests.ViewModels.Authorization
                 .Setup(x => x.Authorize(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(false);
 
-            var vm = new AuthorizationViewModel(_navigationServiceMock.Object, _authorizationMock.Object)
+            var vm = new AuthorizationViewModel(
+                _navigationServiceMock.Object,
+                _authorizationMock.Object,
+                _dialogServiceMock.Object)
             {
                 Login = "login",
                 Password = "password"
@@ -59,7 +68,10 @@ namespace WindowsDev.Tests.ViewModels.Authorization
         [Fact]
         public async Task SwitchToRegViewAsync_NavigateToRegistration()
         {
-            var vm = new AuthorizationViewModel(_navigationServiceMock.Object, _authorizationMock.Object);
+            var vm = new AuthorizationViewModel(
+                _navigationServiceMock.Object,
+                _authorizationMock.Object,
+                _dialogServiceMock.Object);
 
             await ((AsyncRelayCommand)vm.SwitchToRegViewCommand).ExecuteAsync(null);
 

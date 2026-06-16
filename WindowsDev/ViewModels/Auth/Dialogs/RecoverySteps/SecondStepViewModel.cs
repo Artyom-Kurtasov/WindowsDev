@@ -15,6 +15,7 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             _passwordRecoveryService = passwordRecoveryService;
         }
 
+        // Used to cancel previous debounced validation requests
         private CancellationTokenSource? _recoveryCodeCts;
 
         public string RecoveryCode

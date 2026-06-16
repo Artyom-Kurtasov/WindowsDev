@@ -8,15 +8,18 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
 
+    <!-- Header with TextBox Control -->
     <Grid Margin="{Binding FieldMargin, RelativeSource={RelativeSource AncestorType=UserControl}}"
           HorizontalAlignment="Stretch">
 
+        <!-- Header Component -->
         <mah:MetroHeader Header="{Binding Header, RelativeSource={RelativeSource AncestorType=UserControl}}"
                          FontSize="{Binding HeaderFontSize, RelativeSource={RelativeSource AncestorType=UserControl}}"
                          Foreground="{Binding HeaderForeground, RelativeSource={RelativeSource AncestorType=UserControl}}"
                          HorizontalAlignment="Stretch"
                          HorizontalContentAlignment="Stretch">
 
+            <!-- Text Input -->
             <TextBox Text="{Binding Text, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"
                      TextWrapping="{Binding TextWrapping, RelativeSource={RelativeSource AncestorType=UserControl}}"
                      VerticalScrollBarVisibility="{Binding ScrollBarVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"

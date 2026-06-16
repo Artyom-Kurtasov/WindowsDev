@@ -27,6 +27,7 @@ namespace WindowsDev.Tests.ViewModels.Projects.Dialogs
             _loggerMock = new Mock<ILogger<CreateProjectDialogViewModel>>();
 
             _currentUser = new CurrentUserService();
+            _currentUser.UserId = 1;
         }
 
         private CreateProjectDialogViewModel CreateViewModel()
@@ -43,7 +44,6 @@ namespace WindowsDev.Tests.ViewModels.Projects.Dialogs
             string projectName,
             string projectDescription)
         {
-            _currentUser.UserId = 1;
             vm.ProjectName = projectName;
             vm.ProjectDescription = projectDescription;
         }
@@ -83,8 +83,11 @@ namespace WindowsDev.Tests.ViewModels.Projects.Dialogs
             SetupUserAndViewModel(vm, "Test", "Description");
             SetupEvents(vm);
 
+            ProjectsInfo? capturedProject = null;
+
             _projectServiceMock
                 .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
+                .Callback<ProjectsInfo>(p => capturedProject = p)
                 .Returns(Task.CompletedTask);
 
             await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
@@ -92,11 +95,18 @@ namespace WindowsDev.Tests.ViewModels.Projects.Dialogs
             Assert.True(_completedEventWasRaised);
             Assert.True(_closeEventWasRaised);
 
-            _projectServiceMock.Verify(x => x.AddAsync(It.Is<ProjectsInfo>(p =>
-                p.Name == "Test" &&
-                p.UserId == 1 &&
-                p.Description == "Description" &&
-                p.CreatedAt.Date == DateTime.Today.Date)), Times.Once);
+            _projectServiceMock.Verify(
+                x => x.AddAsync(It.IsAny<ProjectsInfo>()),
+                Times.Once);
+
+            Assert.NotNull(capturedProject);
+            Assert.Equal("Test", capturedProject.Name);
+            Assert.Equal(1, capturedProject.UserId);
+            Assert.Equal("Description", capturedProject.Description);
+
+            Assert.Equal(
+                DateTime.Today.ToUniversalTime().Date,
+                capturedProject.CreatedAt.Date);
         }
 
         [Theory]

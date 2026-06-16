@@ -15,6 +15,7 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             _userRepository = userRepository;
         }
 
+        // Used to cancel previous debounced validation requests
         private CancellationTokenSource? _loginCts;
 
         public string Login

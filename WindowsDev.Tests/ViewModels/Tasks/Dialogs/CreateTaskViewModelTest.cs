@@ -26,29 +26,22 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             _loggerMock = new Mock<ILogger<CreateTaskViewModel>>();
         }
 
-        private CreateTaskViewModel CreateViewModel()
+        private CreateTaskViewModel CreateViewModel(int projectId = 1)
         {
-            return new CreateTaskViewModel(
+            var vm = new CreateTaskViewModel(
+                projectId,
                 _taskServiceMock.Object,
                 _dialogCoordinatorMock.Object,
                 _loggerMock.Object);
-        }
 
-        private void SetupViewModel(
-            CreateTaskViewModel vm,
-            string name,
-            string description,
-            int projectId)
-        {
-            vm.Name = name;
-            vm.Description = description;
+            vm.Name = "Test Task";
+            vm.Description = "Test Description";
             vm.Priority = TaskPriority.Normal;
             vm.Progress = 0;
             vm.Status = TaskStatus.InProgress;
             vm.DeadLine = DateTime.UtcNow.AddDays(7);
 
-            var initializationTask = vm.InitializationAsync(projectId);
-            initializationTask.Wait();
+            return vm;
         }
 
         private void SetupEvents(CreateTaskViewModel vm)
@@ -75,26 +68,19 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 .Setup(x => x.ShowMessageAsync(
                     It.IsAny<CreateTaskViewModel>(),
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>()))
                 .ReturnsAsync(MessageDialogResult.Affirmative);
         }
 
         [Fact]
-        public async Task InitializationAsync_WhenProjectIdLessThanOne_ThrowsArgumentNullException()
+        public void Constructor_WhenProjectIdLessThanOne_ThrowsArgumentOutOfRangeException()
         {
-            var vm = CreateViewModel();
-
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => vm.InitializationAsync(0));
-        }
-
-        [Fact]
-        public async Task InitializationAsync_WhenNoArguments_ThrowsArgumentNullException()
-        {
-            var vm = CreateViewModel();
-
-            await Assert.ThrowsAsync<ArgumentNullException>(
-                () => vm.InitializationAsync());
+            Assert.Throws<ArgumentOutOfRangeException>(() => new CreateTaskViewModel(
+                0,
+                _taskServiceMock.Object,
+                _dialogCoordinatorMock.Object,
+                _loggerMock.Object));
         }
 
         [Fact]
@@ -102,7 +88,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         {
             var vm = CreateViewModel();
             SetupEvents(vm);
-            await vm.InitializationAsync(1);
 
             await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
 
@@ -114,7 +99,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         public async Task CreateTask_WhenSuccessful_AddsTask_RaisesEvents_ClosesDialog()
         {
             var vm = CreateViewModel();
-            SetupViewModel(vm, "Test Task", "Test Description", 1);
             SetupEvents(vm);
 
             _taskServiceMock
@@ -140,7 +124,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         public async Task CreateTask_WhenTaskNameIncorrect_ShowsWarningMessage(string? taskName)
         {
             var vm = CreateViewModel();
-            SetupViewModel(vm, taskName!, "Test Description", 1);
+            vm.Name = taskName;
             SetupEvents(vm);
             SetupDialogCoordinatorMock();
 
@@ -165,7 +149,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
         public async Task CreateTask_WhenExceptionOccurs_LogsErrorAndShowsErrorMessage()
         {
             var vm = CreateViewModel();
-            SetupViewModel(vm, "Test Task", "Test Description", 1);
             SetupEvents(vm);
 
             var loggerWasCalled = false;

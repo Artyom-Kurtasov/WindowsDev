@@ -3,7 +3,7 @@ using MahApps.Metro.Controls.Dialogs;
 using System.Windows;
 using System.Windows.Input;
 using WindowsDev.Business.DataBase.Interfaces;
-using WindowsDev.Business.Services.Localization;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Infrastructure;
 using WindowsDev.Settings;
@@ -12,16 +12,20 @@ namespace WindowsDev.ViewModels.Main.Tabs
 {
     public class SettingsViewModel : ViewModelBase
     {
+        private readonly IDbHealthChecker _healthChecker;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IDbManager _dbManager;
-        private readonly LanguageChanger _languageChanger;
-        private readonly IDbHealthChecker _healthChecker;
+        private readonly ILanguageChanger _languageChanger;
 
-        public SettingsViewModel(
-            IDbHealthChecker dbHealthChecker,
-            LanguageChanger languageChanger,
+        // ThemeManager from ControlzEx requires exact theme name strings.
+        // SelectedTheme: 0 = Dakr, 1 = Light 
+        const string lightTheme = "Light.Blue";
+        const string darkTheme = "Dark.Blue";
+
+        public SettingsViewModel(IDbHealthChecker dbHealthChecker,
             IDbManager dbManager,
-            IDialogCoordinator dialogCoordinator)
+            IDialogCoordinator dialogCoordinator,
+            ILanguageChanger languageChanger)
         {
             _dialogCoordinator = dialogCoordinator;
             _healthChecker = dbHealthChecker;
@@ -31,6 +35,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
             ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
             SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
             ApplyLanguageCommand = new RelayCommand(ApplyLanguage);
+
+            Initialize();
         }
 
         public ICommand ApplyLanguageCommand { get; }
@@ -68,6 +74,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 _selectedTheme = value;
                 OnPropertyChanged(nameof(SelectedTheme));
 
+                // Apply theme immediately when selection changes
                 _ = ChangeThemeAsync();
             }
         }
@@ -77,16 +84,34 @@ namespace WindowsDev.ViewModels.Main.Tabs
         public void Initialize()
         {
             LoadSavedLanguages();
+            LoadSavedTheme();
+        }
+
+        private void LoadSavedTheme()
+        {
+            string savedTheme = UserSettings.Default.Theme;
+
+            if (savedTheme == darkTheme)
+            {
+                _selectedTheme = 0;
+            }
+            else if (savedTheme == lightTheme)
+            {
+                _selectedTheme = 1;
+            }
         }
 
         private void LoadSavedLanguages()
         {
             string savedLangCode = UserSettings.Default.LanguageCode;
+
             SelectedLang = Enum.Parse<Language>(savedLangCode, true);
         }
 
         public async Task SetNewConnectionStringAsync()
         {
+            // Save current connection before attempting to change,
+            // so we can roll back if the new one is invalid
             var old = _dbManager.ConnectionString;
 
             _dbManager.ConnectionString = NewConnectionString;
@@ -100,29 +125,35 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
             catch
             {
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate("Warning_InvalidConnectionString"), MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate("Warning_Title"),
+                    Translate("Warning_InvalidConnectionString"),
+                    MessageDialogStyle.Affirmative);
 
+                // Roll back to the working connection string
                 _dbManager.ConnectionString = old;
             }
         }
 
         public async Task ChangeThemeAsync()
         {
-            const string lightTheme = "Light.Blue";
-            const string darkTheme = "Dark.Blue";
-
             if (_selectedTheme == 0)
             {
-                ThemeManager.Current.ChangeTheme(Application.Current, lightTheme);
+                ThemeManager.Current.ChangeTheme(Application.Current, darkTheme);
+                UserSettings.Default.Theme = darkTheme;
             }
             else if (_selectedTheme == 1)
             {
-                ThemeManager.Current.ChangeTheme(Application.Current, darkTheme);
+                ThemeManager.Current.ChangeTheme(Application.Current, lightTheme);
+                UserSettings.Default.Theme = lightTheme;
             }
+
+            UserSettings.Default.Save();
         }
 
         public void ApplyLanguage()
         {
+            // LanguageChanger expects lowercase code
             string langCode = SelectedLang.ToString().ToLower();
 
             _languageChanger.ChangeLanguage(langCode);

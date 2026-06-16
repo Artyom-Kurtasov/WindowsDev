@@ -15,8 +15,10 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
+        <!-- Toolbar with Add, Delete, and Search buttons -->
         <Grid Grid.Row="0">
-            <StackPanel Orientation="Horizontal">
+            <StackPanel Orientation="Horizontal"
+                        Margin="0,0,0,5">
                 <Button Content="{DynamicResource AddButton}" 
                         Background="Transparent" 
                         BorderBrush="Transparent"
@@ -29,16 +31,20 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" 
-                        HorizontalAlignment="Right">
-                <UserCtrl:HeaderTextBox   HorizontalAlignment="Right"
-                                          Watermark="{DynamicResource SearchWatermark}"
-                                          Margin="5,0,0,0"
-                                          Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+                        HorizontalAlignment="Right"
+                        Margin="0,0,0,5">
+                <UserCtrl:HeaderTextBox HorizontalAlignment="Right"
+                                        Watermark="{DynamicResource SearchWatermark}"
+                                        Margin="0,0,5,0"
+                                        Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 <Button Content="{DynamicResource SearchButton}" 
-                        Command="{Binding SearchCommand}"/>
+                        Command="{Binding SearchCommand}"
+                        Background="Transparent" 
+                        BorderBrush="Transparent"/>
             </StackPanel>
         </Grid>
 
+        <!-- Projects Data Grid -->
         <Grid Grid.Row="1">
             <DataGrid ItemsSource="{Binding ProjectsList}"
                   AutoGenerateColumns="False"
@@ -47,6 +53,7 @@
                   CanUserAddRows="False"
                   VerticalAlignment="Stretch">
                 <DataGrid.Columns>
+                    <!-- Selection Checkbox Column -->
                     <DataGridTemplateColumn>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -56,12 +63,14 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <!-- ID Column -->
                     <DataGridTextColumn Binding="{Binding Id}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="{DynamicResource IdLabel}"/>
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
+                    <!-- Name Column -->
                     <DataGridTemplateColumn Width="1*">
                         <DataGridTemplateColumn.Header>
                             <TextBlock Text="{DynamicResource NameLabel}"/>
@@ -79,6 +88,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <!-- Description Column -->
                     <DataGridTemplateColumn Width="3*">
                         <DataGridTemplateColumn.Header>
                             <TextBlock Text="{DynamicResource DescriptionLabel}"
@@ -95,6 +105,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
+                    <!-- Created Date Column -->
                     <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="{DynamicResource CreatedAtLabel}"/>
@@ -104,6 +115,7 @@
             </DataGrid>
         </Grid>
 
+        <!-- Pagination Buttons -->
         <StackPanel Grid.Row="2" 
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"

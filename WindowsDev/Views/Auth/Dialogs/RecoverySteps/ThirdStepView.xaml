@@ -8,9 +8,13 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel>
+        <!-- New Password Input -->
         <UserCtrl:HeaderPasswordBox Header="{DynamicResource NewPasswordLabel}"
                                     Password="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                    ShowRequirements="True"/>
+                                    ShowRequirements="True"
+                                    Margin="0,0,0,10"/>
+
+        <!-- Confirm Password Input -->
         <UserCtrl:HeaderPasswordBox Header="{DynamicResource ConfirmPasswordLabel}"
                                     Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </StackPanel>

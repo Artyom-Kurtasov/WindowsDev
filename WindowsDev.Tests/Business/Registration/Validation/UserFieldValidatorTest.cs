@@ -10,11 +10,7 @@ namespace WindowsDev.Tests.Business.Registration.Validation
         [InlineData("short")]
         public void IsValid_WhenWeakPassword_ReturnsFalse(string password)
         {
-            var validator = new PasswordValidator();
-
-            var result = validator.IsValid(password);
-
-            Assert.False(result);
+            Assert.False(PasswordValidator.IsValid(password));
         }
 
         [Theory]
@@ -23,19 +19,13 @@ namespace WindowsDev.Tests.Business.Registration.Validation
         [InlineData("123456789012")]        
         public void IsValid_WhenMissingRequirements_ReturnsFalse(string password)
         {
-            var validator = new PasswordValidator();
-
-            var result = validator.IsValid(password);
-
-            Assert.False(result);
+            Assert.False(PasswordValidator.IsValid(password));
         }
 
         [Fact]
         public void IsValid_WhenStrongPassword_ReturnsTrue()
         {
-            var validator = new PasswordValidator();
-
-            var result = validator.IsValid("Aa1234567890!");
+            var result = PasswordValidator.IsValid("Aa1234567890!");
 
             Assert.True(result);
         }

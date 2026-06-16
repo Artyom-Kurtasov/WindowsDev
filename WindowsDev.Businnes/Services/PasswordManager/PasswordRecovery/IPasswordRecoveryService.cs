@@ -4,6 +4,6 @@
     {
         int GenerateRecoveryCode();
         Task<bool> IsRecoverCodeCorrect(int recoveryCode, string login);
-        Task ChangePasswordAsync(string login, string password);
+        Task<int> ChangePasswordAsync(string login, string password);
     }
 }

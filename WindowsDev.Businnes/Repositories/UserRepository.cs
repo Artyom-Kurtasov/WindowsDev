@@ -32,6 +32,16 @@ namespace WindowsDev.Business.Repositories
             return false;
         }
 
+        public async Task<bool> ExistsByUsernameAsync(string username)
+        {
+            using var dbContext = _dbManager.Create();
+
+            if (await dbContext.UsersInfo.AnyAsync(x => x.Username == username))
+                return true;
+
+            return false;
+        }
+
         public async Task<UsersInfo?> GetByLoginAsync(string login)
         {
             using var dbContext = _dbManager.Create();

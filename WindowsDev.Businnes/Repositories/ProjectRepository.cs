@@ -52,11 +52,6 @@ namespace WindowsDev.Business.Repositories
             if (project is null)
                 return;
 
-            var relatedTasks = dbContext.TasksInfo
-                .Where(x => x.ProjectId == id);
-
-            dbContext.TasksInfo.RemoveRange(relatedTasks);
-
             dbContext.ProjectsInfo.Remove(project);
             await dbContext.SaveChangesAsync();
         }

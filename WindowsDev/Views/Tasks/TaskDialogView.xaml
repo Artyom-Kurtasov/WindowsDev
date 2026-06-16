@@ -14,6 +14,7 @@
         <converter:TaskPriorityToTextConverter x:Key="PriorityToText"/>
     </UserControl.Resources>
 
+    <!-- Task Form -->
     <Grid MaxWidth="400" Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,14 +24,14 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Name -->
+        <!-- Task Name Input -->
         <UserCtrl:HeaderTextBox Grid.Row="0"
                                  Header="{DynamicResource NameLabel}"
                                  Margin="0,0,0,10"
                                  CornerRadius="8"
                                  Text="{Binding Name}"/>
 
-        <!-- Deadline -->
+        <!-- Deadline Picker -->
         <StackPanel Grid.Row="1">
             <TextBlock Text="{DynamicResource DeadlineLabel}" />
             <DatePicker
@@ -39,8 +40,8 @@
                     mah:ControlsHelper.CornerRadius="8"
                     Text="{Binding DeadLine, Mode=TwoWay}"/>
         </StackPanel>
-        
-        <!-- Priority + Progress -->
+
+        <!-- Progress, Priority, Status Selectors -->
         <Grid Grid.Row="2" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
@@ -50,7 +51,7 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <!-- Progress -->
+            <!-- Progress Selector -->
             <StackPanel Grid.Column="0">
                 <TextBlock Text="{DynamicResource ProgressLabel}"/>
                 <ComboBox ItemsSource="{Binding Percents}"
@@ -59,7 +60,7 @@
                 </ComboBox>
             </StackPanel>
 
-            <!-- Priority -->
+            <!-- Priority Selector -->
             <StackPanel Grid.Column="2">
                 <TextBlock Text="{DynamicResource PriorityLabel}"/>
                 <ComboBox ItemsSource="{Binding Priorities}"
@@ -72,6 +73,7 @@
                 </ComboBox>
             </StackPanel>
 
+            <!-- Status Selector -->
             <StackPanel Grid.Column="4">
                 <TextBlock Text="{DynamicResource StatusLabel}"/>
                 <ComboBox ItemsSource="{Binding Statuses}"
@@ -85,7 +87,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- Description -->
+        <!-- Task Description Input -->
         <UserCtrl:HeaderTextBox Grid.Row="3"
                                  Header="{DynamicResource DescriptionLabel}"
                                  CornerRadius="8"
@@ -93,6 +95,7 @@
                                  ScrollBarVisibility="Auto"
                                  Text="{Binding Description}"/>
 
+        <!-- Action Buttons -->
         <StackPanel Grid.Row="4" Orientation="Horizontal">
             <Button mah:ControlsHelper.CornerRadius="8" Padding="5,6,10,6">
                 <Button.Style>

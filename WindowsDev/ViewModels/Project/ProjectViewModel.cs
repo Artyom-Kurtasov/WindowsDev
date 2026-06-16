@@ -27,22 +27,15 @@ namespace WindowsDev.ViewModels.Projects
         private readonly ILogger<ProjectViewModel> _logger;
 
         private readonly int _pageSize = 15;
-        private int _currentPage = 1;
-        private int _totalTasks;
-        private string _searchFilter = string.Empty;
-        private bool _showAll = true;
-        private bool _showClosed;
-        private bool _showInProgress;
 
-        public ProjectViewModel(
-            ProjectsInfo currentProject,
+        public ProjectViewModel(ProjectsInfo currentProject,
             IDialogCoordinator dialogCoordinator,
             INavigationService navigationService,
             ITaskService taskService,
             IDialogService dialogService,
             ILogger<ProjectViewModel> logger)
         {
-            CurrentProject = currentProject ?? throw new ArgumentNullException(nameof(currentProject));
+            CurrentProject = currentProject;
             _navigationService = navigationService;
             _dialogService = dialogService;
             _taskService = taskService;
@@ -72,6 +65,7 @@ namespace WindowsDev.ViewModels.Projects
         public string Name => CurrentProject.Name;
         public string? Description => CurrentProject.Description;
 
+        private int _currentPage = 1;
         public int CurrentPage
         {
             get => _currentPage;
@@ -82,8 +76,10 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-        public int TotalPages => (int)Math.Ceiling((double)_totalTasks / _pageSize);
+        private int _totalCountOfTasks;
+        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfTasks / _pageSize);
 
+        private string _searchFilter = string.Empty;
         public string SearchFilter
         {
             get => _searchFilter;
@@ -95,6 +91,7 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
+        private bool _showAll = true;
         public bool ShowAll
         {
             get => _showAll;
@@ -106,6 +103,7 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
+        private bool _showClosed;
         public bool ShowClosed
         {
             get => _showClosed;
@@ -117,6 +115,7 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
+        private bool _showInProgress;
         public bool ShowInProgress
         {
             get => _showInProgress;
@@ -135,8 +134,8 @@ namespace WindowsDev.ViewModels.Projects
 
         private async Task LoadTasksAsync()
         {
-            _totalTasks = await _taskService.GetTasksCountAsync(CurrentProject.Id);
-            OnPropertyChanged(nameof(TotalPages));
+            _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject.Id);
+            OnPropertyChanged(nameof(TotalCountOfPages));
             await GetPageAsync();
         }
 
@@ -159,7 +158,7 @@ namespace WindowsDev.ViewModels.Projects
 
         private async Task NextPage()
         {
-            if (CurrentPage < TotalPages)
+            if (CurrentPage < TotalCountOfPages)
             {
                 CurrentPage++;
                 await GetPageAsync();
@@ -179,6 +178,8 @@ namespace WindowsDev.ViewModels.Projects
         {
             var statuses = new List<TaskStatus>();
 
+            // ShowAll overrides individual toggles —
+            // when on, all statuses are included to simplify the filter UI
             if (ShowAll)
             {
                 statuses.Add(TaskStatus.Done);
@@ -238,7 +239,7 @@ namespace WindowsDev.ViewModels.Projects
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "{mes} {mes2}", ex.Message, ex.InnerException);
+                _logger.LogError(ex, "Failed to delete selected tasks");
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_DeleteTasks"),

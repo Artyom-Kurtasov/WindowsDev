@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Business.Services.PasswordManager.Hasher
 {
-    public class DefaultPasswordHasher : PasswordHasherBase
+    public class DefaultHasher : HasherBase
     {
         public override ulong HashSeed => 0941455814;
         public override ulong MixingConstant => 1755195205;

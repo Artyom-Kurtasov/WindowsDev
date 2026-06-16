@@ -22,13 +22,16 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
+            <!-- Main Content -->
             <StackPanel Grid.Row="1" Margin="10,0,10,0">
+                <!-- Logo -->
                 <UserCtrl:Logo Kind="TaskRound"
                            ViewBoxHeight="70" ViewBoxWidth="70"
                            Text="{DynamicResource RegTitle}"
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch"/>
 
+                <!-- Registration Error Message -->
                 <TextBlock Foreground="Red" HorizontalAlignment="Center">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -43,10 +46,12 @@
                     </TextBlock.Style>
                 </TextBlock>
 
+                <!-- Login Input -->
                 <UserCtrl:HeaderTextBox CornerRadius="8" Margin="0,20,0,0"
                                         Header="{DynamicResource LoginLabel}"
                                         Text="{Binding Login, Mode=TwoWay}"/>
 
+                <!-- Login Availability Status -->
                 <TextBlock Visibility="{Binding Login, Converter={StaticResource StringToVisibilityConverter}}"
                        Foreground="{Binding IsLoginAvailable, Converter={StaticResource BoolToBrushConverter}}" Margin="5,5,0,0">
                     <TextBlock.Style>
@@ -63,10 +68,12 @@
                     </TextBlock.Style>
                 </TextBlock>
 
+                <!-- Username Input -->
                 <UserCtrl:HeaderTextBox CornerRadius="8"
                                       Header="{DynamicResource UsernameLabel}" Margin="0,20,0,0"
                                       Text="{Binding Username, Mode=TwoWay}"/>
 
+                <!-- Username Availability Status -->
                 <TextBlock Visibility="{Binding Username, Converter={StaticResource StringToVisibilityConverter}}"
                            Foreground="{Binding IsUsernameAvailable, Converter={StaticResource BoolToBrushConverter}}" 
                            Margin="5,5,0,0">
@@ -84,6 +91,7 @@
                     </TextBlock.Style>
                 </TextBlock>
 
+                <!-- Password Input Section -->
                 <StackPanel HorizontalAlignment="Stretch">
 
                     <UserCtrl:HeaderPasswordBox
@@ -95,22 +103,25 @@
                     Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
                 </StackPanel>
 
+                <!-- Confirm Password Input -->
                 <UserCtrl:HeaderPasswordBox CornerRadius="8" Margin="0,20,0,0"
                                   Header="{DynamicResource ConfirmPasswordLabel}"
                                   Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
+                <!-- Sign Up Button -->
                 <Button Margin="0,20,0,0"
                     mah:ControlsHelper.CornerRadius="8"
-                    Command="{Binding SignUpCommand}">
-                    Sign up
-                </Button>
+                    Command="{Binding SignUpCommand}"
+                    Content="{DynamicResource SignUpButton}"/>
 
+
+                <!-- Login Link -->
                 <TextBlock HorizontalAlignment="Center"
                        MaxWidth="400">
-                
+
                 <Run Text="{DynamicResource ExistingUserText}"/>
                 <Hyperlink Command="{Binding SwitchToAuthViewCommand}">
-                    <TextBlock Text="{DynamicResource SignUpButton}"/>
+                    <TextBlock Text="{DynamicResource SignInButton}"/>
                 </Hyperlink>
                 </TextBlock>
 

@@ -15,16 +15,13 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         private readonly ILogger<CreateTaskViewModel> _logger;
         private readonly int _projectId;
 
-        public CreateTaskViewModel(
-            int projectId,
+        public CreateTaskViewModel(int projectId,
             ITaskService taskService,
             IDialogCoordinator dialogCoordinator,
             ILogger<CreateTaskViewModel> logger)
         {
             if (projectId < 1)
-            {
                 throw new ArgumentOutOfRangeException(nameof(projectId));
-            }
 
             _projectId = projectId;
             _taskService = taskService;
@@ -76,7 +73,7 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to create task\n {mes}", ex.Message);
+                _logger.LogError(ex, "Failed to create task in project {ProjectId}", _projectId);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_CreateTask"),

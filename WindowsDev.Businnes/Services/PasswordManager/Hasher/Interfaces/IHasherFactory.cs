@@ -2,8 +2,8 @@
 
 namespace WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces
 {
-    public interface IPasswordHasherFactory
+    public interface IHasherFactory
     {
-        IPasswordHasherBase GetHashMethod(HashMethod method);
+        IHasherBase GetHashMethod(HashMethod method);
     }
 }

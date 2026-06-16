@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces
 {
-    public interface IPasswordHasherBase
+    public interface IHasherBase
     {
         ulong HashPassword(string password, byte[] salt);
         byte[] GenerateSalt();

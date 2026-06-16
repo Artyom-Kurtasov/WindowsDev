@@ -13,7 +13,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <!-- Theme setting -->
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Themes/Dark.Blue.xaml" />
-                <!-- Lang Dictionary-->
+                <!-- Localization resource dictionary -->
                 <ResourceDictionary Source="/Localization/Lang.en.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

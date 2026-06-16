@@ -9,12 +9,12 @@ namespace WindowsDev.Business.Services.ProjectService
     public class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
-        private readonly ICurrentUserService _currentUser;
+        private readonly ICurrentUserService _currentUserService;
 
-        public ProjectService(IProjectRepository projectRepository, ICurrentUserService currentUser)
+        public ProjectService(IProjectRepository projectRepository, ICurrentUserService currentUserService)
         {
             _projectRepository = projectRepository;
-            _currentUser = currentUser;
+            _currentUserService = currentUserService;
         }
 
         public async Task AddAsync(ProjectsInfo project)
@@ -43,12 +43,12 @@ namespace WindowsDev.Business.Services.ProjectService
             page = page < 1 ? 1 : page;
             size = size < 1 ? 1 : size;
 
-            return await _projectRepository.GetProjectsAsync(page, size, _currentUser.UserId, searchFilter);
+            return await _projectRepository.GetProjectsAsync(page, size, _currentUserService.UserId, searchFilter);
         }
 
         public async Task<int> GetProjectsCountAsync()
         {
-            return await _projectRepository.GetProjectsCountAsync(_currentUser.UserId);
+            return await _projectRepository.GetProjectsCountAsync(_currentUserService.UserId);
         }
     }
 }

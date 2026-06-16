@@ -32,8 +32,7 @@ namespace WindowsDev.ViewModels.Tasks
         private TasksInfo _currentTask;
         private string? _newComment;
 
-        public TaskViewModel(
-            ProjectsInfo project,
+        public TaskViewModel(ProjectsInfo project,
             TasksInfo currentTask,
             ICommentService commentService,
             IDialogService dialogService,
@@ -42,8 +41,8 @@ namespace WindowsDev.ViewModels.Tasks
             ILogger<TaskViewModel> logger,
             IDialogCoordinator dialogCoordinator)
         {
-            Project = project ?? throw new ArgumentNullException(nameof(project));
-            _currentTask = currentTask ?? throw new ArgumentNullException(nameof(currentTask));
+            Project = project;
+            _currentTask = currentTask;
             _commentService = commentService;
             _dialogService = dialogService;
             _navigationService = navigationService;
@@ -57,6 +56,7 @@ namespace WindowsDev.ViewModels.Tasks
             AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
             OpenAttachmentCommand = new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
 
+            // Fire-and-forget: errors are handled and logged inside LoadDetailsAsync
             _ = LoadDetailsAsync();
         }
 
@@ -68,6 +68,9 @@ namespace WindowsDev.ViewModels.Tasks
 
         public ProjectsInfo Project { get; }
 
+        // Proxy properties that delegate to CurrentTask.
+        // CurrentTask is mutated directly — EditTaskViewModel and RefreshAsync
+        // both modify it, then we notify the UI about changed fields
         public TasksInfo CurrentTask
         {
             get => _currentTask;
@@ -86,8 +89,29 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-        public ObservableCollection<Comments>? Comments { get; private set; } = new();
-        public ObservableCollection<TaskAttachment>? Attachments { get; private set; } = new();
+        private ObservableCollection<Comments> _comments = new();
+
+        public ObservableCollection<Comments> Comments
+        {
+            get => _comments;
+            set
+            {
+                _comments = value;
+                OnPropertyChanged(nameof(Comments));
+            }
+        }
+
+        private ObservableCollection<TaskAttachment> _attachments = new();
+
+        public ObservableCollection<TaskAttachment> Attachments
+        {
+            get => _attachments;
+            set
+            {
+                _attachments = value;
+                OnPropertyChanged(nameof(Attachments));
+            }
+        }
 
         public string? NewComment
         {
@@ -99,6 +123,9 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
+        // Delegate properties — read/write directly to CurrentTask.
+        // No separate backing fields needed, but we must manually notify
+        // because CurrentTask doesn't implement INotifyPropertyChanged
         public string Name
         {
             get => CurrentTask.Name;
@@ -173,6 +200,8 @@ namespace WindowsDev.ViewModels.Tasks
 
         public DateTime CreatedAt => CurrentTask.CreatedAt;
 
+        // RefreshAsync is called by DialogService after EditTaskViewModel completes.
+        // We only need to re-notify the UI — CurrentTask was already mutated by the dialog
         public Task RefreshAsync()
         {
             RefreshTask();
@@ -181,6 +210,8 @@ namespace WindowsDev.ViewModels.Tasks
 
         private async Task LoadDetailsAsync()
         {
+            // Comments and attachments are loaded independently —
+            // failure of one doesn't prevent loading the other
             try
             {
                 Comments = new ObservableCollection<Comments>(
@@ -188,7 +219,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Не удалось загрузить комментарии (({mes}, {mes2})).", ex.Message, ex.InnerException);
+                _logger.LogError(ex, "Failed to load comments for task {TaskId}", CurrentTask.Id);
                 Comments = new ObservableCollection<Comments>();
 
                 await _dialogCoordinator.ShowMessageAsync(this,
@@ -204,7 +235,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Не удалось загрузить вложения.");
+                _logger.LogError(ex, "Failed to load attachments for task {TaskId}", CurrentTask.Id);
                 Attachments = new ObservableCollection<TaskAttachment>();
 
                 await _dialogCoordinator.ShowMessageAsync(this,
@@ -221,6 +252,8 @@ namespace WindowsDev.ViewModels.Tasks
 
             try
             {
+                // UseShellExecute = true delegates to the OS default handler
+                // for the file type (PDF reader, image viewer, etc.)
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = taskAttachment.FilePath,
@@ -229,7 +262,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (FileNotFoundException ex)
             {
-                _logger.LogError(ex, "File not found {FilePath}", taskAttachment.FilePath);
+                _logger.LogError(ex, "Attachment file not found: {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_FileNotFound"),
@@ -237,7 +270,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "File error {FilePath}", taskAttachment.FilePath);
+                _logger.LogError(ex, "Failed to open attachment: {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_File"),
@@ -262,7 +295,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to add attachment for task {taskId}", CurrentTask.Id);
+                _logger.LogError(ex, "Failed to add attachment for task {TaskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_AddAttachment"),
@@ -284,7 +317,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to add comment for task {taskId}", CurrentTask.Id);
+                _logger.LogError(ex, "Failed to add comment for task {TaskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
                     Translate("Error_AddComment"),
@@ -292,18 +325,18 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-        private async Task EditTask()
-        {
+        private async Task EditTask() =>
             await _dialogService.ShowDialogAsync<
                 TaskDialogView,
                 EditTaskViewModel>(this, CurrentTask);
-        }
 
         private void SwitchToProject() =>
             _navigationService.NavigateTo<ProjectViewModel>(Project);
 
         private bool CanSwitchToProject() => true;
 
+        // Called after EditTaskViewModel mutates CurrentTask.
+        // We only need to re-notify the UI — the data is already updated in-place
         public void RefreshTask()
         {
             OnPropertyChanged(nameof(Name));

@@ -20,9 +20,12 @@
                  Width="800"
                  MinWidth="252">
 
+    <!-- Main Grid with View Model Content -->
     <Grid>
+        <!-- Content Control for Dynamic View Selection -->
         <ContentControl Content="{Binding CurrentViewModel}">
             <ContentControl.Resources>
+                <!-- Data Templates for View Models -->
                 <DataTemplate DataType="{x:Type authVm:AuthorizationViewModel}">
                     <authViews:AuthorizationView />
                 </DataTemplate>

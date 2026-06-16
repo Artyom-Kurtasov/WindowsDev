@@ -25,6 +25,7 @@ using WindowsDev.Business.Services.TaskService.Attachment;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment;
 using WindowsDev.Business.Services.TaskService.Interfaces;
+using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
 using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Commands.NavigationManager;
@@ -43,6 +44,7 @@ using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Projects.Dialogs;
 using WindowsDev.ViewModels.Tasks;
 using WindowsDev.ViewModels.Tasks.Dialog;
+using WindowsDev.Business.Services.Localization.Interfaces;
 
 namespace WindowsDev.Settings
 {
@@ -85,7 +87,7 @@ namespace WindowsDev.Settings
             services.AddSingleton<IViewModelFactory, ViewModelFactory>();
 
             // Localization
-            services.AddSingleton<LanguageChanger>();
+            services.AddSingleton<ILanguageChanger, LanguageChanger>();
 
             // Converters
             services.AddSingleton<BoolToBrushConverter>();
@@ -122,10 +124,10 @@ namespace WindowsDev.Settings
             services.AddSingleton<ICurrentUserService, CurrentUserService>();
 
             // Passwords
-            services.AddTransient<IPasswordHasherFactory, PasswordHasherFactory>();
+            services.AddTransient<IHasherFactory, HasherFactory>();
 
-            services.AddTransient<DefaultPasswordHasher>();
-            services.AddTransient<SimplePasswordHasher>();
+            services.AddTransient<DefaultHasher>();
+            services.AddTransient<SimpleHasher>();
             services.AddTransient<IPasswordRecoveryService, PasswordRecoveryService>();
 
             // Projects
@@ -135,7 +137,7 @@ namespace WindowsDev.Settings
             services.AddTransient<ITaskService, TaskService>();
 
             services.AddSingleton<IAttacmentService, AttachmentService>();
-            services.AddTransient<CommentsService>();
+            services.AddTransient<ICommentService, CommentsService>();
 
             // Validation
             services.AddSingleton<UserFieldValidator>();
