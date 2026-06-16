@@ -16,6 +16,6 @@ namespace WindowsDev.Business.Services.Logger
             return new FileLogger(categoryName, _path);
         }
 
-        public void Dispose() {}
+        public void Dispose() { }
     }
 }

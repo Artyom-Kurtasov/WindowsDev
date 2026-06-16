@@ -31,9 +31,9 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public string Description
         {
             get => _description;
-            set 
+            set
             {
-                _description = value; 
+                _description = value;
                 OnPropertyChanged(nameof(Description));
             }
         }
@@ -42,10 +42,10 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public int Progress
         {
             get => _progress;
-            set 
-            { 
+            set
+            {
                 _progress = value;
-                OnPropertyChanged(nameof(Progress)); 
+                OnPropertyChanged(nameof(Progress));
             }
         }
 
@@ -53,7 +53,7 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public TaskPriority Priority
         {
             get => _priority;
-            set 
+            set
             {
                 _priority = value;
                 OnPropertyChanged(nameof(Priority));
@@ -64,7 +64,7 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public TaskStatus Status
         {
             get => _status;
-            set 
+            set
             {
                 _status = value;
                 OnPropertyChanged(nameof(Status));

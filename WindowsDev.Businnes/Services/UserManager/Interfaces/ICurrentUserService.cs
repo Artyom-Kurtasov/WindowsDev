@@ -1,6 +1,4 @@
-﻿using WindowsDev.Domain.UsersModels.Enums;
-
-namespace WindowsDev.Business.Services.UserManager.Interfaces
+﻿namespace WindowsDev.Business.Services.UserManager.Interfaces
 {
     public interface ICurrentUserService
     {

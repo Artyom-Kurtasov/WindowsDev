@@ -8,6 +8,7 @@ using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.Authorization;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Business.Services.Localization;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.Logger;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
@@ -24,8 +25,8 @@ using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Attachment;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment;
-using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
+using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Commands.NavigationManager;
@@ -44,7 +45,6 @@ using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Projects.Dialogs;
 using WindowsDev.ViewModels.Tasks;
 using WindowsDev.ViewModels.Tasks.Dialog;
-using WindowsDev.Business.Services.Localization.Interfaces;
 
 namespace WindowsDev.Settings
 {

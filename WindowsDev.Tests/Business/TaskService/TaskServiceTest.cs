@@ -3,8 +3,8 @@ using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Domain.TasksModels.Enums;
-using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
 using Service = WindowsDev.Business.Services.TaskService;
+using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.Business.TaskService
 {

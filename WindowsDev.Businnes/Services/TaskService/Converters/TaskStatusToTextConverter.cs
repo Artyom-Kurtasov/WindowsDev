@@ -13,7 +13,7 @@ namespace WindowsDev.Business.Services.TaskService.Converters
             {
                 string key = $"TaskStatus_{status}";
 
-                return Application.Current.TryFindResource(key) ?? status.ToString(); 
+                return Application.Current.TryFindResource(key) ?? status.ToString();
             }
 
             return "";

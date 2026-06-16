@@ -19,7 +19,7 @@ namespace WindowsDev.Business.Services.Registration.Validation
                 using var dbContext = _dbManager.Create();
 
                 var exists = await dbContext.UsersInfo
-                .AnyAsync(l => l.Login  == login);
+                .AnyAsync(l => l.Login == login);
 
                 return !exists;
             });
@@ -29,15 +29,15 @@ namespace WindowsDev.Business.Services.Registration.Validation
 
         public Task<bool> IsUsernameAvailableAsync(string username)
         {
-           var debounced = Debounce(async () =>
-            {
-                using var dbContext = _dbManager.Create();
+            var debounced = Debounce(async () =>
+             {
+                 using var dbContext = _dbManager.Create();
 
-                var exists = await dbContext.UsersInfo
-                    .AnyAsync(u => u.Username == username);
+                 var exists = await dbContext.UsersInfo
+                     .AnyAsync(u => u.Username == username);
 
-                return !exists;
-            });
+                 return !exists;
+             });
 
             return debounced();
         }
@@ -51,9 +51,9 @@ namespace WindowsDev.Business.Services.Registration.Validation
                 Cts.Cancel();
                 Cts = new CancellationTokenSource();
 
-               await Task.Delay(500, Cts.Token);
+                await Task.Delay(500, Cts.Token);
 
-               return await action();
+                return await action();
             };
         }
     }

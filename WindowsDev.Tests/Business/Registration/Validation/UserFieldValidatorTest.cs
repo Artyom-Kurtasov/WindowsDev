@@ -14,9 +14,9 @@ namespace WindowsDev.Tests.Business.Registration.Validation
         }
 
         [Theory]
-        [InlineData("aaaaaaaaaaaa")]  
+        [InlineData("aaaaaaaaaaaa")]
         [InlineData("AAAAAAAAAAAA")]
-        [InlineData("123456789012")]        
+        [InlineData("123456789012")]
         public void IsValid_WhenMissingRequirements_ReturnsFalse(string password)
         {
             Assert.False(PasswordValidator.IsValid(password));

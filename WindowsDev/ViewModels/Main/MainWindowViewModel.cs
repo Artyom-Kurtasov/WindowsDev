@@ -1,6 +1,6 @@
 ﻿using WindowsDev.Commands.NavigationManager;
-using WindowsDev.ViewModels.Main.Tabs;
 using WindowsDev.Factories.Interfaces;
+using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.ViewModels.Main
 {

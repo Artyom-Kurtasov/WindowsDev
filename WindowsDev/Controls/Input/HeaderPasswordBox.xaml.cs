@@ -1,6 +1,5 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using WindowsDev.Business.Services.Registration.Validation;
@@ -113,7 +112,7 @@ namespace WindowsDev.Controls.Users
         public bool HasMinimumLength
         {
             get => (bool)GetValue(HasMinimumLengthProperty);
-            set => SetValue (HasMinimumLengthProperty, value);
+            set => SetValue(HasMinimumLengthProperty, value);
         }
 
         public static readonly DependencyProperty HasNumberProperty =

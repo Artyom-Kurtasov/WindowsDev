@@ -1,6 +1,5 @@
 ﻿using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 

@@ -79,7 +79,7 @@ namespace WindowsDev.ViewModels.Auth
 
             if (success)
                 await _navigationService.NavigateTo<MainWindowViewModel>();
-            
+
         }
 
         private async Task PasswordRecovery() =>

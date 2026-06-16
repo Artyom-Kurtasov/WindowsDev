@@ -18,7 +18,7 @@ namespace WindowsDev.Infrastructure
             if (parameter is not T param)
                 return false;
 
-           return _canExecute?.Invoke(param) ?? true;
+            return _canExecute?.Invoke(param) ?? true;
         }
 
         public void Execute(object? parameter)

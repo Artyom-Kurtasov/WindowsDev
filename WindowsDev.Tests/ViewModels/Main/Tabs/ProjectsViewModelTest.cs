@@ -238,7 +238,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
         {
             _projectServiceMock
                 .Setup(x => x.GetProjectsCountAsync())
-                .ReturnsAsync(30); 
+                .ReturnsAsync(30);
 
             var vm = CreateViewModel();
             await Task.Delay(50);

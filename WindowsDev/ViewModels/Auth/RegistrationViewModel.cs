@@ -142,7 +142,7 @@ namespace WindowsDev.ViewModels.Auth
         {
             _navigationService.NavigateTo<AuthorizationViewModel>();
         }
-        
+
         private async Task SignUpAsync()
         {
             if (!IsLoginAvailable || !IsUsernameAvailable ||

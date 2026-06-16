@@ -1,10 +1,10 @@
 ﻿using Moq;
 using WindowsDev.Business.Repositories.Interfaces;
-using Service = WindowsDev.Business.Services.Registration;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
-using WindowsDev.Domain.UsersModels;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Domain.UsersModels;
+using Service = WindowsDev.Business.Services.Registration;
 
 namespace WindowsDev.Tests.Business.Registration
 {
