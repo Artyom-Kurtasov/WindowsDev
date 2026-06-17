@@ -20,15 +20,15 @@ namespace WindowsDev.Business.Services.Authorization
             _hasherFactory = hasherFactory;
         }
 
-        public async Task<bool> Authorize(string login, string password)
+        public async Task Authorize(string login, string password)
         {
             if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-                return false;
+                throw new Exception("AuthError_InvalidCredentials");
 
             var user = await _userRepository.GetByLoginAsync(login);
 
             if (user is null)
-                return false;
+                throw new Exception("AuthError_InvalidCredentials");
 
             // Pick the hasher that matches the user's stored hash method.
             // Users registered at different times may have different hash algorithms
@@ -41,11 +41,9 @@ namespace WindowsDev.Business.Services.Authorization
             // PasswordHash is stored as a hex string.
             // Hash is a byte array — convert to hex for case-insensitive comparison
             if (hash.ToString("x16") != user.PasswordHash)
-                return false;
+                throw new Exception("AuthError_InvalidCredentials");
 
             _currentUserService.SetUser(user.Id, user.Login, user.Username);
-
-            return true;
         }
     }
 }

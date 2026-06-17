@@ -125,6 +125,35 @@
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">Новое имя пользователя должно отличаться от текущего</sys:String>
     <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Пароли не совпадают</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">Пользователь с таким именем уже существует</sys:String>
+    <sys:String x:Key="ProfileError_UserNotFound">Пользователь не найден</sys:String>
+
+    <!-- Project Errors -->
+    <sys:String x:Key="ProjectError_ProjectIsNull">Проект не может быть пустым</sys:String>
+
+    <!-- Task Errors -->
+    <sys:String x:Key="TaskError_TaskIsNull">Задача не может быть пустой</sys:String>
+    <sys:String x:Key="TaskError_TaskNotFound">Задача не найдена</sys:String>
+    <sys:String x:Key="TaskError_InvalidTaskId">Неверный идентификатор задачи</sys:String>
+
+    <!-- Comment Errors -->
+    <sys:String x:Key="CommentError_InvalidTaskId">Неверный идентификатор задачи</sys:String>
+    <sys:String x:Key="CommentError_CommentIsEmpty">Комментарий не может быть пустым</sys:String>
+
+    <!-- Attachment Errors -->
+    <sys:String x:Key="AttachmentError_FilePathIsEmpty">Путь к файлу не может быть пустым</sys:String>
+    <sys:String x:Key="AttachmentError_InvalidTaskId">Неверный идентификатор задачи</sys:String>
+    <sys:String x:Key="AttachmentError_FileNotFound">Файл не найден</sys:String>
+
+    <!-- Authorization Errors -->
+    <sys:String x:Key="AuthError_InvalidCredentials">Неверный логин или пароль</sys:String>
+
+    <!-- Registration Errors -->
+    <sys:String x:Key="RegistrationError_PasswordIsEmpty">Пароль не может быть пустым</sys:String>
+    <sys:String x:Key="RegistrationError_LoginExists">Пользователь с таким логином уже существует</sys:String>
+
+    <!-- Recovery Errors -->
+    <sys:String x:Key="RecoveryError_UserNotFound">Пользователь не найден</sys:String>
+    <sys:String x:Key="RecoveryError_InvalidRecoveryCode">Неверный код восстановления</sys:String>
 
     <!-- Success Messages -->
     <sys:String x:Key="Success_PasswordChanged">Пароль успешно изменён</sys:String>

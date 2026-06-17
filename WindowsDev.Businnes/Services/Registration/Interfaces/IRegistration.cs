@@ -2,6 +2,6 @@
 {
     public interface IRegistration
     {
-        Task<(bool, int)> Register(string password, string login, string username);
+        Task<int> Register(string password, string login, string username);
     }
 }

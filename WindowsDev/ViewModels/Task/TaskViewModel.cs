@@ -7,12 +7,12 @@ using System.IO;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Domain.TasksModels.Enums;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Tasks.Dialog;
@@ -224,7 +224,7 @@ namespace WindowsDev.ViewModels.Tasks
 
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_LoadComments"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
 
@@ -240,7 +240,7 @@ namespace WindowsDev.ViewModels.Tasks
 
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_LoadAttachments"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -265,7 +265,7 @@ namespace WindowsDev.ViewModels.Tasks
                 _logger.LogError(ex, "Attachment file not found: {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_FileNotFound"),
+                    Translate("AttachmentError_FileNotFound"),
                     MessageDialogStyle.Affirmative);
             }
             catch (Exception ex)
@@ -273,7 +273,7 @@ namespace WindowsDev.ViewModels.Tasks
                 _logger.LogError(ex, "Failed to open attachment: {FilePath}", taskAttachment.FilePath);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_File"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -298,7 +298,7 @@ namespace WindowsDev.ViewModels.Tasks
                 _logger.LogError(ex, "Failed to add attachment for task {TaskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_AddAttachment"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -320,7 +320,7 @@ namespace WindowsDev.ViewModels.Tasks
                 _logger.LogError(ex, "Failed to add comment for task {TaskId}", CurrentTask.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_AddComment"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }

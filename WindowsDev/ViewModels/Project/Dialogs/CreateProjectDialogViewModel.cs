@@ -89,7 +89,7 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
                 _logger.LogError(ex, "Failed to create project");
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_CreateProject"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }

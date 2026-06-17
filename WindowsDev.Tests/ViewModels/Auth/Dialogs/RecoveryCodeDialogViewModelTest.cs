@@ -1,6 +1,6 @@
 ﻿using Moq;
 using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Infrastructure;
 using WindowsDev.ViewModels.Auth.Dialogs;
 

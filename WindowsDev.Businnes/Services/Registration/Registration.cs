@@ -1,6 +1,6 @@
 ﻿using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.UsersModels;
@@ -27,13 +27,13 @@ namespace WindowsDev.Business.Services.Registration
             _currentUserService = currentUserService;
         }
 
-        public async Task<(bool, int)> Register(string password, string login, string username)
+        public async Task<int> Register(string password, string login, string username)
         {
             if (string.IsNullOrWhiteSpace(password))
-                return (false, -1);
+                throw new Exception("RegistrationError_PasswordIsEmpty");
 
             if (await _userRepository.ExistsByLoginAsync(login))
-                return (false, -1);
+                throw new Exception("RegistrationError_LoginExists");
 
             var passwordSalt = _defaultHasher.GenerateSalt();
             var passwordHash = _defaultHasher.HashPassword(password, passwordSalt);
@@ -57,7 +57,7 @@ namespace WindowsDev.Business.Services.Registration
 
             _currentUserService.SetUser(user.Id, user.Login, user.Username);
 
-            return (true, recoveryCode);
+            return recoveryCode;
         }
     }
 }

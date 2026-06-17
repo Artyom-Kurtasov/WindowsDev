@@ -1,8 +1,8 @@
 ﻿using Moq;
 using WindowsDev.Business.Services.Authorization.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Main;
 

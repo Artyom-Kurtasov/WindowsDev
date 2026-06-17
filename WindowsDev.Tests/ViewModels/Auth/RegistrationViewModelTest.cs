@@ -3,12 +3,12 @@ using Moq;
 using WindowsDev.Business.DataBase.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Main;
 
-namespace WindowsDev.Tests.ViewModels.Registration
+namespace WindowsDev.Tests.ViewModels.Auth
 {
     public class RegistrationViewModelTest
     {

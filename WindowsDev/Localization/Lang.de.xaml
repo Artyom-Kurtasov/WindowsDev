@@ -125,6 +125,35 @@
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">Der neue Benutzername muss sich vom aktuellen unterscheiden</sys:String>
     <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Passwörter stimmen nicht überein</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">Ein Benutzer mit diesem Benutzernamen existiert bereits</sys:String>
+    <sys:String x:Key="ProfileError_UserNotFound">Benutzer nicht gefunden</sys:String>
+
+    <!-- Project Errors -->
+    <sys:String x:Key="ProjectError_ProjectIsNull">Projekt darf nicht leer sein</sys:String>
+
+    <!-- Task Errors -->
+    <sys:String x:Key="TaskError_TaskIsNull">Aufgabe darf nicht leer sein</sys:String>
+    <sys:String x:Key="TaskError_TaskNotFound">Aufgabe nicht gefunden</sys:String>
+    <sys:String x:Key="TaskError_InvalidTaskId">Ungültige Aufgaben-ID</sys:String>
+
+    <!-- Comment Errors -->
+    <sys:String x:Key="CommentError_InvalidTaskId">Ungültige Aufgaben-ID</sys:String>
+    <sys:String x:Key="CommentError_CommentIsEmpty">Kommentar darf nicht leer sein</sys:String>
+
+    <!-- Attachment Errors -->
+    <sys:String x:Key="AttachmentError_FilePathIsEmpty">Dateipfad darf nicht leer sein</sys:String>
+    <sys:String x:Key="AttachmentError_InvalidTaskId">Ungültige Aufgaben-ID</sys:String>
+    <sys:String x:Key="AttachmentError_FileNotFound">Datei nicht gefunden</sys:String>
+
+    <!-- Authorization Errors -->
+    <sys:String x:Key="AuthError_InvalidCredentials">Ungültiger Benutzername oder Passwort</sys:String>
+
+    <!-- Registration Errors -->
+    <sys:String x:Key="RegistrationError_PasswordIsEmpty">Passwort darf nicht leer sein</sys:String>
+    <sys:String x:Key="RegistrationError_LoginExists">Ein Benutzer mit diesem Benutzernamen existiert bereits</sys:String>
+
+    <!-- Recovery Errors -->
+    <sys:String x:Key="RecoveryError_UserNotFound">Benutzer nicht gefunden</sys:String>
+    <sys:String x:Key="RecoveryError_InvalidRecoveryCode">Ungültiger Wiederherstellungscode</sys:String>
 
     <!-- Success Messages -->
     <sys:String x:Key="Success_PasswordChanged">Passwort erfolgreich geändert</sys:String>

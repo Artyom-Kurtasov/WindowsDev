@@ -2,8 +2,8 @@
 using System.Windows.Input;
 using WindowsDev.Business.Services.Profile.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth;
 
 namespace WindowsDev.ViewModels.Main.Tabs

@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Tasks;
@@ -218,7 +218,7 @@ namespace WindowsDev.ViewModels.Projects
                 _logger.LogError(ex, "Failed to tasks for project {projectId}", CurrentProject.Id);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_LoadTasks"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -242,7 +242,7 @@ namespace WindowsDev.ViewModels.Projects
                 _logger.LogError(ex, "Failed to delete selected tasks");
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_DeleteTasks"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }

@@ -19,7 +19,7 @@ namespace WindowsDev.Business.Services.ProjectService
         public async Task AddAsync(ProjectsInfo project)
         {
             if (project is null)
-                throw new ArgumentNullException(nameof(project));
+                throw new Exception("ProjectError_ProjectIsNull");
 
             await _projectRepository.AddAsync(project);
         }
@@ -32,7 +32,7 @@ namespace WindowsDev.Business.Services.ProjectService
         public async Task UpdateAsync(ProjectsInfo project)
         {
             if (project is null)
-                throw new ArgumentNullException(nameof(project));
+                throw new Exception("ProjectError_ProjectIsNull");
 
             await _projectRepository.UpdateAsync(project);
         }

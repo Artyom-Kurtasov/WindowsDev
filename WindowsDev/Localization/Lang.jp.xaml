@@ -125,6 +125,35 @@
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">新しいユーザー名は現在のユーザー名と異なる必要があります</sys:String>
     <sys:String x:Key="ProfileError_PasswordsDoNotMatch">パスワードが一致しません</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">このユーザー名のユーザーはすでに存在します</sys:String>
+    <sys:String x:Key="ProfileError_UserNotFound">ユーザーが見つかりません</sys:String>
+
+    <!-- Project Errors -->
+    <sys:String x:Key="ProjectError_ProjectIsNull">プロジェクトは空にすることはできません</sys:String>
+
+    <!-- Task Errors -->
+    <sys:String x:Key="TaskError_TaskIsNull">タスクは空にすることはできません</sys:String>
+    <sys:String x:Key="TaskError_TaskNotFound">タスクが見つかりません</sys:String>
+    <sys:String x:Key="TaskError_InvalidTaskId">無効なタスクID</sys:String>
+
+    <!-- Comment Errors -->
+    <sys:String x:Key="CommentError_InvalidTaskId">無効なタスクID</sys:String>
+    <sys:String x:Key="CommentError_CommentIsEmpty">コメントは空にすることはできません</sys:String>
+
+    <!-- Attachment Errors -->
+    <sys:String x:Key="AttachmentError_FilePathIsEmpty">ファイルパスは空にすることはできません</sys:String>
+    <sys:String x:Key="AttachmentError_InvalidTaskId">無効なタスクID</sys:String>
+    <sys:String x:Key="AttachmentError_FileNotFound">ファイルが見つかりません</sys:String>
+
+    <!-- Authorization Errors -->
+    <sys:String x:Key="AuthError_InvalidCredentials">無効なログインまたはパスワード</sys:String>
+
+    <!-- Registration Errors -->
+    <sys:String x:Key="RegistrationError_PasswordIsEmpty">パスワードは空にすることはできません</sys:String>
+    <sys:String x:Key="RegistrationError_LoginExists">このユーザー名のユーザーはすでに存在します</sys:String>
+
+    <!-- Recovery Errors -->
+    <sys:String x:Key="RecoveryError_UserNotFound">ユーザーが見つかりません</sys:String>
+    <sys:String x:Key="RecoveryError_InvalidRecoveryCode">無効な復旧コード</sys:String>
 
     <!-- Success Messages -->
     <sys:String x:Key="Success_PasswordChanged">パスワードが正常に変更されました</sys:String>

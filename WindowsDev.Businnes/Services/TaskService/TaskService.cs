@@ -16,7 +16,7 @@ namespace WindowsDev.Business.Services.TaskService
         public async Task AddAsync(TasksInfo task)
         {
             if (task is null)
-                throw new ArgumentNullException(nameof(task));
+                throw new Exception("TaskError_TaskIsNull");
 
             await _taskRepository.AddAsync(task);
         }
@@ -26,7 +26,7 @@ namespace WindowsDev.Business.Services.TaskService
             var task = await _taskRepository.FindTaskById(id);
 
             if (task is null)
-                throw new ArgumentNullException(nameof(task));
+                throw new Exception("TaskError_TaskNotFound");
 
             await _taskRepository.DeleteAsync(task);
         }
@@ -34,7 +34,7 @@ namespace WindowsDev.Business.Services.TaskService
         public async Task UpdateAsync(TasksInfo task)
         {
             if (task is null)
-                throw new ArgumentNullException(nameof(task));
+                throw new Exception("TaskError_TaskIsNull");
 
             await _taskRepository.UpdateAsync(task);
         }
@@ -51,12 +51,12 @@ namespace WindowsDev.Business.Services.TaskService
         public async Task<TasksInfo> GetTaskByIdAsync(int id)
         {
             if (id < 1)
-                throw new ArgumentException("Invalid task id", nameof(id));
+                throw new Exception("TaskError_InvalidTaskId");
 
             var task = await _taskRepository.GetTaskByIdAsync(id);
 
             if (task is null)
-                throw new KeyNotFoundException($"Task {id} not found");
+                throw new Exception("TaskError_TaskNotFound");
 
             return task;
         }

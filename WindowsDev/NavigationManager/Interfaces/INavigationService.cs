@@ -1,6 +1,6 @@
 using WindowsDev.ViewModels;
 
-namespace WindowsDev.Commands.NavigationManager.Interfaces
+namespace WindowsDev.NavigationManager.Interfaces
 {
     public interface INavigationService
     {

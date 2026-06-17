@@ -1,5 +1,6 @@
 ﻿using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 
 namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 {
@@ -20,48 +21,43 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
             return Random.Shared.Next(100000, 999999);
         }
 
-        public async Task<bool> IsRecoverCodeCorrect(int recoveryCode, string login)
+        public async Task IsRecoverCodeCorrect(int recoveryCode, string login)
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
-            if (user != null)
-            {
-                var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-                var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), user.RecoveryCodeSalt!);
+            if (user is null)
+                throw new Exception("RecoveryError_UserNotFound");
 
-                if (recoveryCodeHash.ToString("x16") == user.RecoveryCodeHash)
-                    return true;
-            }
+            var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
+            var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), user.RecoveryCodeSalt!);
 
-            return false;
+            if (recoveryCodeHash.ToString("x16") != user.RecoveryCodeHash)
+                throw new Exception("RecoveryError_InvalidRecoveryCode");
         }
 
         public async Task<int> ChangePasswordAsync(string login, string password)
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
-            if (user != null)
-            {
-                var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-                var passwordSalt = hasher.GenerateSalt();
-                var recoveryCodeSalt = hasher.GenerateSalt();
+            if (user is null)
+                throw new Exception("RecoveryError_UserNotFound");
 
-                var recoveryCode = GenerateRecoveryCode();
-                var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
-                var passwordHash = hasher.HashPassword(password, passwordSalt);
+            var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
+            var passwordSalt = hasher.GenerateSalt();
+            var recoveryCodeSalt = hasher.GenerateSalt();
 
-                user.RecoveryCodeHash = recoveryCodeHash.ToString("x16");
-                user.PasswordHash = passwordHash.ToString("x16");
-                user.Salt = passwordSalt;
-                user.RecoveryCodeSalt = recoveryCodeSalt;
+            var recoveryCode = GenerateRecoveryCode();
+            var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
+            var passwordHash = hasher.HashPassword(password, passwordSalt);
 
+            user.RecoveryCodeHash = recoveryCodeHash.ToString("x16");
+            user.PasswordHash = passwordHash.ToString("x16");
+            user.Salt = passwordSalt;
+            user.RecoveryCodeSalt = recoveryCodeSalt;
 
-                await _userRepository.UpdateAsync(user);
+            await _userRepository.UpdateAsync(user);
 
-                return recoveryCode;
-            }
-
-            return -1;
+            return recoveryCode;
         }
     }
 }

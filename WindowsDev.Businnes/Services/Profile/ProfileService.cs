@@ -52,20 +52,15 @@ namespace WindowsDev.Business.Services.Profile
                 throw new Exception("ProfileError_NewUsernameSameAsCurrent");
 
             if (await _userRepository.ExistsByUsernameAsync(newUsername))
-            {
                 throw new Exception("ProfileError_UsernameExists");
-            }
-            else
-            {
-                var user = await _userRepository.GetByLoginAsync(_currentUserService.Login);
-                if (user != null)
-                {
-                    _currentUserService.Username = newUsername;
 
-                    user.Username = newUsername;
-                    await _userRepository.UpdateAsync(user);
-                }
-            }
+            var user = await _userRepository.GetByLoginAsync(_currentUserService.Login);
+            if (user is null)
+                throw new Exception("ProfileError_UserNotFound");
+
+            _currentUserService.Username = newUsername;
+            user.Username = newUsername;
+            await _userRepository.UpdateAsync(user);
         }
     }
 }

@@ -76,7 +76,7 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
                 _logger.LogError(ex, "Failed to create task in project {ProjectId}", _projectId);
                 await _dialogCoordinator.ShowMessageAsync(this,
                     Translate("Error_Title"),
-                    Translate("Error_CreateTask"),
+                    Translate(ex.Message),
                     MessageDialogStyle.Affirmative);
             }
         }

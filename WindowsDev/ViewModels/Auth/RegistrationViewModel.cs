@@ -2,8 +2,8 @@
 using System.Windows.Input;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.ViewModels.Auth
@@ -152,13 +152,17 @@ namespace WindowsDev.ViewModels.Auth
                 return;
             }
 
-            var success = await _registration.Register(Password, Login, Username);
-            IsRegistrationFailed = !success.Item1;
-
-            if (success.Item1)
+            try
             {
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{Translate("RecoveryKeyMessage")}\n\n {success.Item2}", MessageDialogStyle.Affirmative);
+                var recoveryCode = await _registration.Register(Password, Login, Username);
+                IsRegistrationFailed = false;
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{Translate("RecoveryKeyMessage")}\n\n {recoveryCode}", MessageDialogStyle.Affirmative);
                 await _navigationService.NavigateTo<MainWindowViewModel>();
+            }
+            catch (Exception ex)
+            {
+                IsRegistrationFailed = true;
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
             }
         }
 

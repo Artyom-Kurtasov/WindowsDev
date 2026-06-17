@@ -1,7 +1,7 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Input;
 using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.PasswordRecoveryModels;
@@ -138,18 +138,28 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
 
         private async Task ChangePasswordAsync()
         {
-            // After password change, a new recovery code is generated
-            // and must be shown immediately. The old one becomes invalid
-            int recoveryCode = await _passwordRecoveryService.ChangePasswordAsync(
-                _passwordRecoveryData.Login!,
-                _passwordRecoveryData.NewPassword!);
+            try
+            {
+                // After password change, a new recovery code is generated
+                // and must be shown immediately. The old one becomes invalid
+                int recoveryCode = await _passwordRecoveryService.ChangePasswordAsync(
+                    _passwordRecoveryData.Login!,
+                    _passwordRecoveryData.NewPassword!);
 
-            await _dialogCoordinator.ShowMessageAsync(this,
-                Translate("Information_Title"),
-                $"{Translate("RecoveryKeyMessage")}\n\n {recoveryCode}",
-                MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate("Information_Title"),
+                    $"{Translate("RecoveryKeyMessage")}\n\n {recoveryCode}",
+                    MessageDialogStyle.Affirmative);
 
-            await CancelAsync();
+                await CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate("Warning_Title"),
+                    Translate(ex.Message),
+                    MessageDialogStyle.Affirmative);
+            }
         }
 
         private async Task CancelAsync()

@@ -19,9 +19,9 @@ namespace WindowsDev.Business.Services.TaskService.Comment
         public async Task<Comments> AddComment(int taskId, string commentText)
         {
             if (taskId < 1)
-                throw new ArgumentException("Invalid task id", nameof(taskId));
+                throw new Exception("CommentError_InvalidTaskId");
             if (string.IsNullOrWhiteSpace(commentText))
-                throw new ArgumentException("Comment is empty", nameof(commentText));
+                throw new Exception("CommentError_CommentIsEmpty");
 
             var comment = new Comments
             {

@@ -1,8 +1,9 @@
 ﻿using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using WindowsDev.Business.Services.Authorization.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth.Dialogs;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.Views.Auth.Dialogs;
@@ -12,14 +13,17 @@ namespace WindowsDev.ViewModels.Auth
     public class AuthorizationViewModel : ViewModelBase
     {
         private readonly IDialogService _dialogService;
+        private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IAuthorization _authorization;
         private readonly INavigationService _navigationService;
 
         public AuthorizationViewModel(INavigationService navigationService,
             IAuthorization authorization,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            IDialogCoordinator dialogCoordinator)
         {
             _dialogService = dialogService;
+            _dialogCoordinator = dialogCoordinator;
             _navigationService = navigationService;
             _authorization = authorization;
 
@@ -72,14 +76,17 @@ namespace WindowsDev.ViewModels.Auth
 
         private async Task AuthorizeAsync()
         {
-
-            var success = await _authorization.Authorize(_login, _password);
-
-            IsLoginFailed = !success;
-
-            if (success)
+            try
+            {
+                await _authorization.Authorize(_login, _password);
+                IsLoginFailed = false;
                 await _navigationService.NavigateTo<MainWindowViewModel>();
-
+            }
+            catch (Exception ex)
+            {
+                IsLoginFailed = true;
+                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
+            }
         }
 
         private async Task PasswordRecovery() =>

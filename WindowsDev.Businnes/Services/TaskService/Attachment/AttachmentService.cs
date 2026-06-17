@@ -21,14 +21,14 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
         public async Task<TaskAttachment?> AddFile(string filePath, int taskId)
         {
             if (string.IsNullOrWhiteSpace(filePath))
-                throw new ArgumentException("Filepath is empty", nameof(filePath));
+                throw new Exception("AttachmentError_FilePathIsEmpty");
             if (taskId < 1)
-                throw new ArgumentException("Invalid task id", nameof(taskId));
+                throw new Exception("AttachmentError_InvalidTaskId");
 
             FileInfo fileInfo = new FileInfo(filePath);
 
             if (!fileInfo.Exists)
-                throw new FileNotFoundException("File not found", filePath);
+                throw new Exception("AttachmentError_FileNotFound");
 
             TaskAttachment attachment = new TaskAttachment
             {

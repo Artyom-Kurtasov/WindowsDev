@@ -7,7 +7,7 @@ using System.Windows.Markup;
 using System.Windows.Threading;
 using WindowsDev.Business.DataBase.Interfaces;
 using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.Settings;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Main;

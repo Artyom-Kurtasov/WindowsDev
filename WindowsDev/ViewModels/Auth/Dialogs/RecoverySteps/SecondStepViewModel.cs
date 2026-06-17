@@ -1,4 +1,4 @@
-﻿using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
+﻿using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Domain.PasswordRecoveryModels;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
@@ -51,8 +51,15 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
 
                 if (int.TryParse(RecoveryCode, out int code))
                 {
-                    IsRecoveryCodeCorrect =
+                    try
+                    {
                         await _passwordRecoveryService.IsRecoverCodeCorrect(code, _passwordRecoveryData.Login);
+                        IsRecoveryCodeCorrect = true;
+                    }
+                    catch (Exception)
+                    {
+                        IsRecoveryCodeCorrect = false;
+                    }
                 }
             }
             catch (TaskCanceledException) { }

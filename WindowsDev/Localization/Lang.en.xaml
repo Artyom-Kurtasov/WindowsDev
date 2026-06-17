@@ -125,6 +125,35 @@
     <sys:String x:Key="ProfileError_NewUsernameSameAsCurrent">New username must be different from current username</sys:String>
     <sys:String x:Key="ProfileError_PasswordsDoNotMatch">Passwords do not match</sys:String>
     <sys:String x:Key="ProfileError_UsernameExists">User with this username already exists</sys:String>
+    <sys:String x:Key="ProfileError_UserNotFound">User not found</sys:String>
+
+    <!-- Project Errors -->
+    <sys:String x:Key="ProjectError_ProjectIsNull">Project cannot be null</sys:String>
+
+    <!-- Task Errors -->
+    <sys:String x:Key="TaskError_TaskIsNull">Task cannot be null</sys:String>
+    <sys:String x:Key="TaskError_TaskNotFound">Task not found</sys:String>
+    <sys:String x:Key="TaskError_InvalidTaskId">Invalid task id</sys:String>
+
+    <!-- Comment Errors -->
+    <sys:String x:Key="CommentError_InvalidTaskId">Invalid task id</sys:String>
+    <sys:String x:Key="CommentError_CommentIsEmpty">Comment cannot be empty</sys:String>
+
+    <!-- Attachment Errors -->
+    <sys:String x:Key="AttachmentError_FilePathIsEmpty">File path cannot be empty</sys:String>
+    <sys:String x:Key="AttachmentError_InvalidTaskId">Invalid task id</sys:String>
+    <sys:String x:Key="AttachmentError_FileNotFound">File not found</sys:String>
+
+    <!-- Authorization Errors -->
+    <sys:String x:Key="AuthError_InvalidCredentials">Invalid login or password</sys:String>
+
+    <!-- Registration Errors -->
+    <sys:String x:Key="RegistrationError_PasswordIsEmpty">Password cannot be empty</sys:String>
+    <sys:String x:Key="RegistrationError_LoginExists">User with this login already exists</sys:String>
+
+    <!-- Recovery Errors -->
+    <sys:String x:Key="RecoveryError_UserNotFound">User not found</sys:String>
+    <sys:String x:Key="RecoveryError_InvalidRecoveryCode">Invalid recovery code</sys:String>
 
     <!-- Success Messages -->
     <sys:String x:Key="Success_PasswordChanged">Password changed successfully</sys:String>

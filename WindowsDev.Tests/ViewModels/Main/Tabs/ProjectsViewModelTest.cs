@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Commands.NavigationManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
 using WindowsDev.ViewModels.Projects;
 using WindowsDev.ViewModels.Projects.Dialogs;
