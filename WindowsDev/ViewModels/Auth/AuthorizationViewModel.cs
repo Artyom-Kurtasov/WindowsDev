@@ -1,5 +1,5 @@
-﻿using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Input;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Infrastructure;
