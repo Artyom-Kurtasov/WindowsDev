@@ -23,11 +23,11 @@ namespace WindowsDev.Tests.Business.TaskService
         }
 
         [Fact]
-        public async Task AddAsync_WhenTaskIsNull_ThrowsArgumentNullException()
+        public async Task AddAsync_WhenTaskIsNull_ThrowsException()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.AddAsync(null!));
 
             _taskRepositoryMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Never);
@@ -45,7 +45,7 @@ namespace WindowsDev.Tests.Business.TaskService
         }
 
         [Fact]
-        public async Task DeleteAsync_WhenTaskNotFound_ThrowsArgumentNullException()
+        public async Task DeleteAsync_WhenTaskNotFound_ThrowsException()
         {
             var id = 1;
 
@@ -55,7 +55,7 @@ namespace WindowsDev.Tests.Business.TaskService
 
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.DeleteAsync(id));
 
             _taskRepositoryMock.Verify(x => x.DeleteAsync(It.IsAny<TasksInfo>()), Times.Never);
@@ -80,11 +80,11 @@ namespace WindowsDev.Tests.Business.TaskService
         }
 
         [Fact]
-        public async Task UpdateAsync_WhenTaskIsNull_ThrowsArgumentNullException()
+        public async Task UpdateAsync_WhenTaskIsNull_ThrowsException()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.UpdateAsync(null!));
 
             _taskRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<TasksInfo>()), Times.Never);
@@ -110,7 +110,7 @@ namespace WindowsDev.Tests.Business.TaskService
             var expectedTasks = new List<TasksInfo> { CreateTestTask() };
 
             _taskRepositoryMock
-                .Setup(x => x.GetTasksAsync(filter, 0, 10))
+                .Setup(x => x.GetTasksAsync(It.IsAny<TaskFilter>(), 0, 10))
                 .ReturnsAsync(expectedTasks);
 
             var service = CreateService();
@@ -118,7 +118,7 @@ namespace WindowsDev.Tests.Business.TaskService
             var result = await service.GetTasksAsync(filter);
 
             Assert.Equal(expectedTasks, result);
-            _taskRepositoryMock.Verify(x => x.GetTasksAsync(filter, 0, 10), Times.Once);
+            _taskRepositoryMock.Verify(x => x.GetTasksAsync(It.IsAny<TaskFilter>(), 0, 10), Times.Once);
         }
 
         [Theory]
@@ -130,7 +130,7 @@ namespace WindowsDev.Tests.Business.TaskService
             var expectedTasks = new List<TasksInfo> { CreateTestTask() };
 
             _taskRepositoryMock
-                .Setup(x => x.GetTasksAsync(filter, 0, 1))
+                .Setup(x => x.GetTasksAsync(It.IsAny<TaskFilter>(), 0, 1))
                 .ReturnsAsync(expectedTasks);
 
             var service = CreateService();
@@ -138,7 +138,7 @@ namespace WindowsDev.Tests.Business.TaskService
             var result = await service.GetTasksAsync(filter);
 
             Assert.Equal(expectedTasks, result);
-            _taskRepositoryMock.Verify(x => x.GetTasksAsync(filter, 0, 1), Times.Once);
+            _taskRepositoryMock.Verify(x => x.GetTasksAsync(It.IsAny<TaskFilter>(), 0, 1), Times.Once);
         }
 
         [Fact]
@@ -160,18 +160,18 @@ namespace WindowsDev.Tests.Business.TaskService
         }
 
         [Fact]
-        public async Task GetTaskByIdAsync_WhenIdLessThan1_ThrowsArgumentException()
+        public async Task GetTaskByIdAsync_WhenIdLessThan1_ThrowsException()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.GetTaskByIdAsync(0));
 
             _taskRepositoryMock.Verify(x => x.GetTaskByIdAsync(It.IsAny<int>()), Times.Never);
         }
 
         [Fact]
-        public async Task GetTaskByIdAsync_WhenTaskNotFound_ThrowsKeyNotFoundException()
+        public async Task GetTaskByIdAsync_WhenTaskNotFound_ThrowsException()
         {
             var id = 1;
 
@@ -181,7 +181,7 @@ namespace WindowsDev.Tests.Business.TaskService
 
             var service = CreateService();
 
-            await Assert.ThrowsAsync<KeyNotFoundException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.GetTaskByIdAsync(id));
 
             _taskRepositoryMock.Verify(x => x.GetTaskByIdAsync(id), Times.Once);

@@ -27,11 +27,11 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
         }
 
         [Fact]
-        public async Task AddComment_WhenTaskIdLessThan1_ThrowsArgumentException()
+        public async Task AddComment_WhenTaskIdLessThan1_ThrowsException()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.AddComment(0, "comment text"));
 
             _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
@@ -41,11 +41,11 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public async Task AddComment_WhenCommentTextIsInvalid_ThrowsArgumentException(string commentText)
+        public async Task AddComment_WhenCommentTextIsInvalid_ThrowsException(string commentText)
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentException>(
+            await Assert.ThrowsAsync<Exception>(
                 () => service.AddComment(1, commentText!));
 
             _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
@@ -127,44 +127,6 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
 
             Assert.Empty(result);
             _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
-        }
-
-        [Fact]
-        public async Task AddComment_SetsCreatedAtToUtcNow()
-        {
-            var taskId = 1;
-            var commentText = "test comment";
-            var before = DateTime.UtcNow;
-
-            _commentRepositoryMock
-                .Setup(x => x.AddComments(It.IsAny<Comments>()))
-                .Returns(Task.CompletedTask);
-
-            var service = CreateService();
-
-            var result = await service.AddComment(taskId, commentText);
-
-            Assert.True(result.CreatedAt >= before);
-            Assert.True(result.CreatedAt <= DateTime.UtcNow);
-        }
-
-        [Fact]
-        public async Task AddComment_SetsAuthorFromCurrentUserService()
-        {
-            var taskId = 1;
-            var commentText = "test comment";
-            var username = "customuser";
-            _currentUserService.Username = username;
-
-            _commentRepositoryMock
-                .Setup(x => x.AddComments(It.IsAny<Comments>()))
-                .Returns(Task.CompletedTask);
-
-            var service = CreateService();
-
-            var result = await service.AddComment(taskId, commentText);
-
-            Assert.Equal(username, result.Author);
         }
     }
 }

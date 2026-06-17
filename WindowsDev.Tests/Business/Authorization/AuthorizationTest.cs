@@ -39,13 +39,12 @@ namespace WindowsDev.Tests.Business.Auth
         [InlineData("", "password")]
         [InlineData("login", "")]
         [InlineData(" ", "password")]
-        public async Task Authorize_WhenInputEmpty_ReturnsFalse(string login, string password)
+        public async Task Authorize_WhenInputEmpty_ThrowsException(string login, string password)
         {
             var auth = CreateService();
 
-            var result = await auth.Authorize(login, password);
-
-            Assert.False(result);
+            await Assert.ThrowsAsync<Exception>(() =>
+                auth.Authorize(login, password));
 
             _userRepositoryMock.Verify(x =>
                 x.GetByLoginAsync(It.IsAny<string>()),
@@ -57,7 +56,7 @@ namespace WindowsDev.Tests.Business.Auth
         }
 
         [Fact]
-        public async Task Authorize_WhenUserNotFound_ReturnsFalse()
+        public async Task Authorize_WhenUserNotFound_ThrowsException()
         {
             _userRepositoryMock
                 .Setup(x => x.GetByLoginAsync("login"))
@@ -65,9 +64,8 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            var result = await auth.Authorize("login", "password");
-
-            Assert.False(result);
+            await Assert.ThrowsAsync<Exception>(() =>
+                auth.Authorize("login", "password"));
 
             _userRepositoryMock.Verify(x =>
                 x.GetByLoginAsync("login"),
@@ -79,7 +77,7 @@ namespace WindowsDev.Tests.Business.Auth
         }
 
         [Fact]
-        public async Task Authorize_WhenPasswordIncorrect_ReturnsFalse()
+        public async Task Authorize_WhenPasswordIncorrect_ThrowsException()
         {
             var salt = Encoding.UTF8.GetBytes("salt");
 
@@ -102,9 +100,8 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            var result = await auth.Authorize("admin", "wrong");
-
-            Assert.False(result);
+            await Assert.ThrowsAsync<Exception>(() =>
+                auth.Authorize("admin", "wrong"));
 
             _currentUserServiceMock.Verify(x =>
                 x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
@@ -112,7 +109,7 @@ namespace WindowsDev.Tests.Business.Auth
         }
 
         [Fact]
-        public async Task Authorize_WhenCorrect_ReturnsTrue()
+        public async Task Authorize_WhenCorrect_CompletesSuccessfully()
         {
             var salt = Encoding.UTF8.GetBytes("salt");
 
@@ -135,9 +132,7 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            var result = await auth.Authorize("admin", "password");
-
-            Assert.True(result);
+            await auth.Authorize("admin", "password");
 
             _currentUserServiceMock.Verify(x =>
                 x.SetUser(user.Id, user.Login, user.Username),

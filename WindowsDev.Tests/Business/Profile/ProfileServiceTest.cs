@@ -200,7 +200,7 @@ namespace WindowsDev.Tests.Business.Profile
         }
 
         [Fact]
-        public async Task ChangeUsernameAsync_WhenUserNotFound_DoesNotUpdate()
+        public async Task ChangeUsernameAsync_WhenUserNotFound_ThrowsException()
         {
             var currentUsername = "olduser";
             var newUsername = "newuser";
@@ -218,9 +218,10 @@ namespace WindowsDev.Tests.Business.Profile
 
             var service = CreateService();
 
-            await service.ChangeUsernameAsync(currentUsername, newUsername);
+            await Assert.ThrowsAsync<Exception>(() =>
+                service.ChangeUsernameAsync(currentUsername, newUsername));
 
-            Assert.Equal("", _userService.Username);
+            Assert.Equal(string.Empty, _userService.Username);
             _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
         }
 

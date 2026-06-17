@@ -14,17 +14,16 @@ namespace WindowsDev.Tests.ViewModels.Auth
     {
         private readonly Mock<INavigationService> _navigationServiceMock;
         private readonly Mock<IRegistration> _registrationMock;
-        private readonly Mock<IDbManager> _dbManagerMock;
         private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+        private readonly Mock<IDbManager> _dbManagerMock;
         private readonly UserFieldValidator _userFieldValidator;
 
         public RegistrationViewModelTest()
         {
             _navigationServiceMock = new Mock<INavigationService>();
             _registrationMock = new Mock<IRegistration>();
-            _dbManagerMock = new Mock<IDbManager>();
             _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
-
+            _dbManagerMock = new Mock<IDbManager>();
             _userFieldValidator = new UserFieldValidator(_dbManagerMock.Object);
         }
 
@@ -42,7 +41,7 @@ namespace WindowsDev.Tests.ViewModels.Auth
         {
             _registrationMock
                 .Setup(x => x.Register("Password123!", "login", "username"))
-                .ReturnsAsync((true, 123456));
+                .ReturnsAsync(123456);
 
             _dialogCoordinatorMock
                 .Setup(x => x.ShowMessageAsync(
@@ -58,6 +57,7 @@ namespace WindowsDev.Tests.ViewModels.Auth
             vm.Username = "username";
             vm.Password = "Password123!";
             vm.ConfirmPassword = "Password123!";
+
             vm.IsLoginAvailable = true;
             vm.IsUsernameAvailable = true;
 
@@ -72,13 +72,25 @@ namespace WindowsDev.Tests.ViewModels.Auth
         {
             _registrationMock
                 .Setup(x => x.Register("Password123!", "login", "username"))
-                .ReturnsAsync((false, -1));
+                .ThrowsAsync(new Exception("Registration failed"));
+
+            _dialogCoordinatorMock
+                .Setup(x => x.ShowMessageAsync(
+                    It.IsAny<RegistrationViewModel>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>(),
+                    It.IsAny<MetroDialogSettings>()))
+                .ReturnsAsync(MessageDialogResult.Affirmative);
 
             var vm = CreateViewModel();
             vm.Login = "login";
             vm.Username = "username";
             vm.Password = "Password123!";
             vm.ConfirmPassword = "Password123!";
+
+            await Task.Delay(600);
+
             vm.IsLoginAvailable = true;
             vm.IsUsernameAvailable = true;
 

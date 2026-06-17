@@ -26,7 +26,7 @@ namespace WindowsDev.Tests.Business.PasswordManager
         }
 
         [Fact]
-        public async Task IsRecoverCodeCorrect_WhenUserNotFound_ReturnsFalse()
+        public async Task IsRecoverCodeCorrect_WhenUserNotFound_ThrowsException()
         {
             var login = "nonexistent";
             var recoveryCode = 123456;
@@ -37,14 +37,14 @@ namespace WindowsDev.Tests.Business.PasswordManager
 
             var service = CreateService();
 
-            var result = await service.IsRecoverCodeCorrect(recoveryCode, login);
+            await Assert.ThrowsAsync<Exception>(() =>
+                service.IsRecoverCodeCorrect(recoveryCode, login));
 
-            Assert.False(result);
             _userRepositoryMock.Verify(x => x.GetByLoginAsync(login), Times.Once);
         }
 
         [Fact]
-        public async Task IsRecoverCodeCorrect_WhenCodeIsCorrect_ReturnsTrue()
+        public async Task IsRecoverCodeCorrect_WhenCodeIsCorrect_CompletesSuccessfully()
         {
             var login = "testuser";
             var recoveryCode = 123456;
@@ -69,14 +69,13 @@ namespace WindowsDev.Tests.Business.PasswordManager
 
             var service = CreateService();
 
-            var result = await service.IsRecoverCodeCorrect(recoveryCode, login);
+            await service.IsRecoverCodeCorrect(recoveryCode, login);
 
-            Assert.True(result);
             _userRepositoryMock.Verify(x => x.GetByLoginAsync(login), Times.Once);
         }
 
         [Fact]
-        public async Task IsRecoverCodeCorrect_WhenCodeIsIncorrect_ReturnsFalse()
+        public async Task IsRecoverCodeCorrect_WhenCodeIsIncorrect_ThrowsException()
         {
             var login = "testuser";
             var recoveryCode = 123456;
@@ -102,14 +101,14 @@ namespace WindowsDev.Tests.Business.PasswordManager
 
             var service = CreateService();
 
-            var result = await service.IsRecoverCodeCorrect(recoveryCode, login);
+            await Assert.ThrowsAsync<Exception>(() =>
+                service.IsRecoverCodeCorrect(recoveryCode, login));
 
-            Assert.False(result);
             _userRepositoryMock.Verify(x => x.GetByLoginAsync(login), Times.Once);
         }
 
         [Fact]
-        public async Task ChangePasswordAsync_WhenUserNotFound_ReturnsMinusOne()
+        public async Task ChangePasswordAsync_WhenUserNotFound_ThrowsException()
         {
             var login = "nonexistent";
             var password = "newPassword123!";
@@ -120,9 +119,9 @@ namespace WindowsDev.Tests.Business.PasswordManager
 
             var service = CreateService();
 
-            var result = await service.ChangePasswordAsync(login, password);
+            await Assert.ThrowsAsync<Exception>(() =>
+                service.ChangePasswordAsync(login, password));
 
-            Assert.Equal(-1, result);
             _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
         }
 
@@ -175,6 +174,16 @@ namespace WindowsDev.Tests.Business.PasswordManager
             Assert.Equal(recoveryCodeHash.ToString("x16"), user.RecoveryCodeHash);
 
             _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
+        }
+
+        [Fact]
+        public void GenerateRecoveryCode_ReturnsCodeInRange()
+        {
+            var service = CreateService();
+
+            var result = service.GenerateRecoveryCode();
+
+            Assert.InRange(result, 100000, 999999);
         }
 
         private UsersInfo CreateTestUser(string login)

@@ -61,25 +61,52 @@ namespace WindowsDev.Tests.Business.ProjectService
         }
 
         [Fact]
-        public async Task AddAsync_WhenProjectIsNull_ThrowArgumentNullException()
+        public async Task AddAsync_WhenProjectIsNull_ThrowsException()
         {
             var writer = new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await writer.AddAsync(null!));
+            await Assert.ThrowsAsync<Exception>(() => writer.AddAsync(null!));
 
             _projectRepositoryMock
                 .Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Never);
         }
 
         [Fact]
-        public async Task UpdateAsync_WhenProjectIsNull_ThrowArgumentNullException()
+        public async Task UpdateAsync_WhenProjectIsNull_ThrowsException()
         {
             var writer = new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
 
-            await Assert.ThrowsAsync<ArgumentNullException>(async () => await writer.UpdateAsync(null!));
+            await Assert.ThrowsAsync<Exception>(() => writer.UpdateAsync(null!));
 
             _projectRepositoryMock
                 .Verify(x => x.UpdateAsync(It.IsAny<ProjectsInfo>()), Times.Never);
+        }
+
+        [Fact]
+        public async Task DeleteAsync_WhenCalled_CallsRepositoryDelete()
+        {
+            var projectId = 1;
+            var writer = new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
+
+            await writer.DeleteAsync(projectId);
+
+            _projectRepositoryMock.Verify(x => x.DeleteAsync(projectId), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetProjectsCountAsync_WhenCalled_ReturnsCount()
+        {
+            var expectedCount = 5;
+            var writer = new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
+
+            _projectRepositoryMock
+                .Setup(x => x.GetProjectsCountAsync(_currentUser.UserId))
+                .ReturnsAsync(expectedCount);
+
+            var result = await writer.GetProjectsCountAsync();
+
+            Assert.Equal(expectedCount, result);
+            _projectRepositoryMock.Verify(x => x.GetProjectsCountAsync(_currentUser.UserId), Times.Once);
         }
 
         private List<ProjectsInfo> CreateTestProjects()

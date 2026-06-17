@@ -18,11 +18,11 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
         [InlineData("")]
         [InlineData("   ")]
         [InlineData(null)]
-        public async Task AddFile_WhenFilePathEmpty_ThrowArgumentException(string filePath)
+        public async Task AddFile_WhenFilePathEmpty_ThrowsException(string filePath)
         {
             var writer = new AttachmentService(_attachmentRepositoryMock.Object);
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await writer.AddFile(filePath, 1));
+            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(filePath, 1));
 
             _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
         }
@@ -30,12 +30,12 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public async Task AddFile_WhenInvalidTaskId_ThrowsArgumentException(int taskId)
+        public async Task AddFile_WhenInvalidTaskId_ThrowsException(int taskId)
         {
             var writer = new AttachmentService(_attachmentRepositoryMock.Object);
             var tempFile = Path.GetTempFileName();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await writer.AddFile(tempFile, taskId));
+            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(tempFile, taskId));
 
             _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
 
@@ -43,13 +43,13 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
         }
 
         [Fact]
-        public async Task AddFile_WhenInvalidFilePath_ThrowsFileNotFoundException()
+        public async Task AddFile_WhenInvalidFilePath_ThrowsException()
         {
             string invalidPath = "invalidPath";
 
             var writer = new AttachmentService(_attachmentRepositoryMock.Object);
 
-            await Assert.ThrowsAsync<FileNotFoundException>(async () => await writer.AddFile(invalidPath, 1));
+            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(invalidPath, 1));
 
             _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
         }

@@ -36,13 +36,12 @@ namespace WindowsDev.Tests.Business.Registration
         [InlineData("")]
         [InlineData(null)]
         [InlineData("   ")]
-        public async Task Register_WhenPasswordInvalid_ReturnsFalse(string password)
+        public async Task Register_WhenPasswordInvalid_ThrowsException(string password)
         {
             var registration = CreateService();
 
-            var result = await registration.Register(password, "login", "username");
-
-            Assert.False(result.Item1);
+            await Assert.ThrowsAsync<Exception>(() =>
+                registration.Register(password, "login", "username"));
 
             _userRepositoryMock.Verify(x =>
                 x.ExistsByLoginAsync(It.IsAny<string>()), Times.Never);
@@ -56,7 +55,7 @@ namespace WindowsDev.Tests.Business.Registration
         }
 
         [Fact]
-        public async Task Register_WhenUserAlreadyExist_ReturnsFalse()
+        public async Task Register_WhenUserAlreadyExist_ThrowsException()
         {
             _userRepositoryMock
                 .Setup(x => x.ExistsByLoginAsync("login"))
@@ -64,9 +63,8 @@ namespace WindowsDev.Tests.Business.Registration
 
             var registration = CreateService();
 
-            var result = await registration.Register("password", "login", "username");
-
-            Assert.False(result.Item1);
+            await Assert.ThrowsAsync<Exception>(() =>
+                registration.Register("password", "login", "username"));
 
             _userRepositoryMock.Verify(x =>
                 x.AddAsync(It.IsAny<UsersInfo>()), Times.Never);
@@ -77,27 +75,31 @@ namespace WindowsDev.Tests.Business.Registration
         }
 
         [Fact]
-        public async Task Register_WhenAllCorrect_ReturnsTrue()
+        public async Task Register_WhenAllCorrect_ReturnsRecoveryCode()
         {
+            var expectedRecoveryCode = 123456;
+
             _userRepositoryMock
                 .Setup(x => x.ExistsByLoginAsync("login"))
                 .ReturnsAsync(false);
 
             _passwordRecoveryServiceMock
                 .Setup(x => x.GenerateRecoveryCode())
-                .Returns(123456);
+                .Returns(expectedRecoveryCode);
 
             var registration = CreateService();
 
             var result = await registration.Register("password", "login", "username");
 
-            Assert.True(result.Item1);
+            Assert.Equal(expectedRecoveryCode, result);
 
             _userRepositoryMock.Verify(x =>
                 x.ExistsByLoginAsync("login"), Times.Once);
 
             _userRepositoryMock.Verify(x =>
-                x.AddAsync(It.IsAny<UsersInfo>()), Times.Once);
+                x.AddAsync(It.Is<UsersInfo>(u =>
+                    u.Login == "login" &&
+                    u.Username == "username")), Times.Once);
 
             _currentUserServiceMock.Verify(x =>
                 x.SetUser(It.IsAny<int>(), "login", "username"), Times.Once);
