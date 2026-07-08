@@ -13,7 +13,7 @@
 
             <!-- User ID -->
             <UserCtrl:HeaderTextBlock
-                Header="{DynamicResource UserIdLabel}"
+                Header="{DynamicResource Profile_Label_UserId}"
                 Text="{Binding Id}"
                 HeaderFontSize="12"
                 BorderBrush="{DynamicResource MahApps.Brushes.Gray1}"
@@ -22,7 +22,7 @@
 
             <!-- Login -->
             <UserCtrl:HeaderTextBlock
-                Header="{DynamicResource LoginLabel}"
+                Header="{DynamicResource Profile_Label_Login}"
                 HeaderFontSize="12"
                 Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 BorderBrush="{DynamicResource MahApps.Brushes.Gray1}"
@@ -31,20 +31,20 @@
 
             <!-- Username -->
             <UserCtrl:HeaderTextBox
-                Header="{DynamicResource UsernameLabel}"
+                Header="{DynamicResource Profile_Label_Username}"
                 HeaderFontSize="12"
                 Text="{Binding Username, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 Watermark="{DynamicResource UsernameWatermark}"
                 Margin="0,0,0,15"/>
 
             <!-- Save Username Button -->
-            <Button Content="{DynamicResource SaveButton}"
+            <Button Content="{DynamicResource Profile_Button_Save}"
                     Command="{Binding SaveNewUsernameCommand}"/>
 
             <Separator Margin="0,10,0,20"/>
 
             <!-- Change Password Section Header -->
-            <TextBlock Text="{DynamicResource ChangePasswordLabel}"
+            <TextBlock Text="{DynamicResource Profile_Label_ChangePassword}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -52,27 +52,27 @@
 
             <!-- Current Password -->
             <UserCtrl:HeaderPasswordBox
-                Header="{DynamicResource CurrentPasswordLabel}"
+                Header="{DynamicResource Profile_Label_CurrentPassword}"
                 HeaderFontSize="12"
                 Password="{Binding CurrentPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="{DynamicResource CurrentPasswordWatermark}"
+                Watermark="{DynamicResource Profile_Watermark_CurrentPassword}"
                 Margin="0,0,0,15"/>
 
             <!-- New Password -->
             <UserCtrl:HeaderPasswordBox
-                Header="{DynamicResource NewPasswordLabel}"
+                Header="{DynamicResource Profile_Label_NewPassword}"
                 HeaderFontSize="12"
                 Password="{Binding NewPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                 ShowRequirements="True"
-                Watermark="{DynamicResource NewPasswordWatermark}"
+                Watermark="{DynamicResource Profile_Watermark_NewPassword}"
                 Margin="0,0,0,15"/>
 
             <!-- Confirm Password -->
             <UserCtrl:HeaderPasswordBox
-                Header="{DynamicResource ConfirmPasswordLabel}"
+                Header="{DynamicResource Profile_Label_ConfirmPassword}"
                 HeaderFontSize="12"
                 Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                Watermark="{DynamicResource ConfirmPasswordWatermark}"
+                Watermark="{DynamicResource Profile_Watermark_ConfirmPassword}"
                 Margin="0,0,0,20"/>
 
             <!-- Action Buttons -->
@@ -84,13 +84,13 @@
 
                 <!-- Save Password Button -->
                 <Button Grid.Column="0"
-                        Content="{DynamicResource SaveButton}"
+                        Content="{DynamicResource Profile_Button_Save}"
                         Command="{Binding SaveNewPasswordCommand}"
                         Margin="0,0,10,0"/>
 
                 <!-- Logout Button -->
                 <Button Grid.Column="1"
-                        Content="{DynamicResource LogoutButton}"
+                        Content="{DynamicResource Profile_Button_Logout}"
                         Command="{Binding LogoutCommand}"/>
             </Grid>
 

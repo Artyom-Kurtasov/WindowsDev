@@ -1,11 +1,17 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Informations;
+using WindowsDev.Domain.DialogsMessages.Tooltips;
 using WindowsDev.Domain.PasswordRecoveryModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs
@@ -16,17 +22,18 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly PasswordRecoveryData _passwordRecoveryData;
         private readonly ThirdStepViewModel _thirdStepVM;
+        private readonly ILogger<RecoveryCodeDialogViewModel> _logger;
 
         private readonly List<object> _steps;
 
         public RecoveryCodeDialogViewModel(IUserRepository userRepository,
-            IPasswordRecoveryService passwordRecoveryService)
+            IPasswordRecoveryService passwordRecoveryService,
+            ILogger<RecoveryCodeDialogViewModel> logger)
         {
             _passwordRecoveryService = passwordRecoveryService;
             _passwordRecoveryData = new PasswordRecoveryData();
+            _logger = logger;
 
-            // ThirdStepViewModel is reused across step transitions,
-            // so it's created once and stored in a field
             _thirdStepVM = new ThirdStepViewModel(_passwordRecoveryData);
 
             _steps = new List<object>
@@ -41,8 +48,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
             ChangePasswordCommand = new AsyncRelayCommand(ChangePasswordAsync, CanNextStep);
             CancelCommand = new AsyncRelayCommand(CancelAsync);
 
-            // Any change in shared data may affect step validity,
-            // so we force all commands to re-evaluate CanExecute
             _passwordRecoveryData.PropertyChanged += (_, _) =>
             {
                 ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
@@ -76,16 +81,15 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        // Dynamic tooltip based on why the "Next" button is disabled
         public string NextStepToolTip => CurrentStep switch
         {
             0 when !_passwordRecoveryData.IsUserExist =>
-                Translate("Tooltip_UserNotFound"),
+                Translate(AuthTooltips.UserNotFound),
 
             1 when !_passwordRecoveryData.IsRecoveryCodeCorrect =>
-                Translate("Tooltip_InvalidRecoveryCode"),
+                Translate(AuthTooltips.InvalidRecoveryCode),
 
-            _ => Translate("Tooltip_NextStep")
+            _ => Translate(AuthTooltips.NextStep)
         };
 
         private int _currentStep;
@@ -99,7 +103,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
                 OnPropertyChanged(nameof(CurrentStep));
                 OnPropertyChanged(nameof(NextStepToolTip));
 
-                // Step change may enable/disable navigation buttons
                 ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
                 ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
                 ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
@@ -108,7 +111,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
 
         public bool CanBackStep() => CurrentStep > 0;
 
-        // Each step has its own validation rule for proceeding forward
         public bool CanNextStep() => CurrentStep switch
         {
             0 => _passwordRecoveryData.IsUserExist,
@@ -140,24 +142,34 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
         {
             try
             {
-                // After password change, a new recovery code is generated
-                // and must be shown immediately. The old one becomes invalid
-                int recoveryCode = await _passwordRecoveryService.ChangePasswordAsync(
+                var result = await _passwordRecoveryService.ChangePasswordAsync(
                     _passwordRecoveryData.Login!,
                     _passwordRecoveryData.NewPassword!);
 
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Information_Title"),
-                    $"{Translate("RecoveryKeyMessage")}\n\n {recoveryCode}",
-                    MessageDialogStyle.Affirmative);
+                if (result.IsSuccess)
+                {
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Information),
+                        $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                        MessageDialogStyle.Affirmative);
 
-                await CancelAsync();
+                    await CancelAsync();
+                }
+                else
+                {
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Warning),
+                        Translate(result.Error),
+                        MessageDialogStyle.Affirmative);
+                }
             }
             catch (Exception ex)
             {
+                RecoveryLogs.PasswordResetFailed(_logger,
+                    _passwordRecoveryData.Login ?? "unknown", ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Warning_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }

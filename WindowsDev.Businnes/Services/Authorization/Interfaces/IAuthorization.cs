@@ -1,7 +1,9 @@
-﻿namespace WindowsDev.Business.Services.Authorization.Interfaces
+﻿using WindowsDev.Business.Primitives;
+
+namespace WindowsDev.Business.Services.Authorization.Interfaces
 {
     public interface IAuthorization
     {
-        Task Authorize(string login, string password);
+        Task<Result<bool>> Authorize(string login, string password);
     }
 }

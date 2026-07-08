@@ -13,11 +13,11 @@
     <!-- Project Form -->
     <StackPanel MaxWidth="400">
         <!-- Project Name Input -->
-        <UserCtrl:HeaderTextBox Header="{DynamicResource NameLabel}"
+        <UserCtrl:HeaderTextBox Header="{DynamicResource CreateProject_Label_Name}"
                                   CornerRadius="8"
                                   Text="{Binding ProjectName, Mode=TwoWay}"/>
         <!-- Project Description Input -->
-        <UserCtrl:HeaderTextBox Header="{DynamicResource DescriptionLabel}"
+        <UserCtrl:HeaderTextBox Header="{DynamicResource CreateProject_Label_Description}"
                                   CornerRadius="8"
                                   FieldHeight="100"
                                   ScrollBarVisibility="Auto"
@@ -31,11 +31,11 @@
             </Grid.ColumnDefinitions>
 
             <Button Grid.Column="0"
-                    Content="{DynamicResource CreateButton}"
+                    Content="{DynamicResource CreateProject_Button_Create}"
                     mah:ControlsHelper.CornerRadius="8" Margin="0,0,10,5"
                     Command="{Binding CreateProjectCommand}"/>
             <Button Grid.Column="1"
-                    Content="{DynamicResource CancelButton}"
+                    Content="{DynamicResource CreateProject_Button_Cancel}"
                     mah:ControlsHelper.CornerRadius="8" Margin="10,0,0,5"
                     Command="{Binding CloseDialogCommand}"/>
         </Grid>

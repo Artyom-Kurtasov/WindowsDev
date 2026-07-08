@@ -15,15 +15,15 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Toolbar with Add, Delete, and Search buttons -->
+        <!-- Toolbar with Add, Delete, and Search button -->
         <Grid Grid.Row="0">
             <StackPanel Orientation="Horizontal"
                         Margin="0,0,0,5">
-                <Button Content="{DynamicResource AddButton}" 
+                <Button Content="{DynamicResource Projects_Button_Add}" 
                         Background="Transparent" 
                         BorderBrush="Transparent"
                         Command="{Binding OpenDialogCommand}"/>
-                <Button Content="{DynamicResource DeleteButton}" 
+                <Button Content="{DynamicResource Projects_Button_Delete}" 
                         Background="Transparent" 
                         BorderBrush="Transparent"
                         Command="{Binding DeleteSelectedProjectsCommand}" 
@@ -34,10 +34,10 @@
                         HorizontalAlignment="Right"
                         Margin="0,0,0,5">
                 <UserCtrl:HeaderTextBox HorizontalAlignment="Right"
-                                        Watermark="{DynamicResource SearchWatermark}"
+                                        Watermark="{DynamicResource Projects_Watermark_Search}"
                                         Margin="0,0,5,0"
                                         Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
-                <Button Content="{DynamicResource SearchButton}" 
+                <Button Content="{DynamicResource Projects_Button_Search}" 
                         Command="{Binding SearchCommand}"
                         Background="Transparent" 
                         BorderBrush="Transparent"/>
@@ -66,14 +66,14 @@
                     <!-- ID Column -->
                     <DataGridTextColumn Binding="{Binding Id}">
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="{DynamicResource IdLabel}"/>
+                            <TextBlock Text="{DynamicResource Projects_Label_Id}"/>
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
 
                     <!-- Name Column -->
                     <DataGridTemplateColumn Width="1*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="{DynamicResource NameLabel}"/>
+                            <TextBlock Text="{DynamicResource Projects_Label_Name}"/>
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -91,7 +91,7 @@
                     <!-- Description Column -->
                     <DataGridTemplateColumn Width="3*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="{DynamicResource DescriptionLabel}"
+                            <TextBlock Text="{DynamicResource Projects_Label_Description}"
                                        TextWrapping="Wrap"
                                        TextTrimming="CharacterEllipsis"/>
                         </DataGridTemplateColumn.Header>
@@ -108,7 +108,7 @@
                     <!-- Created Date Column -->
                     <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}">
                         <DataGridTextColumn.Header>
-                            <TextBlock Text="{DynamicResource CreatedAtLabel}"/>
+                            <TextBlock Text="{DynamicResource Projects_Label_CreatedAt}"/>
                         </DataGridTextColumn.Header>
                     </DataGridTextColumn>
                 </DataGrid.Columns>
@@ -120,11 +120,11 @@
                     Orientation="Horizontal" 
                     HorizontalAlignment="Center"
                     Margin="0,10">
-            <Button Content="{DynamicResource PrevButton}" 
+            <Button Content="{DynamicResource Projects_Button_Prev}" 
                     Command="{Binding PrevPageCommand}" 
                     Margin="0,0,20,0"
                     Style="{DynamicResource MahApps.Styles.Button.Square}"/>
-            <Button Content="{DynamicResource NextButton}" 
+            <Button Content="{DynamicResource Projects_Button_Next}" 
                     Command="{Binding NextPageCommand}" 
                     Margin="20,0,0,0"
                     Style="{DynamicResource MahApps.Styles.Button.Square.Accent}"/>

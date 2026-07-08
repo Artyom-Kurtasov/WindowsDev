@@ -1,6 +1,8 @@
-﻿using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService.Comment
@@ -16,12 +18,12 @@ namespace WindowsDev.Business.Services.TaskService.Comment
             _currentUserService = currentUserService;
         }
 
-        public async Task<Comments> AddComment(int taskId, string commentText)
+        public async Task<Result<Comments>> AddComment(int taskId, string commentText)
         {
-            if (taskId < 1)
-                throw new Exception("CommentError_InvalidTaskId");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
+
             if (string.IsNullOrWhiteSpace(commentText))
-                throw new Exception("CommentError_CommentIsEmpty");
+                return Result<Comments>.Failure(CommentErrors.CommentIsEmpty);
 
             var comment = new Comments
             {
@@ -33,7 +35,7 @@ namespace WindowsDev.Business.Services.TaskService.Comment
 
             await _commentRepository.AddComments(comment);
 
-            return comment;
+            return Result<Comments>.Success(comment);
         }
 
         public async Task<List<Comments>> GetComments(int taskId)

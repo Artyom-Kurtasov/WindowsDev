@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Step Labels -->
+    <sys:String x:Key="Recovery_Label_FirstStep">Step 1: Enter recovery code</sys:String>
+    <sys:String x:Key="Recovery_Label_SecondStep">Step 2: Confirmation</sys:String>
+    <sys:String x:Key="Recovery_Label_ThirdStep">Step 3: Change password</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Recovery_Button_Cancel">Cancel</sys:String>
+    <sys:String x:Key="Recovery_Button_ChangePassword">Change password</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Recovery_Tooltip_UserNotFound">User with this login was not found</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_InvalidRecoveryCode">Invalid recovery code</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_NextStep">Next step</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Recovery_Error_InvalidRecoveryCode">
+        Invalid recovery code. Please try again.
+    </sys:String>
+
+    <!-- Informations -->
+    <sys:String x:Key="Recovery_Information_RecoveryKey">Save this recovery key. You will need it to reset your password if you forget it.</sys:String>
+
+</ResourceDictionary>

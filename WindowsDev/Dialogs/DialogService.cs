@@ -1,6 +1,7 @@
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
 using WindowsDev.Factories.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 
@@ -56,6 +57,11 @@ namespace WindowsDev.Dialogs
             viewModel.CloseRequested += closeHandler;
 
             await _dialogCoordinator.ShowMetroDialogAsync(context, dialog);
+        }
+
+        public async Task ShowErrorDialogAsync(object context, string message, params object[] args)
+        {
+            await _dialogCoordinator.ShowMessageAsync(context, DialogTitles.Error, message, MessageDialogStyle.Affirmative);
         }
     }
 }

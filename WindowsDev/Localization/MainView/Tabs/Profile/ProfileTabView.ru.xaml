@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Profile_Label_UserId">ID пользователя:</sys:String>
+    <sys:String x:Key="Profile_Label_Login">Логин:</sys:String>
+    <sys:String x:Key="Profile_Label_Username">Имя пользователя:</sys:String>
+    <sys:String x:Key="Profile_Label_CurrentPassword">Текущий пароль:</sys:String>
+    <sys:String x:Key="Profile_Label_NewPassword">Новый пароль:</sys:String>
+    <sys:String x:Key="Profile_Label_ConfirmPassword">Подтверждение пароля:</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Profile_Button_Save">Сохранить</sys:String>
+    <sys:String x:Key="Profile_Button_Logout">Выйти из аккаунта</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Profile_Watermark_CurrentPassword">Введите текущий пароль</sys:String>
+    <sys:String x:Key="Profile_Watermark_NewPassword">Введите новый пароль</sys:String>
+    <sys:String x:Key="Profile_Watermark_ConfirmPassword">Подтвердите новый пароль</sys:String>
+
+    <!-- Change Password Section -->
+    <sys:String x:Key="Profile_Label_ChangePassword">Смена пароля</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Profile_Error_NewPasswordSameAsCurrent">Новый пароль не должен совпадать со старым.</sys:String>
+    <sys:String x:Key="Profile_Error_PasswordsDontMatch">Пароли не совпадают.</sys:String>
+    <sys:String x:Key="Profile_Error_InvalidCurrentPassword">Неверный текущий пароль.</sys:String>
+    <sys:String x:Key="Profile_Error_NewUsernameSameAsCurrent">Новое имя пользователя не должно совпадать со старым.</sys:String>
+    <sys:String x:Key="Profile_Error_UsernameAlreadyTaken">Новое имя пользователя занято другим пользователем.</sys:String>
+    
+    <!-- Success -->
+    <sys:String x:Key="Profile_Success_UsernameChanged">Имя пользователя успешно изменено.</sys:String>
+    <sys:String x:Key="Profile_Success_PasswordChanged">Пароль успешно изменен.</sys:String>
+
+</ResourceDictionary>

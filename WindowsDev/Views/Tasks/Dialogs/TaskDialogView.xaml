@@ -26,14 +26,14 @@
 
         <!-- Task Name Input -->
         <UserCtrl:HeaderTextBox Grid.Row="0"
-                                 Header="{DynamicResource NameLabel}"
+                                 Header="{DynamicResource TaskDialog_Label_Name}"
                                  Margin="0,0,0,10"
                                  CornerRadius="8"
                                  Text="{Binding Name}"/>
 
         <!-- Deadline Picker -->
         <StackPanel Grid.Row="1">
-            <TextBlock Text="{DynamicResource DeadlineLabel}" />
+            <TextBlock Text="{DynamicResource TaskDialog_Label_Deadline}" />
             <DatePicker
                     Margin="0,0,0,10"
                     Height="35"
@@ -53,7 +53,7 @@
 
             <!-- Progress Selector -->
             <StackPanel Grid.Column="0">
-                <TextBlock Text="{DynamicResource ProgressLabel}"/>
+                <TextBlock Text="{DynamicResource TaskDialog_Label_Progress}"/>
                 <ComboBox ItemsSource="{Binding Percents}"
                           SelectedItem="{Binding Progress}"
                           ItemStringFormat="{}{0}%">
@@ -62,7 +62,7 @@
 
             <!-- Priority Selector -->
             <StackPanel Grid.Column="2">
-                <TextBlock Text="{DynamicResource PriorityLabel}"/>
+                <TextBlock Text="{DynamicResource TaskDialog_Label_Priority}"/>
                 <ComboBox ItemsSource="{Binding Priorities}"
                           SelectedItem="{Binding Priority, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
@@ -75,7 +75,7 @@
 
             <!-- Status Selector -->
             <StackPanel Grid.Column="4">
-                <TextBlock Text="{DynamicResource StatusLabel}"/>
+                <TextBlock Text="{DynamicResource TaskDialog_Label_Status}"/>
                 <ComboBox ItemsSource="{Binding Statuses}"
                           SelectedItem="{Binding Status, Mode=TwoWay}">
                     <ComboBox.ItemTemplate>
@@ -89,7 +89,7 @@
 
         <!-- Task Description Input -->
         <UserCtrl:HeaderTextBox Grid.Row="3"
-                                 Header="{DynamicResource DescriptionLabel}"
+                                 Header="{DynamicResource TaskDialog_Label_Description}"
                                  CornerRadius="8"
                                  FieldHeight="100"
                                  ScrollBarVisibility="Auto"
@@ -101,17 +101,17 @@
                 <Button.Style>
                     <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button}">
                         <Setter Property="Command" Value="{Binding CreateTaskCommand}"/>
-                        <Setter Property="Content" Value="{DynamicResource CreateButton}"/>
+                        <Setter Property="Content" Value="{DynamicResource TaskDialog_Button_Create}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsEditMode}" Value="True">
                                 <Setter Property="Command" Value="{Binding EditTaskCommand}"/>
-                                <Setter Property="Content" Value="{DynamicResource SaveTaskButton}"/>
+                                <Setter Property="Content" Value="{DynamicResource TaskDialog_Button_Save}"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </Button.Style>
             </Button>
-            <Button Content="{DynamicResource CancelButton}" Command="{Binding CancelCommand}"
+            <Button Content="{DynamicResource TaskDialog_Button_Cancel}" Command="{Binding CancelCommand}"
                     mah:ControlsHelper.CornerRadius="8" Padding="10,6,5,6"/>
         </StackPanel>
     </Grid>

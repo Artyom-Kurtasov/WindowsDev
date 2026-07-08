@@ -9,7 +9,7 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
         <!-- Recovery Code Input -->
-        <UserCtrl:HeaderTextBox Header="{DynamicResource RecoveryCodeLabel}"
+        <UserCtrl:HeaderTextBox Header="{DynamicResource RecoverySteps_Label_EnterRecoveryCode}"
                                 Text="{Binding RecoveryCode}"/>
     </Grid>
 </UserControl>

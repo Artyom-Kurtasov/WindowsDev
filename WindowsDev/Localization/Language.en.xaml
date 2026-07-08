@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Localization/AuthorizationView/AuthorizationView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/RegistrationWindow/RegistrationView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/MainView/Tabs/Profile/ProfileTabView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/MainView/Tabs/Projects/ProjectsTabView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/MainView/Tabs/Settings/SettingsTabView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/MainView/MainView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/ProjectView/ProjectView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/TaskWindow/TaskView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/TaskWindow/Dialogs/TaskDialogView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/ProjectView/Dialogs/CreateProjectDialogView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/AuthorizationView/Dialogs/RecoveryCodeDialogView.en.xaml"/>
+        <ResourceDictionary Source="/Localization/AuthorizationView/Dialogs/RecoverySteps/RecoverySteps.en.xaml"/>
+        <ResourceDictionary Source="/Localization/DialogTitles/DialogTitles.en.xaml"/>
+        <ResourceDictionary Source="/Localization/Errors/CommonErrors.en.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+</ResourceDictionary>

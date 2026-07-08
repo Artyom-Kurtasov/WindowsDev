@@ -51,15 +51,15 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
 
                 if (int.TryParse(RecoveryCode, out int code))
                 {
-                    try
-                    {
-                        await _passwordRecoveryService.IsRecoverCodeCorrect(code, _passwordRecoveryData.Login);
-                        IsRecoveryCodeCorrect = true;
-                    }
-                    catch (Exception)
+                    var result = await _passwordRecoveryService.IsRecoverCodeCorrect(code, _passwordRecoveryData.Login);
+
+                    if (!result.IsSuccess)
                     {
                         IsRecoveryCodeCorrect = false;
+                        return;
                     }
+
+                    IsRecoveryCodeCorrect = true;
                 }
             }
             catch (TaskCanceledException) { }

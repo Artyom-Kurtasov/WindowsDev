@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Projects_Label_Id">ID</sys:String>
+    <sys:String x:Key="Projects_Label_Name">Name</sys:String>
+    <sys:String x:Key="Projects_Label_Description">Description</sys:String>
+    <sys:String x:Key="Projects_Label_CreatedAt">Created at</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Projects_Button_Add">Add</sys:String>
+    <sys:String x:Key="Projects_Button_Delete">Delete</sys:String>
+    <sys:String x:Key="Projects_Button_Search">Search</sys:String>
+    <sys:String x:Key="Projects_Button_Prev">Previous</sys:String>
+    <sys:String x:Key="Projects_Button_Next">Next</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Projects_Watermark_Search">Search...</sys:String>
+
+</ResourceDictionary>

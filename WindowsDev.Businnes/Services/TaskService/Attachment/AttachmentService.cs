@@ -1,5 +1,7 @@
-﻿using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService.Attachment
@@ -18,17 +20,11 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
             return await _attachmentRepository.GetAttachmentsAsync(taskId);
         }
 
-        public async Task<TaskAttachment?> AddFile(string filePath, int taskId)
+        public async Task<Result<TaskAttachment>> AddFile(string filePath, int taskId)
         {
-            if (string.IsNullOrWhiteSpace(filePath))
-                throw new Exception("AttachmentError_FilePathIsEmpty");
-            if (taskId < 1)
-                throw new Exception("AttachmentError_InvalidTaskId");
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
 
             FileInfo fileInfo = new FileInfo(filePath);
-
-            if (!fileInfo.Exists)
-                throw new Exception("AttachmentError_FileNotFound");
 
             TaskAttachment attachment = new TaskAttachment
             {
@@ -41,7 +37,7 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
 
             await _attachmentRepository.AddFileInfoToDatabase(attachment);
 
-            return attachment;
+            return Result<TaskAttachment>.Success(attachment);
         }
     }
 }

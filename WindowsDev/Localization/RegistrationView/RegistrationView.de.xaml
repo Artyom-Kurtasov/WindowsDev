@@ -1,0 +1,32 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Title -->
+    <sys:String x:Key="Registration_Title">Konto in TaskManager registrieren</sys:String>
+
+    <!-- Lables -->
+    <sys:String x:Key="Registration_Label_Login">Benutzername:</sys:String>
+    <sys:String x:Key="Registration_Label_Username">Anzeigename:</sys:String>
+    <sys:String x:Key="Registration_Label_Password">Passwort:</sys:String>
+    <sys:String x:Key="Registration_Label_ConfirmPassword">Passwort bestätigen:</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Registration_Button_SignUp">Registrieren</sys:String>
+    <sys:String x:Key="Registration_Link_SignIn">Anmelden</sys:String>
+
+    <!-- Password Reauirements -->
+    <sys:String x:Key="Registration_Requirement_MinLength">Mindestens 12 Zeichen</sys:String>
+    <sys:String x:Key="Registration_Requirement_Number">Zahlen verwenden</sys:String>
+    <sys:String x:Key="Registration_Requirement_SpecialSymbol">Sonderzeichen verwenden</sys:String>
+    <sys:String x:Key="Registration_Requirement_Uppercase">Großbuchstaben verwenden</sys:String>
+
+    <!-- Helpers -->
+    <sys:String x:Key="Registration_Helper_LoginAvailable">Benutzername ist verfügbar</sys:String>
+    <sys:String x:Key="Registration_Helper_LoginTaken">Benutzername wird bereits von einem anderen Benutzer verwendet</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameAvailable">Anzeigename ist verfügbar</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameTaken">Anzeigename wird bereits von einem anderen Benutzer verwendet</sys:String>
+    <sys:String x:Key="Registration_Helper_AlreadyHaveAccount">Bereits ein Konto?</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Registration_Error_RegistrationFailed">Füllen Sie alle Felder korrekt aus!</sys:String>
+</ResourceDictionary>

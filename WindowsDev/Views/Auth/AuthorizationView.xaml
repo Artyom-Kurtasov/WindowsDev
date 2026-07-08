@@ -24,55 +24,61 @@
             <!-- Logo -->
             <UserCtrl:Logo Kind="TaskRound"
                            ViewBoxHeight="70" ViewBoxWidth="70"
-                           Text="{DynamicResource AuthTitle}"
+                           Text="{DynamicResource Authorization_Title}"
                            FontSize="14"
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch" Margin="0,0,5,0"/>
 
-            <!-- Login Input -->
-            <UserCtrl:HeaderTextBox
-                Header="{DynamicResource LoginLabel}"
-                CornerRadius="8"
-                Margin="20,20,20,0"
-                Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
 
             <!-- Login Error Message -->
-            <TextBlock Foreground="Red" Margin="20,0,20,0">
+            <TextBlock Foreground="Red"
+           Margin="20,20,20,0"
+           Text="{Binding ErrorMessage}">
                 <TextBlock.Style>
                     <Style TargetType="TextBlock">
-                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Setter Property="Visibility"
+                    Value="Collapsed"/>
 
                         <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsLoginFailed}" Value="True">
-                                <Setter Property="Text" Value="{DynamicResource UserNotExists}"/>
-                                <Setter Property="Visibility" Value="Visible"/>
+                            <DataTrigger Binding="{Binding HasError}"
+                             Value="True">
+                                <Setter Property="Visibility"
+                            Value="Visible"/>
                             </DataTrigger>
                         </Style.Triggers>
                     </Style>
                 </TextBlock.Style>
             </TextBlock>
 
+            <!-- Login Input -->
+            <UserCtrl:HeaderTextBox
+                Header="{DynamicResource Authorization_Label_Login}"
+                CornerRadius="8"
+                Margin="20,20,20,0"
+                Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+
             <!-- Password Input -->
             <UserCtrl:HeaderPasswordBox
-                Header="{DynamicResource PasswordLabel}"
+                Header="{DynamicResource Authorization_Label_Password}"
                 HeaderFontSize="14"
                 Margin="20,20,20,0"
                 CornerRadius="8"
                 Password="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                LinkText="{DynamicResource ForgotPasswordText}"
+                LinkText="{DynamicResource Authorization_Link_ForgotPassword}"
                 LinkCommand="{Binding PasswordRecoveryCommand}"/>
 
             <!-- Sign In Button -->
             <Button mah:ControlsHelper.CornerRadius="8" Margin="20,20,20,0"
                     Command="{Binding AuthorizeCommand}">
-                <TextBlock Text="{DynamicResource SignInButton}" FontSize="12" FontWeight="Bold"/>
+                <TextBlock Text="{DynamicResource Authorization_Button_SignIn}" FontSize="12" FontWeight="Bold"/>
             </Button>
 
             <!-- Registration Link -->
             <TextBlock HorizontalAlignment="Center">
-                    <Run Text="{DynamicResource NewUserText}"/>
+                    <Run Text="{DynamicResource Authorization_Helper_NewToApp}"/>
                     <Hyperlink Command="{Binding SwitchToRegViewCommand}">
-                            <TextBlock Text="{DynamicResource SignUpButton}"/>
+                            <TextBlock Text="{DynamicResource Authorization_Link_SignUp}"/>
                     </Hyperlink>
             </TextBlock>
         </StackPanel>

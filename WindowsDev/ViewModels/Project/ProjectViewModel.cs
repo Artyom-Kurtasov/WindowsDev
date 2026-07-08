@@ -1,13 +1,17 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main;
@@ -134,9 +138,20 @@ namespace WindowsDev.ViewModels.Projects
 
         private async Task LoadTasksAsync()
         {
-            _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject.Id);
-            OnPropertyChanged(nameof(TotalCountOfPages));
-            await GetPageAsync();
+            try
+            {
+                _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject.Id);
+                OnPropertyChanged(nameof(TotalCountOfPages));
+                await GetPageAsync();
+            }
+            catch (Exception ex)
+            {
+                TaskLogs.TaskLoadFailed(_logger, CurrentProject.Id, ex);
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
+                    MessageDialogStyle.Affirmative);
+            }
         }
 
         private async Task OpenTask(TasksInfo task)
@@ -176,27 +191,25 @@ namespace WindowsDev.ViewModels.Projects
 
         private async Task GetPageAsync()
         {
-            var statuses = new List<TaskStatus>();
-
-            // ShowAll overrides individual toggles —
-            // when on, all statuses are included to simplify the filter UI
-            if (ShowAll)
-            {
-                statuses.Add(TaskStatus.Done);
-                statuses.Add(TaskStatus.InProgress);
-                statuses.Add(TaskStatus.Closed);
-            }
-            else
-            {
-                if (ShowClosed)
-                    statuses.Add(TaskStatus.Closed);
-
-                if (ShowInProgress)
-                    statuses.Add(TaskStatus.InProgress);
-            }
-
             try
             {
+                var statuses = new List<TaskStatus>();
+
+                if (ShowAll)
+                {
+                    statuses.Add(TaskStatus.Done);
+                    statuses.Add(TaskStatus.InProgress);
+                    statuses.Add(TaskStatus.Closed);
+                }
+                else
+                {
+                    if (ShowClosed)
+                        statuses.Add(TaskStatus.Closed);
+
+                    if (ShowInProgress)
+                        statuses.Add(TaskStatus.InProgress);
+                }
+
                 var filter = new TaskFilter
                 {
                     ProjectId = CurrentProject.Id,
@@ -206,8 +219,20 @@ namespace WindowsDev.ViewModels.Projects
                     Statuses = statuses
                 };
 
-                var tasks = await _taskService.GetTasksAsync(filter);
+                var result = await _taskService.GetTasksAsync(filter);
 
+                if (result.IsFailure)
+                {
+                    TaskLogs.TaskLoadFailed(_logger, CurrentProject.Id,
+                    new InvalidOperationException(result.Error));
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Error),
+                        Translate(result.Error),
+                        MessageDialogStyle.Affirmative);
+                    return;
+                }
+
+                var tasks = result.Value;
                 TaskItem.Clear();
 
                 foreach (var task in tasks)
@@ -215,35 +240,36 @@ namespace WindowsDev.ViewModels.Projects
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to tasks for project {projectId}", CurrentProject.Id);
+                TaskLogs.TaskLoadFailed(_logger, CurrentProject.Id, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }
 
         private async Task DeleteSelectedTasks()
         {
-            try
-            {
-                var tasksToDelete = TaskItem
-                    .Where(x => x.IsSelected)
-                    .ToList();
+            var tasksToDelete = TaskItem
+                .Where(x => x.IsSelected)
+                .ToList();
 
-                foreach (var task in tasksToDelete)
+            foreach (var task in tasksToDelete)
+            {
+                try
                 {
                     await _taskService.DeleteAsync(task.Id);
                     TaskItem.Remove(task);
+
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete selected tasks");
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
-                    MessageDialogStyle.Affirmative);
+                catch (Exception ex)
+                {
+                    TaskLogs.TaskDeleteFailed(_logger, task.Id, ex);
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Error),
+                        Translate(CommonErrors.UnexpectedError),
+                        MessageDialogStyle.Affirmative);
+                }
             }
         }
     }

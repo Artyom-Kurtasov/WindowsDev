@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Step Labels -->
+    <sys:String x:Key="Recovery_Label_FirstStep">ステップ 1: 回復コードを入力</sys:String>
+    <sys:String x:Key="Recovery_Label_SecondStep">ステップ 2: 確認</sys:String>
+    <sys:String x:Key="Recovery_Label_ThirdStep">ステップ 3: パスワード変更</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Recovery_Button_Cancel">キャンセル</sys:String>
+    <sys:String x:Key="Recovery_Button_ChangePassword">パスワード変更</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Recovery_Tooltip_UserNotFound">このログインIDのユーザーは見つかりません</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_InvalidRecoveryCode">無効な回復コード</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_NextStep">次のステップ</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Recovery_Error_InvalidRecoveryCode">
+        無効な回復コードです。もう一度お試しください。
+    </sys:String>
+
+    <!-- Informations -->
+    <sys:String x:Key="Recovery_Information_RecoveryKey">この回復キーを保存してください。パスワードを忘れた場合にリセットするために必要になります。</sys:String>
+
+</ResourceDictionary>

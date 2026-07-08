@@ -1,7 +1,9 @@
-﻿using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.Profile.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 
 namespace WindowsDev.Business.Services.Profile
 {
@@ -20,13 +22,13 @@ namespace WindowsDev.Business.Services.Profile
             _currentUserService = currentUserService;
         }
 
-        public async Task ChangePasswordAsync(string currentPassword, string newPassword, string confirmPassword)
+        public async Task<Result<bool>> ChangePasswordAsync(string currentPassword, string newPassword, string confirmPassword)
         {
             if (newPassword == currentPassword)
-                throw new Exception("ProfileError_NewPasswordSameAsCurrent");
+                return Result<bool>.Failure(ProfileErrors.NewPasswordSameAsCurrent);
 
             if (newPassword != confirmPassword)
-                throw new Exception("ProfileError_PasswordsDoNotMatch");
+                return Result<bool>.Failure(ProfileErrors.PasswordsDontMatch);
 
             var user = await _userRepository.GetByLoginAsync(_currentUserService.Login);
 
@@ -35,7 +37,7 @@ namespace WindowsDev.Business.Services.Profile
             var currentHash = hasher.HashPassword(currentPassword, user.Salt);
 
             if (currentHash.ToString("x16") != user.PasswordHash)
-                throw new Exception("ProfileError_CurrentPasswordIncorrect");
+                return Result<bool>.Failure(ProfileErrors.InvalidCurrentPassword);
 
             var newSalt = hasher.GenerateSalt();
             var newHash = hasher.HashPassword(newPassword, newSalt);
@@ -44,23 +46,27 @@ namespace WindowsDev.Business.Services.Profile
             user.PasswordHash = newHash.ToString("x16");
 
             await _userRepository.UpdateAsync(user);
+
+            return Result<bool>.Success(true);
         }
 
-        public async Task ChangeUsernameAsync(string currentUsername, string newUsername)
+        public async Task<Result<bool>> ChangeUsernameAsync(string currentUsername, string newUsername)
         {
             if (currentUsername == newUsername)
-                throw new Exception("ProfileError_NewUsernameSameAsCurrent");
+                return Result<bool>.Failure(ProfileErrors.NewUsernameSameAsCurrent);
 
             if (await _userRepository.ExistsByUsernameAsync(newUsername))
-                throw new Exception("ProfileError_UsernameExists");
+                return Result<bool>.Failure(ProfileErrors.UsernamAlreadyTake);
 
             var user = await _userRepository.GetByLoginAsync(_currentUserService.Login);
             if (user is null)
-                throw new Exception("ProfileError_UserNotFound");
+                return Result<bool>.Failure(CommonErrors.UserNotFound);
 
             _currentUserService.Username = newUsername;
             user.Username = newUsername;
             await _userRepository.UpdateAsync(user);
+
+            return Result<bool>.Success(true);
         }
     }
 }

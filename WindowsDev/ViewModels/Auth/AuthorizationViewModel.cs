@@ -1,8 +1,12 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using Microsoft.Extensions.Logging;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth.Dialogs;
 using WindowsDev.ViewModels.Main;
@@ -12,20 +16,20 @@ namespace WindowsDev.ViewModels.Auth
 {
     public class AuthorizationViewModel : ViewModelBase
     {
+        private readonly ILogger _logger;
         private readonly IDialogService _dialogService;
-        private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IAuthorization _authorization;
         private readonly INavigationService _navigationService;
 
         public AuthorizationViewModel(INavigationService navigationService,
             IAuthorization authorization,
             IDialogService dialogService,
-            IDialogCoordinator dialogCoordinator)
+            ILogger logger)
         {
             _dialogService = dialogService;
-            _dialogCoordinator = dialogCoordinator;
             _navigationService = navigationService;
             _authorization = authorization;
+            _logger = logger;
 
             SwitchToRegViewCommand = new AsyncRelayCommand(SwitchToRegViewAsync);
             AuthorizeCommand = new AsyncRelayCommand(AuthorizeAsync, CanAuthorize);
@@ -43,6 +47,7 @@ namespace WindowsDev.ViewModels.Auth
             set
             {
                 _login = value;
+                ErrorMessage = string.Empty;
                 OnPropertyChanged(nameof(Login));
             }
         }
@@ -54,20 +59,25 @@ namespace WindowsDev.ViewModels.Auth
             set
             {
                 _password = value;
+                ErrorMessage = string.Empty;
                 OnPropertyChanged(nameof(Password));
             }
         }
 
-        private bool _isLoginFailed;
-        public bool IsLoginFailed
+        private string _errorMessage = string.Empty;
+        public string ErrorMessage
         {
-            get => _isLoginFailed;
+            get => _errorMessage;
             set
             {
-                _isLoginFailed = value;
-                OnPropertyChanged(nameof(IsLoginFailed));
+                _errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+                OnPropertyChanged(nameof(HasError));
             }
         }
+
+        public bool HasError =>
+            !string.IsNullOrWhiteSpace(ErrorMessage);
 
         private async Task SwitchToRegViewAsync() =>
             await _navigationService.NavigateTo<RegistrationViewModel>();
@@ -76,20 +86,33 @@ namespace WindowsDev.ViewModels.Auth
 
         private async Task AuthorizeAsync()
         {
+            ErrorMessage = string.Empty;
+
             try
             {
-                await _authorization.Authorize(_login, _password);
-                IsLoginFailed = false;
+
+                var result = await _authorization.Authorize(Login, Password);
+
+                if (result.IsFailure)
+                {
+                    ErrorMessage = Translate(result.Error);
+                    return;
+                }
+
                 await _navigationService.NavigateTo<MainWindowViewModel>();
             }
             catch (Exception ex)
             {
-                IsLoginFailed = true;
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
+                AuthLogs.AuthorizationFailed(_logger, ex);
+                await _dialogService.ShowErrorDialogAsync(this,
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError));
             }
         }
 
         private async Task PasswordRecovery() =>
-            await _dialogService.ShowDialogAsync<RecoveryCodeDialogView, RecoveryCodeDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<
+                RecoveryCodeDialogView,
+                RecoveryCodeDialogViewModel>(this);
     }
 }

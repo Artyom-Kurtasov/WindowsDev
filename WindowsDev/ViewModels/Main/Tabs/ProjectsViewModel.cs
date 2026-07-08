@@ -1,11 +1,15 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
@@ -87,40 +91,50 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private async Task LoadProjectsAsync()
         {
-            _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
-            OnPropertyChanged(nameof(TotalCountOfPages));
-            await GetPageAsync();
+            try
+            {
+                _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
+                OnPropertyChanged(nameof(TotalCountOfPages));
+                await GetPageAsync();
+            }
+            catch (Exception ex)
+            {
+                ProjectLogs.ProjectLoadFailed(_logger, ex);
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
+                    MessageDialogStyle.Affirmative);
+            }
         }
 
         private async Task SearchAsync()
         {
-            // Reset to first page when search criteria change
-            // otherwise we might land on an empty page
             CurrentPage = 1;
             await GetPageAsync(SearchFilter);
         }
 
         private async Task DeleteSelectedProjectsAsync()
         {
-            try
-            {
-                var projectsToDelete = ProjectsList
-                    .Where(x => x.IsSelected)
-                    .ToList();
+            var projectsToDelete = ProjectsList
+                .Where(x => x.IsSelected)
+                .ToList();
 
-                foreach (var project in projectsToDelete)
+            foreach (var project in projectsToDelete)
+            {
+                try
                 {
                     await _projectService.DeleteAsync(project.Id);
                     ProjectsList.Remove(project);
+                    
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to delete projects");
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate("Error_DeleteProjects"),
-                    MessageDialogStyle.Affirmative);
+                catch (Exception ex)
+                {
+                    ProjectLogs.ProjectDeleteFailed(_logger, project.Id, ex);
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Error),
+                        Translate(CommonErrors.UnexpectedError),
+                        MessageDialogStyle.Affirmative);
+                }
             }
         }
 
@@ -150,16 +164,26 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private async Task GetPageAsync(string searchFilter = "")
         {
-            ProjectsList.Clear();
-
-            var projects = await _projectService
-                .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
-
-            foreach (var project in projects)
+            try
             {
-                ProjectsList.Add(project);
-            }
+                ProjectsList.Clear();
 
+                var projects = await _projectService
+                    .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
+
+                foreach (var project in projects)
+                {
+                    ProjectsList.Add(project);
+                }
+            }
+            catch (Exception ex)
+            {
+                ProjectLogs.ProjectLoadFailed(_logger, ex);
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
+                    MessageDialogStyle.Affirmative);
+            }
         }
     }
 }

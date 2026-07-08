@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Profile_Label_UserId">User ID:</sys:String>
+    <sys:String x:Key="Profile_Label_Login">Login:</sys:String>
+    <sys:String x:Key="Profile_Label_Username">Username:</sys:String>
+    <sys:String x:Key="Profile_Label_CurrentPassword">Current password:</sys:String>
+    <sys:String x:Key="Profile_Label_NewPassword">New password:</sys:String>
+    <sys:String x:Key="Profile_Label_ConfirmPassword">Confirm password:</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Profile_Button_Save">Save</sys:String>
+    <sys:String x:Key="Profile_Button_Logout">Logout</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Profile_Watermark_CurrentPassword">Enter current password</sys:String>
+    <sys:String x:Key="Profile_Watermark_NewPassword">Enter new password</sys:String>
+    <sys:String x:Key="Profile_Watermark_ConfirmPassword">Confirm new password</sys:String>
+
+    <!-- Change Password Section -->
+    <sys:String x:Key="Profile_Label_ChangePassword">Change password</sys:String>
+    
+    <!-- Errors -->
+    <sys:String x:Key="Profile_Error_NewPasswordSameAsCurrent">New password must be different from the current one.</sys:String>
+    <sys:String x:Key="Profile_Error_PasswordsDontMatch">Passwords do not match.</sys:String>
+    <sys:String x:Key="Profile_Error_InvalidCurrentPassword">Invalid current password.</sys:String>
+    <sys:String x:Key="Profile_Error_NewUsernameSameAsCurrent">New username must be different from the current one.</sys:String>
+    <sys:String x:Key="Profile_Error_UsernameAlreadyTaken">This username is already taken by another user.</sys:String>
+
+    <!-- Success -->
+    <sys:String x:Key="Profile_Success_UsernameChanged">Username successfully changed.</sys:String>
+    <sys:String x:Key="Profile_Success_PasswordChanged">Password successfully changed.</sys:String>
+
+</ResourceDictionary>

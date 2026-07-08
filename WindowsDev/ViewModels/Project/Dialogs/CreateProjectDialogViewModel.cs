@@ -1,11 +1,16 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 
 namespace WindowsDev.ViewModels.Projects.Dialogs
 {
@@ -60,36 +65,33 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
 
         public async Task CreateProjectExecute()
         {
+            if (string.IsNullOrWhiteSpace(ProjectName))
+            {
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Warning),
+                    Translate(CreateProjectWarnings.EnterName),
+                    MessageDialogStyle.Affirmative);
+                return;
+            }
+
             try
             {
-                if (!string.IsNullOrWhiteSpace(ProjectName))
+                await _projectService.AddAsync(new ProjectsInfo
                 {
-                    await _projectService.AddAsync(new ProjectsInfo
-                    {
-                        Name = _projectName,
-                        UserId = _currentUserData.UserId,
-                        Description = _projectDescription,
-                        CreatedAt = DateTime.Today.Date.ToUniversalTime()
-                    });
+                    Name = _projectName,
+                    UserId = _currentUserData.UserId,
+                    Description = _projectDescription,
+                    CreatedAt = DateTime.Today.Date.ToUniversalTime()
+                });
 
-                    // Notify parent ViewModel to refresh before closing
-                    Completed?.Invoke();
-                    await CloseDialog();
-                }
-                else
-                {
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate("Warning_Title"),
-                        Translate("Warning_EnterName"),
-                        MessageDialogStyle.Affirmative);
-                }
+                Completed?.Invoke();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to create project");
+                ProjectLogs.ProjectCreationFailed(_logger, ProjectName, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }

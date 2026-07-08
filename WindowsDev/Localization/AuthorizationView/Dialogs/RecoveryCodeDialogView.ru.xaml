@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Recovery_Label_FirstStep">Шаг 1: Введите код восстановления</sys:String>
+    <sys:String x:Key="Recovery_Label_SecondStep">Шаг 2: Подтверждение</sys:String>
+    <sys:String x:Key="Recovery_Label_ThirdStep">Шаг 3: Смена пароля</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Recovery_Button_Cancel">Отмена</sys:String>
+    <sys:String x:Key="Recovery_Button_ChangePassword">Сменить пароль</sys:String>
+    
+    <!-- Tooltips -->
+    <sys:String x:Key="Recovery_Tooltip_UserNotFound">Пользователь с данным логином не найден</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_InvalidRecoveryCode">Неверный код восстановления</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_NextStep">Следующий шаг</sys:String>
+    
+    <!-- Errors -->
+    <sys:String x:Key="Recovery_Error_InvalidRecoveryCode">
+        Неверный код восстановления. Попробуйте еще раз.
+    </sys:String>
+
+    <!-- Informations -->
+    <sys:String x:Key="Recovery_Information_RecoveryKey">Сохраните этот ключ восстановления. Он понадобится для сброса пароля, если вы его забудете.</sys:String>
+
+</ResourceDictionary>

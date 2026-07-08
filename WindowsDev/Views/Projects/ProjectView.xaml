@@ -26,7 +26,7 @@
 
                 <!-- Back Button -->
                 <Button Grid.Row="0"
-                                Content="{DynamicResource BackButton}"
+                                Content="{DynamicResource Project_Button_Back}"
                                 Width="100"
                                 Margin="0,0,0,15"
                                 HorizontalAlignment="Left"
@@ -37,13 +37,13 @@
                 <UserCtrl:HeaderTextBlock Grid.Row="1"
                                             Margin="0,0,0,10"
                                             CornerRadius="8"
-                                            Header="{DynamicResource NameLabel}"
+                                            Header="{DynamicResource Project_Label_Name}"
                                             Text="{Binding Name}"/>
 
                 <!-- Project Description -->
                 <UserCtrl:HeaderTextBlock Grid.Row="2"
                                             CornerRadius="8"
-                                            Header="{DynamicResource DescriptionLabel}"
+                                            Header="{DynamicResource Project_Label_Description}"
                                             Text="{Binding Description}"/>
             </Grid>
 
@@ -53,13 +53,13 @@
                 <!-- Action Buttons Row -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                     <!-- Add Task Button -->
-                    <Button Content="{DynamicResource AddButton}"
+                    <Button Content="{DynamicResource Project_Button_Add}"
                             mah:ControlsHelper.CornerRadius="8"
                             Margin="0,0,10,0"
                             Command="{Binding OpenDialogCommand}"/>
 
                     <!-- Delete Tasks Button -->
-                    <Button Content="{DynamicResource DeleteButton}"
+                    <Button Content="{DynamicResource Project_Button_Delete}"
                             mah:ControlsHelper.CornerRadius="8"
                             Command="{Binding DeleteSelectedTasksCommand}"/>
                 </StackPanel>
@@ -75,22 +75,22 @@
                     <UserCtrl:HeaderTextBox Grid.Column="0"
                                                       CornerRadius="8"
                                                       Text="{Binding SearchFilter, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                                      Watermark="{DynamicResource SearchWatermark}"/>
+                                                      Watermark="{DynamicResource Project_Watermark_Search}"/>
 
                     <!-- Status Filters -->
                     <StackPanel Grid.Column="1" 
                                         Orientation="Horizontal" 
                                         Margin="10,0,0,0"
                                         VerticalAlignment="Center">
-                        <CheckBox Content="{DynamicResource AllLabel}"
+                        <CheckBox Content="{DynamicResource Project_Label_All}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowAll}"/>
-                        <CheckBox Content="{DynamicResource TaskStatus_Closed}"
+                        <CheckBox Content="{DynamicResource Project_Label_Closed}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowClosed}"/>
-                        <CheckBox Content="{DynamicResource TaskStatus_InProgress}"
+                        <CheckBox Content="{DynamicResource Project_Label_InProgress}"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowInProgress}"/>
                     </StackPanel>
@@ -114,12 +114,12 @@
                         </DataGridTemplateColumn>
 
                         <!-- ID Column -->
-                        <DataGridTextColumn Header="{DynamicResource IdLabel}"
+                        <DataGridTextColumn Header="{DynamicResource Project_Label_Id}"
                                                 Binding="{Binding Id}"
                                                 Width="Auto"/>
 
                         <!-- Name Column -->
-                        <DataGridTemplateColumn Header="{DynamicResource NameLabel}" Width="*">
+                        <DataGridTemplateColumn Header="{DynamicResource Project_Label_Name}" Width="*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock TextTrimming="CharacterEllipsis">
@@ -133,7 +133,7 @@
                         </DataGridTemplateColumn>
 
                         <!-- Description Column -->
-                        <DataGridTemplateColumn Header="{DynamicResource DescriptionLabel}" Width="2*">
+                        <DataGridTemplateColumn Header="{DynamicResource Project_Label_Description}" Width="2*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Description}"
@@ -144,12 +144,12 @@
                         </DataGridTemplateColumn>
 
                         <!-- Deadline Column -->
-                        <DataGridTextColumn Header="{DynamicResource DeadlineLabel}"
+                        <DataGridTextColumn Header="{DynamicResource Project_Label_Deadline}"
                                                 Binding="{Binding DeadLine, StringFormat=d}"
                                                 Width="*"/>
 
                         <!-- Created Date Column -->
-                        <DataGridTextColumn Header="{DynamicResource CreatedAtLabel}"
+                        <DataGridTextColumn Header="{DynamicResource Project_Label_CreatedAt}"
                                                 Binding="{Binding CreatedAt, StringFormat=d}"
                                                 Width="*"/>
 

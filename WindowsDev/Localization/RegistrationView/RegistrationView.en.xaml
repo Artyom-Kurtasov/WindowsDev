@@ -1,0 +1,32 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Title -->
+    <sys:String x:Key="Registration_Title">Create account in TaskManager</sys:String>
+
+    <!-- Lables -->
+    <sys:String x:Key="Registration_Label_Login">Login:</sys:String>
+    <sys:String x:Key="Registration_Label_Username">Username:</sys:String>
+    <sys:String x:Key="Registration_Label_Password">Password:</sys:String>
+    <sys:String x:Key="Registration_Label_ConfirmPassword">Confirm password:</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Registration_Button_SignUp">Sign Up</sys:String>
+    <sys:String x:Key="Registration_Link_SignIn">Sign in to account</sys:String>
+
+    <!-- Password Reauirements -->
+    <sys:String x:Key="Registration_Requirement_MinLength">At least 12 characters</sys:String>
+    <sys:String x:Key="Registration_Requirement_Number">Use numbers</sys:String>
+    <sys:String x:Key="Registration_Requirement_SpecialSymbol">Use special characters</sys:String>
+    <sys:String x:Key="Registration_Requirement_Uppercase">Use uppercase letters</sys:String>
+
+    <!-- Helpers -->
+    <sys:String x:Key="Registration_Helper_LoginAvailable">Login is available</sys:String>
+    <sys:String x:Key="Registration_Helper_LoginTaken">Login is already taken by another user</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameAvailable">Username is available</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameTaken">Username is already taken by another user</sys:String>
+    <sys:String x:Key="Registration_Helper_AlreadyHaveAccount">Already have an account?</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Registration_Error_RegistrationFailed">Fill in all fields correctly!</sys:String>
+</ResourceDictionary>

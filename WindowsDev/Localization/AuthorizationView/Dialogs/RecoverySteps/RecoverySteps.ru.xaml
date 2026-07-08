@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="RecoverySteps_Label_EnterLogin">Введите логин:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_EnterRecoveryCode">Введите код восстановления:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_EnterNewPassword">Введите новый пароль:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_ConfirmPassword">Подтверждение пароля:</sys:String>
+    
+</ResourceDictionary>

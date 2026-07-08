@@ -21,7 +21,7 @@
                     MaxWidth="600">
 
             <!-- Language Settings -->
-            <TextBlock Text="{DynamicResource LanguageLabel}"
+            <TextBlock Text="{DynamicResource Settings_Label_Language}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -58,7 +58,7 @@
             </Border>
 
             <!-- Theme Settings -->
-            <TextBlock Text="{DynamicResource ThemeLabel}"
+            <TextBlock Text="{DynamicResource Settings_Label_Theme}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -80,11 +80,11 @@
                             Margin="0,15,0,5"/>
 
                     <Grid>
-                        <TextBlock Text="{DynamicResource DarkThemeLabel}"
+                        <TextBlock Text="{DynamicResource Settings_Label_DarkTheme}"
                                    HorizontalAlignment="Left"
                                    Foreground="{DynamicResource MahApps.Brushes.Gray}"/>
 
-                        <TextBlock Text="{DynamicResource LightThemeLabel}"
+                        <TextBlock Text="{DynamicResource Settings_Label_LightTheme}"
                                    HorizontalAlignment="Right"
                                    Foreground="{DynamicResource MahApps.Brushes.Gray}"/>
                     </Grid>
@@ -94,7 +94,7 @@
             </Border>
 
             <!-- Database Settings -->
-            <TextBlock Text="{DynamicResource DatabaseLabel}"
+            <TextBlock Text="{DynamicResource Settings_Label_Database}"
                        FontSize="14"
                        FontWeight="Bold"
                        Foreground="{DynamicResource MahApps.Brushes.Accent}"
@@ -108,15 +108,15 @@
 
                     <!-- Connection String Input -->
                     <UserCtrl:HeaderTextBox
-                        Header="{DynamicResource ConnectionStringLabel}"
+                        Header="{DynamicResource Settings_Label_ConnectionString}"
                         HeaderFontSize="12"
                         Text="{Binding NewConnectionString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                        Watermark="Server=localhost;Database=MyDb;..."/>
+                        Watermark="{DynamicResource Settings_Watermark_ConnectionString}"/>
 
                     <!-- Apply Button -->
-                    <Button Content="{DynamicResource ApplyButton}"
+                    <Button Content="{DynamicResource Settings_Button_Apply}"
                             Command="{Binding SetNewConnectionStringCommand}"
-                            Style="{DynamicResource MahApps.Styles.Button.Accent}"
+                            Style="{DynamicResource MahApps.Styles.Button.Dialogs.Accent}"
                             Width="120"
                             Margin="0,15,0,0"
                             HorizontalAlignment="Right"/>

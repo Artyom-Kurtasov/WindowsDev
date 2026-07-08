@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="TaskDialog_Label_Name">Name</sys:String>
+    <sys:String x:Key="TaskDialog_Label_Deadline">Deadline</sys:String>
+    <sys:String x:Key="TaskDialog_Label_Progress">Progress</sys:String>
+    <sys:String x:Key="TaskDialog_Label_Priority">Priority</sys:String>
+    <sys:String x:Key="TaskDialog_Label_Status">Status</sys:String>
+    <sys:String x:Key="TaskDialog_Label_Description">Description</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="TaskDialog_Button_Create">Create</sys:String>
+    <sys:String x:Key="TaskDialog_Button_Save">Save</sys:String>
+    <sys:String x:Key="TaskDialog_Button_Cancel">Cancel</sys:String>
+
+    <!-- Warnings -->
+    <sys:String x:Key="TaskDialog_Warning_EnterName">Enter task name.</sys:String>
+
+</ResourceDictionary>

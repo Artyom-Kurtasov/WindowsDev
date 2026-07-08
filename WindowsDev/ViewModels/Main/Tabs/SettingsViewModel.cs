@@ -4,6 +4,8 @@ using System.Windows;
 using System.Windows.Input;
 using WindowsDev.Business.DataBase.Interfaces;
 using WindowsDev.Business.Services.Localization.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Infrastructure;
 using WindowsDev.Settings;
@@ -17,7 +19,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
         private readonly IDbManager _dbManager;
         private readonly ILanguageChanger _languageChanger;
 
-        // ThemeManager from ControlzEx requires exact theme name strings.
         // SelectedTheme: 0 = Dakr, 1 = Light 
         const string lightTheme = "Light.Blue";
         const string darkTheme = "Dark.Blue";
@@ -126,8 +127,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
             catch
             {
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Warning_Title"),
-                    Translate("Warning_InvalidConnectionString"),
+                    Translate(DialogTitles.Warning),
+                    Translate(SettingsWarnings.InvalidConnectionString),
                     MessageDialogStyle.Affirmative);
 
                 // Roll back to the working connection string

@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Settings_Label_Language">Язык</sys:String>
+    <sys:String x:Key="Settings_Label_Theme">Тема</sys:String>
+    <sys:String x:Key="Settings_Label_Database">База данных</sys:String>
+    <sys:String x:Key="Settings_Label_ConnectionString">Строка подключения</sys:String>
+    <sys:String x:Key="Settings_Label_DarkTheme">Темная</sys:String>
+    <sys:String x:Key="Settings_Label_LightTheme">Светлая</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Settings_Button_Apply">Применить</sys:String>
+    
+    <!-- Watermarks -->
+    <sys:String x:Key="Settings_Watermark_ConnectionString">Server=localhost;Database=MyDb;...</sys:String>
+    
+    <!-- Warnings -->
+    <sys:String x:Key="Settings_Warning_InvalidConnectionString">Строка подключения неверная.</sys:String>
+
+</ResourceDictionary>

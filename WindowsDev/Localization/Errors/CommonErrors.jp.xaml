@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="Common_Error_UnexpectedError">
+        予期しないエラーが発生しました。もう一度お試しください。
+    </sys:String>
+    <sys:String x:Key="Common_Error_UserNotFound">
+        このログインIDのユーザーは見つかりませんでした。
+    </sys:String>
+</ResourceDictionary>

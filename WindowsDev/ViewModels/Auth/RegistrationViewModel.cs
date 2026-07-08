@@ -1,8 +1,14 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Informations;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Main;
 
@@ -10,24 +16,26 @@ namespace WindowsDev.ViewModels.Auth
 {
     public class RegistrationViewModel : ViewModelBase
     {
+        private readonly ILogger _logger;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
         private readonly IRegistration _registration;
         private readonly UserFieldValidator _userFieldValidator;
 
-        // Used to cancel previous debounced validation requests
         private CancellationTokenSource? _loginCts;
         private CancellationTokenSource? _usernameCts;
 
         public RegistrationViewModel(INavigationService navigationService,
             IRegistration registration,
             IDialogCoordinator dialogCoordinator,
+            ILogger logger,
             UserFieldValidator userFieldValidator)
         {
             _dialogCoordinator = dialogCoordinator;
             _navigationService = navigationService;
             _registration = registration;
             _userFieldValidator = userFieldValidator;
+            _logger = logger;
 
             SignUpCommand = new AsyncRelayCommand(SignUpAsync, CanSignUp);
             SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView);
@@ -105,6 +113,7 @@ namespace WindowsDev.ViewModels.Auth
             internal set
             {
                 if (_isLoginAvailable == value) return;
+
                 _isLoginAvailable = value;
                 OnPropertyChanged(nameof(IsLoginAvailable));
             }
@@ -117,21 +126,26 @@ namespace WindowsDev.ViewModels.Auth
             internal set
             {
                 if (_isUsernameAvailable == value) return;
+
                 _isUsernameAvailable = value;
                 OnPropertyChanged(nameof(IsUsernameAvailable));
             }
         }
 
-        private bool _isRegistrationFailed;
-        public bool IsRegistrationFailed
+        private string _errorMessage = string.Empty;
+        public string ErrorMessage
         {
-            get => _isRegistrationFailed;
+            get => _errorMessage;
             set
             {
-                _isRegistrationFailed = value;
-                OnPropertyChanged(nameof(IsRegistrationFailed));
+                _errorMessage = value;
+                OnPropertyChanged(nameof(ErrorMessage));
+                OnPropertyChanged(nameof(HasError));
             }
         }
+
+        public bool HasError =>
+            !string.IsNullOrWhiteSpace(ErrorMessage);
 
         private bool _isFormFilled =>
             !string.IsNullOrWhiteSpace(Login) &&
@@ -145,26 +159,48 @@ namespace WindowsDev.ViewModels.Auth
 
         private async Task SignUpAsync()
         {
-            if (!IsLoginAvailable || !IsUsernameAvailable ||
-                Password != ConfirmPassword || !PasswordValidator.IsValid(Password) || !_isFormFilled)
+            ErrorMessage = string.Empty;
+
+            if (!IsLoginAvailable ||
+                !IsUsernameAvailable ||
+                Password != ConfirmPassword ||
+                !PasswordValidator.IsValid(Password) ||
+                !_isFormFilled)
             {
-                IsRegistrationFailed = true;
+                ErrorMessage = Translate(AuthErrors.RegistrationFailed);
                 return;
             }
 
             try
             {
-                var recoveryCode = await _registration.Register(Password, Login, Username);
-                IsRegistrationFailed = false;
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Information_Title"), $"{Translate("RecoveryKeyMessage")}\n\n {recoveryCode}", MessageDialogStyle.Affirmative);
-                await _navigationService.NavigateTo<MainWindowViewModel>();
+                var result = await _registration.Register(Password, Login, Username);
+
+                if (result.IsSuccess)
+                {
+                    await _dialogCoordinator.ShowMessageAsync(
+                        this,
+                        Translate(DialogTitles.Information),
+                        $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                        MessageDialogStyle.Affirmative);
+
+                    await _navigationService.NavigateTo<MainWindowViewModel>();
+                }
+                else
+                {
+                    return;
+                }
             }
             catch (Exception ex)
             {
-                IsRegistrationFailed = true;
-                await _dialogCoordinator.ShowMessageAsync(this, Translate("Warning_Title"), Translate(ex.Message), MessageDialogStyle.Affirmative);
+                AuthLogs.RegistrationFailed(_logger, ex);
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
+                    MessageDialogStyle.Affirmative);
             }
         }
+
 
         private bool CanSignUp() => true;
 
@@ -180,7 +216,14 @@ namespace WindowsDev.ViewModels.Auth
                 IsLoginAvailable =
                     await _userFieldValidator.IsLoginAvailableAsync(Login);
             }
-            catch (TaskCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                AuthLogs.LoginAvailabilityCheckFailed(_logger, ex);
+                IsLoginAvailable = false;
+            }
         }
 
         private async Task CheckUsernameAvailabilityAsync()
@@ -195,12 +238,19 @@ namespace WindowsDev.ViewModels.Auth
                 IsUsernameAvailable =
                     await _userFieldValidator.IsUsernameAvailableAsync(Username);
             }
-            catch (TaskCanceledException) { }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                AuthLogs.UsernameAvailabilityCheckFailed(_logger, ex);
+                IsUsernameAvailable = false;
+            }
         }
 
         private void UpdateState()
         {
-            _isRegistrationFailed = false;
+            ErrorMessage = string.Empty;
             ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
         }
 

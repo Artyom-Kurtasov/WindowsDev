@@ -1,7 +1,9 @@
-﻿namespace WindowsDev.Business.Services.Registration.Interfaces
+﻿using WindowsDev.Business.Primitives;
+
+namespace WindowsDev.Business.Services.Registration.Interfaces
 {
     public interface IRegistration
     {
-        Task<int> Register(string password, string login, string username);
+        Task<Result<int>> Register(string password, string login, string username);
     }
 }

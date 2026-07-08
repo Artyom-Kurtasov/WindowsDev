@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Task_Label_Status">ステータス</sys:String>
+    <sys:String x:Key="Task_Label_Priority">優先度</sys:String>
+    <sys:String x:Key="Task_Label_Progress">進捗</sys:String>
+    <sys:String x:Key="Task_Label_CreatedAt">作成日</sys:String>
+    <sys:String x:Key="Task_Label_Description">説明</sys:String>
+    <sys:String x:Key="Task_Label_Attachments">添付ファイル</sys:String>
+    <sys:String x:Key="Task_Label_Comments">コメント</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Task_Button_Edit">編集</sys:String>
+    <sys:String x:Key="Task_Button_Back">戻る</sys:String>
+    <sys:String x:Key="Task_Button_AddAttachment">添付ファイルを追加</sys:String>
+    <sys:String x:Key="Task_Button_PostComment">投稿</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Task_Tooltip_EditTask">タスクを編集</sys:String>
+    <sys:String x:Key="Task_Tooltip_Open">開く</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Task_Watermark_AddComment">コメントを入力...</sys:String>
+    
+    <!-- Errors -->
+    <sys:String x:Key="Task_Error_FileNotFound">ファイルが見つかりません。移動または削除された可能性があります。</sys:String>
+
+</ResourceDictionary>

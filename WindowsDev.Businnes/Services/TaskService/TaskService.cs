@@ -1,5 +1,7 @@
-﻿using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService
@@ -15,8 +17,7 @@ namespace WindowsDev.Business.Services.TaskService
 
         public async Task AddAsync(TasksInfo task)
         {
-            if (task is null)
-                throw new Exception("TaskError_TaskIsNull");
+            ArgumentNullException.ThrowIfNull(task);
 
             await _taskRepository.AddAsync(task);
         }
@@ -25,40 +26,26 @@ namespace WindowsDev.Business.Services.TaskService
         {
             var task = await _taskRepository.FindTaskById(id);
 
-            if (task is null)
-                throw new Exception("TaskError_TaskNotFound");
+            ArgumentNullException.ThrowIfNull(task);
 
             await _taskRepository.DeleteAsync(task);
         }
 
         public async Task UpdateAsync(TasksInfo task)
         {
-            if (task is null)
-                throw new Exception("TaskError_TaskIsNull");
+            ArgumentNullException.ThrowIfNull(task);
 
             await _taskRepository.UpdateAsync(task);
         }
 
-        public async Task<List<TasksInfo>> GetTasksAsync(TaskFilter filter)
+        public async Task<Result<List<TasksInfo>>> GetTasksAsync(TaskFilter filter)
         {
             int page = filter.Page < 1 ? 1 : filter.Page;
             int pageSize = filter.PageSize < 1 ? 1 : filter.PageSize;
             int skip = (page - 1) * pageSize;
 
-            return await _taskRepository.GetTasksAsync(filter, skip, pageSize);
-        }
-
-        public async Task<TasksInfo> GetTaskByIdAsync(int id)
-        {
-            if (id < 1)
-                throw new Exception("TaskError_InvalidTaskId");
-
-            var task = await _taskRepository.GetTaskByIdAsync(id);
-
-            if (task is null)
-                throw new Exception("TaskError_TaskNotFound");
-
-            return task;
+            var tasks = await _taskRepository.GetTasksAsync(filter, skip, pageSize);
+            return Result<List<TasksInfo>>.Success(tasks);
         }
 
         public async Task<int> GetTasksCountAsync(int projectId)

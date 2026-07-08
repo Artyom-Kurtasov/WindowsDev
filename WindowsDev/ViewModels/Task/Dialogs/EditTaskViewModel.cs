@@ -1,10 +1,15 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 
 namespace WindowsDev.ViewModels.Tasks.Dialog
 {
@@ -35,44 +40,36 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        // Mutate the existing tracked entity directly instead of creating a new one —
-        // UpdateAsync relies on change tracking to detect modified fields
         private async Task EditTask()
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Warning),
+                    Translate(TaskDialogWarnings.EnterName),
+                    MessageDialogStyle.Affirmative);
+                return;
+            }
+
             try
             {
-                if (!string.IsNullOrWhiteSpace(Name))
-                {
-                    CurrentTask.Name = Name;
-                    CurrentTask.Description = Description;
-                    CurrentTask.Priority = Priority;
-                    CurrentTask.Progress = Progress;
-                    CurrentTask.Status = Status;
-                    CurrentTask.DeadLine = DeadLine.ToUniversalTime();
+                CurrentTask.Name = Name;
+                CurrentTask.Description = Description;
+                CurrentTask.Priority = Priority;
+                CurrentTask.Progress = Progress;
+                CurrentTask.Status = Status;
+                CurrentTask.DeadLine = DeadLine.ToUniversalTime();
 
-                    await _taskService.UpdateAsync(CurrentTask);
+                await _taskService.UpdateAsync(CurrentTask);
 
-                    if (Completed != null)
-                    {
-                        await Completed.Invoke();
-                    }
-
-                    await Close();
-                }
-                else
-                {
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate("Warning_Title"),
-                        Translate("Warning_EnterName"),
-                        MessageDialogStyle.Affirmative);
-                }
+                Completed?.Invoke();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to edit task {taskId}", CurrentTask.Id);
+                TaskLogs.TaskUpdateFailed(_logger, CurrentTask.Id, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate("Error_EditTask"),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }

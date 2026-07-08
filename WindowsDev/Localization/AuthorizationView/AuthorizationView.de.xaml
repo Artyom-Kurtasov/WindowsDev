@@ -1,0 +1,24 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title -->
+    <sys:String x:Key="Authorization_Title">Bei TaskManager anmelden</sys:String>
+
+    <!-- Lables & Helpers -->
+    <sys:String x:Key="Authorization_Label_Login">Benutzername:</sys:String>
+    <sys:String x:Key="Authorization_Label_Password">Passwort:</sys:String>
+    <sys:String x:Key="Authorization_Helper_NewToApp">Neu bei TaskManager?</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Authorization_Button_SignIn">Anmelden</sys:String>
+    <sys:String x:Key="Authorization_Link_SignUp">Registrieren</sys:String>
+    <sys:String x:Key="Authorization_Link_ForgotPassword">Passwort vergessen?</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Authorization_Error_InvalidCredentials">Ungültiger Benutzername oder Passwort</sys:String>
+    <sys:String x:Key="Authorization_Error_UnexpectedError">
+        Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.
+    </sys:String>
+
+</ResourceDictionary>

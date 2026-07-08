@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Step Labels -->
+    <sys:String x:Key="Recovery_Label_FirstStep">Schritt 1: Wiederherstellungscode eingeben</sys:String>
+    <sys:String x:Key="Recovery_Label_SecondStep">Schritt 2: Bestätigung</sys:String>
+    <sys:String x:Key="Recovery_Label_ThirdStep">Schritt 3: Passwort ändern</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Recovery_Button_Cancel">Abbrechen</sys:String>
+    <sys:String x:Key="Recovery_Button_ChangePassword">Passwort ändern</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Recovery_Tooltip_UserNotFound">Benutzer mit diesem Benutzernamen nicht gefunden</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_InvalidRecoveryCode">Ungültiger Wiederherstellungscode</sys:String>
+    <sys:String x:Key="Recovery_Tooltip_NextStep">Nächster Schritt</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Recovery_Error_InvalidRecoveryCode">
+        Ungültiger Wiederherstellungscode. Bitte versuchen Sie es erneut.
+    </sys:String>
+
+    <!-- Informations -->
+    <sys:String x:Key="Recovery_Information_RecoveryKey">Bewahren Sie diesen Wiederherstellungsschlüssel auf. Sie werden ihn benötigen, wenn Sie Ihr Passwort zurücksetzen möchten.</sys:String>
+
+</ResourceDictionary>

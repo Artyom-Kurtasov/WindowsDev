@@ -72,6 +72,9 @@ namespace WindowsDev.Settings
                 builder.ClearProviders();
                 builder.AddProvider(new FileLoggerProvider("log.txt"));
             });
+
+            services.AddSingleton(typeof(ILogger), sp =>
+                sp.GetRequiredService<ILoggerFactory>().CreateLogger("Default"));
         }
 
         private static void ConfigureInfrastructure(IServiceCollection services)

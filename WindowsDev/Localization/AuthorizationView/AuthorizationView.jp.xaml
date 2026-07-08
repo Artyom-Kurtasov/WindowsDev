@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Title -->
+    <sys:String x:Key="Authorization_Title">TaskManagerにサインイン</sys:String>
+
+    <!-- Lables & Helpers -->
+    <sys:String x:Key="Authorization_Label_Login">ログインID:</sys:String>
+    <sys:String x:Key="Authorization_Label_Password">パスワード:</sys:String>
+    <sys:String x:Key="Authorization_Helper_NewToApp">TaskManagerは初めてですか？</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Authorization_Button_SignIn">サインイン</sys:String>
+    <sys:String x:Key="Authorization_Link_SignUp">アカウント登録</sys:String>
+    <sys:String x:Key="Authorization_Link_ForgotPassword">パスワードをお忘れですか？</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Authorization_Error_InvalidCredentials">ログインIDまたはパスワードが間違っています</sys:String>
+
+</ResourceDictionary>

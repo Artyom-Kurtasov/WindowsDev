@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="RecoverySteps_Label_EnterLogin">ログインIDを入力してください:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_EnterRecoveryCode">回復コードを入力してください:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_EnterNewPassword">新しいパスワードを入力してください:</sys:String>
+    <sys:String x:Key="RecoverySteps_Label_ConfirmPassword">パスワードを確認:</sys:String>
+
+</ResourceDictionary>

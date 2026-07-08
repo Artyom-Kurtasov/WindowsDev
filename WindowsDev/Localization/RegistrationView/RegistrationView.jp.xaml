@@ -1,0 +1,32 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Title -->
+    <sys:String x:Key="Registration_Title">TaskManagerにアカウント登録</sys:String>
+
+    <!-- Lables -->
+    <sys:String x:Key="Registration_Label_Login">ログインID:</sys:String>
+    <sys:String x:Key="Registration_Label_Username">ユーザー名:</sys:String>
+    <sys:String x:Key="Registration_Label_Password">パスワード:</sys:String>
+    <sys:String x:Key="Registration_Label_ConfirmPassword">パスワード確認:</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Registration_Button_SignUp">登録</sys:String>
+    <sys:String x:Key="Registration_Link_SignIn">アカウントにサインイン</sys:String>
+
+    <!-- Password Reauirements -->
+    <sys:String x:Key="Registration_Requirement_MinLength">12文字以上</sys:String>
+    <sys:String x:Key="Registration_Requirement_Number">数字を含む</sys:String>
+    <sys:String x:Key="Registration_Requirement_SpecialSymbol">特殊文字を含む</sys:String>
+    <sys:String x:Key="Registration_Requirement_Uppercase">大文字を含む</sys:String>
+
+    <!-- Helpers -->
+    <sys:String x:Key="Registration_Helper_LoginAvailable">ログインIDは使用可能です</sys:String>
+    <sys:String x:Key="Registration_Helper_LoginTaken">ログインIDは別のユーザーによって使用されています</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameAvailable">ユーザー名は使用可能です</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameTaken">ユーザー名は別のユーザーによって使用されています</sys:String>
+    <sys:String x:Key="Registration_Helper_AlreadyHaveAccount">すでにアカウントをお持ちですか？</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Registration_Error_RegistrationFailed">すべての項目を正しく入力してください！</sys:String>
+</ResourceDictionary>

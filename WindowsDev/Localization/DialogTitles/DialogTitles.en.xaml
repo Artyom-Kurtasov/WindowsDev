@@ -1,0 +1,10 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="DialogTitles_Error">Error</sys:String>
+    <sys:String x:Key="DialogTitles_Warning">Warning</sys:String>
+    <sys:String x:Key="DialogTitles_Information">Information</sys:String>
+    <sys:String x:Key="DialogTitles_Success">Success</sys:String>
+
+</ResourceDictionary>

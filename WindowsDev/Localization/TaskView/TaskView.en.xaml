@@ -1,0 +1,30 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Task_Label_Status">Status</sys:String>
+    <sys:String x:Key="Task_Label_Priority">Priority</sys:String>
+    <sys:String x:Key="Task_Label_Progress">Progress</sys:String>
+    <sys:String x:Key="Task_Label_CreatedAt">Created at</sys:String>
+    <sys:String x:Key="Task_Label_Description">Description</sys:String>
+    <sys:String x:Key="Task_Label_Attachments">Attachments</sys:String>
+    <sys:String x:Key="Task_Label_Comments">Comments</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Task_Button_Edit">Edit</sys:String>
+    <sys:String x:Key="Task_Button_Back">Back</sys:String>
+    <sys:String x:Key="Task_Button_AddAttachment">Add attachment</sys:String>
+    <sys:String x:Key="Task_Button_PostComment">Post</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="Task_Tooltip_EditTask">Edit task</sys:String>
+    <sys:String x:Key="Task_Tooltip_Open">Open</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Task_Watermark_AddComment">Enter a comment...</sys:String>
+    
+    <!-- Errors -->
+    <sys:String x:Key="Task_Error_FileNotFound">File not found. It may have been moved or deleted.</sys:String>
+
+</ResourceDictionary>

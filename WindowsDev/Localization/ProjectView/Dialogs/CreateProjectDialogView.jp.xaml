@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="CreateProject_Label_Name">名前</sys:String>
+    <sys:String x:Key="CreateProject_Label_Description">説明</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="CreateProject_Button_Create">作成</sys:String>
+    <sys:String x:Key="CreateProject_Button_Cancel">キャンセル</sys:String>
+    
+    <!-- Warnings -->
+    <sys:String x:Key="CreateProject_Warning_EnterName">プロジェクト名を入力してください。</sys:String>
+
+</ResourceDictionary>

@@ -1,0 +1,21 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Projects_Label_Id">ID</sys:String>
+    <sys:String x:Key="Projects_Label_Name">名前</sys:String>
+    <sys:String x:Key="Projects_Label_Description">説明</sys:String>
+    <sys:String x:Key="Projects_Label_CreatedAt">作成日</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Projects_Button_Add">追加</sys:String>
+    <sys:String x:Key="Projects_Button_Delete">削除</sys:String>
+    <sys:String x:Key="Projects_Button_Search">検索</sys:String>
+    <sys:String x:Key="Projects_Button_Prev">前へ</sys:String>
+    <sys:String x:Key="Projects_Button_Next">次へ</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Projects_Watermark_Search">検索...</sys:String>
+
+</ResourceDictionary>

@@ -2,16 +2,20 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Domain.TasksModels.Enums;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Projects;
@@ -56,7 +60,6 @@ namespace WindowsDev.ViewModels.Tasks
             AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
             OpenAttachmentCommand = new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
 
-            // Fire-and-forget: errors are handled and logged inside LoadDetailsAsync
             _ = LoadDetailsAsync();
         }
 
@@ -68,9 +71,6 @@ namespace WindowsDev.ViewModels.Tasks
 
         public ProjectsInfo Project { get; }
 
-        // Proxy properties that delegate to CurrentTask.
-        // CurrentTask is mutated directly — EditTaskViewModel and RefreshAsync
-        // both modify it, then we notify the UI about changed fields
         public TasksInfo CurrentTask
         {
             get => _currentTask;
@@ -123,9 +123,6 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-        // Delegate properties — read/write directly to CurrentTask.
-        // No separate backing fields needed, but we must manually notify
-        // because CurrentTask doesn't implement INotifyPropertyChanged
         public string Name
         {
             get => CurrentTask.Name;
@@ -200,8 +197,6 @@ namespace WindowsDev.ViewModels.Tasks
 
         public DateTime CreatedAt => CurrentTask.CreatedAt;
 
-        // RefreshAsync is called by DialogService after EditTaskViewModel completes.
-        // We only need to re-notify the UI — CurrentTask was already mutated by the dialog
         public Task RefreshAsync()
         {
             RefreshTask();
@@ -210,8 +205,8 @@ namespace WindowsDev.ViewModels.Tasks
 
         private async Task LoadDetailsAsync()
         {
-            // Comments and attachments are loaded independently —
-            // failure of one doesn't prevent loading the other
+            var taskId = CurrentTask.Id.ToString();
+
             try
             {
                 Comments = new ObservableCollection<Comments>(
@@ -219,13 +214,13 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load comments for task {TaskId}", CurrentTask.Id);
-                Comments = new ObservableCollection<Comments>();
-
+                CommentLogs.CommentLoadFailed(_logger, taskId, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommentErrors.LoadFailed),
                     MessageDialogStyle.Affirmative);
+
+                Comments = new ObservableCollection<Comments>();
             }
 
             try
@@ -235,13 +230,13 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to load attachments for task {TaskId}", CurrentTask.Id);
-                Attachments = new ObservableCollection<TaskAttachment>();
-
+                AttachmentLogs.AttachmentLoadFailed(_logger, taskId, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(AttachmentErrors.LoadFailed),
                     MessageDialogStyle.Affirmative);
+
+                Attachments = new ObservableCollection<TaskAttachment>();
             }
         }
 
@@ -252,8 +247,6 @@ namespace WindowsDev.ViewModels.Tasks
 
             try
             {
-                // UseShellExecute = true delegates to the OS default handler
-                // for the file type (PDF reader, image viewer, etc.)
                 Process.Start(new ProcessStartInfo
                 {
                     FileName = taskAttachment.FilePath,
@@ -262,18 +255,22 @@ namespace WindowsDev.ViewModels.Tasks
             }
             catch (FileNotFoundException ex)
             {
-                _logger.LogError(ex, "Attachment file not found: {FilePath}", taskAttachment.FilePath);
+                AttachmentLogs.AttachmentNotFound(_logger, taskAttachment.Id.ToString());
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate("AttachmentError_FileNotFound"),
+                    Translate(DialogTitles.Error),
+                    Translate(TaskErrors.FileNotFound),
                     MessageDialogStyle.Affirmative);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to open attachment: {FilePath}", taskAttachment.FilePath);
+                AttachmentLogs.AttachmentDownloadFailed(
+                    _logger,
+                    taskAttachment.Id.ToString(),
+                    taskAttachment.FilePath,
+                    ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(AttachmentErrors.CannotOpenFile),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -286,19 +283,32 @@ namespace WindowsDev.ViewModels.Tasks
 
                 if (dialog.ShowDialog() == true)
                 {
-                    var attachment =
-                        await _attacmentService.AddFile(dialog.FileName, CurrentTask.Id);
+                    var result = await _attacmentService.AddFile(dialog.FileName, CurrentTask.Id);
 
-                    if (attachment != null)
-                        Attachments?.Add(attachment);
+                    if (result.IsSuccess)
+                    {
+                        Attachments?.Add(result.Value);
+                    }
+                    else
+                    {
+                        AttachmentLogs.AttachmentUploadFailed(
+                            _logger,
+                            dialog.FileName,
+                            new FileInfo(dialog.FileName).Length,
+                            new InvalidOperationException(result.Error));
+                        await _dialogCoordinator.ShowMessageAsync(this,
+                            Translate(DialogTitles.Error),
+                            Translate(result.Error),
+                            MessageDialogStyle.Affirmative);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to add attachment for task {TaskId}", CurrentTask.Id);
+                AttachmentLogs.AttachmentUploadFailed(_logger, "unknown", 0, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -308,19 +318,35 @@ namespace WindowsDev.ViewModels.Tasks
             if (string.IsNullOrWhiteSpace(_newComment))
                 return;
 
+            var taskId = CurrentTask.Id.ToString();
+
             try
             {
-                var comment = await _commentService.AddComment(CurrentTask.Id, _newComment);
+                var result = await _commentService.AddComment(CurrentTask.Id, _newComment);
 
-                Comments?.Add(comment);
-                NewComment = string.Empty;
+                if (result.IsSuccess)
+                {
+                    Comments?.Add(result.Value);
+                    NewComment = string.Empty;
+                }
+                else
+                {
+                    CommentLogs.CommentCreationFailed(
+                        _logger,
+                        taskId,
+                        new InvalidOperationException(result.Error));
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Error),
+                        Translate(result.Error),
+                        MessageDialogStyle.Affirmative);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to add comment for task {TaskId}", CurrentTask.Id);
+                CommentLogs.CommentCreationFailed(_logger, taskId, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }
@@ -335,8 +361,6 @@ namespace WindowsDev.ViewModels.Tasks
 
         private bool CanSwitchToProject() => true;
 
-        // Called after EditTaskViewModel mutates CurrentTask.
-        // We only need to re-notify the UI — the data is already updated in-place
         public void RefreshTask()
         {
             OnPropertyChanged(nameof(Name));

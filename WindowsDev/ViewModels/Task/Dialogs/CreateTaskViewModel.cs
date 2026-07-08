@@ -1,10 +1,15 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.Logging;
 
 namespace WindowsDev.ViewModels.Tasks.Dialog
 {
@@ -40,43 +45,37 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
 
         public async Task CreateTask()
         {
+            if (string.IsNullOrWhiteSpace(Name))
+            {
+                await _dialogCoordinator.ShowMessageAsync(this,
+                    Translate(DialogTitles.Warning),
+                    Translate(TaskDialogWarnings.EnterName),
+                    MessageDialogStyle.Affirmative);
+                return;
+            }
+
             try
             {
-                if (!string.IsNullOrWhiteSpace(Name))
+                await _taskService.AddAsync(new TasksInfo
                 {
-                    await _taskService.AddAsync(new TasksInfo
-                    {
-                        Name = Name,
-                        Description = Description,
-                        Priority = Priority,
-                        Progress = Progress,
-                        Status = Status,
-                        DeadLine = DeadLine.ToUniversalTime(),
-                        CreatedAt = DateTime.UtcNow,
-                        ProjectId = _projectId
-                    });
+                    Name = Name,
+                    Description = Description,
+                    Priority = Priority,
+                    Progress = Progress,
+                    Status = Status,
+                    DeadLine = DeadLine.ToUniversalTime(),
+                    CreatedAt = DateTime.UtcNow,
+                    ProjectId = _projectId
+                });
 
-                    if (Completed != null)
-                    {
-                        await Completed.Invoke();
-                    }
-
-                    await Cancel();
-                }
-                else
-                {
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate("Warning_Title"),
-                        Translate("Warning_EnterName"),
-                        MessageDialogStyle.Affirmative);
-                }
+                Completed?.Invoke();
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to create task in project {ProjectId}", _projectId);
+                TaskLogs.TaskCreationFailed(_logger, Name, _projectId, ex);
                 await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate("Error_Title"),
-                    Translate(ex.Message),
+                    Translate(DialogTitles.Error),
+                    Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }

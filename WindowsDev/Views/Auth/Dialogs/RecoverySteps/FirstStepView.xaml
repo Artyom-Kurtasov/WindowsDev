@@ -10,7 +10,7 @@
     <Grid>
         <!-- Login Input -->
         <UserCtrl:HeaderTextBox
-                Header="{DynamicResource EnterLoginLabel}"
+                Header="{DynamicResource RecoverySteps_Label_EnterLogin}"
                 Text="{Binding Login, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
     </Grid>
 </UserControl>

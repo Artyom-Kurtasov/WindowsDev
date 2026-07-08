@@ -1,6 +1,8 @@
-﻿using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 
 namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 {
@@ -21,26 +23,26 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
             return Random.Shared.Next(100000, 999999);
         }
 
-        public async Task IsRecoverCodeCorrect(int recoveryCode, string login)
+        public async Task<Result<bool>> IsRecoverCodeCorrect(int recoveryCode, string login)
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
-            if (user is null)
-                throw new Exception("RecoveryError_UserNotFound");
+            ArgumentNullException.ThrowIfNull(user);
 
             var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
             var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), user.RecoveryCodeSalt!);
 
             if (recoveryCodeHash.ToString("x16") != user.RecoveryCodeHash)
-                throw new Exception("RecoveryError_InvalidRecoveryCode");
+                return Result<bool>.Failure(PasswordRecoveryErrors.InvalidRecoveryCode);
+
+            return Result<bool>.Success(true);
         }
 
-        public async Task<int> ChangePasswordAsync(string login, string password)
+        public async Task<Result<int>> ChangePasswordAsync(string login, string password)
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
-            if (user is null)
-                throw new Exception("RecoveryError_UserNotFound");
+            ArgumentNullException.ThrowIfNull(user);
 
             var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
             var passwordSalt = hasher.GenerateSalt();
@@ -57,7 +59,7 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 
             await _userRepository.UpdateAsync(user);
 
-            return recoveryCode;
+            return Result<int>.Success(recoveryCode);
         }
     }
 }

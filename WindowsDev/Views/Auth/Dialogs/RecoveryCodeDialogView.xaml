@@ -36,13 +36,13 @@
         <ContentControl Grid.Row="0" Margin="0,0,0,15">
             <ContentControl.Style>
                 <Style TargetType="ContentControl">
-                    <Setter Property="Content" Value="{DynamicResource FirstStepLabel}"/>
+                    <Setter Property="Content" Value="{DynamicResource Recovery_Label_FirstStep}"/>
                     <Style.Triggers>
                         <DataTrigger Binding="{Binding CurrentStep}" Value="1">
-                            <Setter Property="Content" Value="{DynamicResource SecondStepLabel}"/>
+                            <Setter Property="Content" Value="{DynamicResource Recovery_Label_SecondStep}"/>
                         </DataTrigger>
                         <DataTrigger Binding="{Binding CurrentStep}" Value="2">
-                            <Setter Property="Content" Value="{DynamicResource ThirdStepLabel}"/>
+                            <Setter Property="Content" Value="{DynamicResource Recovery_Label_ThirdStep}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>
@@ -55,7 +55,7 @@
         <!-- Action Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
 
-            <Button Content="{DynamicResource CancelButton}" 
+            <Button Content="{DynamicResource Recovery_Button_Cancel}" 
                     Margin="10,0,0,0"
                     Command="{Binding CancelCommand}">
                 <Button.Style>
@@ -104,7 +104,7 @@
                 </Button.Style>
             </Button>
 
-            <Button Content="{DynamicResource ChangePasswordLabel}" 
+            <Button Content="{DynamicResource Recovery_Button_ChangePassword}" 
                     Margin="10,0,0,0"
                     Command="{Binding ChangePasswordCommand}">
                 <Button.Style>

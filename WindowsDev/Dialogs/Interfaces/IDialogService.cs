@@ -7,5 +7,7 @@ namespace WindowsDev.Dialogs.Interfaces
         Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
             where TView : UserControl, new()
             where TViewModel : class, IDialogViewModel;
+
+        Task ShowErrorDialogAsync(object context, string message, params object[] args);
     }
 }

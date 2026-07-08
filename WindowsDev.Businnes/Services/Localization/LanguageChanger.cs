@@ -31,7 +31,7 @@ namespace WindowsDev.Business.Services.Localization
             {
                 return new ResourceDictionary
                 {
-                    Source = new Uri($"/Localization/Lang.{languageCode}.xaml", UriKind.Relative)
+                    Source = new Uri($"/Localization/Language.{languageCode}.xaml", UriKind.Relative)
                 };
             }
             catch (IOException)

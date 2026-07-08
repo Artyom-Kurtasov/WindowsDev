@@ -1,0 +1,36 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Profile_Label_UserId">ユーザーID:</sys:String>
+    <sys:String x:Key="Profile_Label_Login">ログインID:</sys:String>
+    <sys:String x:Key="Profile_Label_Username">ユーザー名:</sys:String>
+    <sys:String x:Key="Profile_Label_CurrentPassword">現在のパスワード:</sys:String>
+    <sys:String x:Key="Profile_Label_NewPassword">新しいパスワード:</sys:String>
+    <sys:String x:Key="Profile_Label_ConfirmPassword">パスワード確認:</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Profile_Button_Save">保存</sys:String>
+    <sys:String x:Key="Profile_Button_Logout">ログアウト</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Profile_Watermark_CurrentPassword">現在のパスワードを入力</sys:String>
+    <sys:String x:Key="Profile_Watermark_NewPassword">新しいパスワードを入力</sys:String>
+    <sys:String x:Key="Profile_Watermark_ConfirmPassword">新しいパスワードを確認</sys:String>
+
+    <!-- Change Password Section -->
+    <sys:String x:Key="Profile_Label_ChangePassword">パスワード変更</sys:String>
+    
+    <!-- Errors -->
+    <sys:String x:Key="Profile_Error_NewPasswordSameAsCurrent">新しいパスワードは現在のパスワードと異なるものを設定してください。</sys:String>
+    <sys:String x:Key="Profile_Error_PasswordsDontMatch">パスワードが一致しません。</sys:String>
+    <sys:String x:Key="Profile_Error_InvalidCurrentPassword">現在のパスワードが正しくありません。</sys:String>
+    <sys:String x:Key="Profile_Error_NewUsernameSameAsCurrent">新しいユーザー名は現在のユーザー名と異なるものを設定してください。</sys:String>
+    <sys:String x:Key="Profile_Error_UsernameAlreadyTaken">このユーザー名は別のユーザーによって既に使用されています。</sys:String>
+
+    <!-- Success -->
+    <sys:String x:Key="Profile_Success_UsernameChanged">ユーザー名が正常に変更されました。</sys:String>
+    <sys:String x:Key="Profile_Success_PasswordChanged">パスワードが正常に変更されました。</sys:String>
+
+</ResourceDictionary>

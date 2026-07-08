@@ -31,7 +31,7 @@
                    Orientation="Horizontal" 
                    Margin="0,0,0,20">
 
-                <Button Content="{DynamicResource EditButton}" 
+                <Button Content="{DynamicResource Task_Button_Edit}" 
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8" 
                    Margin="0,0,8,0"
@@ -39,7 +39,7 @@
                    ToolTip="{DynamicResource EditTaskTooltip}"
                     Command="{Binding EditTaskCommand}"/>
 
-                <Button Content="{DynamicResource BackButton}"
+                <Button Content="{DynamicResource Task_Button_Back}"
                     mah:ControlsHelper.CornerRadius="8"
                     Padding="16, 8"
                     Command="{Binding SwitchToProjectCommand}"/>
@@ -72,7 +72,7 @@
                 <!-- Status -->
                 <UserCtrl:HeaderTextBlock Grid.Row="0"
                           Grid.Column="0"
-                          Header="{DynamicResource StatusLabel}"
+                          Header="{DynamicResource Task_Label_Status}"
                           Text="{Binding Status,
                                          Converter={StaticResource TaskStatusConverter}}"
                           FontSize="16"
@@ -81,7 +81,7 @@
                 <!-- Priority -->
                 <UserCtrl:HeaderTextBlock Grid.Row="1"
                           Grid.Column="0"
-                          Header="{DynamicResource PriorityLabel}"
+                          Header="{DynamicResource Task_Label_Priority}"
                           Text="{Binding Priority,
                                          Converter={StaticResource TaskPriorityConverter}}"
                           FontSize="16"
@@ -90,14 +90,14 @@
                 <!-- Progress -->
                 <UserCtrl:HeaderTextBlock Grid.Row="0"
                           Grid.Column="1"
-                          Header="{DynamicResource ProgressLabel}"
+                          Header="{DynamicResource Task_Label_Progress}"
                           Text="{Binding Progress, StringFormat={}{0}%}"
                           FontSize="16"
                           FontWeight="SemiBold"/>
 
                 <!-- Created Date -->
                 <UserCtrl:HeaderTextBlock Grid.Row="1" Grid.Column="1" 
-                                Header="{DynamicResource CreatedAtLabel}"
+                                Header="{DynamicResource Task_Label_CreatedAt}"
                                 Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy}'}" 
                                 FontSize="16" 
                                 FontWeight="SemiBold"/>
@@ -105,7 +105,7 @@
 
             <!-- Task Description -->
             <UserCtrl:HeaderTextBlock 
-            Header="{DynamicResource DescriptionLabel}"
+            Header="{DynamicResource Task_Label_Description}"
             Grid.Row="3" 
             mah:ControlsHelper.CornerRadius="8"
             Margin="0,0,0,20" 
@@ -124,13 +124,13 @@
 
                 <!-- Attachments Header -->
                 <TextBlock Grid.Row="0"
-                      Text="{DynamicResource AttachmentsLabel}" 
+                      Text="{DynamicResource Task_Label_Attachments}" 
                       FontSize="16" 
                       FontWeight="SemiBold" 
                       Foreground="#2196F3" 
                       Margin="0,0,0,12"/>
 
-                <!-- Attachments List (Scrollable) -->
+                <!-- Attachments List -->
                 <ScrollViewer Grid.Row="1"
                          VerticalScrollBarVisibility="Auto"
                          Margin="0,0,0,12">
@@ -167,11 +167,11 @@
 
                                         <!-- Download Button -->
                                         <Button Grid.Column="2" 
-                                           Content="📥"
+                                                
                                            mah:ControlsHelper.CornerRadius="4"
                                            Padding="8,4"
                                            FontSize="14"
-                                           ToolTip="{DynamicResource DownloadTooltip}"
+                                           ToolTip="{DynamicResource Task_Tooltip_Open}"
                                            Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                            CommandParameter="{Binding}"/>
                                     </Grid>
@@ -183,7 +183,7 @@
 
                 <!-- Add Attachment Button -->
                 <Button Grid.Row="2"
-                   Content="{DynamicResource AddAttachmentButton}"
+                   Content="{DynamicResource Task_Button_AddAttachment}"
                    mah:ControlsHelper.CornerRadius="6"
                    Padding="16,8"
                    HorizontalAlignment="Left"
@@ -200,13 +200,13 @@
 
                 <!-- Comments Header -->
                 <TextBlock Grid.Row="0" 
-                      Text="{DynamicResource CommentsLabel}" 
+                      Text="{DynamicResource Task_Label_Comments}" 
                       FontSize="16" 
                       FontWeight="SemiBold" 
                       Foreground="#2196F3" 
                       Margin="0,0,0,12"/>
 
-                <!-- Comments List (Scrollable with Fixed Height) -->
+                <!-- Comments List -->
                 <ScrollViewer Grid.Row="1" 
                          VerticalScrollBarVisibility="Auto"
                          Margin="0,0,0,12">
@@ -263,14 +263,14 @@
 
                     <!-- Comment Text Input -->
                     <TextBox Grid.Column="0" 
-                        mah:TextBoxHelper.Watermark="{DynamicResource AddCommentWatermark}"
+                        mah:TextBoxHelper.Watermark="{DynamicResource Task_Watermark_AddComment}"
                         Margin="0,0,8,0"
                         Padding="8"
                         Text="{Binding NewComment, Mode=TwoWay}"/>
 
                     <!-- Post Comment Button -->
                     <Button Grid.Column="1" 
-                       Content="{DynamicResource PostCommentButton}"
+                       Content="{DynamicResource Task_Button_PostComment}"
                        mah:ControlsHelper.CornerRadius="6"
                        Padding="16,8"
                        Command="{Binding AddCommentCommand}"/>

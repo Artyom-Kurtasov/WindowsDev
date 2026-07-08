@@ -1,0 +1,35 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Title -->
+    <sys:String x:Key="Registration_Title">Зарегистрировать аккаунт в TaskManager</sys:String>
+    
+    <!-- Lables -->
+    <sys:String x:Key="Registration_Label_Login">Логин:</sys:String>
+    <sys:String x:Key="Registration_Label_Username">Имя пользователя:</sys:String>
+    <sys:String x:Key="Registration_Label_Password">Пароль:</sys:String>
+    <sys:String x:Key="Registration_Label_ConfirmPassword">Повторите пароль:</sys:String>
+
+    <!-- Buttons & Links -->
+    <sys:String x:Key="Registration_Button_SignUp">Зарегистрироваться</sys:String>
+    <sys:String x:Key="Registration_Link_SignIn">Войти в аккаунт</sys:String>
+
+    <!-- Password Reauirements -->
+    <sys:String x:Key="Registration_Requirement_MinLength">Минимум 12 символов</sys:String>
+    <sys:String x:Key="Registration_Requirement_Number">Используйте цифры</sys:String>
+    <sys:String x:Key="Registration_Requirement_SpecialSymbol">Используйте специальные символы</sys:String>
+    <sys:String x:Key="Registration_Requirement_Uppercase">Используйте заглавные буквы</sys:String>
+    
+    <!-- Helpers -->
+    <sys:String x:Key="Registration_Helper_LoginAvailable">Данный логин свободен</sys:String>
+    <sys:String x:Key="Registration_Helper_LoginTaken">Данный логин уже занят другим пользователем</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameAvailable">Данное имя пользователя свободно</sys:String>
+    <sys:String x:Key="Registration_Helper_UsernameTaken">Данное имя пользователя уже используется другим пользователем</sys:String>
+    <sys:String x:Key="Registration_Helper_AlreadyHaveAccount">Уже есть аккаунт?</sys:String>
+
+    <!-- Errors -->
+    <sys:String x:Key="Registration_Error_RegistrationFailed">Заполните все поля корректно!</sys:String>
+    
+
+
+</ResourceDictionary>

@@ -1,4 +1,5 @@
-﻿using WindowsDev.Domain.ProjectsModels;
+﻿using WindowsDev.Business.Primitives;
+using WindowsDev.Domain.ProjectsModels;
 
 namespace WindowsDev.Business.Services.ProjectService.Interfaces
 {

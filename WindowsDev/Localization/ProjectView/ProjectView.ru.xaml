@@ -1,0 +1,25 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Labels -->
+    <sys:String x:Key="Project_Label_Name">Название</sys:String>
+    <sys:String x:Key="Project_Label_Description">Описание</sys:String>
+    <sys:String x:Key="Project_Label_Id">ID</sys:String>
+    <sys:String x:Key="Project_Label_Deadline">Дедлайн</sys:String>
+    <sys:String x:Key="Project_Label_CreatedAt">Дата создания</sys:String>
+
+    <!-- Buttons -->
+    <sys:String x:Key="Project_Button_Back">Назад</sys:String>
+    <sys:String x:Key="Project_Button_Add">Добавить</sys:String>
+    <sys:String x:Key="Project_Button_Delete">Удалить</sys:String>
+
+    <!-- Watermarks -->
+    <sys:String x:Key="Project_Watermark_Search">Поиск...</sys:String>
+
+    <!-- Status Filters -->
+    <sys:String x:Key="Project_Label_All">Все</sys:String>
+    <sys:String x:Key="Project_Label_Closed">Закрытые</sys:String>
+    <sys:String x:Key="Project_Label_InProgress">В процессе</sys:String>
+
+</ResourceDictionary>

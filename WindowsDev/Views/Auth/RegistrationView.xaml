@@ -27,19 +27,24 @@
                 <!-- Logo -->
                 <UserCtrl:Logo Kind="TaskRound"
                            ViewBoxHeight="70" ViewBoxWidth="70"
-                           Text="{DynamicResource RegTitle}"
+                           Text="{DynamicResource Registration_Title}"
                            HorizontalContentAlignment="Center"
                            HorizontalAlignment="Stretch"/>
 
                 <!-- Registration Error Message -->
-                <TextBlock Foreground="Red" HorizontalAlignment="Center">
+                <TextBlock
+                    Margin="20,20,20,0"
+                    Foreground="Red"
+                    HorizontalAlignment="Center"
+                    Text="{Binding ErrorMessage}">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
                             <Setter Property="Visibility" Value="Collapsed"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsRegistrationFailed}" Value="True">
-                                    <Setter Property="Text" Value="{DynamicResource Registration_Failed}"/>
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                <DataTrigger Binding="{Binding HasError}"
+                             Value="True">
+                                    <Setter Property="Visibility"
+                             Value="Visible"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -48,7 +53,7 @@
 
                 <!-- Login Input -->
                 <UserCtrl:HeaderTextBox CornerRadius="8" Margin="0,20,0,0"
-                                        Header="{DynamicResource LoginLabel}"
+                                        Header="{DynamicResource Registration_Label_Login}"
                                         Text="{Binding Login, Mode=TwoWay}"/>
 
                 <!-- Login Availability Status -->
@@ -58,10 +63,10 @@
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsLoginAvailable}" Value="True">
-                                    <Setter Property="Text" Value="{DynamicResource LoginAvailable}"/>
+                                    <Setter Property="Text" Value="{DynamicResource Registration_Helper_LoginAvailable}"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsLoginAvailable}" Value="False">
-                                    <Setter Property="Text" Value="{DynamicResource LoginTaken}"/>
+                                    <Setter Property="Text" Value="{DynamicResource Registration_Helper_LoginTaken}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -70,7 +75,7 @@
 
                 <!-- Username Input -->
                 <UserCtrl:HeaderTextBox CornerRadius="8"
-                                      Header="{DynamicResource UsernameLabel}" Margin="0,20,0,0"
+                                      Header="{DynamicResource Registration_Label_Username}" Margin="0,20,0,0"
                                       Text="{Binding Username, Mode=TwoWay}"/>
 
                 <!-- Username Availability Status -->
@@ -81,10 +86,10 @@
                         <Style TargetType="TextBlock">
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding IsUsernameAvailable}" Value="True">
-                                    <Setter Property="Text" Value="{DynamicResource UsernameAvailable}"/>
+                                    <Setter Property="Text" Value="{DynamicResource Registration_Helper_UsernameAvailable}"/>
                                 </DataTrigger>
                                 <DataTrigger Binding="{Binding IsUsernameAvailable}" Value="False">
-                                    <Setter Property="Text" Value="{DynamicResource UsernameTaken}"/>
+                                    <Setter Property="Text" Value="{DynamicResource Registration_Helper_UsernameTaken}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
@@ -95,7 +100,7 @@
                 <StackPanel HorizontalAlignment="Stretch">
 
                     <UserCtrl:HeaderPasswordBox
-                    Header="{DynamicResource PasswordLabel}"
+                    Header="{DynamicResource Registration_Label_Password}"
                     HeaderFontSize="14"
                     Margin="0,20,0,0"
                     ShowRequirements="True"
@@ -105,23 +110,23 @@
 
                 <!-- Confirm Password Input -->
                 <UserCtrl:HeaderPasswordBox CornerRadius="8" Margin="0,20,0,0"
-                                  Header="{DynamicResource ConfirmPasswordLabel}"
+                                  Header="{DynamicResource Registration_Label_ConfirmPassword}"
                                   Password="{Binding ConfirmPassword, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
                 <!-- Sign Up Button -->
                 <Button Margin="0,20,0,0"
                     mah:ControlsHelper.CornerRadius="8"
                     Command="{Binding SignUpCommand}"
-                    Content="{DynamicResource SignUpButton}"/>
+                    Content="{DynamicResource Registration_Button_SignUp}"/>
 
 
                 <!-- Login Link -->
                 <TextBlock HorizontalAlignment="Center"
                        MaxWidth="400">
 
-                <Run Text="{DynamicResource ExistingUserText}"/>
+                <Run Text="{DynamicResource Registration_Helper_AlreadyHaveAccount}"/>
                 <Hyperlink Command="{Binding SwitchToAuthViewCommand}">
-                    <TextBlock Text="{DynamicResource SignInButton}"/>
+                    <TextBlock Text="{DynamicResource Registration_Link_SignIn}"/>
                 </Hyperlink>
                 </TextBlock>
 

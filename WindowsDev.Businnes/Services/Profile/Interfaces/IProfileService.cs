@@ -1,8 +1,10 @@
-﻿namespace WindowsDev.Business.Services.Profile.Interfaces
+﻿using WindowsDev.Business.Primitives;
+
+namespace WindowsDev.Business.Services.Profile.Interfaces
 {
     public interface IProfileService
     {
-        Task ChangePasswordAsync(string currentPassword, string newPassword, string confirmPassword);
-        Task ChangeUsernameAsync(string currentUsername, string newUsername);
+        Task<Result<bool>> ChangePasswordAsync(string currentPassword, string newPassword, string confirmPassword);
+        Task<Result<bool>> ChangeUsernameAsync(string currentUsername, string newUsername);
     }
 }
