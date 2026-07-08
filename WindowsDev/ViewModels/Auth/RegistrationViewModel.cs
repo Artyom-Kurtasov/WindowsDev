@@ -6,7 +6,6 @@ using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Domain;
 using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.DialogsMessages.Informations;
-using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.Logging;
 using WindowsDev.NavigationManager.Interfaces;

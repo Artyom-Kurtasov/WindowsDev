@@ -1,7 +1,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
@@ -125,7 +124,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 {
                     await _projectService.DeleteAsync(project.Id);
                     ProjectsList.Remove(project);
-                    
+
                 }
                 catch (Exception ex)
                 {

@@ -1,6 +1,5 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;

@@ -1,5 +1,3 @@
-using WindowsDev.Domain.DialogsMessages.Errors;
-
 namespace WindowsDev.Domain.DialogsMessages.Tooltips
 {
     public static class AuthTooltips

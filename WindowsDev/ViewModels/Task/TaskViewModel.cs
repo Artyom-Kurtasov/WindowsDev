@@ -2,7 +2,6 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Input;

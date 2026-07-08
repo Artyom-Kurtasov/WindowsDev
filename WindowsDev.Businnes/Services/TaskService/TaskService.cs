@@ -1,7 +1,6 @@
 ﻿using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService

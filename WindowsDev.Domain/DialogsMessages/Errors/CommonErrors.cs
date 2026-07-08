@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace WindowsDev.Domain.DialogsMessages.Errors
+﻿namespace WindowsDev.Domain.DialogsMessages.Errors
 {
     public static class CommonErrors
     {

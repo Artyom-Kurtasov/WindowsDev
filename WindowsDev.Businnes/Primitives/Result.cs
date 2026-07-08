@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Business.Primitives
 {
-    public class Result <TValue>
+    public class Result<TValue>
     {
         public bool IsSuccess { get; }
         public bool IsFailure => !IsSuccess;

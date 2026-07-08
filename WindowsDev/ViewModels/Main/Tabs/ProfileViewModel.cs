@@ -1,12 +1,10 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.Profile.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain;
 using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Informations;
 using WindowsDev.Domain.DialogsMessages.Success;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.Logging;
@@ -127,16 +125,16 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 var result = await _profileService.ChangeUsernameAsync(_userData.Username, Username);
                 if (result.IsSuccess)
                 {
-                    await _dialogCoordinator.ShowMessageAsync(this, 
-                        Translate(DialogTitles.Success), 
-                        Translate(ProfileSuccesses.UsernameChanged), 
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Success),
+                        Translate(ProfileSuccesses.UsernameChanged),
                         MessageDialogStyle.Affirmative);
                 }
                 else
                 {
-                    await _dialogCoordinator.ShowMessageAsync(this, 
-                        Translate(DialogTitles.Warning), 
-                        Translate(result.Error), 
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Warning),
+                        Translate(result.Error),
                         MessageDialogStyle.Affirmative);
                 }
             }
@@ -158,16 +156,16 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 var result = await _profileService.ChangePasswordAsync(CurrentPassword, NewPassword, ConfirmPassword);
                 if (result.IsSuccess)
                 {
-                    await _dialogCoordinator.ShowMessageAsync(this, 
-                        Translate(DialogTitles.Success), 
-                        Translate(ProfileSuccesses.PasswordChanged), 
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Success),
+                        Translate(ProfileSuccesses.PasswordChanged),
                         MessageDialogStyle.Affirmative);
                 }
                 else
                 {
-                    await _dialogCoordinator.ShowMessageAsync(this, 
-                        Translate(DialogTitles.Warning), 
-                        Translate(result.Error), 
+                    await _dialogCoordinator.ShowMessageAsync(this,
+                        Translate(DialogTitles.Warning),
+                        Translate(result.Error),
                         MessageDialogStyle.Affirmative);
                 }
             }

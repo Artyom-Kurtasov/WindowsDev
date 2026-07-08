@@ -1,7 +1,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Interfaces;

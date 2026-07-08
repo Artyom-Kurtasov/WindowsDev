@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Data.Common;
 using System.Windows.Input;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Dialogs.Interfaces;

@@ -1,8 +1,6 @@
-﻿using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Repositories.Interfaces;
+﻿using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.ProjectsModels;
 
 namespace WindowsDev.Business.Services.ProjectService

@@ -4,7 +4,6 @@ using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.UsersModels;
 using WindowsDev.Domain.UsersModels.Enums;
 
