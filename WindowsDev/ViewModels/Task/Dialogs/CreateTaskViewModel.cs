@@ -1,6 +1,7 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain;
@@ -22,18 +23,18 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public CreateTaskViewModel(int projectId,
             ITaskService taskService,
             IDialogCoordinator dialogCoordinator,
-            ILogger<CreateTaskViewModel> logger)
+            ILogger<CreateTaskViewModel> logger,
+            ILanguageChanger languageChanger) : base(languageChanger, dialogCoordinator)
         {
-            if (projectId < 1)
-                throw new ArgumentOutOfRangeException(nameof(projectId));
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(projectId);
 
             _projectId = projectId;
             _taskService = taskService;
             _dialogCoordinator = dialogCoordinator;
             _logger = logger;
 
-            CreateTaskCommand = new AsyncRelayCommand(CreateTask);
-            CancelCommand = new AsyncRelayCommand(Cancel);
+            CreateTaskCommand = new AsyncRelayCommand(CreateTaskAsync);
+            CancelCommand = new AsyncRelayCommand(CancelAsync);
         }
 
         public ICommand CreateTaskCommand { get; }
@@ -42,14 +43,11 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-        public async Task CreateTask()
+        private async Task CreateTaskAsync()
         {
             if (string.IsNullOrWhiteSpace(Name))
             {
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate(DialogTitles.Warning),
-                    Translate(TaskDialogWarnings.EnterName),
-                    MessageDialogStyle.Affirmative);
+                await ShowWarningAsync();
                 return;
             }
 
@@ -67,24 +65,28 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
                     ProjectId = _projectId
                 });
 
-                Completed?.Invoke();
+                if (Completed != null)
+                {
+                    Completed?.Invoke();
+                    await CancelAsync();
+                }
             }
             catch (Exception ex)
             {
                 TaskLogs.TaskCreationFailed(_logger, Name, _projectId, ex);
-                await _dialogCoordinator.ShowMessageAsync(this,
+
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
             }
         }
 
-        public async Task Cancel()
+        private async Task CancelAsync()
         {
             if (CloseRequested != null)
-            {
                 await CloseRequested.Invoke();
-            }
         }
     }
 }

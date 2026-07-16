@@ -1,4 +1,6 @@
-﻿using WindowsDev.Business.Primitives;
+﻿using Microsoft.Win32;
+using System.Diagnostics;
+using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Domain.TasksModels;
@@ -19,16 +21,22 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
             return await _attachmentRepository.GetAttachmentsAsync(taskId);
         }
 
-        public async Task<Result<TaskAttachment>> AddFile(string filePath, int taskId)
+        public async Task<Result<TaskAttachment>> AddFile(int taskId)
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
 
-            FileInfo fileInfo = new FileInfo(filePath);
+            var dialog = new OpenFileDialog();
+
+
+            if (dialog.ShowDialog() != true)
+                return Result<TaskAttachment>.Failure(dialog.FileName);
+
+            FileInfo fileInfo = new FileInfo(dialog.FileName);
 
             TaskAttachment attachment = new TaskAttachment
             {
                 FileName = fileInfo.Name,
-                FilePath = filePath,
+                FilePath = fileInfo.FullName,
                 FileExtension = fileInfo.Extension,
                 FileSize = fileInfo.Length,
                 TaskId = taskId
@@ -37,6 +45,15 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
             await _attachmentRepository.AddFileInfoToDatabase(attachment);
 
             return Result<TaskAttachment>.Success(attachment);
+        }
+
+        public async Task OpenFile(TaskAttachment attachment)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = attachment.FilePath,
+                UseShellExecute = true
+            });
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Moq;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment;
-using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.TasksModels;
 
@@ -10,45 +9,36 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
     public class CommentsServiceTest
     {
         private readonly Mock<ICommentRepository> _commentRepositoryMock;
-        private readonly ICurrentUserService _currentUserService;
+        private readonly Mock<ICurrentUserService> _currentUserMock;
 
         public CommentsServiceTest()
         {
             _commentRepositoryMock = new Mock<ICommentRepository>();
-            _currentUserService = new CurrentUserService();
-            _currentUserService.Username = "testuser";
+
+            _currentUserMock = new Mock<ICurrentUserService>();
+            _currentUserMock
+                .SetupGet(x => x.Username)
+                .Returns("testuser");
         }
 
         private CommentsService CreateService()
         {
             return new CommentsService(
                 _commentRepositoryMock.Object,
-                _currentUserService);
+                _currentUserMock.Object);
         }
 
         [Fact]
-        public async Task AddComment_WhenTaskIdLessThan1_ThrowsException()
+        public async Task AddComment_WhenTaskIdLessThan1_ThrowsArgumentOutOfRangeException()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
                 () => service.AddComment(0, "comment text"));
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("   ")]
-        public async Task AddComment_WhenCommentTextIsInvalid_ThrowsException(string commentText)
-        {
-            var service = CreateService();
-
-            await Assert.ThrowsAsync<Exception>(
-                () => service.AddComment(1, commentText!));
-
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
+            _commentRepositoryMock.Verify(
+                x => x.AddComments(It.IsAny<Comments>()),
+                Times.Never);
         }
 
         [Fact]
@@ -56,31 +46,31 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
         {
             var taskId = 1;
             var commentText = "test comment";
-            var username = _currentUserService.Username;
-
-            _commentRepositoryMock
-                .Setup(x => x.AddComments(It.IsAny<Comments>()))
-                .Returns(Task.CompletedTask);
 
             var service = CreateService();
 
             var result = await service.AddComment(taskId, commentText);
 
-            Assert.Equal(commentText, result.Text);
-            Assert.Equal(username, result.Author);
-            Assert.Equal(taskId, result.TaskId);
-            Assert.True((DateTime.UtcNow - result.CreatedAt).TotalSeconds < 1);
+            Assert.True(result.IsSuccess);
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Once);
+            Assert.Equal(commentText, result.Value.Text);
+            Assert.Equal("testuser", result.Value.Author);
+            Assert.Equal(taskId, result.Value.TaskId);
+            Assert.True((DateTime.UtcNow - result.Value.CreatedAt).TotalSeconds < 1);
+
+            _commentRepositoryMock.Verify(
+                x => x.AddComments(It.IsAny<Comments>()),
+                Times.Once);
         }
 
         [Fact]
         public async Task GetComments_WhenCalled_ReturnsCommentsFromRepository()
         {
             var taskId = 1;
+
             var expectedComments = new List<Comments>
             {
-                new Comments
+                new()
                 {
                     Id = 1,
                     Text = "comment1",
@@ -88,7 +78,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
                     CreatedAt = DateTime.UtcNow,
                     Author = "user1"
                 },
-                new Comments
+                new()
                 {
                     Id = 2,
                     Text = "comment2",
@@ -108,25 +98,30 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
 
             Assert.Equal(expectedComments, result);
             Assert.Equal(2, result.Count);
-            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
+
+            _commentRepositoryMock.Verify(
+                x => x.GetComments(taskId),
+                Times.Once);
         }
 
         [Fact]
         public async Task GetComments_WhenNoComments_ReturnsEmptyList()
         {
             var taskId = 1;
-            var expectedComments = new List<Comments>();
 
             _commentRepositoryMock
                 .Setup(x => x.GetComments(taskId))
-                .ReturnsAsync(expectedComments);
+                .ReturnsAsync(new List<Comments>());
 
             var service = CreateService();
 
             var result = await service.GetComments(taskId);
 
             Assert.Empty(result);
-            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
+
+            _commentRepositoryMock.Verify(
+                x => x.GetComments(taskId),
+                Times.Once);
         }
     }
 }

@@ -1,9 +1,12 @@
 ﻿using Moq;
+using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
+using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.Profile;
 using WindowsDev.Business.Services.UserManager;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.UsersModels;
 using WindowsDev.Domain.UsersModels.Enums;
 
@@ -11,229 +14,290 @@ namespace WindowsDev.Tests.Business.Profile
 {
     public class ProfileServiceTest
     {
-        private readonly ICurrentUserService _userService;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IHasherFactory> _hasherFactoryMock;
+        private readonly Mock<IPasswordChanger> _passwordChangerMock;
+
+        private readonly ICurrentUserService _currentUserService;
+
 
         public ProfileServiceTest()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _hasherFactoryMock = new Mock<IHasherFactory>();
 
-            _userService = new CurrentUserService();
+            _passwordChangerMock = new Mock<IPasswordChanger>();
+
+            _passwordChangerMock
+                .SetupProperty(x => x.IsRecoveryMode);
+
+            _currentUserService = new CurrentUserService();
         }
+
 
         private ProfileService CreateService()
         {
             return new ProfileService(
                 _userRepositoryMock.Object,
                 _hasherFactoryMock.Object,
-                _userService);
+                _currentUserService,
+                _passwordChangerMock.Object);
         }
 
+
         [Fact]
-        public async Task ChangePasswordAsync_WhenNewPasswordSameAsCurrent_ThrowsException()
+        public async Task ChangePasswordAsync_WhenPasswordsSame_ReturnsFailure()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
-                () => service.ChangePasswordAsync("password", "password", "password"));
+            var result = await service.ChangePasswordAsync(
+                "password",
+                "password",
+                "password");
 
-            _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(
+                ProfileErrors.NewPasswordSameAsCurrent,
+                result.Error);
+
+
+            _passwordChangerMock.Verify(
+                x => x.ChangeUserPasswordAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                Times.Never);
         }
 
+
+
         [Fact]
-        public async Task ChangePasswordAsync_WhenNewPasswordDoesNotMatchConfirm_ThrowsException()
+        public async Task ChangePasswordAsync_WhenConfirmPasswordWrong_ReturnsFailure()
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
-                () => service.ChangePasswordAsync("currentPass", "newPass123", "differentPass"));
 
-            _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
+            var result = await service.ChangePasswordAsync(
+                "old",
+                "new",
+                "different");
+
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(
+                ProfileErrors.PasswordsDontMatch,
+                result.Error);
         }
 
+
+
         [Fact]
-        public async Task ChangePasswordAsync_WhenCurrentPasswordIsIncorrect_ThrowsException()
+        public async Task ChangePasswordAsync_WhenUserNotFound_ThrowsException()
         {
-            var userLogin = "testuser";
-            var currentPassword = "currentPass";
-            var newPassword = "newPass123";
-            var confirmPassword = "newPass123";
-            var user = CreateTestUser(userLogin);
-            ulong wrongHash = 13958235;
+            _currentUserService.Login = "user";
 
-            var hasherMock = new Mock<IHasherBase>();
-
-            _userService.Login = userLogin;
-            user.PasswordHash = "differenthashvalue0000000000000000";
 
             _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync(userLogin))
-                .ReturnsAsync(user);
+                .Setup(x => x.GetByLoginAsync("user"))
+                .ReturnsAsync((UsersInfo)null);
 
-            _hasherFactoryMock
-                .Setup(x => x.GetHashMethod(user.HashMethod))
-                .Returns(hasherMock.Object);
-
-            hasherMock
-                .Setup(x => x.HashPassword(currentPassword, user.Salt))
-                .Returns(wrongHash);
 
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
-                () => service.ChangePasswordAsync(currentPassword, newPassword, confirmPassword));
 
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
+            await Assert.ThrowsAsync<ArgumentNullException>(() =>
+                service.ChangePasswordAsync(
+                    "old",
+                    "new",
+                    "new"));
         }
 
+
+
         [Fact]
-        public async Task ChangePasswordAsync_WhenAllValid_UpdatesPasswordSuccessfully()
+        public async Task ChangePasswordAsync_WhenPasswordChangerReturnsError_ReturnsFailure()
         {
-            var userLogin = "testuser";
-            var currentPassword = "currentPass";
-            var newPassword = "newPass123";
-            var confirmPassword = "newPass123";
-            var user = CreateTestUser(userLogin);
-            ulong currentHash = 12345678;
-            var newSalt = new byte[] { 1, 2, 3 };
-            ulong newHash = 87654321;
+            _currentUserService.Login = "user";
 
-            var hasherMock = new Mock<IHasherBase>();
-
-            _userService.Login = userLogin;
-            user.PasswordHash = currentHash.ToString("x16");
 
             _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync(userLogin))
-                .ReturnsAsync(user);
+                .Setup(x => x.GetByLoginAsync("user"))
+                .ReturnsAsync(CreateUser());
 
-            _hasherFactoryMock
-                .Setup(x => x.GetHashMethod(user.HashMethod))
-                .Returns(hasherMock.Object);
 
-            hasherMock
-                .Setup(x => x.HashPassword(currentPassword, user.Salt))
-                .Returns(currentHash);
+            _passwordChangerMock
+                .Setup(x => x.ChangeUserPasswordAsync(
+                    "user",
+                    "new",
+                    "old"))
+                .ReturnsAsync(
+                    Result<int>.Failure(
+                        ProfileErrors.InvalidCurrentPassword));
 
-            hasherMock
-                .Setup(x => x.GenerateSalt())
-                .Returns(newSalt);
-
-            hasherMock
-                .Setup(x => x.HashPassword(newPassword, newSalt))
-                .Returns(newHash);
 
             var service = CreateService();
 
-            await service.ChangePasswordAsync(currentPassword, newPassword, confirmPassword);
 
-            Assert.Equal(newSalt, user.Salt);
-            Assert.Equal(newHash.ToString("x16"), user.PasswordHash);
+            var result = await service.ChangePasswordAsync(
+                "old",
+                "new",
+                "new");
 
-            _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(
+                ProfileErrors.InvalidCurrentPassword,
+                result.Error);
         }
 
-        [Fact]
-        public async Task ChangeUsernameAsync_WhenCurrentUsernameSameAsNew_ThrowsException()
-        {
-            var username = "sameuser";
-            var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
-                () => service.ChangeUsernameAsync(username, username));
-
-            _userRepositoryMock.Verify(x => x.ExistsByUsernameAsync(It.IsAny<string>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
-        }
 
         [Fact]
-        public async Task ChangeUsernameAsync_WhenNewUsernameAlreadyExists_ThrowsException()
+        public async Task ChangePasswordAsync_WhenValid_ReturnsRecoveryCode()
         {
-            var currentUsername = "currentuser";
-            var newUsername = "existinguser";
+            _currentUserService.Login = "user";
+
 
             _userRepositoryMock
-                .Setup(x => x.ExistsByUsernameAsync(newUsername))
+                .Setup(x => x.GetByLoginAsync("user"))
+                .ReturnsAsync(CreateUser());
+
+
+            _passwordChangerMock
+                .Setup(x => x.ChangeUserPasswordAsync(
+                    "user",
+                    "new",
+                    "old"))
+                .ReturnsAsync(
+                    Result<int>.Success(123456));
+
+
+            var service = CreateService();
+
+
+            var result = await service.ChangePasswordAsync(
+                "old",
+                "new",
+                "new");
+
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(123456, result.Value);
+
+
+            Assert.False(_passwordChangerMock.Object.IsRecoveryMode);
+
+
+            _passwordChangerMock.Verify(
+                x => x.ChangeUserPasswordAsync(
+                    "user",
+                    "new",
+                    "old"),
+                Times.Once);
+        }
+
+
+
+        [Fact]
+        public async Task ChangeUsernameAsync_WhenUsernameSame_ReturnsFailure()
+        {
+            var service = CreateService();
+
+
+            var result = await service.ChangeUsernameAsync(
+                "user",
+                "user");
+
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(
+                ProfileErrors.NewUsernameSameAsCurrent,
+                result.Error);
+        }
+
+
+
+        [Fact]
+        public async Task ChangeUsernameAsync_WhenUsernameTaken_ReturnsFailure()
+        {
+            _userRepositoryMock
+                .Setup(x => x.ExistsByUsernameAsync("new"))
                 .ReturnsAsync(true);
 
+
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(
-                () => service.ChangeUsernameAsync(currentUsername, newUsername));
 
-            _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
+            var result = await service.ChangeUsernameAsync(
+                "old",
+                "new");
+
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(
+                ProfileErrors.UsernamAlreadyTake,
+                result.Error);
         }
 
-        [Fact]
-        public async Task ChangeUsernameAsync_WhenValid_UpdatesUsernameSuccessfully()
-        {
-            var currentUsername = "olduser";
-            var newUsername = "newuser";
-            var userLogin = "userlogin";
-            var user = CreateTestUser(userLogin);
-            user.Username = currentUsername;
 
-            _userService.Login = userLogin;
+
+        [Fact]
+        public async Task ChangeUsernameAsync_WhenValid_UpdatesUser()
+        {
+            _currentUserService.Login = "login";
+
+
+            var user = CreateUser();
+
 
             _userRepositoryMock
-                .Setup(x => x.ExistsByUsernameAsync(newUsername))
+                .Setup(x => x.ExistsByUsernameAsync("new"))
                 .ReturnsAsync(false);
 
+
             _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync(userLogin))
+                .Setup(x => x.GetByLoginAsync("login"))
                 .ReturnsAsync(user);
 
-            var service = CreateService();
 
-            await service.ChangeUsernameAsync(currentUsername, newUsername);
-
-            Assert.Equal(newUsername, _userService.Username);
-            Assert.Equal(newUsername, user.Username);
-
-            _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
-        }
-
-        [Fact]
-        public async Task ChangeUsernameAsync_WhenUserNotFound_ThrowsException()
-        {
-            var currentUsername = "olduser";
-            var newUsername = "newuser";
-            var userLogin = "nonexistent";
-
-            _userService.Login = userLogin;
-
-            _userRepositoryMock
-                .Setup(x => x.ExistsByUsernameAsync(newUsername))
-                .ReturnsAsync(false);
-
-            _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync(userLogin))
-                .ReturnsAsync((UsersInfo?)null);
 
             var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(() =>
-                service.ChangeUsernameAsync(currentUsername, newUsername));
 
-            Assert.Equal(string.Empty, _userService.Username);
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
+            var result = await service.ChangeUsernameAsync(
+                "old",
+                "new");
+
+
+
+            Assert.True(result.IsSuccess);
+            Assert.Equal(
+                "new",
+                _currentUserService.Username);
+
+
+            Assert.Equal(
+                "new",
+                user.Username);
+
+
+            _userRepositoryMock.Verify(
+                x => x.UpdateAsync(user),
+                Times.Once);
         }
 
-        private UsersInfo CreateTestUser(string login)
+
+
+        private UsersInfo CreateUser()
         {
             return new UsersInfo
             {
-                Login = login,
-                Username = login,
+                Login = "user",
+                Username = "old",
                 HashMethod = HashMethod.Default,
-                Salt = new byte[] { 1, 2, 3, 4 },
-                PasswordHash = ""
+                PasswordHash = "hash",
+                Salt = new byte[] { 1, 2, 3 }
             };
         }
     }

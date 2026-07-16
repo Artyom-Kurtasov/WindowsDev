@@ -2,6 +2,7 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain;
@@ -17,7 +18,7 @@ using WindowsDev.Views.Projects;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProjectsViewModel : ViewModelBase, IRefreshableViewModel
+    public class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IProjectService _projectService;
@@ -25,28 +26,27 @@ namespace WindowsDev.ViewModels.Main.Tabs
         private readonly ILogger<ProjectsViewModel> _logger;
         private readonly IDialogService _dialogService;
 
-        private readonly int _pageSize = 15;
+        private const int PageSize = 15;
 
         public ProjectsViewModel(IDialogCoordinator dialogCoordinator,
             IProjectService projectService,
             INavigationService navigationService,
             ILogger<ProjectsViewModel> logger,
-            IDialogService dialogService)
+            IDialogService dialogService,
+            ILanguageChanger languageChanger) : base(languageChanger)
         {
-            _navigationService = navigationService;
-            _dialogService = dialogService;
-            _projectService = projectService;
             _dialogCoordinator = dialogCoordinator;
+            _projectService = projectService;
+            _navigationService = navigationService;
             _logger = logger;
+            _dialogService = dialogService;
 
             DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjectsAsync);
             OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialogAsync);
-            OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProjectAsync, _ => true);
+            OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProjectAsync);
             SearchCommand = new AsyncRelayCommand(SearchAsync);
             NextPageCommand = new AsyncRelayCommand(NextPageAsync);
             PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
-
-            _ = LoadProjectsAsync();
         }
 
         public ICommand DeleteSelectedProjectsCommand { get; }
@@ -59,29 +59,41 @@ namespace WindowsDev.ViewModels.Main.Tabs
         public ObservableCollection<ProjectsInfo> ProjectsList { get; } = new();
 
         private string _searchFilter = string.Empty;
+
         public string SearchFilter
         {
             get => _searchFilter;
             set
             {
+                if (_searchFilter == value)
+                    return;
+
                 _searchFilter = value;
-                OnPropertyChanged(nameof(SearchFilter));
+
+                OnPropertyChanged();
             }
         }
 
         private int _currentPage = 1;
+
         public int CurrentPage
         {
             get => _currentPage;
             set
             {
+                if (_currentPage == value)
+                    return;
+
                 _currentPage = value;
-                OnPropertyChanged(nameof(CurrentPage));
+
+                OnPropertyChanged();
             }
         }
 
         private int _totalCountOfProjects;
-        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfProjects / _pageSize);
+
+        public int TotalCountOfPages =>
+            (int)Math.Ceiling((double)_totalCountOfProjects / PageSize);
 
         public async Task RefreshAsync()
         {
@@ -92,25 +104,28 @@ namespace WindowsDev.ViewModels.Main.Tabs
         {
             try
             {
-                _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
+                _totalCountOfProjects =
+                    await _projectService.GetProjectsCountAsync();
+
                 OnPropertyChanged(nameof(TotalCountOfPages));
+
                 await GetPageAsync();
             }
             catch (Exception ex)
             {
                 ProjectLogs.ProjectLoadFailed(_logger, ex);
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+
+                await ShowErrorDialogAsync();
             }
         }
 
         private async Task SearchAsync()
         {
             CurrentPage = 1;
+
             await GetPageAsync(SearchFilter);
         }
+
 
         private async Task DeleteSelectedProjectsAsync()
         {
@@ -118,47 +133,56 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 .Where(x => x.IsSelected)
                 .ToList();
 
+
             foreach (var project in projectsToDelete)
             {
                 try
                 {
                     await _projectService.DeleteAsync(project.Id);
-                    ProjectsList.Remove(project);
 
+                    ProjectsList.Remove(project);
                 }
                 catch (Exception ex)
                 {
-                    ProjectLogs.ProjectDeleteFailed(_logger, project.Id, ex);
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate(DialogTitles.Error),
-                        Translate(CommonErrors.UnexpectedError),
-                        MessageDialogStyle.Affirmative);
+                    ProjectLogs.ProjectDeleteFailed(
+                        _logger,
+                        project.Id,
+                        ex);
+
+                    await ShowErrorDialogAsync();
                 }
             }
         }
 
-        private async Task OpenProjectAsync(ProjectsInfo project) =>
+        private async Task OpenProjectAsync(ProjectsInfo project)
+        {
             await _navigationService.NavigateTo<ProjectViewModel>(project);
+        }
 
-        private async Task ShowCreateProjectDialogAsync() =>
+
+        private async Task ShowCreateProjectDialogAsync()
+        {
             await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(this);
+        }
 
         private async Task NextPageAsync()
         {
-            if (CurrentPage < TotalCountOfPages)
-            {
-                CurrentPage++;
-                await GetPageAsync(SearchFilter);
-            }
+            if (CurrentPage >= TotalCountOfPages)
+                return;
+
+            CurrentPage++;
+
+            await GetPageAsync(SearchFilter);
         }
 
         private async Task PrevPageAsync()
         {
-            if (CurrentPage > 1)
-            {
-                CurrentPage--;
-                await GetPageAsync(SearchFilter);
-            }
+            if (CurrentPage <= 1)
+                return;
+
+            CurrentPage--;
+
+            await GetPageAsync(SearchFilter);
         }
 
         private async Task GetPageAsync(string searchFilter = "")
@@ -168,7 +192,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 ProjectsList.Clear();
 
                 var projects = await _projectService
-                    .GetProjectsAsync(CurrentPage, _pageSize, searchFilter);
+                    .GetProjectsAsync(CurrentPage, PageSize, searchFilter);
+
 
                 foreach (var project in projects)
                 {
@@ -178,11 +203,19 @@ namespace WindowsDev.ViewModels.Main.Tabs
             catch (Exception ex)
             {
                 ProjectLogs.ProjectLoadFailed(_logger, ex);
-                await _dialogCoordinator.ShowMessageAsync(this,
-                    Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+
+                await ShowErrorDialogAsync();
             }
+        }
+
+
+        private async Task ShowErrorDialogAsync()
+        {
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Error),
+                Translate(CommonErrors.UnexpectedError),
+                MessageDialogStyle.Affirmative);
         }
     }
 }

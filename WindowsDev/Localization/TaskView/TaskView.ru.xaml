@@ -25,6 +25,8 @@
     <sys:String x:Key="Task_Watermark_AddComment">Введите комментарий...</sys:String>
     
     <!-- Errors -->
-    <sys:String x:Key="Task_Error_FileNotFound">Файл не найден. Возможно он был перемещен или удален.</sys:String>
+    <sys:String x:Key="Task_Error_OpenAttachmentFailed">Произошла ошибка при открытии файла. Возможно он был перемещен или удален.</sys:String>
+    <sys:String x:Key="Task_Error_LoadCommentsFailed">Произошла ошибка при загрузке комментариев.</sys:String>
+    <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Произошла ошибка при загрузке вложений.</sys:String>
 
 </ResourceDictionary>

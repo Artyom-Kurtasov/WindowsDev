@@ -4,6 +4,7 @@ using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.UsersModels;
 
 namespace WindowsDev.Business.Services.Authorization
 {
@@ -32,16 +33,22 @@ namespace WindowsDev.Business.Services.Authorization
             if (user is null)
                 return Result<bool>.Failure(AuthErrors.InvalidCredentials);
 
-            var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-
-            var hash = hasher.HashPassword(password, user.Salt);
-
-            if (hash.ToString("x16") != user.PasswordHash)
+            if (!VerifyPassword(password, user))
                 return Result<bool>.Failure(AuthErrors.InvalidCredentials);
 
             _currentUserService.SetUser(user.Id, user.Login, user.Username);
 
             return Result<bool>.Success(true);
+        }
+
+        private bool VerifyPassword(string password, UsersInfo user)
+        {
+            const string HashHexFormat = "x16";
+
+            var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
+            var hash = hasher.HashValue(password, user.Salt);
+
+            return hash.ToString(HashHexFormat) == user.PasswordHash;
         }
     }
 }

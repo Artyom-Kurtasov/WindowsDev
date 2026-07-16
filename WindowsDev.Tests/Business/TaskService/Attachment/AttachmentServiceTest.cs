@@ -9,49 +9,120 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
     {
         private readonly Mock<IAttachmentRepository> _attachmentRepositoryMock;
 
+
         public AttachmentServiceTest()
         {
             _attachmentRepositoryMock = new Mock<IAttachmentRepository>();
         }
 
-        [Theory]
-        [InlineData("")]
-        [InlineData("   ")]
-        [InlineData(null)]
-        public async Task AddFile_WhenFilePathEmpty_ThrowsException(string filePath)
+
+        private AttachmentService CreateService()
         {
-            var writer = new AttachmentService(_attachmentRepositoryMock.Object);
-
-            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(filePath, 1));
-
-            _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
+            return new AttachmentService(
+                _attachmentRepositoryMock.Object);
         }
+
+
 
         [Theory]
         [InlineData(0)]
         [InlineData(-1)]
-        public async Task AddFile_WhenInvalidTaskId_ThrowsException(int taskId)
+        public async Task AddFile_WhenTaskIdInvalid_ThrowsException(int taskId)
         {
-            var writer = new AttachmentService(_attachmentRepositoryMock.Object);
-            var tempFile = Path.GetTempFileName();
+            var service = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(tempFile, taskId));
 
-            _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => service.AddFile(taskId));
 
-            File.Delete(tempFile);
+
+            _attachmentRepositoryMock.Verify(
+                x => x.AddFileInfoToDatabase(
+                    It.IsAny<TaskAttachment>()),
+                Times.Never);
         }
 
+
         [Fact]
-        public async Task AddFile_WhenInvalidFilePath_ThrowsException()
+        public async Task GetAttachmentsAsync_WhenCalled_ReturnsAttachments()
         {
-            string invalidPath = "invalidPath";
+            var taskId = 1;
 
-            var writer = new AttachmentService(_attachmentRepositoryMock.Object);
+            var attachments = new List<TaskAttachment>
+            {
+                new()
+                {
+                    Id = 1,
+                    FileName = "test.txt",
+                    FilePath = "C:\\test.txt",
+                    TaskId = taskId,
+                    FileExtension = ".txt",
+                    FileSize = 100
+                }
+            };
 
-            await Assert.ThrowsAsync<Exception>(() => writer.AddFile(invalidPath, 1));
 
-            _attachmentRepositoryMock.Verify(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()), Times.Never);
+            _attachmentRepositoryMock
+                .Setup(x => x.GetAttachmentsAsync(taskId))
+                .ReturnsAsync(attachments);
+
+
+
+            var service = CreateService();
+
+
+            var result =
+                await service.GetAttachmentsAsync(taskId);
+
+
+
+            Assert.Single(result);
+            Assert.Equal(
+                "test.txt",
+                result[0].FileName);
+
+
+            _attachmentRepositoryMock.Verify(
+                x => x.GetAttachmentsAsync(taskId),
+                Times.Once);
+        }
+
+
+
+        [Fact]
+        public async Task GetAttachmentsAsync_WhenRepositoryReturnsEmpty_ReturnsEmptyList()
+        {
+            var taskId = 1;
+
+
+            _attachmentRepositoryMock
+                .Setup(x => x.GetAttachmentsAsync(taskId))
+                .ReturnsAsync(new List<TaskAttachment>());
+
+
+
+            var service = CreateService();
+
+
+            var result =
+                await service.GetAttachmentsAsync(taskId);
+
+
+
+            Assert.Empty(result);
+        }
+
+        private TaskAttachment CreateAttachment()
+        {
+            return new TaskAttachment
+            {
+                Id = 1,
+                FileName = "test.txt",
+                FilePath = "C:\\test.txt",
+                FileExtension = ".txt",
+                FileSize = 100,
+                TaskId = 1
+            };
         }
     }
 }

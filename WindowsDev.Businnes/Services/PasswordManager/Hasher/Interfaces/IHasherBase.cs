@@ -2,7 +2,7 @@
 {
     public interface IHasherBase
     {
-        ulong HashPassword(string password, byte[] salt);
+        ulong HashValue(string password, byte[] salt);
         byte[] GenerateSalt();
     }
 }

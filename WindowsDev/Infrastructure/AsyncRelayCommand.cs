@@ -9,23 +9,31 @@ namespace WindowsDev.Infrastructure
 
         private bool _isExecuting;
 
-        public event EventHandler? CanExecuteChanged;
 
-        public AsyncRelayCommand(Func<Task> execute, Func<bool>? canExecute = null)
+        public AsyncRelayCommand(
+            Func<Task> execute,
+            Func<bool>? canExecute = null)
         {
             _execute = execute ?? throw new ArgumentNullException(nameof(execute));
             _canExecute = canExecute;
         }
 
+
+        public event EventHandler? CanExecuteChanged;
+
+
         public bool CanExecute(object? parameter)
         {
-            return !_isExecuting && (_canExecute?.Invoke() ?? true);
+            return !_isExecuting &&
+                   (_canExecute?.Invoke() ?? true);
         }
+
 
         public async void Execute(object? parameter)
         {
-            await ExecuteAsync(parameter);
+            await ExecuteAsync();
         }
+
 
         public async Task ExecuteAsync(object? parameter = null)
         {
@@ -45,8 +53,11 @@ namespace WindowsDev.Infrastructure
                 RaiseCanExecuteChanged();
             }
         }
-        public void RaiseCanExecuteChanged() =>
+
+
+        public void RaiseCanExecuteChanged()
+        {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
     }
 }
-

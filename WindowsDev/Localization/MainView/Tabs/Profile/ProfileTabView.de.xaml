@@ -31,6 +31,6 @@
     
     <!-- Success -->
     <sys:String x:Key="Profile_Success_UsernameChanged">Benutzername wurde erfolgreich geändert.</sys:String>
-    <sys:String x:Key="Profile_Success_PasswordChanged">Passwort wurde erfolgreich geändert.</sys:String>
+    <sys:String x:Key="Profile_Success_PasswordChanged">Passwort erfolgreich geändert. Hier ist der neue Wiederherstellungscode:</sys:String>
 
 </ResourceDictionary>

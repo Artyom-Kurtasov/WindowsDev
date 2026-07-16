@@ -1,10 +1,12 @@
 ﻿using Moq;
 using System.Text;
+using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.Authorization;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.UsersModels;
 using WindowsDev.Domain.UsersModels.Enums;
 
@@ -29,8 +31,7 @@ namespace WindowsDev.Tests.Business.Auth
 
         private Authorization CreateService()
         {
-            return new Authorization(
-                _userRepositoryMock.Object,
+            return new Authorization(_userRepositoryMock.Object,
                 _currentUserServiceMock.Object,
                 _hasherFactory);
         }
@@ -39,12 +40,15 @@ namespace WindowsDev.Tests.Business.Auth
         [InlineData("", "password")]
         [InlineData("login", "")]
         [InlineData(" ", "password")]
-        public async Task Authorize_WhenInputEmpty_ThrowsException(string login, string password)
+        [InlineData("login", " ")]
+        public async Task Authorize_WhenInputEmpty_ReturnsFailure(string login, string password)
         {
             var auth = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(() =>
-                auth.Authorize(login, password));
+            var result = await auth.Authorize(login, password);
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
             _userRepositoryMock.Verify(x =>
                 x.GetByLoginAsync(It.IsAny<string>()),
@@ -56,7 +60,7 @@ namespace WindowsDev.Tests.Business.Auth
         }
 
         [Fact]
-        public async Task Authorize_WhenUserNotFound_ThrowsException()
+        public async Task Authorize_WhenUserNotFound_ReturnsFailure()
         {
             _userRepositoryMock
                 .Setup(x => x.GetByLoginAsync("login"))
@@ -64,8 +68,10 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(() =>
-                auth.Authorize("login", "password"));
+            var result = await auth.Authorize("login", "password");
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
             _userRepositoryMock.Verify(x =>
                 x.GetByLoginAsync("login"),
@@ -77,12 +83,12 @@ namespace WindowsDev.Tests.Business.Auth
         }
 
         [Fact]
-        public async Task Authorize_WhenPasswordIncorrect_ThrowsException()
+        public async Task Authorize_WhenPasswordIncorrect_ReturnsFailure()
         {
             var salt = Encoding.UTF8.GetBytes("salt");
 
             var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
-            var correctHash = hasher.HashPassword("correct", salt).ToString("x16");
+            var correctHash = hasher.HashValue("correct", salt).ToString("x16");
 
             var user = new UsersInfo
             {
@@ -100,8 +106,10 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            await Assert.ThrowsAsync<Exception>(() =>
-                auth.Authorize("admin", "wrong"));
+            var result = await auth.Authorize("admin", "wrong");
+
+            Assert.False(result.IsSuccess);
+            Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
             _currentUserServiceMock.Verify(x =>
                 x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
@@ -114,7 +122,7 @@ namespace WindowsDev.Tests.Business.Auth
             var salt = Encoding.UTF8.GetBytes("salt");
 
             var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
-            var hash = hasher.HashPassword("password", salt).ToString("x16");
+            var hash = hasher.HashValue("password", salt).ToString("x16");
 
             var user = new UsersInfo
             {
@@ -132,7 +140,10 @@ namespace WindowsDev.Tests.Business.Auth
 
             var auth = CreateService();
 
-            await auth.Authorize("admin", "password");
+            var result = await auth.Authorize("admin", "password");
+
+            Assert.True(result.IsSuccess);
+            Assert.True(result.Value);
 
             _currentUserServiceMock.Verify(x =>
                 x.SetUser(user.Id, user.Login, user.Username),

@@ -3,14 +3,14 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Localization/AuthorizationView/AuthorizationView.ru.xaml"/>
-        <ResourceDictionary Source="/Localization/RegistrationWindow/RegistrationView.ru.xaml"/>
+        <ResourceDictionary Source="/Localization/RegistrationView/RegistrationView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/MainView/Tabs/Profile/ProfileTabView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/MainView/Tabs/Projects/ProjectsTabView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/MainView/Tabs/Settings/SettingsTabView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/MainView/MainView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/ProjectView/ProjectView.ru.xaml"/>
-        <ResourceDictionary Source="/Localization/TaskWindow/TaskView.ru.xaml"/>
-        <ResourceDictionary Source="/Localization/TaskWindow/Dialogs/TaskDialogView.ru.xaml"/>
+        <ResourceDictionary Source="/Localization/TaskView/TaskView.ru.xaml"/>
+        <ResourceDictionary Source="/Localization/TaskView/Dialogs/TaskDialogView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/ProjectView/Dialogs/CreateProjectDialogView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/AuthorizationView/Dialogs/RecoveryCodeDialogView.ru.xaml"/>
         <ResourceDictionary Source="/Localization/AuthorizationView/Dialogs/RecoverySteps/RecoverySteps.ru.xaml"/>

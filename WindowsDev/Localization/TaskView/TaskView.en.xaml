@@ -25,6 +25,8 @@
     <sys:String x:Key="Task_Watermark_AddComment">Enter a comment...</sys:String>
     
     <!-- Errors -->
-    <sys:String x:Key="Task_Error_FileNotFound">File not found. It may have been moved or deleted.</sys:String>
+    <sys:String x:Key="Task_Error_OpenAttachmentFailed">An error occurred while opening the file. It may have been moved or deleted.</sys:String>
+    <sys:String x:Key="Task_Error_LoadCommentsFailed">Failed to load comments.</sys:String>
+    <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Failed to load attachments.</sys:String>   
 
 </ResourceDictionary>

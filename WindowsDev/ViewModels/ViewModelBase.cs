@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WindowsDev.Business.Services.Localization;
+using WindowsDev.Business.Services.Localization.Interfaces;
 
 namespace WindowsDev.ViewModels
 {
@@ -13,11 +14,6 @@ namespace WindowsDev.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        protected static string Translate(string key)
-        {
-            return new LanguageChanger().Translate(key);
         }
     }
 }

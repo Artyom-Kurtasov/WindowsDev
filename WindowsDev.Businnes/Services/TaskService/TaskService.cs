@@ -39,11 +39,14 @@ namespace WindowsDev.Business.Services.TaskService
 
         public async Task<Result<List<TasksInfo>>> GetTasksAsync(TaskFilter filter)
         {
+            ArgumentNullException.ThrowIfNull(filter);
+
             int page = filter.Page < 1 ? 1 : filter.Page;
             int pageSize = filter.PageSize < 1 ? 1 : filter.PageSize;
             int skip = (page - 1) * pageSize;
 
             var tasks = await _taskRepository.GetTasksAsync(filter, skip, pageSize);
+
             return Result<List<TasksInfo>>.Success(tasks);
         }
 

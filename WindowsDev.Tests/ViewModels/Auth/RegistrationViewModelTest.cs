@@ -1,12 +1,18 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.DataBase.Interfaces;
+using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Services.DebounceService;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
-using WindowsDev.Business.Services.Registration.Validation;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Informations;
 using WindowsDev.Infrastructure;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Main;
+using Xunit;
 
 namespace WindowsDev.Tests.ViewModels.Auth
 {
@@ -15,17 +21,46 @@ namespace WindowsDev.Tests.ViewModels.Auth
         private readonly Mock<INavigationService> _navigationServiceMock;
         private readonly Mock<IRegistration> _registrationMock;
         private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
-        private readonly Mock<IDbManager> _dbManagerMock;
-        private readonly UserFieldValidator _userFieldValidator;
+        private readonly Mock<ILogger<RegistrationViewModel>> _loggerMock;
+        private readonly Mock<IDebounceService> _debounceServiceMock;
+        private readonly Mock<ILanguageChanger> _languageChangerMock;
+
 
         public RegistrationViewModelTest()
         {
             _navigationServiceMock = new Mock<INavigationService>();
             _registrationMock = new Mock<IRegistration>();
             _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
-            _dbManagerMock = new Mock<IDbManager>();
-            _userFieldValidator = new UserFieldValidator(_dbManagerMock.Object);
+            _loggerMock = new Mock<ILogger<RegistrationViewModel>>();
+            _debounceServiceMock = new Mock<IDebounceService>();
+            _languageChangerMock = new Mock<ILanguageChanger>();
+
+
+            _languageChangerMock
+                .Setup(x => x.Translate(It.IsAny<string>()))
+                .Returns((string key) => key);
+
+
+            _debounceServiceMock
+                .Setup(x => x.DebounceAsync(
+                    It.IsAny<Func<Task>>(),
+                    It.IsAny<TimeSpan>()))
+                .Returns<Func<Task>, TimeSpan>(async (action, _) =>
+                {
+                    await action();
+                });
+
+
+            _dialogCoordinatorMock
+                .Setup(x => x.ShowMessageAsync(
+                    It.IsAny<RegistrationViewModel>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageDialogStyle>(),
+                    It.IsAny<MetroDialogSettings>()))
+                .ReturnsAsync(MessageDialogResult.Affirmative);
         }
+
 
         private RegistrationViewModel CreateViewModel()
         {
@@ -33,209 +68,265 @@ namespace WindowsDev.Tests.ViewModels.Auth
                 _navigationServiceMock.Object,
                 _registrationMock.Object,
                 _dialogCoordinatorMock.Object,
-                _userFieldValidator);
+                _loggerMock.Object,
+                _debounceServiceMock.Object,
+                _languageChangerMock.Object);
         }
 
-        [Fact]
-        public async Task SignUp_WhenAllFieldsValid_NavigatesToMain()
+
+        private void SetupAvailableUsers()
         {
             _registrationMock
-                .Setup(x => x.Register("Password123!", "login", "username"))
-                .ReturnsAsync(123456);
+                .Setup(x => x.IsLoginAvailableAsync("login"))
+                .ReturnsAsync(true);
 
-            _dialogCoordinatorMock
-                .Setup(x => x.ShowMessageAsync(
-                    It.IsAny<RegistrationViewModel>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<MessageDialogStyle>(),
-                    It.IsAny<MetroDialogSettings>()))
-                .ReturnsAsync(MessageDialogResult.Affirmative);
 
-            var vm = CreateViewModel();
+            _registrationMock
+                .Setup(x => x.IsUsernameAvailableAsync("username"))
+                .ReturnsAsync(true);
+        }
+
+
+        private void FillValidData(RegistrationViewModel vm)
+        {
             vm.Login = "login";
             vm.Username = "username";
             vm.Password = "Password123!";
             vm.ConfirmPassword = "Password123!";
-
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = true;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.False(vm.IsRegistrationFailed);
-            _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Once());
         }
 
+
         [Fact]
-        public async Task SignUp_WhenServerReturnsError_SetsRegistrationFailed()
+        public async Task SignUp_WhenSuccess_ShowsInformationDialogAndNavigates()
+        {
+            SetupAvailableUsers();
+
+
+            _registrationMock
+                .Setup(x => x.Register(
+                    "Password123!",
+                    "login",
+                    "username"))
+                .ReturnsAsync(Result<int>.Success(123456));
+
+
+            var vm = CreateViewModel();
+
+            FillValidData(vm);
+
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
+            _dialogCoordinatorMock.Verify(
+                x => x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Information,
+                    $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
+                    MessageDialogStyle.Affirmative,
+                    It.IsAny<MetroDialogSettings>()),
+                Times.Once);
+
+
+            _navigationServiceMock.Verify(
+                x => x.NavigateTo<MainWindowViewModel>(),
+                Times.Once);
+        }
+
+
+        [Fact]
+        public async Task SignUp_WhenRegistrationFails_DoesNotNavigate()
+        {
+            SetupAvailableUsers();
+
+
+            _registrationMock
+                .Setup(x => x.Register(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ReturnsAsync(Result<int>.Failure("error"));
+
+
+            var vm = CreateViewModel();
+
+            FillValidData(vm);
+
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
+            _navigationServiceMock.Verify(
+                x => x.NavigateTo<MainWindowViewModel>(),
+                Times.Never);
+        }
+
+
+        [Fact]
+        public async Task SignUp_WhenException_ShowsErrorDialog()
+        {
+            SetupAvailableUsers();
+
+
+            _registrationMock
+                .Setup(x => x.Register(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .ThrowsAsync(new Exception());
+
+
+            var vm = CreateViewModel();
+
+            FillValidData(vm);
+
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
+            _dialogCoordinatorMock.Verify(
+                x => x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Error,
+                    CommonErrors.UnexpectedError,
+                    MessageDialogStyle.Affirmative,
+                    It.IsAny<MetroDialogSettings>()),
+                Times.Once);
+        }
+
+
+        [Fact]
+        public void SignUp_WhenFieldsInvalid_CannotExecute()
+        {
+            var vm = CreateViewModel();
+
+            Assert.False(
+                vm.SignUpCommand.CanExecute(null));
+        }
+
+
+        [Fact]
+        public async Task SignUp_WhenPasswordsDoNotMatch_DoesNotRegister()
+        {
+            SetupAvailableUsers();
+
+
+            var vm = CreateViewModel();
+
+
+            vm.Login = "login";
+            vm.Username = "username";
+            vm.Password = "Password123!";
+            vm.ConfirmPassword = "DifferentPassword123!";
+
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
+            _registrationMock.Verify(
+                x => x.Register(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                Times.Never);
+        }
+
+
+        [Fact]
+        public async Task SignUp_WhenLoginUnavailable_DoesNotRegister()
         {
             _registrationMock
-                .Setup(x => x.Register("Password123!", "login", "username"))
-                .ThrowsAsync(new Exception("Registration failed"));
+                .Setup(x => x.IsLoginAvailableAsync("login"))
+                .ReturnsAsync(false);
 
-            _dialogCoordinatorMock
-                .Setup(x => x.ShowMessageAsync(
-                    It.IsAny<RegistrationViewModel>(),
+
+            _registrationMock
+                .Setup(x => x.IsUsernameAvailableAsync("username"))
+                .ReturnsAsync(true);
+
+
+            var vm = CreateViewModel();
+
+            FillValidData(vm);
+
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
+            _registrationMock.Verify(
+                x => x.Register(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<MessageDialogStyle>(),
-                    It.IsAny<MetroDialogSettings>()))
-                .ReturnsAsync(MessageDialogResult.Affirmative);
-
-            var vm = CreateViewModel();
-            vm.Login = "login";
-            vm.Username = "username";
-            vm.Password = "Password123!";
-            vm.ConfirmPassword = "Password123!";
-
-            await Task.Delay(600);
-
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = true;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.True(vm.IsRegistrationFailed);
-            _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Never());
+                    It.IsAny<string>()),
+                Times.Never);
         }
+
 
         [Fact]
-        public async Task SignUp_WhenPasswordsDontMatch_SetsRegistrationFailed()
+        public async Task SignUp_WhenUsernameUnavailable_DoesNotRegister()
         {
+            _registrationMock
+                .Setup(x => x.IsLoginAvailableAsync("login"))
+                .ReturnsAsync(true);
+
+
+            _registrationMock
+                .Setup(x => x.IsUsernameAvailableAsync("username"))
+                .ReturnsAsync(false);
+
+
             var vm = CreateViewModel();
-            vm.Login = "login";
-            vm.Username = "username";
-            vm.Password = "Password123!";
-            vm.ConfirmPassword = "DifferentPass123!";
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = true;
 
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
+            FillValidData(vm);
 
-            Assert.True(vm.IsRegistrationFailed);
+
+            await ((AsyncRelayCommand)vm.SignUpCommand)
+                .ExecuteAsync(null);
+
+
             _registrationMock.Verify(
-                x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never());
+                x => x.Register(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()),
+                Times.Never);
         }
+
 
         [Fact]
-        public async Task SignUp_WhenLoginNotAvailable_SetsRegistrationFailed()
-        {
-            var vm = CreateViewModel();
-            vm.Login = "login";
-            vm.Username = "username";
-            vm.Password = "Password123!";
-            vm.ConfirmPassword = "Password123!";
-            vm.IsLoginAvailable = false;
-            vm.IsUsernameAvailable = true;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.True(vm.IsRegistrationFailed);
-            _registrationMock.Verify(
-                x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never());
-        }
-
-        [Fact]
-        public async Task SignUp_WhenUsernameNotAvailable_SetsRegistrationFailed()
-        {
-            var vm = CreateViewModel();
-            vm.Login = "login";
-            vm.Username = "username";
-            vm.Password = "Password123!";
-            vm.ConfirmPassword = "Password123!";
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = false;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.True(vm.IsRegistrationFailed);
-            _registrationMock.Verify(
-                x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never());
-        }
-
-        [Theory]
-        [InlineData("", "username", "Password123!")]
-        [InlineData("login", "", "Password123!")]
-        [InlineData("login", "username", "")]
-        public async Task SignUp_WhenRequiredFieldsEmpty_SetsRegistrationFailed(
-            string login, string username, string password)
-        {
-            var vm = CreateViewModel();
-            vm.Login = login;
-            vm.Username = username;
-            vm.Password = password;
-            vm.ConfirmPassword = password;
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = true;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.True(vm.IsRegistrationFailed);
-            _registrationMock.Verify(
-                x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never());
-        }
-
-        [Theory]
-        [InlineData("short")]
-        [InlineData("nouppercase1!")]
-        [InlineData("NONUMBER!")]
-        [InlineData("NoSymbol1")]
-        public async Task SignUp_WhenPasswordDoesNotMeetRequirements_SetsRegistrationFailed(string password)
-        {
-            var vm = CreateViewModel();
-            vm.Login = "login";
-            vm.Username = "username";
-            vm.Password = password;
-            vm.ConfirmPassword = password;
-            vm.IsLoginAvailable = true;
-            vm.IsUsernameAvailable = true;
-
-            await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
-
-            Assert.True(vm.IsRegistrationFailed);
-            _registrationMock.Verify(
-                x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never());
-        }
-
-        [Fact]
-        public void SwitchToAuthView_WhenExecuted_NavigatesToAuthorization()
+        public async Task SwitchToAuthView_NavigatesToAuthorization()
         {
             var vm = CreateViewModel();
 
-            vm.SwitchToAuthViewCommand.Execute(null);
+
+            await ((AsyncRelayCommand)vm.SwitchToAuthViewCommand)
+                .ExecuteAsync(null);
+
 
             _navigationServiceMock.Verify(
                 x => x.NavigateTo<AuthorizationViewModel>(),
-                Times.Once());
+                Times.Once);
         }
 
-        [Fact]
-        public void PropertyChanged_WhenFieldUpdated_ResetsRegistrationFailed()
-        {
-            var vm = CreateViewModel();
-            vm.IsRegistrationFailed = true;
-
-            vm.Login = "newlogin";
-
-            Assert.False(vm.IsRegistrationFailed);
-        }
 
         [Fact]
-        public void IsRegistrationFailed_SetAndGet_ReturnsCorrectValue()
+        public void LoginChanged_ClearsError()
         {
             var vm = CreateViewModel();
 
-            vm.IsRegistrationFailed = true;
-            Assert.True(vm.IsRegistrationFailed);
 
-            vm.IsRegistrationFailed = false;
-            Assert.False(vm.IsRegistrationFailed);
+            vm.ErrorMessage = "error";
+
+
+            vm.Login = "newLogin";
+
+
+            Assert.False(vm.HasError);
         }
     }
 }

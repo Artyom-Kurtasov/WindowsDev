@@ -25,6 +25,8 @@
     <sys:String x:Key="Task_Watermark_AddComment">Kommentar eingeben...</sys:String>
     
     <!-- Errors -->
-    <sys:String x:Key="Task_Error_FileNotFound">Datei nicht gefunden. Sie wurde möglicherweise verschoben oder gelöscht.</sys:String>
+    <sys:String x:Key="Task_Error_OpenAttachmentFailed">Beim Öffnen der Datei ist ein Fehler aufgetreten. Sie wurde möglicherweise verschoben oder gelöscht.</sys:String>
+    <sys:String x:Key="Task_Error_LoadCommentsFailed">Fehler beim Laden der Kommentare.</sys:String>
+    <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Fehler beim Laden der Anhänge.</sys:String>
 
 </ResourceDictionary>

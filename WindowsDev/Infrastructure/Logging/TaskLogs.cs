@@ -40,13 +40,5 @@ namespace WindowsDev.Infrastructure.Logging
             ILogger logger,
             int taskId,
             Exception exception);
-
-        [LoggerMessage(
-            EventId = EventIds.TaskNotFound,
-            Level = LogLevel.Warning,
-            Message = "Task {TaskId} not found")]
-        public static partial void TaskNotFound(
-            ILogger logger,
-            int taskId);
     }
 }

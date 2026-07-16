@@ -12,26 +12,24 @@ using WindowsDev.Settings;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class SettingsViewModel : ViewModelBase
+    public class SettingsViewModel : LocalizedViewModelBase
     {
+        private const string LightTheme = "Light.Blue";
+        private const string DarkTheme = "Dark.Blue";
+
         private readonly IDbHealthChecker _healthChecker;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IDbManager _dbManager;
-        private readonly ILanguageChanger _languageChanger;
 
-        // SelectedTheme: 0 = Dakr, 1 = Light 
-        const string lightTheme = "Light.Blue";
-        const string darkTheme = "Dark.Blue";
-
-        public SettingsViewModel(IDbHealthChecker dbHealthChecker,
+        public SettingsViewModel(
+            IDbHealthChecker dbHealthChecker,
             IDbManager dbManager,
             IDialogCoordinator dialogCoordinator,
-            ILanguageChanger languageChanger)
+            ILanguageChanger languageChanger) : base(languageChanger)
         {
-            _dialogCoordinator = dialogCoordinator;
             _healthChecker = dbHealthChecker;
-            _languageChanger = languageChanger;
             _dbManager = dbManager;
+            _dialogCoordinator = dialogCoordinator;
 
             ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
             SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
@@ -40,9 +38,11 @@ namespace WindowsDev.ViewModels.Main.Tabs
             Initialize();
         }
 
+
         public ICommand ApplyLanguageCommand { get; }
         public ICommand ChangeThemeCommand { get; }
         public ICommand SetNewConnectionStringCommand { get; }
+
 
         private string _newConnectionString = string.Empty;
         public string NewConnectionString
@@ -50,70 +50,55 @@ namespace WindowsDev.ViewModels.Main.Tabs
             get => _newConnectionString;
             set
             {
+                if (_newConnectionString == value)
+                    return;
+
                 _newConnectionString = value;
                 OnPropertyChanged(nameof(NewConnectionString));
             }
         }
 
+
         private Language _selectedLang;
+
         public Language SelectedLang
         {
             get => _selectedLang;
             set
             {
+                if (_selectedLang == value)
+                    return;
+
                 _selectedLang = value;
                 OnPropertyChanged(nameof(SelectedLang));
             }
         }
 
+
         private double _selectedTheme;
+
         public double SelectedTheme
         {
             get => _selectedTheme;
             set
             {
+                if (_selectedTheme == value)
+                    return;
+
                 _selectedTheme = value;
                 OnPropertyChanged(nameof(SelectedTheme));
 
-                // Apply theme immediately when selection changes
                 _ = ChangeThemeAsync();
             }
         }
 
-        public IEnumerable<Language> Languages => Enum.GetValues<Language>().Cast<Language>();
 
-        public void Initialize()
-        {
-            LoadSavedLanguages();
-            LoadSavedTheme();
-        }
+        public IEnumerable<Language> Languages { get; } = Enum.GetValues<Language>();
 
-        private void LoadSavedTheme()
-        {
-            string savedTheme = UserSettings.Default.Theme;
-
-            if (savedTheme == darkTheme)
-            {
-                _selectedTheme = 0;
-            }
-            else if (savedTheme == lightTheme)
-            {
-                _selectedTheme = 1;
-            }
-        }
-
-        private void LoadSavedLanguages()
-        {
-            string savedLangCode = UserSettings.Default.LanguageCode;
-
-            SelectedLang = Enum.Parse<Language>(savedLangCode, true);
-        }
 
         public async Task SetNewConnectionStringAsync()
         {
-            // Save current connection before attempting to change,
-            // so we can roll back if the new one is invalid
-            var old = _dbManager.ConnectionString;
+            var oldConnection = _dbManager.ConnectionString;
 
             _dbManager.ConnectionString = NewConnectionString;
 
@@ -126,41 +111,75 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
             catch
             {
-                await _dialogCoordinator.ShowMessageAsync(this,
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
                     Translate(DialogTitles.Warning),
                     Translate(SettingsWarnings.InvalidConnectionString),
                     MessageDialogStyle.Affirmative);
 
-                // Roll back to the working connection string
-                _dbManager.ConnectionString = old;
+                _dbManager.ConnectionString = oldConnection;
             }
         }
+
 
         public async Task ChangeThemeAsync()
         {
-            if (_selectedTheme == 0)
+            switch (_selectedTheme)
             {
-                ThemeManager.Current.ChangeTheme(Application.Current, darkTheme);
-                UserSettings.Default.Theme = darkTheme;
-            }
-            else if (_selectedTheme == 1)
-            {
-                ThemeManager.Current.ChangeTheme(Application.Current, lightTheme);
-                UserSettings.Default.Theme = lightTheme;
+                case 0:
+                    ThemeManager.Current.ChangeTheme(
+                        Application.Current,
+                        DarkTheme);
+
+                    UserSettings.Default.Theme = DarkTheme;
+                    break;
+
+                case 1:
+                    ThemeManager.Current.ChangeTheme(
+                        Application.Current,
+                        LightTheme);
+
+                    UserSettings.Default.Theme = LightTheme;
+                    break;
             }
 
             UserSettings.Default.Save();
+
+            await Task.CompletedTask;
         }
+
 
         public void ApplyLanguage()
         {
-            // LanguageChanger expects lowercase code
-            string langCode = SelectedLang.ToString().ToLower();
+            var languageCode = SelectedLang.ToString().ToLower();
 
-            _languageChanger.ChangeLanguage(langCode);
+            LanguageChanger.ChangeLanguage(languageCode);
 
-            UserSettings.Default.LanguageCode = langCode;
+            UserSettings.Default.LanguageCode = languageCode;
             UserSettings.Default.Save();
+        }
+
+
+        private void Initialize()
+        {
+            LoadSavedLanguages();
+            LoadSavedTheme();
+        }
+
+
+        private void LoadSavedTheme()
+        {
+            SelectedTheme = UserSettings.Default.Theme == DarkTheme
+                ? 0
+                : 1;
+        }
+
+
+        private void LoadSavedLanguages()
+        {
+            SelectedLang = Enum.Parse<Language>(
+                UserSettings.Default.LanguageCode,
+                true);
         }
     }
 }

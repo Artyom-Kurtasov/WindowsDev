@@ -1,10 +1,22 @@
-﻿using WindowsDev.Domain.TasksModels.Enums;
+﻿using MahApps.Metro.Controls.Dialogs;
+using WindowsDev.Business.Services.Localization.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Warnings;
+using WindowsDev.Domain.TasksModels.Enums;
 using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Tasks.Dialog
 {
-    public class TaskDialogViewModelBase : ViewModelBase
+    public class TaskDialogViewModelBase : LocalizedViewModelBase
     {
+        protected readonly IDialogCoordinator _dialogCoordinator;
+
+        protected TaskDialogViewModelBase(ILanguageChanger languageChanger,
+            IDialogCoordinator dialogCoordinator) : base(languageChanger)
+        {
+            _dialogCoordinator = dialogCoordinator;
+        }
+
         private bool _isEditMode;
         public bool IsEditMode
         {
@@ -80,6 +92,14 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
                 _deadLine = value;
                 OnPropertyChanged(nameof(DeadLine));
             }
+        }
+
+        protected async Task ShowWarningAsync()
+        {
+            await _dialogCoordinator.ShowMessageAsync(this,
+                Translate(DialogTitles.Warning),
+                Translate(TaskDialogWarnings.EnterName),
+                MessageDialogStyle.Affirmative);
         }
 
         // Generates values 0..100 with step 10 for ComboBox

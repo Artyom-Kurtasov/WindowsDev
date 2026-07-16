@@ -36,7 +36,7 @@ namespace WindowsDev.Infrastructure.Logging
             EventId = EventIds.AttachmentDownloadFailed,
             Level = LogLevel.Error,
             Message = "Failed to download attachment {AttachmentId}: '{FileName}'")]
-        internal static partial void AttachmentDownloadFailed(
+        internal static partial void AttachmentOpenFailed(
             ILogger logger,
             string attachmentId,
             string fileName,

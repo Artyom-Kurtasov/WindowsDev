@@ -10,56 +10,41 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
     {
         private readonly IUserRepository _userRepository;
         private readonly IHasherFactory _hasherFactory;
+        private readonly IPasswordChanger _passwordChanger;
+
+        private const string HashHexFormat = "x16";
 
         public PasswordRecoveryService(IHasherFactory hasherFactory,
-                                       IUserRepository userRepository)
+                                       IUserRepository userRepository,
+                                       IPasswordChanger passwordChanger)
         {
             _hasherFactory = hasherFactory;
             _userRepository = userRepository;
+            _passwordChanger = passwordChanger;
         }
 
-        public int GenerateRecoveryCode()
-        {
-            return Random.Shared.Next(100000, 999999);
-        }
-
-        public async Task<Result<bool>> IsRecoverCodeCorrect(int recoveryCode, string login)
+        public async Task<Result<bool>> IsRecoverCodeCorrectAsync(int recoveryCode, string login)
         {
             var user = await _userRepository.GetByLoginAsync(login);
-
             ArgumentNullException.ThrowIfNull(user);
 
             var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-            var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), user.RecoveryCodeSalt!);
+            var recoveryCodeHash = hasher.HashValue(recoveryCode.ToString(), user.RecoveryCodeSalt!);
 
-            if (recoveryCodeHash.ToString("x16") != user.RecoveryCodeHash)
-                return Result<bool>.Failure(PasswordRecoveryErrors.InvalidRecoveryCode);
-
-            return Result<bool>.Success(true);
+            return recoveryCodeHash.ToString(HashHexFormat) == user.RecoveryCodeHash
+                ? Result<bool>.Success(true)
+                : Result<bool>.Failure(PasswordRecoveryErrors.InvalidRecoveryCode);
         }
 
         public async Task<Result<int>> ChangePasswordAsync(string login, string password)
         {
-            var user = await _userRepository.GetByLoginAsync(login);
+            _passwordChanger.IsRecoveryMode = true;
+            return await _passwordChanger.ChangeUserPasswordAsync(login, password);
+        }
 
-            ArgumentNullException.ThrowIfNull(user);
-
-            var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-            var passwordSalt = hasher.GenerateSalt();
-            var recoveryCodeSalt = hasher.GenerateSalt();
-
-            var recoveryCode = GenerateRecoveryCode();
-            var recoveryCodeHash = hasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
-            var passwordHash = hasher.HashPassword(password, passwordSalt);
-
-            user.RecoveryCodeHash = recoveryCodeHash.ToString("x16");
-            user.PasswordHash = passwordHash.ToString("x16");
-            user.Salt = passwordSalt;
-            user.RecoveryCodeSalt = recoveryCodeSalt;
-
-            await _userRepository.UpdateAsync(user);
-
-            return Result<int>.Success(recoveryCode);
+        public async Task<bool> IsUserExistAsync(string login)
+        {
+            return await _userRepository.ExistsByLoginAsync(login);
         }
     }
 }

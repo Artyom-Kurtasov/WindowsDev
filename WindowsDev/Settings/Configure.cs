@@ -7,9 +7,11 @@ using WindowsDev.Business.Repositories;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.Authorization;
 using WindowsDev.Business.Services.Authorization.Interfaces;
+using WindowsDev.Business.Services.DebounceService;
 using WindowsDev.Business.Services.Localization;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.Logger;
+using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
@@ -39,6 +41,7 @@ using WindowsDev.NavigationManager;
 using WindowsDev.NavigationManager.Interfaces;
 using WindowsDev.ViewModels.Auth;
 using WindowsDev.ViewModels.Auth.Dialogs;
+using WindowsDev.ViewModels.Auth.Dialogs.Factories;
 using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Main.Tabs;
@@ -89,6 +92,7 @@ namespace WindowsDev.Settings
 
             // Factories
             services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+            services.AddTransient<IRecoveryStepsFactory, RecoveryStepsFactory>();
 
             // Localization
             services.AddSingleton<ILanguageChanger, LanguageChanger>();
@@ -133,6 +137,7 @@ namespace WindowsDev.Settings
             services.AddTransient<DefaultHasher>();
             services.AddTransient<SimpleHasher>();
             services.AddTransient<IPasswordRecoveryService, PasswordRecoveryService>();
+            services.AddTransient<IPasswordChanger, PasswordChanger>();
 
             // Projects
             services.AddSingleton<IProjectService, ProjectService>();
@@ -143,11 +148,11 @@ namespace WindowsDev.Settings
             services.AddSingleton<IAttacmentService, AttachmentService>();
             services.AddTransient<ICommentService, CommentsService>();
 
-            // Validation
-            services.AddSingleton<UserFieldValidator>();
-
             // Profile
             services.AddSingleton<IProfileService, ProfileService>();
+
+            // Debounce
+            services.AddTransient<IDebounceService, DebounceService>();
         }
 
         private static void ConfigureViewModels(IServiceCollection services)

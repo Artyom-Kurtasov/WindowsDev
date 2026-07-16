@@ -22,9 +22,6 @@ namespace WindowsDev.Business.Services.TaskService.Comment
         {
             ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
 
-            if (string.IsNullOrWhiteSpace(commentText))
-                return Result<Comments>.Failure(CommentErrors.CommentIsEmpty);
-
             var comment = new Comments
             {
                 Text = commentText,

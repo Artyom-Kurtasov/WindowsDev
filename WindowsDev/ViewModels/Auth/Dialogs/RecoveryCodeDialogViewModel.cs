@@ -1,7 +1,7 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Business.Repositories.Interfaces;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Dialogs.Interfaces;
@@ -12,50 +12,45 @@ using WindowsDev.Domain.DialogsMessages.Tooltips;
 using WindowsDev.Domain.PasswordRecoveryModels;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.Logging;
+using WindowsDev.ViewModels.Auth.Dialogs.Factories;
+
 using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs
 {
-    public class RecoveryCodeDialogViewModel : ViewModelBase, IDialogViewModel
+    public class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogViewModel
     {
         private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly PasswordRecoveryData _passwordRecoveryData;
-        private readonly ThirdStepViewModel _thirdStepVM;
         private readonly ILogger<RecoveryCodeDialogViewModel> _logger;
+        private readonly IRecoveryStepsFactory _recoveryStepsFactory;
 
-        private readonly List<object> _steps;
+        private readonly IReadOnlyList<object> _steps;
 
-        public RecoveryCodeDialogViewModel(IUserRepository userRepository,
-            IPasswordRecoveryService passwordRecoveryService,
-            ILogger<RecoveryCodeDialogViewModel> logger)
+        public RecoveryCodeDialogViewModel(IPasswordRecoveryService passwordRecoveryService,
+            IDialogCoordinator dialogCoordinator,
+            ILogger<RecoveryCodeDialogViewModel> logger,
+            ILanguageChanger languageChanger,
+            IRecoveryStepsFactory recoveryStepsFactory,
+            PasswordRecoveryData passwordRecoveryData) : base(languageChanger)
         {
             _passwordRecoveryService = passwordRecoveryService;
-            _passwordRecoveryData = new PasswordRecoveryData();
+            _dialogCoordinator = dialogCoordinator;
             _logger = logger;
+            _recoveryStepsFactory = recoveryStepsFactory;
+            _passwordRecoveryData = passwordRecoveryData;
 
-            _thirdStepVM = new ThirdStepViewModel(_passwordRecoveryData);
-
-            _steps = new List<object>
-            {
-                new FirstStepViewModel(_passwordRecoveryData, userRepository),
-                new SecondStepViewModel(_passwordRecoveryData, passwordRecoveryService),
-                _thirdStepVM
-            };
+            _steps = _recoveryStepsFactory.CreateSteps();
 
             NextStepCommand = new RelayCommand(NextStep, CanNextStep);
             PrevStepCommand = new RelayCommand(PrevStep, CanBackStep);
             ChangePasswordCommand = new AsyncRelayCommand(ChangePasswordAsync, CanNextStep);
             CancelCommand = new AsyncRelayCommand(CancelAsync);
 
-            _passwordRecoveryData.PropertyChanged += (_, _) =>
-            {
-                ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
-                ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
 
-                OnPropertyChanged(nameof(NextStepToolTip));
-            };
+            _passwordRecoveryData.PropertyChanged += PasswordRecoveryDataChanged;
+
 
             CurrentStep = 0;
             CurrentStepView = _steps[0];
@@ -66,6 +61,9 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
         public ICommand NextStepCommand { get; }
         public ICommand PrevStepCommand { get; }
 
+        public event Func<Task>? CloseRequested;
+        public event Func<Task>? Completed;
+
         private object _currentStepView = null!;
 
         public object CurrentStepView
@@ -73,69 +71,76 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
             get => _currentStepView;
             set
             {
+                if (_currentStepView == value)
+                    return;
+
                 _currentStepView = value;
-                OnPropertyChanged(nameof(CurrentStepView));
+                OnPropertyChanged();
             }
         }
 
-        public event Func<Task>? CloseRequested;
-        public event Func<Task>? Completed;
-
-        public string NextStepToolTip => CurrentStep switch
-        {
-            0 when !_passwordRecoveryData.IsUserExist =>
-                Translate(AuthTooltips.UserNotFound),
-
-            1 when !_passwordRecoveryData.IsRecoveryCodeCorrect =>
-                Translate(AuthTooltips.InvalidRecoveryCode),
-
-            _ => Translate(AuthTooltips.NextStep)
-        };
-
         private int _currentStep;
+
         public int CurrentStep
         {
             get => _currentStep;
             set
             {
+                if (_currentStep == value)
+                    return;
+
                 _currentStep = value;
 
-                OnPropertyChanged(nameof(CurrentStep));
-                OnPropertyChanged(nameof(NextStepToolTip));
+                OnPropertyChanged();
 
-                ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
-                ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
-                ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
+                UpdateCommands();
             }
         }
 
-        public bool CanBackStep() => CurrentStep > 0;
-
-        public bool CanNextStep() => CurrentStep switch
+        public string NextStepToolTip => CurrentStep switch
         {
-            0 => _passwordRecoveryData.IsUserExist,
-            1 => _passwordRecoveryData.IsRecoveryCodeCorrect,
-            2 => PasswordValidator.IsValid(_thirdStepVM.NewPassword)
-                 && _thirdStepVM.NewPassword == _thirdStepVM.ConfirmPassword,
-            _ => false
+            0 when !_passwordRecoveryData.IsUserExist =>
+                Translate(PasswordRecoveryTooltips.UserNotFound),
+
+            1 when !_passwordRecoveryData.IsRecoveryCodeCorrect =>
+                Translate(PasswordRecoveryTooltips.InvalidRecoveryCode),
+
+            _ =>
+                Translate(PasswordRecoveryTooltips.NextStep)
         };
+
+        public bool CanBackStep() =>
+            CurrentStep > 0;
+
+        public bool CanNextStep() =>
+            CurrentStep switch
+            {
+                0 => _passwordRecoveryData.IsUserExist,
+
+                1 => _passwordRecoveryData.IsRecoveryCodeCorrect,
+
+                2 => PasswordValidator.IsValid(_passwordRecoveryData.NewPassword) &&
+                     _passwordRecoveryData.NewPassword == _passwordRecoveryData.ConfirmPassword,
+
+                _ => false
+            };
 
         private void NextStep()
         {
-            if (CurrentStep < _steps.Count - 1)
-            {
-                CurrentStep++;
-                CurrentStepView = _steps[CurrentStep];
-            }
+            if (CurrentStep >= _steps.Count - 1)
+                return;
+
+            CurrentStep++;
+            CurrentStepView = _steps[CurrentStep];
         }
 
         private void PrevStep()
         {
-            if (CurrentStep > 0)
-            {
-                CurrentStep--;
-                CurrentStepView = _steps[CurrentStep];
-            }
+            if (CurrentStep <= 0)
+                return;
+
+            CurrentStep--;
+            CurrentStepView = _steps[CurrentStep];
         }
 
         private async Task ChangePasswordAsync()
@@ -146,28 +151,25 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
                     _passwordRecoveryData.Login!,
                     _passwordRecoveryData.NewPassword!);
 
-                if (result.IsSuccess)
-                {
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate(DialogTitles.Information),
-                        $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
-                        MessageDialogStyle.Affirmative);
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
+                    Translate(DialogTitles.Information),
+                    $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                    MessageDialogStyle.Affirmative);
 
-                    await CancelAsync();
-                }
-                else
-                {
-                    await _dialogCoordinator.ShowMessageAsync(this,
-                        Translate(DialogTitles.Warning),
-                        Translate(result.Error),
-                        MessageDialogStyle.Affirmative);
-                }
+
+                await CancelAsync();
             }
             catch (Exception ex)
             {
-                RecoveryLogs.PasswordResetFailed(_logger,
-                    _passwordRecoveryData.Login ?? "unknown", ex);
-                await _dialogCoordinator.ShowMessageAsync(this,
+                RecoveryLogs.PasswordResetFailed(
+                    _logger,
+                    _passwordRecoveryData.Login ?? "unknown",
+                    ex);
+
+
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
                     MessageDialogStyle.Affirmative);
@@ -177,9 +179,21 @@ namespace WindowsDev.ViewModels.Auth.Dialogs
         private async Task CancelAsync()
         {
             if (CloseRequested != null)
-            {
                 await CloseRequested.Invoke();
-            }
+        }
+
+        private void PasswordRecoveryDataChanged(object? sender, EventArgs e)
+        {
+            UpdateCommands();
+
+            OnPropertyChanged(nameof(NextStepToolTip));
+        }
+
+        private void UpdateCommands()
+        {
+            ((RelayCommand)NextStepCommand).RaiseCanExecuteChanged();
+            ((RelayCommand)PrevStepCommand).RaiseCanExecuteChanged();
+            ((AsyncRelayCommand)ChangePasswordCommand).RaiseCanExecuteChanged();
         }
     }
 }

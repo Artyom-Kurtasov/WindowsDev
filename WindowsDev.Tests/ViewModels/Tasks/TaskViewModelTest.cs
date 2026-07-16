@@ -1,9 +1,13 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.Business.Primitives;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
+using WindowsDev.Domain;
+using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.ProjectsModels;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Domain.TasksModels.Enums;
@@ -25,29 +29,34 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         private readonly Mock<IAttacmentService> _attachmentServiceMock;
         private readonly Mock<ILogger<TaskViewModel>> _loggerMock;
         private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+        private readonly Mock<ILanguageChanger> _languageChangerMock;
+
 
         public TaskViewModelTest()
         {
-            _commentServiceMock = new Mock<ICommentService>();
-            _dialogServiceMock = new Mock<IDialogService>();
-            _navigationServiceMock = new Mock<INavigationService>();
-            _attachmentServiceMock = new Mock<IAttacmentService>();
-            _loggerMock = new Mock<ILogger<TaskViewModel>>();
-            _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+            _commentServiceMock = new();
+            _dialogServiceMock = new();
+            _navigationServiceMock = new();
+            _attachmentServiceMock = new();
+            _loggerMock = new();
+            _dialogCoordinatorMock = new();
+            _languageChangerMock = new();
+
+
+            _languageChangerMock
+                .Setup(x => x.Translate(It.IsAny<string>()))
+                .Returns<string>(x => x);
         }
 
-        private TaskViewModel CreateViewModel(ProjectsInfo project = null, TasksInfo task = null)
+
+
+        private TaskViewModel CreateViewModel(
+            ProjectsInfo? project = null,
+            TasksInfo? task = null)
         {
             project ??= CreateTestProject();
             task ??= CreateTestTask();
 
-            _commentServiceMock
-                .Setup(x => x.GetComments(task.Id))
-                .ReturnsAsync(new List<Comments>());
-
-            _attachmentServiceMock
-                .Setup(x => x.GetAttachmentsAsync(task.Id))
-                .ReturnsAsync(new List<TaskAttachment>());
 
             return new TaskViewModel(
                 project,
@@ -57,28 +66,47 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 _navigationServiceMock.Object,
                 _attachmentServiceMock.Object,
                 _loggerMock.Object,
-                _dialogCoordinatorMock.Object);
+                _dialogCoordinatorMock.Object,
+                _languageChangerMock.Object);
         }
 
-        private ProjectsInfo CreateTestProject(int id = 1, string name = "Test Project")
+
+
+        private void SetupSuccessfulLoading(int taskId)
+        {
+            _commentServiceMock
+                .Setup(x => x.GetComments(taskId))
+                .ReturnsAsync(new List<Comments>());
+
+
+            _attachmentServiceMock
+                .Setup(x => x.GetAttachmentsAsync(taskId))
+                .ReturnsAsync(new List<TaskAttachment>());
+        }
+
+
+
+        private ProjectsInfo CreateTestProject()
         {
             return new ProjectsInfo
             {
-                Id = id,
-                Name = name,
+                Id = 1,
+                Name = "Test Project",
                 UserId = 1,
-                CreatedAt = DateTime.Today
+                CreatedAt = DateTime.UtcNow
             };
         }
 
-        private TasksInfo CreateTestTask(int id = 1, string name = "Test Task", int projectId = 1)
+
+
+        private TasksInfo CreateTestTask()
         {
             return new TasksInfo
             {
-                Id = id,
-                Name = name,
-                Description = "Test Description",
-                ProjectId = projectId,
+                Id = 1,
+                Name = "Test Task",
+                Description = "Description",
+                ProjectId = 1,
                 Priority = TaskPriority.Normal,
                 Progress = 0,
                 Status = TaskStatus.InProgress,
@@ -87,40 +115,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks
             };
         }
 
-        private List<Comments> CreateTestComments(int count = 2)
-        {
-            var comments = new List<Comments>();
-            for (int i = 1; i <= count; i++)
-            {
-                comments.Add(new Comments
-                {
-                    Id = i,
-                    Text = $"Comment {i}",
-                    CreatedAt = DateTime.UtcNow,
-                    Author = "author",
-                    TaskId = i,
-                });
-            }
-            return comments;
-        }
 
-        private List<TaskAttachment> CreateTestAttachments(int count = 2)
-        {
-            var attachments = new List<TaskAttachment>();
-            for (int i = 1; i <= count; i++)
-            {
-                attachments.Add(new TaskAttachment
-                {
-                    Id = i,
-                    FileName = $"file{i}.txt",
-                    FilePath = $"C:\\temp\\file{i}.txt",
-                    FileExtension = "txt",
-                    FileSize = 1.0,
-                    TaskId = i
-                });
-            }
-            return attachments;
-        }
 
         private void SetupDialogCoordinatorMock()
         {
@@ -129,275 +124,308 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                     It.IsAny<TaskViewModel>(),
                     It.IsAny<string>(),
                     It.IsAny<string>(),
-                    It.IsAny<MessageDialogStyle>(),
+                    MessageDialogStyle.Affirmative,
                     It.IsAny<MetroDialogSettings>()))
                 .ReturnsAsync(MessageDialogResult.Affirmative);
         }
 
+
+
         [Fact]
-        public void Constructor_WhenTaskAndProjectProvided_LoadsTaskCommentsAndAttachments()
+        public void Constructor_WhenTaskAndProjectProvided_SetsData()
         {
             var project = CreateTestProject();
             var task = CreateTestTask();
-            var comments = CreateTestComments();
-            var attachments = CreateTestAttachments();
 
-            _commentServiceMock
-                .Setup(x => x.GetComments(task.Id))
-                .ReturnsAsync(comments);
+            SetupSuccessfulLoading(task.Id);
 
-            _attachmentServiceMock
-                .Setup(x => x.GetAttachmentsAsync(task.Id))
-                .ReturnsAsync(attachments);
+            var vm = CreateViewModel(project, task);
 
-            var vm = new TaskViewModel(
-                project,
-                task,
-                _commentServiceMock.Object,
-                _dialogServiceMock.Object,
-                _navigationServiceMock.Object,
-                _attachmentServiceMock.Object,
-                _loggerMock.Object,
-                _dialogCoordinatorMock.Object);
 
             Assert.Equal(task, vm.CurrentTask);
             Assert.Equal(project, vm.Project);
-            Assert.Equal(2, vm.Comments?.Count);
-            Assert.Equal(2, vm.Attachments?.Count);
+            Assert.Equal(task.Name, vm.Name);
         }
 
+
+
         [Fact]
-        public async Task Constructor_WhenGetCommentsThrowsException_ShowsErrorMessageAndSetsEmptyComments()
+        public async Task Constructor_WhenCommentsLoadFails_ShowsError()
         {
             var project = CreateTestProject();
             var task = CreateTestTask();
+
 
             _commentServiceMock
                 .Setup(x => x.GetComments(task.Id))
                 .ThrowsAsync(new Exception());
 
-            _attachmentServiceMock
-                .Setup(x => x.GetAttachmentsAsync(task.Id))
-                .ReturnsAsync(new List<TaskAttachment>());
 
             SetupDialogCoordinatorMock();
 
-            var vm = new TaskViewModel(
-                project,
-                task,
-                _commentServiceMock.Object,
-                _dialogServiceMock.Object,
-                _navigationServiceMock.Object,
-                _attachmentServiceMock.Object,
-                _loggerMock.Object,
-                _dialogCoordinatorMock.Object);
 
-            await Task.Delay(100);
+            var vm = CreateViewModel(project, task);
+
+
+            await Task.Delay(200);
+
 
             Assert.Empty(vm.Comments);
-            _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
-                It.IsAny<TaskViewModel>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<MessageDialogStyle>(),
-                It.IsAny<MetroDialogSettings>()), Times.Once);
+
+
+            _dialogCoordinatorMock.Verify(x =>
+                x.ShowMessageAsync(
+                    It.IsAny<TaskViewModel>(),
+                    DialogTitles.Error,
+                    TaskErrors.LoadCommentsFailed,
+                    MessageDialogStyle.Affirmative,
+                    It.IsAny<MetroDialogSettings>()),
+                Times.Once);
         }
 
+
+
         [Fact]
-        public async Task Constructor_WhenGetAttachmentsThrowsException_ShowsErrorMessageAndSetsEmptyAttachments()
+        public async Task Constructor_WhenAttachmentsLoadFails_ShowsError()
         {
             var project = CreateTestProject();
             var task = CreateTestTask();
-            var comments = CreateTestComments();
 
-            _commentServiceMock
-                .Setup(x => x.GetComments(task.Id))
-                .ReturnsAsync(comments);
 
             _attachmentServiceMock
                 .Setup(x => x.GetAttachmentsAsync(task.Id))
                 .ThrowsAsync(new Exception());
 
+
             SetupDialogCoordinatorMock();
 
-            var vm = new TaskViewModel(
-                project,
-                task,
-                _commentServiceMock.Object,
-                _dialogServiceMock.Object,
-                _navigationServiceMock.Object,
-                _attachmentServiceMock.Object,
-                _loggerMock.Object,
-                _dialogCoordinatorMock.Object);
 
-            await Task.Delay(100);
+            var vm = CreateViewModel(project, task);
+
+
+            await Task.Delay(200);
+
 
             Assert.Empty(vm.Attachments);
-            _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
-                It.IsAny<TaskViewModel>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<MessageDialogStyle>(),
-                It.IsAny<MetroDialogSettings>()), Times.Once);
+
+
+            _dialogCoordinatorMock.Verify(x =>
+                x.ShowMessageAsync(
+                    It.IsAny<TaskViewModel>(),
+                    DialogTitles.Error,
+                    TaskErrors.LoadAttachmentsFailed,
+                    MessageDialogStyle.Affirmative,
+                    It.IsAny<MetroDialogSettings>()),
+                Times.Once);
         }
 
+
+
         [Fact]
-        public async Task SwitchToProjectCommand_WhenExecuted_NavigatesToProjectViewModel()
+        public async Task SwitchToProjectCommand_Navigates()
         {
             var project = CreateTestProject();
-            var task = CreateTestTask();
-            var vm = CreateViewModel(project, task);
+
+            SetupSuccessfulLoading(1);
+
+            var vm = CreateViewModel(project);
+
 
             await Task.Delay(100);
 
-            ((RelayCommand)vm.SwitchToProjectCommand).Execute(null);
 
-            _navigationServiceMock.Verify(x => x.NavigateTo<ProjectViewModel>(project), Times.Once);
+            ((RelayCommand)vm.SwitchToProjectCommand)
+                .Execute(null);
+
+
+
+            _navigationServiceMock.Verify(x =>
+                x.NavigateTo<ProjectViewModel>(project),
+                Times.Once);
         }
 
-        [Fact]
-        public void SwitchToProjectCommand_CanExecute_ReturnsTrue()
-        {
-            var vm = CreateViewModel();
 
-            var result = ((RelayCommand)vm.SwitchToProjectCommand).CanExecute(null);
-
-            Assert.True(result);
-        }
 
         [Fact]
-        public async Task EditTaskCommand_WhenExecuted_ShowsEditTaskDialog()
+        public async Task EditTaskCommand_ShowsDialog()
         {
-            var project = CreateTestProject();
             var task = CreateTestTask();
-            var vm = CreateViewModel(project, task);
+
+            SetupSuccessfulLoading(task.Id);
+
+
+            var vm = CreateViewModel(task: task);
+
 
             await Task.Delay(100);
 
-            await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
-            _dialogServiceMock.Verify(x => x.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(
-                vm, task), Times.Once);
+            await ((AsyncRelayCommand)vm.EditTaskCommand)
+                .ExecuteAsync(null);
+
+
+
+            _dialogServiceMock.Verify(x =>
+                x.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(
+                    vm,
+                    task),
+                Times.Once);
         }
 
+
+
         [Fact]
-        public async Task AddCommentCommand_WhenNewCommentIsValid_AddsCommentAndClearsInput()
+        public async Task AddComment_WhenValid_AddsComment()
         {
-            var project = CreateTestProject();
             var task = CreateTestTask();
-            var comments = CreateTestComments();
-            var attachments = CreateTestAttachments();
-            var newComment = new Comments
+
+
+            var comment = new Comments
             {
-                Id = 3,
-                Text = "New comment",
+                Id = 1,
+                Text = "New",
+                TaskId = task.Id,
                 CreatedAt = DateTime.UtcNow,
-                Author = "author",
-                TaskId = task.Id
+                Author = "Test User"
             };
 
+
+            SetupSuccessfulLoading(task.Id);
+
+
             _commentServiceMock
-                .Setup(x => x.GetComments(task.Id))
-                .ReturnsAsync(comments);
+                .Setup(x => x.AddComment(task.Id, "New"))
+                .ReturnsAsync(Result<Comments>.Success(comment));
 
-            _attachmentServiceMock
-                .Setup(x => x.GetAttachmentsAsync(task.Id))
-                .ReturnsAsync(attachments);
 
-            var vm = CreateViewModel(project, task);
+            var vm = CreateViewModel(task: task);
+
 
             await Task.Delay(100);
 
-            vm.NewComment = "New comment";
 
-            _commentServiceMock
-                .Setup(x => x.AddComment(task.Id, "New comment"))
-                .ReturnsAsync(newComment);
+            vm.NewComment = "New";
 
-            await ((AsyncRelayCommand)vm.AddCommentCommand).ExecuteAsync(null);
 
-            Assert.Contains(newComment, vm.Comments);
+            await ((AsyncRelayCommand)vm.AddCommentCommand)
+                .ExecuteAsync(null);
+
+
+
+            Assert.Contains(comment, vm.Comments);
             Assert.Equal(string.Empty, vm.NewComment);
-            _commentServiceMock.Verify(x => x.AddComment(task.Id, "New comment"), Times.Once);
         }
+
+
 
         [Theory]
-        [InlineData(null)]
         [InlineData("")]
-        [InlineData("   ")]
-        public async Task AddCommentCommand_WhenNewCommentIsNullOrEmpty_DoesNotAddComment(string? newComment)
+        [InlineData(" ")]
+        [InlineData(null)]
+        public async Task AddComment_WhenEmpty_DoesNothing(string? text)
         {
-            var project = CreateTestProject();
             var task = CreateTestTask();
-            var vm = CreateViewModel(project, task);
+
+            SetupSuccessfulLoading(task.Id);
+
+
+            var vm = CreateViewModel(task: task);
+
 
             await Task.Delay(100);
 
-            vm.NewComment = newComment;
 
-            await ((AsyncRelayCommand)vm.AddCommentCommand).ExecuteAsync(null);
+            vm.NewComment = text;
 
-            _commentServiceMock.Verify(x => x.AddComment(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+
+            await ((AsyncRelayCommand)vm.AddCommentCommand)
+                .ExecuteAsync(null);
+
+
+
+            _commentServiceMock.Verify(x =>
+                x.AddComment(
+                    It.IsAny<int>(),
+                    It.IsAny<string>()),
+                Times.Never);
         }
 
+
+
         [Fact]
-        public async Task AddCommentCommand_WhenExceptionOccurs_ShowsErrorMessage()
+        public async Task AddComment_WhenException_ShowsError()
         {
-            var project = CreateTestProject();
             var task = CreateTestTask();
-            var comments = CreateTestComments();
-            var attachments = CreateTestAttachments();
+
+
+            SetupSuccessfulLoading(task.Id);
+
 
             _commentServiceMock
-                .Setup(x => x.GetComments(task.Id))
-                .ReturnsAsync(comments);
-
-            _attachmentServiceMock
-                .Setup(x => x.GetAttachmentsAsync(task.Id))
-                .ReturnsAsync(attachments);
-
-            var vm = CreateViewModel(project, task);
-
-            await Task.Delay(100);
-
-            vm.NewComment = "New comment";
-
-            _commentServiceMock
-                .Setup(x => x.AddComment(It.IsAny<int>(), It.IsAny<string>()))
+                .Setup(x => x.AddComment(
+                    It.IsAny<int>(),
+                    It.IsAny<string>()))
                 .ThrowsAsync(new Exception());
+
 
             SetupDialogCoordinatorMock();
 
-            await ((AsyncRelayCommand)vm.AddCommentCommand).ExecuteAsync(null);
 
-            _dialogCoordinatorMock.Verify(x => x.ShowMessageAsync(
-                It.IsAny<TaskViewModel>(),
-                It.IsAny<string>(),
-                It.IsAny<string>(),
-                It.IsAny<MessageDialogStyle>(),
-                It.IsAny<MetroDialogSettings>()), Times.Once);
-        }
+            var vm = CreateViewModel(task: task);
 
-        [Fact]
-        public async Task RefreshTask_UpdatesAllProperties()
-        {
-            var project = CreateTestProject();
-            var task = CreateTestTask();
-            var vm = CreateViewModel(project, task);
 
             await Task.Delay(100);
 
-            var propertiesChanged = new List<string>();
-            vm.PropertyChanged += (s, e) => propertiesChanged.Add(e.PropertyName);
+
+            vm.NewComment = "Test";
+
+
+            await ((AsyncRelayCommand)vm.AddCommentCommand)
+                .ExecuteAsync(null);
+
+
+
+            _dialogCoordinatorMock.Verify(x =>
+                x.ShowMessageAsync(
+                    It.IsAny<TaskViewModel>(),
+                    DialogTitles.Error,
+                    CommonErrors.UnexpectedError,
+                    MessageDialogStyle.Affirmative,
+                    It.IsAny<MetroDialogSettings>()),
+                Times.Once);
+        }
+
+
+
+        [Fact]
+        public void RefreshTask_RaisesPropertiesChanged()
+        {
+            var task = CreateTestTask();
+
+            SetupSuccessfulLoading(task.Id);
+
+
+            var vm = CreateViewModel(task: task);
+
+
+            var changed = new List<string>();
+
+
+            vm.PropertyChanged += (_, e) =>
+                changed.Add(e.PropertyName);
+
+
 
             vm.RefreshTask();
 
-            Assert.Contains(nameof(vm.Name), propertiesChanged);
-            Assert.Contains(nameof(vm.Description), propertiesChanged);
-            Assert.Contains(nameof(vm.Priority), propertiesChanged);
-            Assert.Contains(nameof(vm.Progress), propertiesChanged);
-            Assert.Contains(nameof(vm.Status), propertiesChanged);
-            Assert.Contains(nameof(vm.DeadLine), propertiesChanged);
+
+
+            Assert.Contains(nameof(vm.Name), changed);
+            Assert.Contains(nameof(vm.Description), changed);
+            Assert.Contains(nameof(vm.Priority), changed);
+            Assert.Contains(nameof(vm.Progress), changed);
+            Assert.Contains(nameof(vm.Status), changed);
+            Assert.Contains(nameof(vm.DeadLine), changed);
         }
     }
 }

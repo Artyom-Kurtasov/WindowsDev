@@ -31,6 +31,6 @@
 
     <!-- Success -->
     <sys:String x:Key="Profile_Success_UsernameChanged">ユーザー名が正常に変更されました。</sys:String>
-    <sys:String x:Key="Profile_Success_PasswordChanged">パスワードが正常に変更されました。</sys:String>
+    <sys:String x:Key="Profile_Success_PasswordChanged">パスワードが正常に変更されました。新しい復旧コードはこちらです:</sys:String>
 
 </ResourceDictionary>

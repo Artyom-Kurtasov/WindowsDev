@@ -99,7 +99,7 @@
                 <!-- Tasks Data Grid -->
                 <DataGrid AutoGenerateColumns="False"
                                   CanUserAddRows="False"
-                                  ItemsSource="{Binding TaskItem}">
+                                  ItemsSource="{Binding Tasks}">
 
                     <DataGrid.Columns>
 

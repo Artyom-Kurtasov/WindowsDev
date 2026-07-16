@@ -1,4 +1,5 @@
-﻿using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
+﻿using WindowsDev.Business.Services.DebounceService;
+using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Domain.PasswordRecoveryModels;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
@@ -7,62 +8,70 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
     {
         private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly PasswordRecoveryData _passwordRecoveryData;
+        private readonly IDebounceService _debounceService;
+
+        private const int DebounceDelayMilliseconds = 500;
+
 
         public SecondStepViewModel(PasswordRecoveryData passwordRecoveryData,
-                                   IPasswordRecoveryService passwordRecoveryService)
+            IPasswordRecoveryService passwordRecoveryService,
+            IDebounceService debounceService)
         {
             _passwordRecoveryData = passwordRecoveryData;
             _passwordRecoveryService = passwordRecoveryService;
+            _debounceService = debounceService;
         }
 
-        // Used to cancel previous debounced validation requests
-        private CancellationTokenSource? _recoveryCodeCts;
 
         public string RecoveryCode
         {
             get => _passwordRecoveryData.RecoveryCode;
             set
             {
+                if (_passwordRecoveryData.RecoveryCode == value)
+                    return;
+
                 _passwordRecoveryData.RecoveryCode = value;
-                OnPropertyChanged(nameof(RecoveryCode));
+
+                OnPropertyChanged();
 
                 _ = CheckRecoveryCodeAsync();
             }
         }
 
+
         public bool IsRecoveryCodeCorrect
         {
             get => _passwordRecoveryData.IsRecoveryCodeCorrect;
-            set
+            private set
             {
+                if (_passwordRecoveryData.IsRecoveryCodeCorrect == value)
+                    return;
+
                 _passwordRecoveryData.IsRecoveryCodeCorrect = value;
-                OnPropertyChanged(nameof(IsRecoveryCodeCorrect));
+
+                OnPropertyChanged();
             }
         }
 
+
         private async Task CheckRecoveryCodeAsync()
         {
-            _recoveryCodeCts?.Cancel();
-            _recoveryCodeCts = new CancellationTokenSource();
-
-            try
-            {
-                await Task.Delay(500, _recoveryCodeCts.Token);
-
-                if (int.TryParse(RecoveryCode, out int code))
+            await _debounceService.DebounceAsync(
+                async () =>
                 {
-                    var result = await _passwordRecoveryService.IsRecoverCodeCorrect(code, _passwordRecoveryData.Login);
-
-                    if (!result.IsSuccess)
+                    if (!int.TryParse(RecoveryCode, out int code))
                     {
                         IsRecoveryCodeCorrect = false;
                         return;
                     }
 
-                    IsRecoveryCodeCorrect = true;
-                }
-            }
-            catch (TaskCanceledException) { }
+                    var result = await _passwordRecoveryService
+                        .IsRecoverCodeCorrectAsync(code, _passwordRecoveryData.Login);
+
+                    IsRecoveryCodeCorrect = result.IsSuccess;
+                },
+                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds));
         }
     }
 }

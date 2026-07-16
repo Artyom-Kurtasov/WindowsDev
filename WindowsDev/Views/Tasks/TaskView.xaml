@@ -16,50 +16,35 @@
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-
+        <StackPanel>
             <!-- Action Buttons -->
-            <StackPanel Grid.Row="0" 
-                   Orientation="Horizontal" 
-                   Margin="0,0,0,20">
-
+            <StackPanel Orientation="Horizontal" 
+                       Margin="0,0,0,20">
                 <Button Content="{DynamicResource Task_Button_Edit}" 
-                   mah:ControlsHelper.CornerRadius="6"
-                   Padding="16,8" 
-                   Margin="0,0,8,0"
-                   FontWeight="SemiBold"
-                   ToolTip="{DynamicResource EditTaskTooltip}"
-                    Command="{Binding EditTaskCommand}"/>
-
+                       mah:ControlsHelper.CornerRadius="6"
+                       Padding="16,8" 
+                       Margin="0,0,8,0"
+                       FontWeight="SemiBold"
+                       ToolTip="{DynamicResource EditTaskTooltip}"
+                       Command="{Binding EditTaskCommand}"/>
                 <Button Content="{DynamicResource Task_Button_Back}"
-                    mah:ControlsHelper.CornerRadius="8"
-                    Padding="16, 8"
-                    Command="{Binding SwitchToProjectCommand}"/>
+                       mah:ControlsHelper.CornerRadius="8"
+                       Padding="16, 8"
+                       Command="{Binding SwitchToProjectCommand}"/>
             </StackPanel>
 
             <!-- Task Title -->
-            <Border Grid.Row="1" 
-                Padding="16" 
-                Margin="0,0,0,20">
+            <Border Padding="16" 
+                   Margin="0,0,0,20">
                 <TextBlock Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" 
-                      FontSize="24" 
-                      FontWeight="Bold" 
-                      TextWrapping="Wrap"/>
+                          FontSize="24" 
+                          FontWeight="Bold" 
+                          TextWrapping="Wrap"/>
             </Border>
 
             <!-- Task Properties Grid -->
-            <Grid Grid.Row="2" 
-              mah:ControlsHelper.CornerRadius="8"
-              Margin="0,0,0,20">
-
+            <Grid mah:ControlsHelper.CornerRadius="8"
+                  Margin="0,0,0,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -71,77 +56,74 @@
 
                 <!-- Status -->
                 <UserCtrl:HeaderTextBlock Grid.Row="0"
-                          Grid.Column="0"
-                          Header="{DynamicResource Task_Label_Status}"
-                          Text="{Binding Status,
-                                         Converter={StaticResource TaskStatusConverter}}"
-                          FontSize="16"
-                          FontWeight="SemiBold"/>
+                                         Grid.Column="0"
+                                         Header="{DynamicResource Task_Label_Status}"
+                                         Text="{Binding Status, Converter={StaticResource TaskStatusConverter}}"
+                                         FontSize="16"
+                                         FontWeight="SemiBold"/>
 
                 <!-- Priority -->
                 <UserCtrl:HeaderTextBlock Grid.Row="1"
-                          Grid.Column="0"
-                          Header="{DynamicResource Task_Label_Priority}"
-                          Text="{Binding Priority,
-                                         Converter={StaticResource TaskPriorityConverter}}"
-                          FontSize="16"
-                          FontWeight="SemiBold"/>
+                                         Grid.Column="0"
+                                         Header="{DynamicResource Task_Label_Priority}"
+                                         Text="{Binding Priority, Converter={StaticResource TaskPriorityConverter}}"
+                                         FontSize="16"
+                                         FontWeight="SemiBold"/>
 
                 <!-- Progress -->
                 <UserCtrl:HeaderTextBlock Grid.Row="0"
-                          Grid.Column="1"
-                          Header="{DynamicResource Task_Label_Progress}"
-                          Text="{Binding Progress, StringFormat={}{0}%}"
-                          FontSize="16"
-                          FontWeight="SemiBold"/>
+                                         Grid.Column="1"
+                                         Header="{DynamicResource Task_Label_Progress}"
+                                         Text="{Binding Progress, StringFormat={}{0}%}"
+                                         FontSize="16"
+                                         FontWeight="SemiBold"/>
 
                 <!-- Created Date -->
-                <UserCtrl:HeaderTextBlock Grid.Row="1" Grid.Column="1" 
-                                Header="{DynamicResource Task_Label_CreatedAt}"
-                                Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy}'}" 
-                                FontSize="16" 
-                                FontWeight="SemiBold"/>
+                <UserCtrl:HeaderTextBlock Grid.Row="1" 
+                                         Grid.Column="1" 
+                                         Header="{DynamicResource Task_Label_CreatedAt}"
+                                         Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy}'}" 
+                                         FontSize="16" 
+                                         FontWeight="SemiBold"/>
             </Grid>
 
             <!-- Task Description -->
-            <UserCtrl:HeaderTextBlock 
-            Header="{DynamicResource Task_Label_Description}"
-            Grid.Row="3" 
-            mah:ControlsHelper.CornerRadius="8"
-            Margin="0,0,0,20" 
-            CornerRadius="8" 
-            Wrapping="Wrap"
-            Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
+            <UserCtrl:HeaderTextBlock Header="{DynamicResource Task_Label_Description}"
+                                     mah:ControlsHelper.CornerRadius="8"
+                                     Margin="0,0,0,20" 
+                                     CornerRadius="8" 
+                                     Wrapping="Wrap"
+                                     Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"/>
 
             <!-- Attachments Section -->
-            <Grid Grid.Row="4" 
-              Margin="0,0,0,20">
+            <Grid Margin="0,0,0,20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Attachments Header -->
                 <TextBlock Grid.Row="0"
-                      Text="{DynamicResource Task_Label_Attachments}" 
-                      FontSize="16" 
-                      FontWeight="SemiBold" 
-                      Foreground="#2196F3" 
-                      Margin="0,0,0,12"/>
+                          Text="{DynamicResource Task_Label_Attachments}" 
+                          FontSize="16" 
+                          FontWeight="SemiBold" 
+                          Foreground="#2196F3" 
+                          Margin="0,0,0,12"/>
 
-                <!-- Attachments List -->
+                <!-- Attachments List with max height constraint -->
                 <ScrollViewer Grid.Row="1"
-                         VerticalScrollBarVisibility="Auto"
-                         Margin="0,0,0,12">
+                             MaxHeight="200"
+                             VerticalScrollBarVisibility="Auto"
+                             Margin="0,0,0,12">
                     <ItemsControl ItemsSource="{Binding Attachments}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border CornerRadius="6"
-                                   Padding="8"
-                                   Margin="0,0,0,4"
-                                   BorderBrush="#E0E0E0"
-                                   BorderThickness="1">
+                                       Padding="8"
+                                       Margin="0,0,0,4"
+                                       BorderBrush="#E0E0E0"
+                                       BorderThickness="1">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
@@ -150,30 +132,29 @@
                                         </Grid.ColumnDefinitions>
 
                                         <TextBlock Grid.Column="0" 
-                                              Text="📎" 
-                                              Margin="0,0,8,0"
-                                              FontSize="16"/>
+                                                  Text="📎" 
+                                                  Margin="0,0,8,0"
+                                                  FontSize="16"/>
 
                                         <StackPanel Grid.Column="1" 
-                                              Orientation="Horizontal"
-                                              Margin="0,0,8,0">
+                                                  Orientation="Horizontal"
+                                                  Margin="0,0,8,0">
                                             <TextBlock Text="{Binding FileName}" 
-                                                  FontWeight="Medium"
-                                                  Margin="0,0,8,0"/>
+                                                      FontWeight="Medium"
+                                                      Margin="0,0,8,0"/>
                                             <TextBlock Text="{Binding FileSize}" 
-                                                  FontSize="11"
-                                                  Foreground="#757575"/>
+                                                      FontSize="11"
+                                                      Foreground="#757575"/>
                                         </StackPanel>
 
-                                        <!-- Download Button -->
+                                        <!-- Open Button -->
                                         <Button Grid.Column="2" 
-                                                
-                                           mah:ControlsHelper.CornerRadius="4"
-                                           Padding="8,4"
-                                           FontSize="14"
-                                           ToolTip="{DynamicResource Task_Tooltip_Open}"
-                                           Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                           CommandParameter="{Binding}"/>
+                                               mah:ControlsHelper.CornerRadius="4"
+                                               Padding="8,4"
+                                               FontSize="14"
+                                               ToolTip="{DynamicResource Task_Tooltip_Open}"
+                                               Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                               CommandParameter="{Binding}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -183,41 +164,42 @@
 
                 <!-- Add Attachment Button -->
                 <Button Grid.Row="2"
-                   Content="{DynamicResource Task_Button_AddAttachment}"
-                   mah:ControlsHelper.CornerRadius="6"
-                   Padding="16,8"
-                   HorizontalAlignment="Left"
-                   Command="{Binding AddAttachmentCommand}"/>
+                       Content="{DynamicResource Task_Button_AddAttachment}"
+                       mah:ControlsHelper.CornerRadius="6"
+                       Padding="16,8"
+                       HorizontalAlignment="Left"
+                       Command="{Binding AddAttachmentCommand}"/>
             </Grid>
 
             <!-- Comments Section -->
-            <Grid Grid.Row="5">
+            <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="250"/>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Comments Header -->
                 <TextBlock Grid.Row="0" 
-                      Text="{DynamicResource Task_Label_Comments}" 
-                      FontSize="16" 
-                      FontWeight="SemiBold" 
-                      Foreground="#2196F3" 
-                      Margin="0,0,0,12"/>
+                          Text="{DynamicResource Task_Label_Comments}" 
+                          FontSize="16" 
+                          FontWeight="SemiBold" 
+                          Foreground="#2196F3" 
+                          Margin="0,0,0,12"/>
 
-                <!-- Comments List -->
+                <!-- Comments List with max height constraint -->
                 <ScrollViewer Grid.Row="1" 
-                         VerticalScrollBarVisibility="Auto"
-                         Margin="0,0,0,12">
+                             MaxHeight="400"
+                             VerticalScrollBarVisibility="Auto"
+                             Margin="0,0,0,12">
                     <ItemsControl ItemsSource="{Binding Comments}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border CornerRadius="6"
-                                   Padding="12"
-                                   Margin="0,0,0,8"
-                                   BorderBrush="#E0E0E0"
-                                   BorderThickness="1">
+                                       Padding="12"
+                                       Margin="0,0,0,8"
+                                       BorderBrush="#E0E0E0"
+                                       BorderThickness="1">
                                     <Grid>
                                         <Grid.RowDefinitions>
                                             <RowDefinition Height="Auto"/>
@@ -230,23 +212,23 @@
 
                                         <!-- Author Name -->
                                         <TextBlock Grid.Row="0" Grid.Column="0"
-                                              Text="{Binding Author}" 
-                                              FontWeight="SemiBold"
-                                              Margin="0,0,8,4"/>
+                                                  Text="{Binding Author}" 
+                                                  FontWeight="SemiBold"
+                                                  Margin="0,0,8,4"/>
 
                                         <!-- Comment Date -->
                                         <TextBlock Grid.Row="0" Grid.Column="1"
-                                              Text="{Binding CreatedAt}" 
-                                              FontSize="11"
-                                              Foreground="#757575"
-                                              HorizontalAlignment="Right"/>
+                                                  Text="{Binding CreatedAt}" 
+                                                  FontSize="11"
+                                                  Foreground="#757575"
+                                                  HorizontalAlignment="Right"/>
 
                                         <!-- Comment Text -->
                                         <TextBlock Grid.Row="1" Grid.Column="0" 
-                                              Grid.ColumnSpan="2"
-                                              Text="{Binding Text}" 
-                                              TextWrapping="Wrap"
-                                              FontSize="13"/>
+                                                  Grid.ColumnSpan="2"
+                                                  Text="{Binding Text}" 
+                                                  TextWrapping="Wrap"
+                                                  FontSize="13"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -263,19 +245,19 @@
 
                     <!-- Comment Text Input -->
                     <TextBox Grid.Column="0" 
-                        mah:TextBoxHelper.Watermark="{DynamicResource Task_Watermark_AddComment}"
-                        Margin="0,0,8,0"
-                        Padding="8"
-                        Text="{Binding NewComment, Mode=TwoWay}"/>
+                            mah:TextBoxHelper.Watermark="{DynamicResource Task_Watermark_AddComment}"
+                            Margin="0,0,8,0"
+                            Padding="8"
+                            Text="{Binding NewComment, Mode=TwoWay}"/>
 
                     <!-- Post Comment Button -->
                     <Button Grid.Column="1" 
-                       Content="{DynamicResource Task_Button_PostComment}"
-                       mah:ControlsHelper.CornerRadius="6"
-                       Padding="16,8"
-                       Command="{Binding AddCommentCommand}"/>
+                           Content="{DynamicResource Task_Button_PostComment}"
+                           mah:ControlsHelper.CornerRadius="6"
+                           Padding="16,8"
+                           Command="{Binding AddCommentCommand}"/>
                 </Grid>
             </Grid>
-        </Grid>
+        </StackPanel>
     </ScrollViewer>
 </UserControl>

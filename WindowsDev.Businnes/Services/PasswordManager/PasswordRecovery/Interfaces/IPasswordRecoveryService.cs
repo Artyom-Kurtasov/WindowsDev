@@ -4,8 +4,8 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfac
 {
     public interface IPasswordRecoveryService
     {
-        int GenerateRecoveryCode();
-        Task<Result<bool>> IsRecoverCodeCorrect(int recoveryCode, string login);
+        Task<Result<bool>> IsRecoverCodeCorrectAsync(int recoveryCode, string login);
         Task<Result<int>> ChangePasswordAsync(string login, string password);
+        Task<bool> IsUserExistAsync(string login);
     }
 }

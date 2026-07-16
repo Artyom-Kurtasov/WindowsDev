@@ -1,5 +1,6 @@
 ﻿using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
+using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
@@ -16,35 +17,38 @@ namespace WindowsDev.Business.Services.Registration
         private readonly ICurrentUserService _currentUserService;
         private readonly DefaultHasher _defaultHasher;
         private readonly IPasswordRecoveryService _passwordRecoveryService;
+        private readonly IPasswordChanger _passwordChanger;
+
+        private const string HashHexFormat = "x16";
 
         public Registration(IUserRepository userRepository,
                             ICurrentUserService currentUserService,
                             DefaultHasher defaultHasher,
-                            IPasswordRecoveryService passwordRecoveryService)
+                            IPasswordRecoveryService passwordRecoveryService,
+                            IPasswordChanger passwordChanger)
         {
             _passwordRecoveryService = passwordRecoveryService;
             _userRepository = userRepository;
             _defaultHasher = defaultHasher;
             _currentUserService = currentUserService;
+            _passwordChanger = passwordChanger;
         }
 
         public async Task<Result<int>> Register(string password, string login, string username)
         {
-            var passwordSalt = _defaultHasher.GenerateSalt();
-            var passwordHash = _defaultHasher.HashPassword(password, passwordSalt);
+            var (passwordHash, passwordSalt) = HashPassword(password);
 
-            var recoveryCodeSalt = _defaultHasher.GenerateSalt();
-            var recoveryCode = _passwordRecoveryService.GenerateRecoveryCode();
-            var recoveryCodeHash = _defaultHasher.HashPassword(recoveryCode.ToString(), recoveryCodeSalt);
+            var recoveryCode = _passwordChanger.GenerateRecoveryCode();
+            var (recoveryCodeHash, recoveryCodeSalt) = HashRecoveryCode(recoveryCode);
 
             var user = new UsersInfo
             {
                 Salt = passwordSalt,
                 Username = username,
                 Login = login,
-                PasswordHash = passwordHash.ToString("x16"),
+                PasswordHash = passwordHash,
                 HashMethod = (HashMethod)1,
-                RecoveryCodeHash = recoveryCodeHash.ToString("x16"),
+                RecoveryCodeHash = recoveryCodeHash,
                 RecoveryCodeSalt = recoveryCodeSalt
             };
 
@@ -53,6 +57,34 @@ namespace WindowsDev.Business.Services.Registration
             _currentUserService.SetUser(user.Id, user.Login, user.Username);
 
             return Result<int>.Success(recoveryCode);
+        }
+
+        public async Task<bool> IsLoginAvailableAsync(string login)
+        {
+
+            return !await _userRepository.ExistsByLoginAsync(login);
+
+        }
+
+        public async Task<bool> IsUsernameAvailableAsync(string username)
+        {
+            return !await _userRepository.ExistsByUsernameAsync(username);
+        }
+
+        private (string passwordHash, byte[] passwordSalt) HashPassword(string password)
+        {
+            var passwordSalt = _defaultHasher.GenerateSalt();
+            var passwordHash = _defaultHasher.HashValue(password, passwordSalt).ToString(HashHexFormat);
+
+            return (passwordHash, passwordSalt);
+        }
+
+        private (string recoveryCodeHash, byte[] recoveryCodeSalt) HashRecoveryCode(int recoveryCode)
+        {
+            var recoveryCodeSalt = _defaultHasher.GenerateSalt();
+            var recoveryCodeHash = _defaultHasher.HashValue(recoveryCode.ToString(), recoveryCodeSalt).ToString(HashHexFormat);
+
+            return (recoveryCodeHash, recoveryCodeSalt);
         }
     }
 }

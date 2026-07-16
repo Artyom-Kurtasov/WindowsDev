@@ -29,22 +29,5 @@ namespace WindowsDev.Infrastructure.Logging
         internal static partial void ProjectLoadFailed(
             ILogger logger,
             Exception exception);
-
-        [LoggerMessage(
-            EventId = EventIds.ProjectUpdateFailed,
-            Level = LogLevel.Error,
-            Message = "Failed to update project {ProjectId}")]
-        internal static partial void ProjectUpdateFailed(
-            ILogger logger,
-            int projectId,
-            Exception exception);
-
-        [LoggerMessage(
-            EventId = EventIds.ProjectNotFound,
-            Level = LogLevel.Warning,
-            Message = "Project {ProjectId} not found")]
-        internal static partial void ProjectNotFound(
-            ILogger logger,
-            int projectId);
     }
 }

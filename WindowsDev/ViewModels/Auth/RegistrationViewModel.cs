@@ -1,6 +1,8 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.Business.Services.DebounceService;
+using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Domain;
@@ -13,158 +15,190 @@ using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.ViewModels.Auth
 {
-    public class RegistrationViewModel : ViewModelBase
+    public class RegistrationViewModel : LocalizedViewModelBase
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<RegistrationViewModel> _logger;
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
         private readonly IRegistration _registration;
-        private readonly UserFieldValidator _userFieldValidator;
+        private readonly IDebounceService _debounceService;
 
-        private CancellationTokenSource? _loginCts;
-        private CancellationTokenSource? _usernameCts;
+        private const int DebounceDelayMilliseconds = 500;
 
         public RegistrationViewModel(INavigationService navigationService,
             IRegistration registration,
             IDialogCoordinator dialogCoordinator,
-            ILogger logger,
-            UserFieldValidator userFieldValidator)
+            ILogger<RegistrationViewModel> logger,
+            IDebounceService debounceService,
+            ILanguageChanger languageChanger)
+            : base(languageChanger)
         {
-            _dialogCoordinator = dialogCoordinator;
             _navigationService = navigationService;
             _registration = registration;
-            _userFieldValidator = userFieldValidator;
+            _dialogCoordinator = dialogCoordinator;
             _logger = logger;
+            _debounceService = debounceService;
 
             SignUpCommand = new AsyncRelayCommand(SignUpAsync, CanSignUp);
-            SwitchToAuthViewCommand = new RelayCommand(SwitchToAuthView);
+            SwitchToAuthViewCommand = new AsyncRelayCommand(SwitchToAuthViewAsync);
         }
+
 
         public ICommand SignUpCommand { get; }
         public ICommand SwitchToAuthViewCommand { get; }
 
+
         private string _login = string.Empty;
+
         public string Login
         {
             get => _login;
             set
             {
-                if (_login == value) return;
+                if (_login == value)
+                    return;
 
                 _login = value;
-                OnPropertyChanged(nameof(Login));
+
+                OnPropertyChanged();
 
                 _ = CheckLoginAvailabilityAsync();
                 UpdateState();
             }
         }
 
+
         private string _username = string.Empty;
+
         public string Username
         {
             get => _username;
             set
             {
-                if (_username == value) return;
+                if (_username == value)
+                    return;
 
                 _username = value;
-                OnPropertyChanged(nameof(Username));
+
+                OnPropertyChanged();
 
                 _ = CheckUsernameAvailabilityAsync();
                 UpdateState();
             }
         }
 
+
         private string _password = string.Empty;
+
         public string Password
         {
             get => _password;
             set
             {
-                if (_password == value) return;
+                if (_password == value)
+                    return;
 
                 _password = value;
-                OnPropertyChanged(nameof(Password));
 
-                OnPasswordChanged();
-            }
-        }
-
-        private string _confirmPassword = string.Empty;
-        public string ConfirmPassword
-        {
-            get => _confirmPassword;
-            set
-            {
-                if (_confirmPassword == value) return;
-
-                _confirmPassword = value;
-                OnPropertyChanged(nameof(ConfirmPassword));
+                OnPropertyChanged();
 
                 UpdateState();
             }
         }
 
+
+        private string _confirmPassword = string.Empty;
+
+        public string ConfirmPassword
+        {
+            get => _confirmPassword;
+            set
+            {
+                if (_confirmPassword == value)
+                    return;
+
+                _confirmPassword = value;
+
+                OnPropertyChanged();
+
+                UpdateState();
+            }
+        }
+
+
         private bool _isLoginAvailable;
+
         public bool IsLoginAvailable
         {
             get => _isLoginAvailable;
-            internal set
+            private set
             {
-                if (_isLoginAvailable == value) return;
+                if (_isLoginAvailable == value)
+                    return;
 
                 _isLoginAvailable = value;
-                OnPropertyChanged(nameof(IsLoginAvailable));
+
+                OnPropertyChanged();
+
+                UpdateState();
             }
         }
 
+
         private bool _isUsernameAvailable;
+
         public bool IsUsernameAvailable
         {
             get => _isUsernameAvailable;
-            internal set
+            private set
             {
-                if (_isUsernameAvailable == value) return;
+                if (_isUsernameAvailable == value)
+                    return;
 
                 _isUsernameAvailable = value;
-                OnPropertyChanged(nameof(IsUsernameAvailable));
+
+                OnPropertyChanged();
+
+                UpdateState();
             }
         }
 
+
         private string _errorMessage = string.Empty;
+
         public string ErrorMessage
         {
             get => _errorMessage;
             set
             {
+                if (_errorMessage == value)
+                    return;
+
                 _errorMessage = value;
-                OnPropertyChanged(nameof(ErrorMessage));
+
+                OnPropertyChanged();
                 OnPropertyChanged(nameof(HasError));
             }
         }
 
+
         public bool HasError =>
             !string.IsNullOrWhiteSpace(ErrorMessage);
 
-        private bool _isFormFilled =>
-            !string.IsNullOrWhiteSpace(Login) &&
-            !string.IsNullOrWhiteSpace(Username) &&
-            !string.IsNullOrWhiteSpace(Password);
 
-        private void SwitchToAuthView()
+        private bool IsFormFilled()
         {
-            _navigationService.NavigateTo<AuthorizationViewModel>();
+            return !string.IsNullOrWhiteSpace(Login) &&
+                   !string.IsNullOrWhiteSpace(Username) &&
+                   !string.IsNullOrWhiteSpace(Password);
         }
+
 
         private async Task SignUpAsync()
         {
             ErrorMessage = string.Empty;
 
-            if (!IsLoginAvailable ||
-                !IsUsernameAvailable ||
-                Password != ConfirmPassword ||
-                !PasswordValidator.IsValid(Password) ||
-                !_isFormFilled)
+            if (!CanSignUp())
             {
                 ErrorMessage = Translate(AuthErrors.RegistrationFailed);
                 return;
@@ -172,26 +206,26 @@ namespace WindowsDev.ViewModels.Auth
 
             try
             {
-                var result = await _registration.Register(Password, Login, Username);
+                var result = await _registration.Register(
+                    Password,
+                    Login,
+                    Username);
 
-                if (result.IsSuccess)
-                {
-                    await _dialogCoordinator.ShowMessageAsync(
-                        this,
-                        Translate(DialogTitles.Information),
-                        $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
-                        MessageDialogStyle.Affirmative);
-
-                    await _navigationService.NavigateTo<MainWindowViewModel>();
-                }
-                else
-                {
+                if (result.IsFailure)
                     return;
-                }
+
+                await _dialogCoordinator.ShowMessageAsync(
+                    this,
+                    Translate(DialogTitles.Information),
+                    $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                    MessageDialogStyle.Affirmative);
+
+                await _navigationService.NavigateTo<MainWindowViewModel>();
             }
             catch (Exception ex)
             {
                 AuthLogs.RegistrationFailed(_logger, ex);
+
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Error),
@@ -201,61 +235,59 @@ namespace WindowsDev.ViewModels.Auth
         }
 
 
-        private bool CanSignUp() => true;
+        private async Task SwitchToAuthViewAsync()
+        {
+            await _navigationService.NavigateTo<AuthorizationViewModel>();
+        }
+
+
+        private bool CanSignUp()
+        {
+            return IsFormFilled() &&
+                   IsLoginAvailable &&
+                   IsUsernameAvailable &&
+                   Password == ConfirmPassword &&
+                   PasswordValidator.IsValid(Password);
+        }
+
 
         private async Task CheckLoginAvailabilityAsync()
         {
-            _loginCts?.Cancel();
-            _loginCts = new CancellationTokenSource();
-
-            try
-            {
-                await Task.Delay(500, _loginCts.Token);
-
-                IsLoginAvailable =
-                    await _userFieldValidator.IsLoginAvailableAsync(Login);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-            catch (Exception ex)
-            {
-                AuthLogs.LoginAvailabilityCheckFailed(_logger, ex);
-                IsLoginAvailable = false;
-            }
+            await CheckFieldAvailabilityAsync(
+                async () => IsLoginAvailable =
+                    await _registration.IsLoginAvailableAsync(Login),
+                ex => AuthLogs.LoginAvailabilityCheckFailed(_logger, ex));
         }
+
 
         private async Task CheckUsernameAvailabilityAsync()
         {
-            _usernameCts?.Cancel();
-            _usernameCts = new CancellationTokenSource();
+            await CheckFieldAvailabilityAsync(
+                async () => IsUsernameAvailable =
+                    await _registration.IsUsernameAvailableAsync(Username),
+                ex => AuthLogs.UsernameAvailabilityCheckFailed(_logger, ex));
+        }
 
+
+        private async Task CheckFieldAvailabilityAsync(Func<Task> action, Action<Exception> log)
+        {
             try
             {
-                await Task.Delay(500, _usernameCts.Token);
-
-                IsUsernameAvailable =
-                    await _userFieldValidator.IsUsernameAvailableAsync(Username);
-            }
-            catch (OperationCanceledException)
-            {
+                await _debounceService.DebounceAsync(
+                    action,
+                    TimeSpan.FromMilliseconds(DebounceDelayMilliseconds));
             }
             catch (Exception ex)
             {
-                AuthLogs.UsernameAvailabilityCheckFailed(_logger, ex);
-                IsUsernameAvailable = false;
+                log(ex);
             }
         }
+
 
         private void UpdateState()
         {
             ErrorMessage = string.Empty;
             ((AsyncRelayCommand)SignUpCommand).RaiseCanExecuteChanged();
-        }
-
-        private void OnPasswordChanged()
-        {
-            UpdateState();
         }
     }
 }
