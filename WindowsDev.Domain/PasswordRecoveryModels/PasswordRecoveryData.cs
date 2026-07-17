@@ -5,8 +5,8 @@ namespace WindowsDev.Domain.PasswordRecoveryModels
 {
     public class PasswordRecoveryData : INotifyPropertyChanged
     {
-        private string? _login;
-        public string? Login
+        private string _login = string.Empty;
+        public string Login
         {
             get => _login;
             set
@@ -16,8 +16,8 @@ namespace WindowsDev.Domain.PasswordRecoveryModels
             }
         }
 
-        private string? _recoveryCode;
-        public string? RecoveryCode
+        private string _recoveryCode = string.Empty;
+        public string RecoveryCode
         {
             get => _recoveryCode;
             set
@@ -27,8 +27,8 @@ namespace WindowsDev.Domain.PasswordRecoveryModels
             }
         }
 
-        private string? _newPassword;
-        public string? NewPassword
+        private string _newPassword = string.Empty;
+        public string NewPassword
         {
             get => _newPassword;
             set
@@ -38,8 +38,8 @@ namespace WindowsDev.Domain.PasswordRecoveryModels
             }
         }
 
-        private string? _confirmPassword;
-        public string? ConfirmPassword
+        private string _confirmPassword = string.Empty;
+        public string ConfirmPassword
         {
             get => _confirmPassword;
             set

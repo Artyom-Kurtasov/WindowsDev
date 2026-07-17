@@ -42,7 +42,7 @@ namespace WindowsDev.Tests.Business.ProjectService
             {
                 Name = "Test Project",
                 UserId = _currentUser.UserId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             await service.AddAsync(project);
@@ -57,7 +57,10 @@ namespace WindowsDev.Tests.Business.ProjectService
 
             await Assert.ThrowsAsync<ArgumentNullException>(() => service.UpdateAsync(null!));
 
-            _projectRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<ProjectsInfo>()), Times.Never);
+            _projectRepositoryMock.Verify(
+                x => x.UpdateAsync(It.IsAny<ProjectsInfo>()),
+                Times.Never
+            );
         }
 
         [Fact]
@@ -69,7 +72,7 @@ namespace WindowsDev.Tests.Business.ProjectService
                 Id = 1,
                 Name = "Updated Project",
                 UserId = _currentUser.UserId,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
             };
 
             await service.UpdateAsync(project);
@@ -104,7 +107,10 @@ namespace WindowsDev.Tests.Business.ProjectService
             var result = await service.GetProjectsAsync(page, size, searchFilter);
 
             Assert.Equal(expectedProjects, result);
-            _projectRepositoryMock.Verify(x => x.GetProjectsAsync(page, size, _currentUser.UserId, searchFilter), Times.Once);
+            _projectRepositoryMock.Verify(
+                x => x.GetProjectsAsync(page, size, _currentUser.UserId, searchFilter),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -117,13 +123,19 @@ namespace WindowsDev.Tests.Business.ProjectService
             var expectedProjects = new List<ProjectsInfo>();
 
             _projectRepositoryMock
-                .Setup(x => x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>()))
+                .Setup(x =>
+                    x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>())
+                )
                 .ReturnsAsync(expectedProjects);
 
             var result = await service.GetProjectsAsync(invalidPage, size);
 
             Assert.Equal(expectedProjects, result);
-            _projectRepositoryMock.Verify(x => x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>()), Times.Once);
+            _projectRepositoryMock.Verify(
+                x =>
+                    x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>()),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -136,13 +148,19 @@ namespace WindowsDev.Tests.Business.ProjectService
             var expectedProjects = new List<ProjectsInfo>();
 
             _projectRepositoryMock
-                .Setup(x => x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>()))
+                .Setup(x =>
+                    x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>())
+                )
                 .ReturnsAsync(expectedProjects);
 
             var result = await service.GetProjectsAsync(page, invalidSize);
 
             Assert.Equal(expectedProjects, result);
-            _projectRepositoryMock.Verify(x => x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>()), Times.Once);
+            _projectRepositoryMock.Verify(
+                x =>
+                    x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>()),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -158,7 +176,10 @@ namespace WindowsDev.Tests.Business.ProjectService
             var result = await service.GetProjectsCountAsync();
 
             Assert.Equal(expectedCount, result);
-            _projectRepositoryMock.Verify(x => x.GetProjectsCountAsync(_currentUser.UserId), Times.Once);
+            _projectRepositoryMock.Verify(
+                x => x.GetProjectsCountAsync(_currentUser.UserId),
+                Times.Once
+            );
         }
 
         [Fact]
@@ -173,7 +194,10 @@ namespace WindowsDev.Tests.Business.ProjectService
             var result = await service.GetProjectsCountAsync();
 
             Assert.Equal(0, result);
-            _projectRepositoryMock.Verify(x => x.GetProjectsCountAsync(_currentUser.UserId), Times.Once);
+            _projectRepositoryMock.Verify(
+                x => x.GetProjectsCountAsync(_currentUser.UserId),
+                Times.Once
+            );
         }
     }
 }

@@ -22,7 +22,6 @@ using WindowsDev.Business.Services.ProjectService;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.Registration;
 using WindowsDev.Business.Services.Registration.Interfaces;
-using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Business.Services.Registration.Validation.Converters;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Attachment;
@@ -76,8 +75,10 @@ namespace WindowsDev.Settings
                 builder.AddProvider(new FileLoggerProvider("log.txt"));
             });
 
-            services.AddSingleton(typeof(ILogger), sp =>
-                sp.GetRequiredService<ILoggerFactory>().CreateLogger("Default"));
+            services.AddSingleton(
+                typeof(ILogger),
+                sp => sp.GetRequiredService<ILoggerFactory>().CreateLogger("Default")
+            );
         }
 
         private static void ConfigureInfrastructure(IServiceCollection services)

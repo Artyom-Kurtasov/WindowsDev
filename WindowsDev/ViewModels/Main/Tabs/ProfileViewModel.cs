@@ -1,6 +1,6 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Windows.Input;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.Profile.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
@@ -22,13 +22,15 @@ namespace WindowsDev.ViewModels.Main.Tabs
         private readonly ICurrentUserService _userData;
         private readonly ILogger<ProfileViewModel> _logger;
 
-
-        public ProfileViewModel(ICurrentUserService currentUserService,
+        public ProfileViewModel(
+            ICurrentUserService currentUserService,
             IProfileService profileService,
             IDialogCoordinator dialogCoordinator,
             INavigationService navigationService,
             ILogger<ProfileViewModel> logger,
-            ILanguageChanger languageChanger) : base(languageChanger)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger)
         {
             _userData = currentUserService;
             _profileService = profileService;
@@ -42,10 +44,10 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
             SetUserData();
         }
+
         public ICommand SaveNewUsernameCommand { get; }
         public ICommand SaveNewPasswordCommand { get; }
         public ICommand LogoutCommand { get; }
-
 
         private int _id;
 
@@ -62,7 +64,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private string _login = string.Empty;
 
         public string Login
@@ -77,7 +78,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 OnPropertyChanged();
             }
         }
-
 
         private string _username = string.Empty;
 
@@ -94,7 +94,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private string _currentPassword = string.Empty;
 
         public string CurrentPassword
@@ -109,7 +108,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 OnPropertyChanged();
             }
         }
-
 
         private string _newPassword = string.Empty;
 
@@ -126,7 +124,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private string _confirmPassword = string.Empty;
 
         public string ConfirmPassword
@@ -142,14 +139,14 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private async Task SaveNewUsernameAsync()
         {
             try
             {
-                var result = await _profileService
-                    .ChangeUsernameAsync(_userData.Username, Username);
-
+                var result = await _profileService.ChangeUsernameAsync(
+                    _userData.Username,
+                    Username
+                );
 
                 if (!result.IsSuccess)
                 {
@@ -157,34 +154,31 @@ namespace WindowsDev.ViewModels.Main.Tabs
                         this,
                         Translate(DialogTitles.Warning),
                         Translate(result.Error),
-                        MessageDialogStyle.Affirmative);
+                        MessageDialogStyle.Affirmative
+                    );
 
                     return;
                 }
-
 
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Success),
                     Translate(ProfileSuccesses.UsernameChanged),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
             catch (Exception ex)
             {
-                ProfileLogs.UsernameChangeFailed(
-                    _logger,
-                    _userData.UserId,
-                    ex);
-
+                ProfileLogs.UsernameChangeFailed(_logger, _userData.UserId, ex);
 
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
         }
-
 
         private async Task SaveNewPasswordAsync()
         {
@@ -193,8 +187,8 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 var result = await _profileService.ChangePasswordAsync(
                     CurrentPassword,
                     NewPassword,
-                    ConfirmPassword);
-
+                    ConfirmPassword
+                );
 
                 if (!result.IsSuccess)
                 {
@@ -202,34 +196,31 @@ namespace WindowsDev.ViewModels.Main.Tabs
                         this,
                         Translate(DialogTitles.Warning),
                         Translate(result.Error),
-                        MessageDialogStyle.Affirmative);
+                        MessageDialogStyle.Affirmative
+                    );
 
                     return;
                 }
-
 
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Success),
                     $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value}",
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
             catch (Exception ex)
             {
-                ProfileLogs.PasswordChangeFailed(
-                    _logger,
-                    _userData.UserId,
-                    ex);
-
+                ProfileLogs.PasswordChangeFailed(_logger, _userData.UserId, ex);
 
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
         }
-
 
         private async Task LogoutAsync()
         {
@@ -237,7 +228,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
             await _navigationService.NavigateTo<AuthorizationViewModel>();
         }
-
 
         private void SetUserData()
         {

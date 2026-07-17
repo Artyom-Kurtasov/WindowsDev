@@ -1,5 +1,5 @@
-﻿using Microsoft.Win32;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using Microsoft.Win32;
 using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
@@ -27,7 +27,6 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
 
             var dialog = new OpenFileDialog();
 
-
             if (dialog.ShowDialog() != true)
                 return Result<TaskAttachment>.Failure(dialog.FileName);
 
@@ -39,7 +38,7 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
                 FilePath = fileInfo.FullName,
                 FileExtension = fileInfo.Extension,
                 FileSize = fileInfo.Length,
-                TaskId = taskId
+                TaskId = taskId,
             };
 
             await _attachmentRepository.AddFileInfoToDatabase(attachment);
@@ -49,11 +48,9 @@ namespace WindowsDev.Business.Services.TaskService.Attachment
 
         public async Task OpenFile(TaskAttachment attachment)
         {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = attachment.FilePath,
-                UseShellExecute = true
-            });
+            Process.Start(
+                new ProcessStartInfo { FileName = attachment.FilePath, UseShellExecute = true }
+            );
         }
     }
 }

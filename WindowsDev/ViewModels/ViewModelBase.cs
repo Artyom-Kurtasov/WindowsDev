@@ -1,7 +1,5 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using WindowsDev.Business.Services.Localization;
-using WindowsDev.Business.Services.Localization.Interfaces;
 
 namespace WindowsDev.ViewModels
 {

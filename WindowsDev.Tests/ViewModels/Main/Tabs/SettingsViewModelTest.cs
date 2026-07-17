@@ -21,7 +21,6 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
         {
             _dbManagerMock = new Mock<IDbManager>();
             _dbManagerMock.SetupProperty(x => x.ConnectionString);
-
             _healthCheckerMock = new Mock<IDbHealthChecker>();
             _dialogMock = new Mock<IDialogCoordinator>();
             _languageChangerMock = new Mock<ILanguageChanger>();
@@ -37,23 +36,26 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
                 _healthCheckerMock.Object,
                 _dbManagerMock.Object,
                 _dialogMock.Object,
-                _languageChangerMock.Object);
+                _languageChangerMock.Object
+            );
         }
 
         private void SetupWarningDialog()
         {
             _dialogMock
-                .Setup(x => x.ShowMessageAsync(
-                    It.IsAny<SettingsViewModel>(),
-                    DialogTitles.Warning,
-                    SettingsWarnings.InvalidConnectionString,
-                    MessageDialogStyle.Affirmative,
-                    It.IsAny<MetroDialogSettings>()))
+                .Setup(x =>
+                    x.ShowMessageAsync(
+                        It.IsAny<SettingsViewModel>(),
+                        DialogTitles.Warning,
+                        SettingsWarnings.InvalidConnectionString,
+                        MessageDialogStyle.Affirmative
+                    )
+                )
                 .ReturnsAsync(MessageDialogResult.Affirmative);
         }
 
         [Fact]
-        public async Task SetNewConnectionString_WhenValid_SavesConnection()
+        public async Task SetNewConnectionStringCommand_WhenValid_SavesConnection()
         {
             var vm = CreateViewModel();
 
@@ -61,25 +63,19 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             await vm.SetNewConnectionStringAsync();
 
-            Assert.Equal(
-                "new_connection",
-                _dbManagerMock.Object.ConnectionString);
+            Assert.Equal("new_connection", _dbManagerMock.Object.ConnectionString);
 
-            _healthCheckerMock.Verify(
-                x => x.Check(),
-                Times.Once);
+            _healthCheckerMock.Verify(x => x.Check(), Times.Once);
         }
 
         [Fact]
-        public async Task SetNewConnectionString_WhenInvalid_RestoresOldConnection()
+        public async Task SetNewConnectionStringCommand_WhenInvalid_RestoresOldConnection()
         {
             SetupWarningDialog();
 
             _dbManagerMock.Object.ConnectionString = "old_connection";
 
-            _healthCheckerMock
-                .Setup(x => x.Check())
-                .Throws(new Exception());
+            _healthCheckerMock.Setup(x => x.Check()).Throws(new Exception());
 
             var vm = CreateViewModel();
 
@@ -87,22 +83,22 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             await vm.SetNewConnectionStringAsync();
 
-            Assert.Equal(
-                "old_connection",
-                _dbManagerMock.Object.ConnectionString);
+            Assert.Equal("old_connection", _dbManagerMock.Object.ConnectionString);
 
             _dialogMock.Verify(
-                x => x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Warning,
-                    SettingsWarnings.InvalidConnectionString,
-                    MessageDialogStyle.Affirmative,
-                    It.IsAny<MetroDialogSettings>()),
-                Times.Once);
+                x =>
+                    x.ShowMessageAsync(
+                        vm,
+                        DialogTitles.Warning,
+                        SettingsWarnings.InvalidConnectionString,
+                        MessageDialogStyle.Affirmative
+                    ),
+                Times.Once
+            );
         }
 
         [Fact]
-        public async Task SetNewConnectionString_WhenValid_SavesUserSettings()
+        public async Task SetNewConnectionStringCommand_WhenValid_SavesUserSettings()
         {
             var vm = CreateViewModel();
 
@@ -110,9 +106,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             await vm.SetNewConnectionStringAsync();
 
-            Assert.Equal(
-                "valid_connection",
-                UserSettings.Default.ConnectionString);
+            Assert.Equal("valid_connection", UserSettings.Default.ConnectionString);
         }
 
         [Fact]
@@ -122,9 +116,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             vm.SelectedLang = Language.en;
 
-            Assert.Equal(
-                Language.en,
-                vm.SelectedLang);
+            Assert.Equal(Language.en, vm.SelectedLang);
         }
 
         [Fact]
@@ -134,13 +126,11 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             var vm = CreateViewModel();
 
-            Assert.Equal(
-                Language.ru,
-                vm.SelectedLang);
+            Assert.Equal(Language.ru, vm.SelectedLang);
         }
 
         [Fact]
-        public void ApplyLanguage_SavesLanguage()
+        public void ApplyLanguageCommand_SavesLanguage()
         {
             var vm = CreateViewModel();
 
@@ -148,9 +138,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             vm.ApplyLanguage();
 
-            Assert.Equal(
-                "ru",
-                UserSettings.Default.LanguageCode);
+            Assert.Equal("ru", UserSettings.Default.LanguageCode);
         }
 
         [Fact]
@@ -160,9 +148,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             var vm = CreateViewModel();
 
-            Assert.Equal(
-                0,
-                vm.SelectedTheme);
+            Assert.Equal(0, vm.SelectedTheme);
         }
 
         [Fact]
@@ -172,9 +158,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             var vm = CreateViewModel();
 
-        Assert.Equal(
-                1,
-                vm.SelectedTheme);
+            Assert.Equal(1, vm.SelectedTheme);
         }
 
         [Fact]
@@ -184,9 +168,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             Assert.NotEmpty(vm.Languages);
 
-            Assert.Contains(
-                Language.en,
-                vm.Languages);
+            Assert.Contains(Language.en, vm.Languages);
         }
     }
 }

@@ -19,14 +19,22 @@ namespace WindowsDev.Business.Services.PasswordManager
 
         public bool IsRecoveryMode { get; set; }
 
-        public PasswordChanger(ICurrentUserService currentUser, IUserRepository userRepository, IHasherFactory hasherFactory)
+        public PasswordChanger(
+            ICurrentUserService currentUser,
+            IUserRepository userRepository,
+            IHasherFactory hasherFactory
+        )
         {
             _currentUser = currentUser;
             _userRepository = userRepository;
             _hasherFactory = hasherFactory;
         }
 
-        public async Task<Result<int>> ChangeUserPasswordAsync(string login, string newPassword, string currentPassword = "")
+        public async Task<Result<int>> ChangeUserPasswordAsync(
+            string login,
+            string newPassword,
+            string currentPassword = ""
+        )
         {
             var user = await _userRepository.GetByLoginAsync(login);
 
@@ -36,7 +44,13 @@ namespace WindowsDev.Business.Services.PasswordManager
 
             var recoveryCode = GenerateRecoveryCode();
 
-            var updateResult = UpdateUserCredentials(user, hasher, recoveryCode, currentPassword, newPassword);
+            var updateResult = UpdateUserCredentials(
+                user,
+                hasher,
+                recoveryCode,
+                currentPassword,
+                newPassword
+            );
 
             if (!updateResult.IsSuccess)
                 return Result<int>.Failure(updateResult.Error);
@@ -48,8 +62,13 @@ namespace WindowsDev.Business.Services.PasswordManager
 
         public int GenerateRecoveryCode() => Random.Shared.Next(MinRecoveryCode, MaxRecoveryCode);
 
-        private Result<bool> UpdateUserCredentials(UsersInfo user, IHasherBase hasher, int recoveryCode,
-            string currentPassword, string newPassword)
+        private Result<bool> UpdateUserCredentials(
+            UsersInfo user,
+            IHasherBase hasher,
+            int recoveryCode,
+            string currentPassword,
+            string newPassword
+        )
         {
             if (!IsRecoveryMode)
             {
@@ -61,7 +80,10 @@ namespace WindowsDev.Business.Services.PasswordManager
 
             var (newPasswordHash, newPasswordSalt) = GeneratePasswordHash(hasher, newPassword);
 
-            var (recoveryCodeHash, recoveryCodeSalt) = GenerateRecoveryCodeHash(hasher, recoveryCode);
+            var (recoveryCodeHash, recoveryCodeSalt) = GenerateRecoveryCodeHash(
+                hasher,
+                recoveryCode
+            );
 
             user.PasswordHash = newPasswordHash.ToString(HashHexFormat);
             user.Salt = newPasswordSalt;
@@ -77,7 +99,10 @@ namespace WindowsDev.Business.Services.PasswordManager
             return (hasher.HashValue(password, salt), salt);
         }
 
-        private (ulong hash, byte[] salt) GenerateRecoveryCodeHash(IHasherBase hasher, int recoveryCode)
+        private (ulong hash, byte[] salt) GenerateRecoveryCodeHash(
+            IHasherBase hasher,
+            int recoveryCode
+        )
         {
             var salt = hasher.GenerateSalt();
             return (hasher.HashValue(recoveryCode.ToString(), salt), salt);

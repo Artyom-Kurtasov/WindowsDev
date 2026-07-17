@@ -2,7 +2,6 @@
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.TasksModels;
 
 namespace WindowsDev.Business.Services.TaskService.Comment
@@ -12,7 +11,10 @@ namespace WindowsDev.Business.Services.TaskService.Comment
         private readonly ICommentRepository _commentRepository;
         private readonly ICurrentUserService _currentUserService;
 
-        public CommentsService(ICommentRepository commentRepository, ICurrentUserService currentUserService)
+        public CommentsService(
+            ICommentRepository commentRepository,
+            ICurrentUserService currentUserService
+        )
         {
             _commentRepository = commentRepository;
             _currentUserService = currentUserService;
@@ -27,7 +29,7 @@ namespace WindowsDev.Business.Services.TaskService.Comment
                 Text = commentText,
                 CreatedAt = DateTime.UtcNow,
                 Author = _currentUserService.Username,
-                TaskId = taskId
+                TaskId = taskId,
             };
 
             await _commentRepository.AddComments(comment);
@@ -41,4 +43,3 @@ namespace WindowsDev.Business.Services.TaskService.Comment
         }
     }
 }
-

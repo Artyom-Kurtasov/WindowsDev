@@ -16,6 +16,9 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             get => _passwordRecoveryData.NewPassword;
             set
             {
+                if (_passwordRecoveryData.NewPassword == value)
+                    return;
+
                 _passwordRecoveryData.NewPassword = value;
                 OnPropertyChanged(nameof(NewPassword));
             }
@@ -26,6 +29,9 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             get => _passwordRecoveryData.ConfirmPassword;
             set
             {
+                if (_passwordRecoveryData.ConfirmPassword == value)
+                    return;
+
                 _passwordRecoveryData.ConfirmPassword = value;
                 OnPropertyChanged(nameof(ConfirmPassword));
             }

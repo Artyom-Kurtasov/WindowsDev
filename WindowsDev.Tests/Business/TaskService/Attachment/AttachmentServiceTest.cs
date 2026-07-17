@@ -9,20 +9,15 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
     {
         private readonly Mock<IAttachmentRepository> _attachmentRepositoryMock;
 
-
         public AttachmentServiceTest()
         {
             _attachmentRepositoryMock = new Mock<IAttachmentRepository>();
         }
 
-
         private AttachmentService CreateService()
         {
-            return new AttachmentService(
-                _attachmentRepositoryMock.Object);
+            return new AttachmentService(_attachmentRepositoryMock.Object);
         }
-
-
 
         [Theory]
         [InlineData(0)]
@@ -31,17 +26,13 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
         {
             var service = CreateService();
 
-
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                () => service.AddFile(taskId));
-
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => service.AddFile(taskId));
 
             _attachmentRepositoryMock.Verify(
-                x => x.AddFileInfoToDatabase(
-                    It.IsAny<TaskAttachment>()),
-                Times.Never);
+                x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()),
+                Times.Never
+            );
         }
-
 
         [Fact]
         public async Task GetAttachmentsAsync_WhenCalled_ReturnsAttachments()
@@ -57,57 +48,36 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
                     FilePath = "C:\\test.txt",
                     TaskId = taskId,
                     FileExtension = ".txt",
-                    FileSize = 100
-                }
+                    FileSize = 100,
+                },
             };
-
 
             _attachmentRepositoryMock
                 .Setup(x => x.GetAttachmentsAsync(taskId))
                 .ReturnsAsync(attachments);
 
-
-
             var service = CreateService();
 
-
-            var result =
-                await service.GetAttachmentsAsync(taskId);
-
-
+            var result = await service.GetAttachmentsAsync(taskId);
 
             Assert.Single(result);
-            Assert.Equal(
-                "test.txt",
-                result[0].FileName);
+            Assert.Equal("test.txt", result[0].FileName);
 
-
-            _attachmentRepositoryMock.Verify(
-                x => x.GetAttachmentsAsync(taskId),
-                Times.Once);
+            _attachmentRepositoryMock.Verify(x => x.GetAttachmentsAsync(taskId), Times.Once);
         }
-
-
 
         [Fact]
         public async Task GetAttachmentsAsync_WhenRepositoryReturnsEmpty_ReturnsEmptyList()
         {
             var taskId = 1;
 
-
             _attachmentRepositoryMock
                 .Setup(x => x.GetAttachmentsAsync(taskId))
                 .ReturnsAsync(new List<TaskAttachment>());
 
-
-
             var service = CreateService();
 
-
-            var result =
-                await service.GetAttachmentsAsync(taskId);
-
-
+            var result = await service.GetAttachmentsAsync(taskId);
 
             Assert.Empty(result);
         }
@@ -121,7 +91,7 @@ namespace WindowsDev.Tests.Business.TaskService.Attachment
                 FilePath = "C:\\test.txt",
                 FileExtension = ".txt",
                 FileSize = 100,
-                TaskId = 1
+                TaskId = 1,
             };
         }
     }

@@ -10,7 +10,10 @@ namespace WindowsDev.Tests.Business.PasswordManager
         [Theory]
         [InlineData("password123", "salt")]
         [InlineData("password", "saltsalt")]
-        public void HashPassword_WhenInputIsSame_ReturnsSameHash(string testPassword, string testSalt)
+        public void HashPassword_WhenInputIsSame_ReturnsSameHash(
+            string testPassword,
+            string testSalt
+        )
         {
             byte[] salt = Encoding.UTF8.GetBytes(testSalt);
 

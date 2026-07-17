@@ -22,16 +22,22 @@ namespace WindowsDev.Business.Services.Logger
             return logLevel >= LogLevel.Information;
         }
 
-        public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter
+        )
         {
             if (!IsEnabled(logLevel))
                 return;
 
             string msg =
-                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] " +
-                $"[{logLevel}] " +
-                $"[{_categoryName}] " +
-                $"{formatter(state, exception)}";
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] "
+                + $"[{logLevel}] "
+                + $"[{_categoryName}] "
+                + $"{formatter(state, exception)}";
 
             if (exception is not null)
             {
@@ -40,9 +46,7 @@ namespace WindowsDev.Business.Services.Logger
 
             lock (_lock)
             {
-                File.AppendAllText(
-                    _filePath,
-                    msg + Environment.NewLine);
+                File.AppendAllText(_filePath, msg + Environment.NewLine);
             }
         }
     }

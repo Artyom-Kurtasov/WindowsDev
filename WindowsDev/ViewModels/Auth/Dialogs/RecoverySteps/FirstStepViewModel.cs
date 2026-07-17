@@ -1,8 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using WindowsDev.Business.Services.DebounceService;
+﻿using WindowsDev.Business.Services.DebounceService;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Domain.PasswordRecoveryModels;
-using WindowsDev.Infrastructure.Logging;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
 {
@@ -14,16 +12,16 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
 
         private const int DebounceDelayMilliseconds = 300;
 
-
-        public FirstStepViewModel(PasswordRecoveryData passwordRecoveryData,
+        public FirstStepViewModel(
+            PasswordRecoveryData passwordRecoveryData,
             IPasswordRecoveryService passwordRecoveryService,
-            IDebounceService debounceService)
+            IDebounceService debounceService
+        )
         {
             _passwordRecoveryData = passwordRecoveryData;
             _passwordRecoveryService = passwordRecoveryService;
             _debounceService = debounceService;
         }
-
 
         public string Login
         {
@@ -41,7 +39,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             }
         }
 
-
         public bool IsUserExist
         {
             get => _passwordRecoveryData.IsUserExist;
@@ -56,18 +53,17 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             }
         }
 
-
         private async Task CheckUserAsync()
         {
             await _debounceService.DebounceAsync(
                 async () =>
                 {
-                    IsUserExist = !string.IsNullOrWhiteSpace(Login) &&
-                                  await _passwordRecoveryService
-                                      .IsUserExistAsync(Login);
+                    IsUserExist =
+                        !string.IsNullOrWhiteSpace(Login)
+                        && await _passwordRecoveryService.IsUserExistAsync(Login);
                 },
-                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds));
-
+                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
+            );
         }
     }
 }

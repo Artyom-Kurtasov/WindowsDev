@@ -24,7 +24,7 @@
 
     <!-- Main Tab Control -->
     <Grid>
-        <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}">
+        <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}" SelectedIndex="{Binding SelectedTabIndex}">
             <TabItem Header="{DynamicResource MainWindow_Label_Projects}" Content="{Binding Projects}"/>
             <TabItem Header="{DynamicResource MainWindow_Label_Settings}" Content="{Binding Settings}"/>
             <TabItem Header="{DynamicResource MainWindow_Label_Profile}" Content="{Binding Profile}"/>

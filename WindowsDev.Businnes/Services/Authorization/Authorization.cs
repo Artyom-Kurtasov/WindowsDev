@@ -14,9 +14,11 @@ namespace WindowsDev.Business.Services.Authorization
         private readonly ICurrentUserService _currentUserService;
         private readonly IHasherFactory _hasherFactory;
 
-        public Authorization(IUserRepository userRepository,
+        public Authorization(
+            IUserRepository userRepository,
             ICurrentUserService currentUserService,
-            IHasherFactory hasherFactory)
+            IHasherFactory hasherFactory
+        )
         {
             _userRepository = userRepository;
             _currentUserService = currentUserService;

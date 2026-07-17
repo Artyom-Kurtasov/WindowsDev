@@ -7,4 +7,3 @@
         public override int Iterations => 50000;
     }
 }
-

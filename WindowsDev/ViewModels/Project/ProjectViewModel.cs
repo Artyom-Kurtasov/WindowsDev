@@ -1,7 +1,7 @@
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Business.Services.TaskService.Interfaces;
@@ -22,7 +22,7 @@ using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Projects
 {
-    public class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel
+    public class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
     {
         private const int PageSize = 15;
 
@@ -32,14 +32,16 @@ namespace WindowsDev.ViewModels.Projects
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ILogger<ProjectViewModel> _logger;
 
-
-        public ProjectViewModel(ProjectsInfo currentProject,
+        public ProjectViewModel(
+            ProjectsInfo currentProject,
             IDialogCoordinator dialogCoordinator,
             INavigationService navigationService,
             ITaskService taskService,
             IDialogService dialogService,
             ILogger<ProjectViewModel> logger,
-            ILanguageChanger languageChanger) : base(languageChanger)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger)
         {
             CurrentProject = currentProject;
 
@@ -66,14 +68,12 @@ namespace WindowsDev.ViewModels.Projects
         public ICommand NextPageCommand { get; }
         public ICommand PrevPageCommand { get; }
 
-        public ProjectsInfo CurrentProject { get; }
+        public ProjectsInfo? CurrentProject { get; private set; }
 
-        public ObservableCollection<TasksInfo> Tasks { get; } = new();
+        public ObservableCollection<TasksInfo> Tasks { get; private set; } = new();
 
-
-        public string Name => CurrentProject.Name;
-        public string? Description => CurrentProject.Description;
-
+        public string? Name => CurrentProject?.Name;
+        public string? Description => CurrentProject?.Description;
 
         private int _currentPage = 1;
 
@@ -90,12 +90,9 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private int _totalCountOfTasks;
 
-        public int TotalCountOfPages =>
-            (int)Math.Ceiling((double)_totalCountOfTasks / PageSize);
-
+        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfTasks / PageSize);
 
         private string _searchFilter = string.Empty;
 
@@ -114,7 +111,6 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private bool _showAll = true;
 
         public bool ShowAll
@@ -131,7 +127,6 @@ namespace WindowsDev.ViewModels.Projects
                 _ = GetPageAsync();
             }
         }
-
 
         private bool _showClosed;
 
@@ -150,8 +145,8 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private bool _showInProgress;
+        private bool disposedValue;
 
         public bool ShowInProgress
         {
@@ -168,12 +163,10 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         public async Task RefreshAsync()
         {
             await LoadTasksAsync();
         }
-
 
         public async Task NextPageAsync()
         {
@@ -184,7 +177,6 @@ namespace WindowsDev.ViewModels.Projects
             await GetPageAsync();
         }
 
-
         public async Task PrevPageAsync()
         {
             if (CurrentPage <= 1)
@@ -194,37 +186,30 @@ namespace WindowsDev.ViewModels.Projects
             await GetPageAsync();
         }
 
-
         private async Task OpenTaskAsync(TasksInfo task)
         {
-            await _navigationService.NavigateTo<TaskViewModel>(
-                CurrentProject,
-                task);
+            await _navigationService.NavigateTo<TaskViewModel>(CurrentProject, task);
         }
-
 
         private void SwitchToMainView()
         {
+            Dispose();
             _navigationService.NavigateTo<MainWindowViewModel>();
         }
 
-
         private async Task OpenTaskDialogAsync()
         {
-            await _dialogService.ShowDialogAsync<
-                TaskDialogView,
-                CreateTaskViewModel>(
-                    this,
-                    CurrentProject.Id);
+            await _dialogService.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(
+                this,
+                CurrentProject!.Id
+            );
         }
-
 
         private async Task LoadTasksAsync()
         {
             try
             {
-                _totalCountOfTasks =
-                    await _taskService.GetTasksCountAsync(CurrentProject.Id);
+                _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject!.Id);
 
                 OnPropertyChanged(nameof(TotalCountOfPages));
 
@@ -236,29 +221,20 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private async Task GetPageAsync()
         {
             try
             {
                 var filter = new TaskFilter
                 {
-                    ProjectId = CurrentProject.Id,
+                    ProjectId = CurrentProject!.Id,
                     Page = CurrentPage,
                     PageSize = PageSize,
                     Seacrh = SearchFilter,
-                    Statuses = GetSelectedStatuses()
+                    Statuses = GetSelectedStatuses(),
                 };
 
                 var result = await _taskService.GetTasksAsync(filter);
-
-                if (result.IsFailure)
-                {
-                    await ShowErrorAsync(
-                        new InvalidOperationException(result.Error));
-
-                    return;
-                }
 
                 Tasks.Clear();
 
@@ -271,12 +247,9 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private async Task DeleteSelectedTasksAsync()
         {
-            var tasksToDelete = Tasks
-                .Where(x => x.IsSelected)
-                .ToList();
+            var tasksToDelete = Tasks.Where(x => x.IsSelected).ToList();
 
             foreach (var task in tasksToDelete)
             {
@@ -294,17 +267,11 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
-
         private List<TaskStatus> GetSelectedStatuses()
         {
             if (ShowAll)
             {
-                return new()
-                {
-                    TaskStatus.Done,
-                    TaskStatus.InProgress,
-                    TaskStatus.Closed
-                };
+                return new() { TaskStatus.Done, TaskStatus.InProgress, TaskStatus.Closed };
             }
 
             var statuses = new List<TaskStatus>();
@@ -318,19 +285,36 @@ namespace WindowsDev.ViewModels.Projects
             return statuses;
         }
 
-
         private async Task ShowErrorAsync(Exception exception)
         {
-            TaskLogs.TaskLoadFailed(
-                _logger,
-                CurrentProject.Id,
-                exception);
+            TaskLogs.TaskLoadFailed(_logger, CurrentProject!.Id, exception);
 
             await _dialogCoordinator.ShowMessageAsync(
                 this,
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
-                MessageDialogStyle.Affirmative);
+                MessageDialogStyle.Affirmative
+            );
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Tasks = null!;
+                    CurrentProject = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

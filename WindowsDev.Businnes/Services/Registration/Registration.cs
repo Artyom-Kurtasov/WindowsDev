@@ -10,24 +10,22 @@ using WindowsDev.Domain.UsersModels.Enums;
 
 namespace WindowsDev.Business.Services.Registration
 {
-
     public class Registration : IRegistration
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrentUserService _currentUserService;
         private readonly DefaultHasher _defaultHasher;
-        private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly IPasswordChanger _passwordChanger;
 
         private const string HashHexFormat = "x16";
 
-        public Registration(IUserRepository userRepository,
-                            ICurrentUserService currentUserService,
-                            DefaultHasher defaultHasher,
-                            IPasswordRecoveryService passwordRecoveryService,
-                            IPasswordChanger passwordChanger)
+        public Registration(
+            IUserRepository userRepository,
+            ICurrentUserService currentUserService,
+            DefaultHasher defaultHasher,
+            IPasswordChanger passwordChanger
+        )
         {
-            _passwordRecoveryService = passwordRecoveryService;
             _userRepository = userRepository;
             _defaultHasher = defaultHasher;
             _currentUserService = currentUserService;
@@ -49,7 +47,7 @@ namespace WindowsDev.Business.Services.Registration
                 PasswordHash = passwordHash,
                 HashMethod = (HashMethod)1,
                 RecoveryCodeHash = recoveryCodeHash,
-                RecoveryCodeSalt = recoveryCodeSalt
+                RecoveryCodeSalt = recoveryCodeSalt,
             };
 
             await _userRepository.AddAsync(user);
@@ -61,9 +59,7 @@ namespace WindowsDev.Business.Services.Registration
 
         public async Task<bool> IsLoginAvailableAsync(string login)
         {
-
             return !await _userRepository.ExistsByLoginAsync(login);
-
         }
 
         public async Task<bool> IsUsernameAvailableAsync(string username)
@@ -74,18 +70,23 @@ namespace WindowsDev.Business.Services.Registration
         private (string passwordHash, byte[] passwordSalt) HashPassword(string password)
         {
             var passwordSalt = _defaultHasher.GenerateSalt();
-            var passwordHash = _defaultHasher.HashValue(password, passwordSalt).ToString(HashHexFormat);
+            var passwordHash = _defaultHasher
+                .HashValue(password, passwordSalt)
+                .ToString(HashHexFormat);
 
             return (passwordHash, passwordSalt);
         }
 
-        private (string recoveryCodeHash, byte[] recoveryCodeSalt) HashRecoveryCode(int recoveryCode)
+        private (string recoveryCodeHash, byte[] recoveryCodeSalt) HashRecoveryCode(
+            int recoveryCode
+        )
         {
             var recoveryCodeSalt = _defaultHasher.GenerateSalt();
-            var recoveryCodeHash = _defaultHasher.HashValue(recoveryCode.ToString(), recoveryCodeSalt).ToString(HashHexFormat);
+            var recoveryCodeHash = _defaultHasher
+                .HashValue(recoveryCode.ToString(), recoveryCodeSalt)
+                .ToString(HashHexFormat);
 
             return (recoveryCodeHash, recoveryCodeSalt);
         }
     }
 }
-

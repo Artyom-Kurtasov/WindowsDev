@@ -5,6 +5,7 @@ using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Domain;
 using WindowsDev.Domain.DialogsMessages.Errors;
+using WindowsDev.Domain.DialogsMessages.Warnings;
 using WindowsDev.Domain.TasksModels;
 using WindowsDev.Domain.TasksModels.Enums;
 using WindowsDev.Infrastructure;
@@ -35,7 +36,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 .Returns((string key) => key);
         }
 
-
         private CreateTaskViewModel CreateViewModel(int projectId = 1)
         {
             var vm = new CreateTaskViewModel(
@@ -43,7 +43,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 _taskServiceMock.Object,
                 _dialogCoordinatorMock.Object,
                 _loggerMock.Object,
-                _languageChangerMock.Object);
+                _languageChangerMock.Object
+            );
 
             vm.Name = "Test Task";
             vm.Description = "Test Description";
@@ -54,7 +55,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 
             return vm;
         }
-
 
         private void SetupEvents(CreateTaskViewModel vm)
         {
@@ -74,20 +74,6 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             };
         }
 
-
-        private void SetupDialogCoordinatorMock()
-        {
-            _dialogCoordinatorMock
-                .Setup(x => x.ShowMessageAsync(
-                    It.IsAny<CreateTaskViewModel>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    MessageDialogStyle.Affirmative,
-                    It.IsAny<MetroDialogSettings>()))
-                .ReturnsAsync(MessageDialogResult.Affirmative);
-        }
-
-
         [Fact]
         public void Constructor_WhenProjectIdLessThanOne_ThrowsArgumentOutOfRangeException()
         {
@@ -97,9 +83,10 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                     _taskServiceMock.Object,
                     _dialogCoordinatorMock.Object,
                     _loggerMock.Object,
-                    _languageChangerMock.Object));
+                    _languageChangerMock.Object
+                )
+            );
         }
-
 
         [Fact]
         public async Task CancelCommand_WhenExecuted_RaisesCloseRequestedEvent()
@@ -108,13 +95,11 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 
             SetupEvents(vm);
 
-            await ((AsyncRelayCommand)vm.CancelCommand)
-                .ExecuteAsync(null);
+            await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
 
             Assert.True(_closeEventWasRaised);
             Assert.False(_completedEventWasRaised);
         }
-
 
         [Fact]
         public async Task CreateTask_WhenSuccessful_AddsTask_RaisesCompletedAndCloseEvents()
@@ -130,10 +115,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 .Callback<TasksInfo>(task => createdTask = task)
                 .Returns(Task.CompletedTask);
 
-
-            await ((AsyncRelayCommand)vm.CreateTaskCommand)
-                .ExecuteAsync(null);
-
+            await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
 
             Assert.True(_completedEventWasRaised);
             Assert.True(_closeEventWasRaised);
@@ -146,11 +128,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             Assert.Equal(TaskPriority.Normal, createdTask.Priority);
             Assert.Equal(TaskStatus.InProgress, createdTask.Status);
 
-            _taskServiceMock.Verify(
-                x => x.AddAsync(It.IsAny<TasksInfo>()),
-                Times.Once);
+            _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Once);
         }
-
 
         [Theory]
         [InlineData("")]
@@ -163,32 +142,25 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             vm.Name = name;
 
             SetupEvents(vm);
-            SetupDialogCoordinatorMock();
 
-
-            await ((AsyncRelayCommand)vm.CreateTaskCommand)
-                .ExecuteAsync(null);
-
+            await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
 
             Assert.False(_completedEventWasRaised);
             Assert.False(_closeEventWasRaised);
 
-
-            _taskServiceMock.Verify(
-                x => x.AddAsync(It.IsAny<TasksInfo>()),
-                Times.Never);
-
+            _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Never);
 
             _dialogCoordinatorMock.Verify(
-                x => x.ShowMessageAsync(
-                    vm,
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    MessageDialogStyle.Affirmative,
-                    It.IsAny<MetroDialogSettings>()),
-                Times.Once);
+                x =>
+                    x.ShowMessageAsync(
+                        vm,
+                        DialogTitles.Warning,
+                        TaskDialogWarnings.EnterName,
+                        MessageDialogStyle.Affirmative
+                    ),
+                Times.Once
+            );
         }
-
 
         [Fact]
         public async Task CreateTask_WhenServiceThrows_ShowsErrorDialog()
@@ -196,35 +168,28 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             var vm = CreateViewModel();
 
             SetupEvents(vm);
-            SetupDialogCoordinatorMock();
-
 
             _taskServiceMock
                 .Setup(x => x.AddAsync(It.IsAny<TasksInfo>()))
                 .ThrowsAsync(new Exception());
 
-
-            await ((AsyncRelayCommand)vm.CreateTaskCommand)
-                .ExecuteAsync(null);
-
+            await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
 
             Assert.False(_completedEventWasRaised);
             Assert.False(_closeEventWasRaised);
 
-
-            _taskServiceMock.Verify(
-                x => x.AddAsync(It.IsAny<TasksInfo>()),
-                Times.Once);
-
+            _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Once);
 
             _dialogCoordinatorMock.Verify(
-                x => x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Error,
-                    CommonErrors.UnexpectedError,
-                    MessageDialogStyle.Affirmative,
-                    It.IsAny<MetroDialogSettings>()),
-                Times.Once);
+                x =>
+                    x.ShowMessageAsync(
+                        vm,
+                        DialogTitles.Error,
+                        CommonErrors.UnexpectedError,
+                        MessageDialogStyle.Affirmative
+                    ),
+                Times.Once
+            );
         }
     }
 }

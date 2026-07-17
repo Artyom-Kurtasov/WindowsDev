@@ -1,7 +1,7 @@
-﻿using ControlzEx.Theming;
-using MahApps.Metro.Controls.Dialogs;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Input;
+using ControlzEx.Theming;
+using MahApps.Metro.Controls.Dialogs;
 using WindowsDev.Business.DataBase.Interfaces;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Domain;
@@ -25,7 +25,9 @@ namespace WindowsDev.ViewModels.Main.Tabs
             IDbHealthChecker dbHealthChecker,
             IDbManager dbManager,
             IDialogCoordinator dialogCoordinator,
-            ILanguageChanger languageChanger) : base(languageChanger)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger)
         {
             _healthChecker = dbHealthChecker;
             _dbManager = dbManager;
@@ -38,11 +40,9 @@ namespace WindowsDev.ViewModels.Main.Tabs
             Initialize();
         }
 
-
         public ICommand ApplyLanguageCommand { get; }
         public ICommand ChangeThemeCommand { get; }
         public ICommand SetNewConnectionStringCommand { get; }
-
 
         private string _newConnectionString = string.Empty;
         public string NewConnectionString
@@ -58,7 +58,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private Language _selectedLang;
 
         public Language SelectedLang
@@ -73,7 +72,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 OnPropertyChanged(nameof(SelectedLang));
             }
         }
-
 
         private double _selectedTheme;
 
@@ -92,9 +90,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         public IEnumerable<Language> Languages { get; } = Enum.GetValues<Language>();
-
 
         public async Task SetNewConnectionStringAsync()
         {
@@ -109,35 +105,31 @@ namespace WindowsDev.ViewModels.Main.Tabs
                 UserSettings.Default.ConnectionString = NewConnectionString;
                 UserSettings.Default.Save();
             }
-            catch
+            catch (Exception)
             {
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
                     Translate(DialogTitles.Warning),
                     Translate(SettingsWarnings.InvalidConnectionString),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
 
                 _dbManager.ConnectionString = oldConnection;
             }
         }
-
 
         public async Task ChangeThemeAsync()
         {
             switch (_selectedTheme)
             {
                 case 0:
-                    ThemeManager.Current.ChangeTheme(
-                        Application.Current,
-                        DarkTheme);
+                    ThemeManager.Current.ChangeTheme(Application.Current, DarkTheme);
 
                     UserSettings.Default.Theme = DarkTheme;
                     break;
 
                 case 1:
-                    ThemeManager.Current.ChangeTheme(
-                        Application.Current,
-                        LightTheme);
+                    ThemeManager.Current.ChangeTheme(Application.Current, LightTheme);
 
                     UserSettings.Default.Theme = LightTheme;
                     break;
@@ -147,7 +139,6 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
             await Task.CompletedTask;
         }
-
 
         public void ApplyLanguage()
         {
@@ -159,27 +150,20 @@ namespace WindowsDev.ViewModels.Main.Tabs
             UserSettings.Default.Save();
         }
 
-
         private void Initialize()
         {
             LoadSavedLanguages();
             LoadSavedTheme();
         }
 
-
         private void LoadSavedTheme()
         {
-            SelectedTheme = UserSettings.Default.Theme == DarkTheme
-                ? 0
-                : 1;
+            SelectedTheme = UserSettings.Default.Theme == DarkTheme ? 0 : 1;
         }
-
 
         private void LoadSavedLanguages()
         {
-            SelectedLang = Enum.Parse<Language>(
-                UserSettings.Default.LanguageCode,
-                true);
+            SelectedLang = Enum.Parse<Language>(UserSettings.Default.LanguageCode, true);
         }
     }
 }

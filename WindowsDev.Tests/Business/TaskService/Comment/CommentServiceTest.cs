@@ -16,16 +16,12 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
             _commentRepositoryMock = new Mock<ICommentRepository>();
 
             _currentUserMock = new Mock<ICurrentUserService>();
-            _currentUserMock
-                .SetupGet(x => x.Username)
-                .Returns("testuser");
+            _currentUserMock.SetupGet(x => x.Username).Returns("testuser");
         }
 
         private CommentsService CreateService()
         {
-            return new CommentsService(
-                _commentRepositoryMock.Object,
-                _currentUserMock.Object);
+            return new CommentsService(_commentRepositoryMock.Object, _currentUserMock.Object);
         }
 
         [Fact]
@@ -33,12 +29,11 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
         {
             var service = CreateService();
 
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                () => service.AddComment(0, "comment text"));
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+                service.AddComment(0, "comment text")
+            );
 
-            _commentRepositoryMock.Verify(
-                x => x.AddComments(It.IsAny<Comments>()),
-                Times.Never);
+            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
         }
 
         [Fact]
@@ -58,9 +53,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
             Assert.Equal(taskId, result.Value.TaskId);
             Assert.True((DateTime.UtcNow - result.Value.CreatedAt).TotalSeconds < 1);
 
-            _commentRepositoryMock.Verify(
-                x => x.AddComments(It.IsAny<Comments>()),
-                Times.Once);
+            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Once);
         }
 
         [Fact]
@@ -76,7 +69,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
                     Text = "comment1",
                     TaskId = taskId,
                     CreatedAt = DateTime.UtcNow,
-                    Author = "user1"
+                    Author = "user1",
                 },
                 new()
                 {
@@ -84,13 +77,11 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
                     Text = "comment2",
                     TaskId = taskId,
                     CreatedAt = DateTime.UtcNow,
-                    Author = "user2"
-                }
+                    Author = "user2",
+                },
             };
 
-            _commentRepositoryMock
-                .Setup(x => x.GetComments(taskId))
-                .ReturnsAsync(expectedComments);
+            _commentRepositoryMock.Setup(x => x.GetComments(taskId)).ReturnsAsync(expectedComments);
 
             var service = CreateService();
 
@@ -99,9 +90,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
             Assert.Equal(expectedComments, result);
             Assert.Equal(2, result.Count);
 
-            _commentRepositoryMock.Verify(
-                x => x.GetComments(taskId),
-                Times.Once);
+            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
         }
 
         [Fact]
@@ -119,9 +108,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
 
             Assert.Empty(result);
 
-            _commentRepositoryMock.Verify(
-                x => x.GetComments(taskId),
-                Times.Once);
+            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
         }
     }
 }

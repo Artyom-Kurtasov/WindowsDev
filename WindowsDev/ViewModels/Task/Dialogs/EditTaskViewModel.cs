@@ -1,6 +1,6 @@
+using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Windows.Input;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
@@ -15,19 +15,20 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
     public class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
     {
         private readonly ITaskService _taskService;
-        private readonly IDialogCoordinator _dialogCoordinator;
         private readonly ILogger<EditTaskViewModel> _logger;
         private readonly TasksInfo _currentTask;
 
-        public EditTaskViewModel(TasksInfo currentTask,
+        public EditTaskViewModel(
+            TasksInfo currentTask,
             ITaskService taskService,
             IDialogCoordinator dialogCoordinator,
             ILogger<EditTaskViewModel> logger,
-            ILanguageChanger languageChanger) : base(languageChanger, dialogCoordinator)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger, dialogCoordinator)
         {
             _currentTask = currentTask;
             _taskService = taskService;
-            _dialogCoordinator = dialogCoordinator;
             _logger = logger;
 
             EditTaskCommand = new AsyncRelayCommand(EditTaskAsync);
@@ -67,7 +68,8 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
                     this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
         }
 

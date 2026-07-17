@@ -1,6 +1,6 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+﻿using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Windows.Input;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
@@ -26,7 +26,9 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             ICurrentUserService currentUserData,
             IProjectService projectService,
             ILogger<CreateProjectDialogViewModel> logger,
-            ILanguageChanger languageChanger) : base(languageChanger)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger)
         {
             _dialogCoordinator = dialogCoordinator;
             _currentUserData = currentUserData;
@@ -37,10 +39,8 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync);
         }
 
-
         public ICommand CloseDialogCommand { get; }
         public ICommand CreateProjectCommand { get; }
-
 
         private string _projectName = string.Empty;
 
@@ -57,7 +57,6 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             }
         }
 
-
         private string _projectDescription = string.Empty;
 
         public string ProjectDescription
@@ -73,12 +72,10 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
             }
         }
 
-
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
 
-
-        public async Task CreateProjectAsync()
+        private async Task CreateProjectAsync()
         {
             if (string.IsNullOrWhiteSpace(ProjectName))
             {
@@ -86,23 +83,28 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
                     this,
                     Translate(DialogTitles.Warning),
                     Translate(CreateProjectWarnings.EnterName),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
 
                 return;
             }
 
             try
             {
-                await _projectService.AddAsync(new ProjectsInfo
-                {
-                    Name = ProjectName,
-                    UserId = _currentUserData.UserId,
-                    Description = ProjectDescription,
-                    CreatedAt = DateTime.Today.ToUniversalTime()
-                });
+                await _projectService.AddAsync(
+                    new ProjectsInfo
+                    {
+                        Name = ProjectName,
+                        UserId = _currentUserData.UserId,
+                        Description = ProjectDescription,
+                        CreatedAt = DateTime.Today.ToUniversalTime(),
+                    }
+                );
 
                 if (Completed != null)
                     await Completed.Invoke();
+
+                await CloseDialogAsync();
             }
             catch (Exception ex)
             {
@@ -112,10 +114,10 @@ namespace WindowsDev.ViewModels.Projects.Dialogs
                     this,
                     Translate(DialogTitles.Error),
                     Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
             }
         }
-
 
         private async Task CloseDialogAsync()
         {

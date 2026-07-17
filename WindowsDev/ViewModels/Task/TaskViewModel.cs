@@ -1,7 +1,7 @@
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
 using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
@@ -21,7 +21,7 @@ using WindowsDev.Views.Tasks;
 
 namespace WindowsDev.ViewModels.Tasks
 {
-    public class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel
+    public class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;
@@ -30,11 +30,10 @@ namespace WindowsDev.ViewModels.Tasks
         private readonly ICommentService _commentService;
         private readonly ILogger<TaskViewModel> _logger;
 
-        private TasksInfo _currentTask;
-        private string? _newComment;
+        private bool disposedValue;
 
-
-        public TaskViewModel(ProjectsInfo project,
+        public TaskViewModel(
+            ProjectsInfo project,
             TasksInfo currentTask,
             ICommentService commentService,
             IDialogService dialogService,
@@ -42,7 +41,8 @@ namespace WindowsDev.ViewModels.Tasks
             IAttacmentService attacmentService,
             ILogger<TaskViewModel> logger,
             IDialogCoordinator dialogCoordinator,
-            ILanguageChanger languageChanger)
+            ILanguageChanger languageChanger
+        )
             : base(languageChanger)
         {
             ArgumentNullException.ThrowIfNull(project);
@@ -62,12 +62,10 @@ namespace WindowsDev.ViewModels.Tasks
             EditTaskCommand = new AsyncRelayCommand(EditTask);
             SwitchToProjectCommand = new RelayCommand(SwitchToProject);
             AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
-            OpenAttachmentCommand =
-                new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
+            OpenAttachmentCommand = new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
 
             _ = LoadDetailsAsync();
         }
-
 
         public ICommand SwitchToProjectCommand { get; }
         public ICommand EditTaskCommand { get; }
@@ -75,11 +73,10 @@ namespace WindowsDev.ViewModels.Tasks
         public ICommand AddAttachmentCommand { get; }
         public ICommand OpenAttachmentCommand { get; }
 
+        public ProjectsInfo? Project { get; private set; }
 
-        public ProjectsInfo Project { get; }
-
-
-        public TasksInfo CurrentTask
+        private TasksInfo? _currentTask;
+        public TasksInfo? CurrentTask
         {
             get => _currentTask;
             set
@@ -92,12 +89,11 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
+        public ObservableCollection<Comments>? Comments { get; private set; } = new();
 
-        public ObservableCollection<Comments> Comments { get; } = new();
+        public ObservableCollection<TaskAttachment>? Attachments { get; private set; } = new();
 
-        public ObservableCollection<TaskAttachment> Attachments { get; } = new();
-
-
+        private string? _newComment;
         public string? NewComment
         {
             get => _newComment;
@@ -108,13 +104,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public string Name
         {
-            get => CurrentTask.Name;
+            get => CurrentTask!.Name;
             set
             {
-                if (CurrentTask.Name == value)
+                if (CurrentTask!.Name == value)
                     return;
 
                 CurrentTask.Name = value;
@@ -122,13 +117,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public string? Description
         {
-            get => CurrentTask.Description;
+            get => CurrentTask!.Description;
             set
             {
-                if (CurrentTask.Description == value)
+                if (CurrentTask!.Description == value)
                     return;
 
                 CurrentTask.Description = value;
@@ -136,13 +130,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public TaskPriority Priority
         {
-            get => CurrentTask.Priority;
+            get => CurrentTask!.Priority;
             set
             {
-                if (CurrentTask.Priority == value)
+                if (CurrentTask!.Priority == value)
                     return;
 
                 CurrentTask.Priority = value;
@@ -150,13 +143,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public int Progress
         {
-            get => CurrentTask.Progress;
+            get => CurrentTask!.Progress;
             set
             {
-                if (CurrentTask.Progress == value)
+                if (CurrentTask!.Progress == value)
                     return;
 
                 CurrentTask.Progress = value;
@@ -164,13 +156,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public Domain.TasksModels.Enums.TaskStatus Status
         {
-            get => CurrentTask.Status;
+            get => CurrentTask!.Status;
             set
             {
-                if (CurrentTask.Status == value)
+                if (CurrentTask!.Status == value)
                     return;
 
                 CurrentTask.Status = value;
@@ -178,13 +169,12 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
         public DateTime DeadLine
         {
-            get => CurrentTask.DeadLine;
+            get => CurrentTask!.DeadLine;
             set
             {
-                if (CurrentTask.DeadLine == value)
+                if (CurrentTask!.DeadLine == value)
                     return;
 
                 CurrentTask.DeadLine = value;
@@ -192,9 +182,7 @@ namespace WindowsDev.ViewModels.Tasks
             }
         }
 
-
-        public DateTime CreatedAt => CurrentTask.CreatedAt;
-
+        public DateTime CreatedAt => CurrentTask!.CreatedAt;
 
         public async Task RefreshAsync()
         {
@@ -202,61 +190,49 @@ namespace WindowsDev.ViewModels.Tasks
             RefreshTask();
         }
 
-
         private async Task LoadDetailsAsync()
         {
             await LoadCommentsAsync();
             await LoadAttachmentsAsync();
         }
 
-
         private async Task LoadCommentsAsync()
         {
             try
             {
-                Comments.Clear();
+                Comments!.Clear();
 
-                var comments =
-                    await _commentService.GetComments(CurrentTask.Id);
+                var comments = await _commentService.GetComments(CurrentTask!.Id);
 
                 foreach (var comment in comments)
                     Comments.Add(comment);
             }
             catch (Exception ex)
             {
-                CommentLogs.CommentLoadFailed(
-                    _logger,
-                    CurrentTask.Id.ToString(),
-                    ex);
+                CommentLogs.CommentLoadFailed(_logger, CurrentTask!.Id.ToString(), ex);
 
                 await ShowErrorAsync(TaskErrors.LoadCommentsFailed);
             }
         }
 
-
         private async Task LoadAttachmentsAsync()
         {
             try
             {
-                Attachments.Clear();
+                Attachments!.Clear();
 
-                var attachments =
-                    await _attacmentService.GetAttachmentsAsync(CurrentTask.Id);
+                var attachments = await _attacmentService.GetAttachmentsAsync(CurrentTask!.Id);
 
                 foreach (var attachment in attachments)
                     Attachments.Add(attachment);
             }
             catch (Exception ex)
             {
-                AttachmentLogs.AttachmentLoadFailed(
-                    _logger,
-                    CurrentTask.Id.ToString(),
-                    ex);
+                AttachmentLogs.AttachmentLoadFailed(_logger, CurrentTask!.Id.ToString(), ex);
 
                 await ShowErrorAsync(TaskErrors.LoadAttachmentsFailed);
             }
         }
-
 
         private async Task OpenAttachment(TaskAttachment attachment)
         {
@@ -273,97 +249,78 @@ namespace WindowsDev.ViewModels.Tasks
                     _logger,
                     attachment.Id.ToString(),
                     attachment.FilePath,
-                    ex);
+                    ex
+                );
 
                 await ShowErrorAsync(TaskErrors.OpenAttachmentFailed);
             }
         }
 
-
         private async Task AddAttachment()
         {
             try
             {
-                var result =
-                    await _attacmentService.AddFile(CurrentTask.Id);
-
+                var result = await _attacmentService.AddFile(CurrentTask!.Id);
 
                 if (result.IsSuccess)
                 {
-                    Attachments.Add(result.Value);
+                    Attachments!.Add(result.Value);
                     return;
                 }
-
 
                 AttachmentLogs.AttachmentUploadFailed(
                     _logger,
                     "unknown",
                     0,
-                    new InvalidOperationException(result.Error));
-
+                    new InvalidOperationException(result.Error)
+                );
 
                 await ShowErrorAsync(result.Error);
             }
             catch (Exception ex)
             {
-                AttachmentLogs.AttachmentUploadFailed(
-                    _logger,
-                    "unknown",
-                    0,
-                    ex);
+                AttachmentLogs.AttachmentUploadFailed(_logger, "unknown", 0, ex);
 
                 await ShowErrorAsync(CommonErrors.UnexpectedError);
             }
         }
-
 
         private async Task AddComment()
         {
             if (string.IsNullOrWhiteSpace(NewComment))
                 return;
 
-
             try
             {
-                var result =
-                    await _commentService.AddComment(
-                        CurrentTask.Id,
-                        NewComment);
-
+                var result = await _commentService.AddComment(CurrentTask!.Id, NewComment);
 
                 if (result.IsSuccess)
                 {
-                    Comments.Add(result.Value);
+                    Comments!.Add(result.Value);
                     NewComment = string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                CommentLogs.CommentCreationFailed(
-                    _logger,
-                    CurrentTask.Id.ToString(),
-                    ex);
+                CommentLogs.CommentCreationFailed(_logger, CurrentTask!.Id.ToString(), ex);
 
                 await ShowErrorAsync(CommonErrors.UnexpectedError);
             }
         }
 
-
         private async Task EditTask()
         {
-            await _dialogService.ShowDialogAsync<
-                TaskDialogView,
-                EditTaskViewModel>(
-                    this,
-                    CurrentTask);
+            await _dialogService.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(
+                this,
+                CurrentTask!
+            );
         }
-
 
         private void SwitchToProject()
         {
-            _navigationService.NavigateTo<ProjectViewModel>(Project);
+            _navigationService.NavigateTo<ProjectViewModel>(Project!);
+            Dispose();
         }
-
 
         private async Task ShowErrorAsync(string error)
         {
@@ -371,9 +328,9 @@ namespace WindowsDev.ViewModels.Tasks
                 this,
                 Translate(DialogTitles.Error),
                 Translate(error),
-                MessageDialogStyle.Affirmative);
+                MessageDialogStyle.Affirmative
+            );
         }
-
 
         public void RefreshTask()
         {
@@ -384,6 +341,28 @@ namespace WindowsDev.ViewModels.Tasks
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(DeadLine));
             OnPropertyChanged(nameof(CreatedAt));
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    Comments = null;
+                    Attachments = null;
+                    _currentTask = null;
+                    Project = null;
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

@@ -1,6 +1,5 @@
-﻿using Moq;
-using System.Text;
-using WindowsDev.Business.Primitives;
+﻿using System.Text;
+using Moq;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.Authorization;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
@@ -31,9 +30,11 @@ namespace WindowsDev.Tests.Business.Auth
 
         private Authorization CreateService()
         {
-            return new Authorization(_userRepositoryMock.Object,
+            return new Authorization(
+                _userRepositoryMock.Object,
                 _currentUserServiceMock.Object,
-                _hasherFactory);
+                _hasherFactory
+            );
         }
 
         [Theory]
@@ -50,13 +51,12 @@ namespace WindowsDev.Tests.Business.Auth
             Assert.False(result.IsSuccess);
             Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
-            _userRepositoryMock.Verify(x =>
-                x.GetByLoginAsync(It.IsAny<string>()),
-                Times.Never);
+            _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
 
-            _currentUserServiceMock.Verify(x =>
-                x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never);
+            _currentUserServiceMock.Verify(
+                x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+                Times.Never
+            );
         }
 
         [Fact]
@@ -73,13 +73,12 @@ namespace WindowsDev.Tests.Business.Auth
             Assert.False(result.IsSuccess);
             Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
-            _userRepositoryMock.Verify(x =>
-                x.GetByLoginAsync("login"),
-                Times.Once);
+            _userRepositoryMock.Verify(x => x.GetByLoginAsync("login"), Times.Once);
 
-            _currentUserServiceMock.Verify(x =>
-                x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never);
+            _currentUserServiceMock.Verify(
+                x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+                Times.Never
+            );
         }
 
         [Fact]
@@ -97,12 +96,10 @@ namespace WindowsDev.Tests.Business.Auth
                 Username = "Artyom",
                 Salt = salt,
                 PasswordHash = correctHash,
-                HashMethod = HashMethod.Default
+                HashMethod = HashMethod.Default,
             };
 
-            _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync("admin"))
-                .ReturnsAsync(user);
+            _userRepositoryMock.Setup(x => x.GetByLoginAsync("admin")).ReturnsAsync(user);
 
             var auth = CreateService();
 
@@ -111,9 +108,10 @@ namespace WindowsDev.Tests.Business.Auth
             Assert.False(result.IsSuccess);
             Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
-            _currentUserServiceMock.Verify(x =>
-                x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never);
+            _currentUserServiceMock.Verify(
+                x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+                Times.Never
+            );
         }
 
         [Fact]
@@ -131,12 +129,10 @@ namespace WindowsDev.Tests.Business.Auth
                 Username = "Artyom",
                 Salt = salt,
                 PasswordHash = hash,
-                HashMethod = HashMethod.Default
+                HashMethod = HashMethod.Default,
             };
 
-            _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync("admin"))
-                .ReturnsAsync(user);
+            _userRepositoryMock.Setup(x => x.GetByLoginAsync("admin")).ReturnsAsync(user);
 
             var auth = CreateService();
 
@@ -145,9 +141,10 @@ namespace WindowsDev.Tests.Business.Auth
             Assert.True(result.IsSuccess);
             Assert.True(result.Value);
 
-            _currentUserServiceMock.Verify(x =>
-                x.SetUser(user.Id, user.Login, user.Username),
-                Times.Once);
+            _currentUserServiceMock.Verify(
+                x => x.SetUser(user.Id, user.Login, user.Username),
+                Times.Once
+            );
         }
     }
 }

@@ -14,9 +14,11 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
 
         private const string HashHexFormat = "x16";
 
-        public PasswordRecoveryService(IHasherFactory hasherFactory,
-                                       IUserRepository userRepository,
-                                       IPasswordChanger passwordChanger)
+        public PasswordRecoveryService(
+            IHasherFactory hasherFactory,
+            IUserRepository userRepository,
+            IPasswordChanger passwordChanger
+        )
         {
             _hasherFactory = hasherFactory;
             _userRepository = userRepository;
@@ -29,7 +31,10 @@ namespace WindowsDev.Business.Services.PasswordManager.PasswordRecovery
             ArgumentNullException.ThrowIfNull(user);
 
             var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
-            var recoveryCodeHash = hasher.HashValue(recoveryCode.ToString(), user.RecoveryCodeSalt!);
+            var recoveryCodeHash = hasher.HashValue(
+                recoveryCode.ToString(),
+                user.RecoveryCodeSalt!
+            );
 
             return recoveryCodeHash.ToString(HashHexFormat) == user.RecoveryCodeHash
                 ? Result<bool>.Success(true)

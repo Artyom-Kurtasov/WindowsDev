@@ -12,8 +12,7 @@ namespace WindowsDev.Dialogs
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IViewModelFactory _viewModelFactory;
 
-        public DialogService(
-            IDialogCoordinator dialogCoordinator,
+        public DialogService(IDialogCoordinator dialogCoordinator,
             IViewModelFactory viewModelFactory)
         {
             _dialogCoordinator = dialogCoordinator;

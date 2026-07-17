@@ -7,10 +7,12 @@ namespace WindowsDev.Infrastructure.Logging
         [LoggerMessage(
             EventId = EventIds.PasswordResetFailed,
             Level = LogLevel.Error,
-            Message = "Failed to reset password for user '{Login}'")]
+            Message = "Failed to reset password for user '{Login}'"
+        )]
         internal static partial void PasswordResetFailed(
             ILogger logger,
             string login,
-            Exception exception);
+            Exception exception
+        );
     }
 }

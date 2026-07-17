@@ -6,22 +6,22 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
 {
     public class SecondStepViewModel : ViewModelBase
     {
-        private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly PasswordRecoveryData _passwordRecoveryData;
+        private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly IDebounceService _debounceService;
 
         private const int DebounceDelayMilliseconds = 500;
 
-
-        public SecondStepViewModel(PasswordRecoveryData passwordRecoveryData,
+        public SecondStepViewModel(
+            PasswordRecoveryData passwordRecoveryData,
             IPasswordRecoveryService passwordRecoveryService,
-            IDebounceService debounceService)
+            IDebounceService debounceService
+        )
         {
             _passwordRecoveryData = passwordRecoveryData;
             _passwordRecoveryService = passwordRecoveryService;
             _debounceService = debounceService;
         }
-
 
         public string RecoveryCode
         {
@@ -39,7 +39,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             }
         }
 
-
         public bool IsRecoveryCodeCorrect
         {
             get => _passwordRecoveryData.IsRecoveryCodeCorrect;
@@ -54,7 +53,6 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
             }
         }
 
-
         private async Task CheckRecoveryCodeAsync()
         {
             await _debounceService.DebounceAsync(
@@ -66,12 +64,15 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps
                         return;
                     }
 
-                    var result = await _passwordRecoveryService
-                        .IsRecoverCodeCorrectAsync(code, _passwordRecoveryData.Login);
+                    var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(
+                        code,
+                        _passwordRecoveryData.Login
+                    );
 
                     IsRecoveryCodeCorrect = result.IsSuccess;
                 },
-                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds));
+                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
+            );
         }
     }
 }

@@ -16,5 +16,3 @@ namespace WindowsDev.Domain.ProjectsModels
         public bool IsSelected { get; set; }
     }
 }
-
-

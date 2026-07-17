@@ -10,7 +10,10 @@ namespace WindowsDev.Business.Services.ProjectService
         private readonly IProjectRepository _projectRepository;
         private readonly ICurrentUserService _currentUserService;
 
-        public ProjectService(IProjectRepository projectRepository, ICurrentUserService currentUserService)
+        public ProjectService(
+            IProjectRepository projectRepository,
+            ICurrentUserService currentUserService
+        )
         {
             _projectRepository = projectRepository;
             _currentUserService = currentUserService;
@@ -18,7 +21,6 @@ namespace WindowsDev.Business.Services.ProjectService
 
         public async Task AddAsync(ProjectsInfo project)
         {
-
             ArgumentNullException.ThrowIfNull(project);
 
             await _projectRepository.AddAsync(project);
@@ -36,12 +38,21 @@ namespace WindowsDev.Business.Services.ProjectService
             await _projectRepository.UpdateAsync(project);
         }
 
-        public async Task<List<ProjectsInfo>> GetProjectsAsync(int page, int size, string searchFilter = "")
+        public async Task<List<ProjectsInfo>> GetProjectsAsync(
+            int page,
+            int size,
+            string searchFilter = ""
+        )
         {
             page = page < 1 ? 1 : page;
             size = size < 1 ? 1 : size;
 
-            return await _projectRepository.GetProjectsAsync(page, size, _currentUserService.UserId, searchFilter);
+            return await _projectRepository.GetProjectsAsync(
+                page,
+                size,
+                _currentUserService.UserId,
+                searchFilter
+            );
         }
 
         public async Task<int> GetProjectsCountAsync()

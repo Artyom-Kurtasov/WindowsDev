@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using System.Windows.Input;
+﻿using System.Windows.Input;
+using Microsoft.Extensions.Logging;
 using WindowsDev.Business.Services.Authorization.Interfaces;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
@@ -21,12 +21,13 @@ namespace WindowsDev.ViewModels.Auth
         private readonly IAuthorization _authorization;
         private readonly INavigationService _navigationService;
 
-
-        public AuthorizationViewModel(INavigationService navigationService,
+        public AuthorizationViewModel(
+            INavigationService navigationService,
             IAuthorization authorization,
             IDialogService dialogService,
             ILogger<AuthorizationViewModel> logger,
-            ILanguageChanger languageChanger)
+            ILanguageChanger languageChanger
+        )
             : base(languageChanger)
         {
             _navigationService = navigationService;
@@ -39,11 +40,9 @@ namespace WindowsDev.ViewModels.Auth
             PasswordRecoveryCommand = new AsyncRelayCommand(PasswordRecoveryAsync);
         }
 
-
         public ICommand PasswordRecoveryCommand { get; }
         public ICommand AuthorizeCommand { get; }
         public ICommand SwitchToRegViewCommand { get; }
-
 
         private string _login = string.Empty;
 
@@ -61,7 +60,6 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-
         private string _password = string.Empty;
 
         public string Password
@@ -77,7 +75,6 @@ namespace WindowsDev.ViewModels.Auth
                 OnPropertyChanged();
             }
         }
-
 
         private string _errorMessage = string.Empty;
 
@@ -96,16 +93,12 @@ namespace WindowsDev.ViewModels.Auth
             }
         }
 
-
-        public bool HasError =>
-            !string.IsNullOrWhiteSpace(ErrorMessage);
-
+        public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
 
         private async Task SwitchToRegViewAsync()
         {
             await _navigationService.NavigateTo<RegistrationViewModel>();
         }
-
 
         private async Task AuthorizeAsync()
         {
@@ -127,17 +120,20 @@ namespace WindowsDev.ViewModels.Auth
             {
                 AuthLogs.AuthorizationFailed(_logger, ex);
 
-                await _dialogService.ShowErrorDialogAsync(this,
+                await _dialogService.ShowErrorDialogAsync(
+                    this,
                     Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError));
+                    Translate(CommonErrors.UnexpectedError)
+                );
             }
         }
 
-
         private async Task PasswordRecoveryAsync()
         {
-            await _dialogService.ShowDialogAsync<RecoveryCodeDialogView,
-                RecoveryCodeDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<
+                RecoveryCodeDialogView,
+                RecoveryCodeDialogViewModel
+            >(this);
         }
     }
 }

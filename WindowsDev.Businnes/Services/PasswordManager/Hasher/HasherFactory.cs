@@ -19,7 +19,7 @@ namespace WindowsDev.Business.Services.PasswordManager.Hasher
             return method switch
             {
                 HashMethod.Simple => _simplePasswordHasher,
-                _ => _defaultHasher
+                _ => _defaultHasher,
             };
         }
     }

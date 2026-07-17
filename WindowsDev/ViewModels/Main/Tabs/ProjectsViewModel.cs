@@ -1,7 +1,7 @@
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
 using WindowsDev.Business.Services.Localization.Interfaces;
 using WindowsDev.Business.Services.ProjectService.Interfaces;
 using WindowsDev.Dialogs.Interfaces;
@@ -28,12 +28,15 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private const int PageSize = 15;
 
-        public ProjectsViewModel(IDialogCoordinator dialogCoordinator,
+        public ProjectsViewModel(
+            IDialogCoordinator dialogCoordinator,
             IProjectService projectService,
             INavigationService navigationService,
             ILogger<ProjectsViewModel> logger,
             IDialogService dialogService,
-            ILanguageChanger languageChanger) : base(languageChanger)
+            ILanguageChanger languageChanger
+        )
+            : base(languageChanger)
         {
             _dialogCoordinator = dialogCoordinator;
             _projectService = projectService;
@@ -92,8 +95,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private int _totalCountOfProjects;
 
-        public int TotalCountOfPages =>
-            (int)Math.Ceiling((double)_totalCountOfProjects / PageSize);
+        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfProjects / PageSize);
 
         public async Task RefreshAsync()
         {
@@ -104,8 +106,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
         {
             try
             {
-                _totalCountOfProjects =
-                    await _projectService.GetProjectsCountAsync();
+                _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
 
                 OnPropertyChanged(nameof(TotalCountOfPages));
 
@@ -126,28 +127,20 @@ namespace WindowsDev.ViewModels.Main.Tabs
             await GetPageAsync(SearchFilter);
         }
 
-
         private async Task DeleteSelectedProjectsAsync()
         {
-            var projectsToDelete = ProjectsList
-                .Where(x => x.IsSelected)
-                .ToList();
-
+            var projectsToDelete = ProjectsList.Where(x => x.IsSelected).ToList();
 
             foreach (var project in projectsToDelete)
             {
                 try
                 {
                     await _projectService.DeleteAsync(project.Id);
-
                     ProjectsList.Remove(project);
                 }
                 catch (Exception ex)
                 {
-                    ProjectLogs.ProjectDeleteFailed(
-                        _logger,
-                        project.Id,
-                        ex);
+                    ProjectLogs.ProjectDeleteFailed(_logger, project.Id, ex);
 
                     await ShowErrorDialogAsync();
                 }
@@ -159,10 +152,12 @@ namespace WindowsDev.ViewModels.Main.Tabs
             await _navigationService.NavigateTo<ProjectViewModel>(project);
         }
 
-
         private async Task ShowCreateProjectDialogAsync()
         {
-            await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(this);
+            await _dialogService.ShowDialogAsync<
+                CreateProjectDialogView,
+                CreateProjectDialogViewModel
+            >(this);
         }
 
         private async Task NextPageAsync()
@@ -191,9 +186,11 @@ namespace WindowsDev.ViewModels.Main.Tabs
             {
                 ProjectsList.Clear();
 
-                var projects = await _projectService
-                    .GetProjectsAsync(CurrentPage, PageSize, searchFilter);
-
+                var projects = await _projectService.GetProjectsAsync(
+                    CurrentPage,
+                    PageSize,
+                    searchFilter
+                );
 
                 foreach (var project in projects)
                 {
@@ -208,14 +205,14 @@ namespace WindowsDev.ViewModels.Main.Tabs
             }
         }
 
-
         private async Task ShowErrorDialogAsync()
         {
             await _dialogCoordinator.ShowMessageAsync(
                 this,
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
-                MessageDialogStyle.Affirmative);
+                MessageDialogStyle.Affirmative
+            );
         }
     }
 }
