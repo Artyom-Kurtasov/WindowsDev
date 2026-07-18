@@ -33,7 +33,7 @@ namespace WindowsDev.Infrastructure.Logging
             Exception exception);
 
         [LoggerMessage(
-            EventId = EventIds.AttachmentDownloadFailed,
+            EventId = EventIds.AttachmentOpenFailed,
             Level = LogLevel.Error,
             Message = "Failed to download attachment {AttachmentId}: '{FileName}'")]
         internal static partial void AttachmentOpenFailed(
