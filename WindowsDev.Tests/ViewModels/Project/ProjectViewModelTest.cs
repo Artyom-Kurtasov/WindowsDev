@@ -78,7 +78,7 @@ namespace WindowsDev.Tests.ViewModels.Projects
                 Name = $"Task {id}",
                 ProjectId = 1,
                 Status = TaskStatus.InProgress,
-                Priority = TaskPriority.Normal,
+                Priority = TaskPriority.Medium,
                 CreatedAt = DateTime.Today,
                 DeadLine = DateTime.Today.AddDays(7),
                 Progress = 0,

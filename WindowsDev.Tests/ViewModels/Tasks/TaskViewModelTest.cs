@@ -90,7 +90,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks
                 Name = "Task",
                 Description = "Description",
                 ProjectId = 1,
-                Priority = TaskPriority.Normal,
+                Priority = TaskPriority.Medium,
                 Status = TaskStatus.InProgress,
                 Progress = 0,
                 CreatedAt = DateTime.UtcNow,

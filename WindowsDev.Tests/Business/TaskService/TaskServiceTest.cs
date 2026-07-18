@@ -211,7 +211,7 @@ namespace WindowsDev.Tests.Business.TaskService
             return new TasksInfo
             {
                 Name = "Test Task",
-                Priority = TaskPriority.Normal,
+                Priority = TaskPriority.Medium,
                 Progress = 0,
                 Status = TaskStatus.InProgress,
                 ProjectId = 1,

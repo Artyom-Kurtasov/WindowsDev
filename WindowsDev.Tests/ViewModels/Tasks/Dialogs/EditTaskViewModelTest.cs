@@ -61,7 +61,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                 Name = name,
                 Description = description,
                 ProjectId = 1,
-                Priority = TaskPriority.Normal,
+                Priority = TaskPriority.Medium,
                 Progress = 0,
                 Status = TaskStatus.InProgress,
                 DeadLine = DateTime.UtcNow.AddDays(7),
@@ -99,7 +99,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             Assert.Equal(task.Priority, vm.Priority);
             Assert.Equal(task.Progress, vm.Progress);
             Assert.Equal(task.Status, vm.Status);
-            Assert.Equal(task.DeadLine, vm.DeadLine);
+            Assert.Equal(task.DeadLine.ToLocalTime(), vm.DeadLine.ToLocalTime());
             Assert.True(vm.IsEditMode);
         }
 
@@ -113,9 +113,9 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 
             vm.Name = "Updated Name";
             vm.Description = "Updated Description";
-            vm.Priority = TaskPriority.Normal;
+            vm.Priority = TaskPriority.Medium;
             vm.Progress = 50;
-            vm.Status = TaskStatus.Complited;
+            vm.Status = TaskStatus.Completed;
 
             _taskServiceMock
                 .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
@@ -124,7 +124,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
             Assert.True(_completedEventWasRaised);
-            Assert.False(_closeEventWasRaised);
+            Assert.True(_closeEventWasRaised);
 
             _taskServiceMock.Verify(
                 x =>
@@ -133,9 +133,9 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                             t.Id == task.Id
                             && t.Name == "Updated Name"
                             && t.Description == "Updated Description"
-                            && t.Priority == TaskPriority.Normal
+                            && t.Priority == TaskPriority.Medium
                             && t.Progress == 50
-                            && t.Status == TaskStatus.Complited
+                            && t.Status == TaskStatus.Completed
                         )
                     ),
                 Times.Once
@@ -214,7 +214,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 
             Assert.True(vm.IsEditMode);
 
-            await ((AsyncRelayCommand)vm.CloseCommand).ExecuteAsync(null);
+            await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
 
             Assert.True(_closeEventWasRaised);
             Assert.False(vm.IsEditMode);

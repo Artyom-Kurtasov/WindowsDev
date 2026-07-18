@@ -48,7 +48,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 
             vm.Name = "Test Task";
             vm.Description = "Test Description";
-            vm.Priority = TaskPriority.Normal;
+            vm.Priority = TaskPriority.Medium;
             vm.Progress = 0;
             vm.Status = TaskStatus.InProgress;
             vm.DeadLine = DateTime.UtcNow.AddDays(7);
@@ -125,7 +125,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             Assert.Equal("Test Task", createdTask.Name);
             Assert.Equal("Test Description", createdTask.Description);
             Assert.Equal(1, createdTask.ProjectId);
-            Assert.Equal(TaskPriority.Normal, createdTask.Priority);
+            Assert.Equal(TaskPriority.Medium, createdTask.Priority);
             Assert.Equal(TaskStatus.InProgress, createdTask.Status);
 
             _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Once);
