@@ -11,7 +11,7 @@ namespace WindowsDev.Business.Services.TaskService.Converters
         {
             if (value is TaskPriority priority)
             {
-                string key = $"TaskPriority_{priority}";
+                string key = $"Task_Priority_{priority}";
 
                 return Application.Current.TryFindResource(key) ?? priority.ToString();
             }

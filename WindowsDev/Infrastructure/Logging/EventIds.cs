@@ -49,5 +49,11 @@
         public const int AttachmentDownloadFailed = 1603;
         public const int AttachmentNotFound = 1604;
         public const int AttachmentStorageCritical = 1605;
+
+        // 1700-1799 AppXaml
+        public const int DispatcherUnhandledException = 1700;
+        public const int AppDomainUnhandledException = 1701;
+        public const int UnobservedTaskException = 1702;
+        public const int DatabaseWarmUpFailed = 1703;
     }
 }

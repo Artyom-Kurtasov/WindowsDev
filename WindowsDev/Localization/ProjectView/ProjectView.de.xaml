@@ -18,8 +18,9 @@
     <sys:String x:Key="Project_Watermark_Search">Suchen...</sys:String>
 
     <!-- Status Filters -->
-    <sys:String x:Key="Project_Label_All">Alle</sys:String>
-    <sys:String x:Key="Project_Label_Closed">Abgeschlossen</sys:String>
-    <sys:String x:Key="Project_Label_InProgress">In Bearbeitung</sys:String>
+    <sys:String x:Key="Project_Filter_All">Alle</sys:String>
+    <sys:String x:Key="Project_Filter_Closed">Abgeschlossen</sys:String>
+    <sys:String x:Key="Project_Filter_InProgress">In Bearbeitung</sys:String>
+    <sys:String x:Key="Project_Filter_Frozen">Eingefroren</sys:String>
 
 </ResourceDictionary>

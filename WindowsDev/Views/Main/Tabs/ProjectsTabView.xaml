@@ -106,7 +106,7 @@
                     </DataGridTemplateColumn>
 
                     <!-- Created Date Column -->
-                    <DataGridTextColumn Binding="{Binding CreatedAt, StringFormat={}{0:dd/MM/yyyy}}">
+                    <DataGridTextColumn Binding="{Binding CreatedAtLocal, StringFormat={}{0:dd/MM/yyyy}}">
                         <DataGridTextColumn.Header>
                             <TextBlock Text="{DynamicResource Projects_Label_CreatedAt}"/>
                         </DataGridTextColumn.Header>

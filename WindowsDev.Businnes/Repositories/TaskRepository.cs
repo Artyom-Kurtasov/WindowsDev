@@ -85,7 +85,8 @@ namespace WindowsDev.Business.Repositories
         public async Task UpdateAsync(TasksInfo task)
         {
             using var dbContext = _dbManager.Create();
-            var existingTask = await FindTaskById(task.Id);
+            var existingTask = await dbContext.TasksInfo
+                .FirstOrDefaultAsync(x => x.Id == task.Id);
 
             if (existingTask != null)
             {

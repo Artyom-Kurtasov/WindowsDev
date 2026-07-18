@@ -3,6 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <sys:String x:Key="DialogTitles_Error">Ошибка</sys:String>
+    <sys:String x:Key="DialogTitles_CriticalError">Критическая Ошибка</sys:String>
     <sys:String x:Key="DialogTitles_Warning">Предупреждение</sys:String>
     <sys:String x:Key="DialogTitles_Information">Информация</sys:String>
     <sys:String x:Key="DialogTitles_Success">Успех</sys:String>

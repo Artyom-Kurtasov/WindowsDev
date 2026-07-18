@@ -18,4 +18,16 @@
     <!-- Warnings -->
     <sys:String x:Key="TaskDialog_Warning_EnterName">タスク名を入力してください。</sys:String>
 
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Complited">完了</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">進行中</sys:String>
+    <sys:String x:Key="Task_Status_Closed">クローズ</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">凍結</sys:String>
+
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">クリティカル</sys:String>
+    <sys:String x:Key="Task_Priority_High">高</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">中</sys:String>
+    <sys:String x:Key="Task_Priority_Low">低</sys:String>
+
 </ResourceDictionary>

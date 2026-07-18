@@ -18,8 +18,9 @@
     <sys:String x:Key="Project_Watermark_Search">検索...</sys:String>
 
     <!-- Status Filters -->
-    <sys:String x:Key="Project_Label_All">すべて</sys:String>
-    <sys:String x:Key="Project_Label_Closed">完了</sys:String>
-    <sys:String x:Key="Project_Label_InProgress">進行中</sys:String>
+    <sys:String x:Key="Project_Filter_All">すべて</sys:String>
+    <sys:String x:Key="Project_Filter_Closed">完了</sys:String>
+    <sys:String x:Key="Project_Filter_InProgress">進行中</sys:String>
+    <sys:String x:Key="Project_Filter_Frozen">凍結</sys:String>
 
 </ResourceDictionary>

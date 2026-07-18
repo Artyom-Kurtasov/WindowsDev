@@ -17,5 +17,17 @@
 
     <!-- Warnings -->
     <sys:String x:Key="TaskDialog_Warning_EnterName">Введите имя задачи.</sys:String>
+    
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Completed">Выполнено</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">В процессе</sys:String>
+    <sys:String x:Key="Task_Status_Closed">Закрыто</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">Заморожено</sys:String>
+
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">Критический</sys:String>
+    <sys:String x:Key="Task_Priority_High">Высокий</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">Средний</sys:String>
+    <sys:String x:Key="Task_Priority_Low">Низкий</sys:String>
 
 </ResourceDictionary>

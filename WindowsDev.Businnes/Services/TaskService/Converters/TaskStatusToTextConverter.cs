@@ -11,7 +11,7 @@ namespace WindowsDev.Business.Services.TaskService.Converters
         {
             if (value is TaskStatus status)
             {
-                string key = $"TaskStatus_{status}";
+                string key = $"Task_Status_{status}";
 
                 return Application.Current.TryFindResource(key) ?? status.ToString();
             }

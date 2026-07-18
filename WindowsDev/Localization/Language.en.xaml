@@ -16,6 +16,7 @@
         <ResourceDictionary Source="/Localization/AuthorizationView/Dialogs/RecoverySteps/RecoverySteps.en.xaml"/>
         <ResourceDictionary Source="/Localization/DialogTitles/DialogTitles.en.xaml"/>
         <ResourceDictionary Source="/Localization/Errors/CommonErrors.en.xaml"/>
+        <ResourceDictionary Source="/Localization/AppXaml/App.Xaml.en.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

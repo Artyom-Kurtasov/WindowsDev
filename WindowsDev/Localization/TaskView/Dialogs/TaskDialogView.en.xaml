@@ -18,4 +18,16 @@
     <!-- Warnings -->
     <sys:String x:Key="TaskDialog_Warning_EnterName">Enter task name.</sys:String>
 
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Complited">Completed</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">In Progress</sys:String>
+    <sys:String x:Key="Task_Status_Closed">Closed</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">Frozen</sys:String>
+
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">Critical</sys:String>
+    <sys:String x:Key="Task_Priority_High">High</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">Medium</sys:String>
+    <sys:String x:Key="Task_Priority_Low">Low</sys:String>
+
 </ResourceDictionary>

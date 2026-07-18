@@ -115,7 +115,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
             vm.Description = "Updated Description";
             vm.Priority = TaskPriority.Normal;
             vm.Progress = 50;
-            vm.Status = TaskStatus.Done;
+            vm.Status = TaskStatus.Complited;
 
             _taskServiceMock
                 .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
@@ -135,7 +135,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
                             && t.Description == "Updated Description"
                             && t.Priority == TaskPriority.Normal
                             && t.Progress == 50
-                            && t.Status == TaskStatus.Done
+                            && t.Status == TaskStatus.Complited
                         )
                     ),
                 Times.Once

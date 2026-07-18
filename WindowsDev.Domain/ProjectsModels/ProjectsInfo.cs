@@ -14,5 +14,6 @@ namespace WindowsDev.Domain.ProjectsModels
 
         [NotMapped]
         public bool IsSelected { get; set; }
+        public DateTime CreatedAtLocal => CreatedAt.ToLocalTime();
     }
 }

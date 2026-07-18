@@ -6,7 +6,7 @@
     <sys:String x:Key="Task_Label_Status">Status</sys:String>
     <sys:String x:Key="Task_Label_Priority">Priority</sys:String>
     <sys:String x:Key="Task_Label_Progress">Progress</sys:String>
-    <sys:String x:Key="Task_Label_CreatedAt">Created at</sys:String>
+    <sys:String x:Key="Task_Label_DateRange">Created - Deadline</sys:String>
     <sys:String x:Key="Task_Label_Description">Description</sys:String>
     <sys:String x:Key="Task_Label_Attachments">Attachments</sys:String>
     <sys:String x:Key="Task_Label_Comments">Comments</sys:String>
@@ -23,7 +23,19 @@
 
     <!-- Watermarks -->
     <sys:String x:Key="Task_Watermark_AddComment">Enter a comment...</sys:String>
-    
+
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Complited">Completed</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">In Progress</sys:String>
+    <sys:String x:Key="Task_Status_Closed">Closed</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">Frozen</sys:String>
+
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">Critical</sys:String>
+    <sys:String x:Key="Task_Priority_High">High</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">Medium</sys:String>
+    <sys:String x:Key="Task_Priority_Low">Low</sys:String>
+
     <!-- Errors -->
     <sys:String x:Key="Task_Error_OpenAttachmentFailed">An error occurred while opening the file. It may have been moved or deleted.</sys:String>
     <sys:String x:Key="Task_Error_LoadCommentsFailed">Failed to load comments.</sys:String>

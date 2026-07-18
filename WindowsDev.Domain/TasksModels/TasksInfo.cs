@@ -23,6 +23,7 @@ namespace WindowsDev.Domain.TasksModels
 
         [NotMapped]
         public bool IsSelected { get; set; }
+        public DateTime DeadLineAtLocal => DeadLine.ToLocalTime();
     }
 }
 

@@ -3,6 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
     <sys:String x:Key="DialogTitles_Error">エラー</sys:String>
+    <sys:String x:Key="DialogTitles_CriticalError">重大なエラー</sys:String>
     <sys:String x:Key="DialogTitles_Warning">警告</sys:String>
     <sys:String x:Key="DialogTitles_Information">情報</sys:String>
     <sys:String x:Key="DialogTitles_Success">成功</sys:String>

@@ -145,6 +145,22 @@ namespace WindowsDev.ViewModels.Projects
             }
         }
 
+        private bool _showFrozen;
+        public bool ShowFrozen
+        {
+            get => _showFrozen;
+            set
+            {
+                if (_showFrozen == value)
+                    return;
+
+                _showFrozen = value;
+                OnPropertyChanged(nameof(ShowFrozen));
+
+                _ = GetPageAsync();
+            }
+        }
+
         private bool _showInProgress;
         private bool disposedValue;
 
@@ -271,7 +287,7 @@ namespace WindowsDev.ViewModels.Projects
         {
             if (ShowAll)
             {
-                return new() { TaskStatus.Done, TaskStatus.InProgress, TaskStatus.Closed };
+                return new() { TaskStatus.Completed, TaskStatus.InProgress, TaskStatus.Closed, TaskStatus.Frozen };
             }
 
             var statuses = new List<TaskStatus>();
@@ -281,6 +297,9 @@ namespace WindowsDev.ViewModels.Projects
 
             if (ShowInProgress)
                 statuses.Add(TaskStatus.InProgress);
+
+            if (ShowFrozen)
+                statuses.Add(TaskStatus.Frozen);
 
             return statuses;
         }

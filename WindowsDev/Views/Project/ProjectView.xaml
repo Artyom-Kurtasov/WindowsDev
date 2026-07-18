@@ -13,7 +13,7 @@
         <Grid Margin="10">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="4*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Left Panel: Project Info -->
@@ -82,17 +82,21 @@
                                         Orientation="Horizontal" 
                                         Margin="10,0,0,0"
                                         VerticalAlignment="Center">
-                        <CheckBox Content="{DynamicResource Project_Label_All}"
+                        <CheckBox Content="{DynamicResource Project_Filter_All}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowAll}"/>
-                        <CheckBox Content="{DynamicResource Project_Label_Closed}"
+                        <CheckBox Content="{DynamicResource Project_Filter_Closed}"
                                           Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowClosed}"/>
-                        <CheckBox Content="{DynamicResource Project_Label_InProgress}"
+                        <CheckBox Content="{DynamicResource Project_Filter_InProgress}"
+                                          Margin="0,0,10,0"
                                           VerticalAlignment="Center"
                                           IsChecked="{Binding ShowInProgress}"/>
+                        <CheckBox Content="{DynamicResource Project_Filter_Frozen}"
+                                  VerticalAlignment="Center"
+                                  IsChecked="{Binding ShowFrozen}"/>
                     </StackPanel>
                 </Grid>
 
@@ -145,7 +149,7 @@
 
                         <!-- Deadline Column -->
                         <DataGridTextColumn Header="{DynamicResource Project_Label_Deadline}"
-                                                Binding="{Binding DeadLine, StringFormat=d}"
+                                                Binding="{Binding DeadLineAtLocal, StringFormat=d}"
                                                 Width="*"/>
 
                         <!-- Created Date Column -->

@@ -32,13 +32,13 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             _logger = logger;
 
             EditTaskCommand = new AsyncRelayCommand(EditTaskAsync);
-            CloseCommand = new AsyncRelayCommand(CloseAsync);
+            CancelCommand = new AsyncRelayCommand(CloseAsync);
 
             SetEditDialog();
         }
 
         public ICommand EditTaskCommand { get; }
-        public ICommand CloseCommand { get; }
+        public ICommand CancelCommand { get; }
 
         public event Func<Task>? CloseRequested;
         public event Func<Task>? Completed;
@@ -59,6 +59,8 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
 
                 if (Completed != null)
                     await Completed.Invoke();
+
+                await CloseAsync();
             }
             catch (Exception ex)
             {
@@ -90,7 +92,7 @@ namespace WindowsDev.ViewModels.Tasks.Dialog
             Priority = _currentTask.Priority;
             Progress = _currentTask.Progress;
             Status = _currentTask.Status;
-            DeadLine = _currentTask.DeadLine;
+            DeadLine = _currentTask.DeadLine.ToLocalTime();
 
             IsEditMode = true;
         }

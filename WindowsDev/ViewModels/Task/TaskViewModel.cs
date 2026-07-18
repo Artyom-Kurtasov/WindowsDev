@@ -171,7 +171,7 @@ namespace WindowsDev.ViewModels.Tasks
 
         public DateTime DeadLine
         {
-            get => CurrentTask!.DeadLine;
+            get => CurrentTask!.DeadLine.ToLocalTime();
             set
             {
                 if (CurrentTask!.DeadLine == value)
@@ -183,6 +183,15 @@ namespace WindowsDev.ViewModels.Tasks
         }
 
         public DateTime CreatedAt => CurrentTask!.CreatedAt;
+
+        public string DateRange
+        {
+            get => $"{CreatedAt:dd.MM.yyyy} - {DeadLine:dd.MM.yyyy}";
+            set
+            {
+                OnPropertyChanged(nameof(DateRange));
+            }
+        }
 
         public async Task RefreshAsync()
         {
@@ -341,6 +350,7 @@ namespace WindowsDev.ViewModels.Tasks
             OnPropertyChanged(nameof(Status));
             OnPropertyChanged(nameof(DeadLine));
             OnPropertyChanged(nameof(CreatedAt));
+            OnPropertyChanged(nameof(DateRange));
         }
 
         protected virtual void Dispose(bool disposing)

@@ -5,6 +5,7 @@
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
              xmlns:converters="clr-namespace:WindowsDev.Business.Services.TaskService.Converters;assembly=WindowsDev.Business"
              xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              dialogs:DialogParticipation.Register="{Binding}"
@@ -13,6 +14,7 @@
     <UserControl.Resources>
         <converters:TaskStatusToTextConverter x:Key="TaskStatusConverter"/>
         <converters:TaskPriorityToTextConverter x:Key="TaskPriorityConverter"/>
+        <converters:FileSizeConverter x:Key="FileSizeConverter"/>
     </UserControl.Resources>
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -81,8 +83,8 @@
                 <!-- Created Date -->
                 <UserCtrl:HeaderTextBlock Grid.Row="1" 
                                          Grid.Column="1" 
-                                         Header="{DynamicResource Task_Label_CreatedAt}"
-                                         Text="{Binding CreatedAt, StringFormat='{}{0:dd.MM.yyyy}'}" 
+                                         Header="{DynamicResource Task_Label_DateRange}"
+                                         Text="{Binding DateRange}" 
                                          FontSize="16" 
                                          FontWeight="SemiBold"/>
             </Grid>
@@ -111,7 +113,7 @@
                           Foreground="#2196F3" 
                           Margin="0,0,0,12"/>
 
-                <!-- Attachments List with max height constraint -->
+                <!-- Attachments List -->
                 <ScrollViewer Grid.Row="1"
                              MaxHeight="200"
                              VerticalScrollBarVisibility="Auto"
@@ -142,9 +144,13 @@
                                             <TextBlock Text="{Binding FileName}" 
                                                       FontWeight="Medium"
                                                       Margin="0,0,8,0"/>
-                                            <TextBlock Text="{Binding FileSize}" 
+                                            <TextBlock Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" 
                                                       FontSize="11"
                                                       Foreground="#757575"/>
+                                            <TextBlock Text="{Binding FileExtension}"
+                                                       Margin="10,0,0,0"
+                                                       FontSize="11"
+                                                       Foreground="#757575"/>
                                         </StackPanel>
 
                                         <!-- Open Button -->
@@ -154,7 +160,12 @@
                                                FontSize="14"
                                                ToolTip="{DynamicResource Task_Tooltip_Open}"
                                                Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                               CommandParameter="{Binding}"/>
+                                               CommandParameter="{Binding}"
+                                               >
+                                            <StackPanel>
+                                                <iconPacks:PackIconModern Kind="BookOpenTextImage"/>
+                                            </StackPanel>
+                                        </Button>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

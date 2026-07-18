@@ -6,7 +6,7 @@
     <sys:String x:Key="Task_Label_Status">ステータス</sys:String>
     <sys:String x:Key="Task_Label_Priority">優先度</sys:String>
     <sys:String x:Key="Task_Label_Progress">進捗</sys:String>
-    <sys:String x:Key="Task_Label_CreatedAt">作成日</sys:String>
+    <sys:String x:Key="Task_Label_DateRange">作成日 - 期限</sys:String>
     <sys:String x:Key="Task_Label_Description">説明</sys:String>
     <sys:String x:Key="Task_Label_Attachments">添付ファイル</sys:String>
     <sys:String x:Key="Task_Label_Comments">コメント</sys:String>
@@ -23,7 +23,19 @@
 
     <!-- Watermarks -->
     <sys:String x:Key="Task_Watermark_AddComment">コメントを入力...</sys:String>
-    
+
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Complited">完了</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">進行中</sys:String>
+    <sys:String x:Key="Task_Status_Closed">クローズ</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">凍結</sys:String>
+
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">クリティカル</sys:String>
+    <sys:String x:Key="Task_Priority_High">高</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">中</sys:String>
+    <sys:String x:Key="Task_Priority_Low">低</sys:String>
+
     <!-- Errors -->
     <sys:String x:Key="Task_Error_OpenAttachmentFailed">ファイルを開く際にエラーが発生しました。移動または削除された可能性があります。</sys:String>
     <sys:String x:Key="Task_Error_LoadCommentsFailed">コメントの読み込み中にエラーが発生しました。</sys:String>

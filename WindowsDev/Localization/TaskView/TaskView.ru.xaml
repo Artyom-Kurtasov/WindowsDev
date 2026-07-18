@@ -6,7 +6,7 @@
     <sys:String x:Key="Task_Label_Status">Статус</sys:String>
     <sys:String x:Key="Task_Label_Priority">Приоритет</sys:String>
     <sys:String x:Key="Task_Label_Progress">Прогресс</sys:String>
-    <sys:String x:Key="Task_Label_CreatedAt">Дата создания</sys:String>
+    <sys:String x:Key="Task_Label_DateRange">Дата создания - дедлайн</sys:String>
     <sys:String x:Key="Task_Label_Description">Описание</sys:String>
     <sys:String x:Key="Task_Label_Attachments">Вложения</sys:String>
     <sys:String x:Key="Task_Label_Comments">Комментарии</sys:String>
@@ -23,6 +23,18 @@
 
     <!-- Watermarks -->
     <sys:String x:Key="Task_Watermark_AddComment">Введите комментарий...</sys:String>
+    
+    <!-- Statuses -->
+    <sys:String x:Key="Task_Status_Completed">Выполнено</sys:String>
+    <sys:String x:Key="Task_Status_InProgress">В процессе</sys:String>
+    <sys:String x:Key="Task_Status_Closed">Закрыто</sys:String>
+    <sys:String x:Key="Task_Status_Frozen">Заморожено</sys:String>
+    
+    <!-- Priorities -->
+    <sys:String x:Key="Task_Priority_Critical">Критический</sys:String>
+    <sys:String x:Key="Task_Priority_High">Высокий</sys:String>
+    <sys:String x:Key="Task_Priority_Medium">Средний</sys:String>
+    <sys:String x:Key="Task_Priority_Low">Низкий</sys:String>
     
     <!-- Errors -->
     <sys:String x:Key="Task_Error_OpenAttachmentFailed">Произошла ошибка при открытии файла. Возможно он был перемещен или удален.</sys:String>
