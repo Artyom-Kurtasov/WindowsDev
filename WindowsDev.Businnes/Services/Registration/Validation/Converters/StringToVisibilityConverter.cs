@@ -16,7 +16,12 @@ namespace WindowsDev.Business.Services.Registration.Validation.Converters
             return Visibility.Collapsed;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object ConvertBack(
+            object value,
+            Type targetType,
+            object parameter,
+            CultureInfo culture
+        )
         {
             return DependencyProperty.UnsetValue;
         }

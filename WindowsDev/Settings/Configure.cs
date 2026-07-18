@@ -14,6 +14,7 @@ using WindowsDev.Business.Services.Logger;
 using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Business.Services.PasswordManager.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Profile;

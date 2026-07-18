@@ -1,6 +1,6 @@
 ﻿using WindowsDev.Business.Primitives;
 
-namespace WindowsDev.Business.Services.PasswordManager
+namespace WindowsDev.Business.Services.PasswordManager.Interfaces
 {
     public interface IPasswordChanger
     {

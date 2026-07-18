@@ -1,7 +1,7 @@
 ﻿using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.PasswordManager;
 using WindowsDev.Business.Services.PasswordManager.Hasher;
+using WindowsDev.Business.Services.PasswordManager.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
 using WindowsDev.Business.Services.Registration.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;

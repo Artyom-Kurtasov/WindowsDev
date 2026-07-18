@@ -8,9 +8,11 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.Factories
         private readonly SecondStepViewModel _secondStepViewModel;
         private readonly ThirdStepViewModel _thirdStepViewModel;
 
-        public RecoveryStepsFactory(FirstStepViewModel firstStepViewModel,
+        public RecoveryStepsFactory(
+            FirstStepViewModel firstStepViewModel,
             SecondStepViewModel secondStepViewModel,
-            ThirdStepViewModel thirdStepViewModel)
+            ThirdStepViewModel thirdStepViewModel
+        )
         {
             _firstStepViewModel = firstStepViewModel;
             _secondStepViewModel = secondStepViewModel;
@@ -19,12 +21,7 @@ namespace WindowsDev.ViewModels.Auth.Dialogs.Factories
 
         public IReadOnlyList<object> CreateSteps()
         {
-            return
-            [
-                _firstStepViewModel,
-                _secondStepViewModel,
-                _thirdStepViewModel
-            ];
+            return [_firstStepViewModel, _secondStepViewModel, _thirdStepViewModel];
         }
     }
 }

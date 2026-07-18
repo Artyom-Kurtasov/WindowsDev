@@ -26,9 +26,7 @@ namespace WindowsDev.Business.Repositories
         {
             using var dbContext = _dbManager.Create();
 
-            return await dbContext.Comments
-                .Where(x => x.TaskId == taskId)
-                .ToListAsync();
+            return await dbContext.Comments.Where(x => x.TaskId == taskId).ToListAsync();
         }
     }
 }

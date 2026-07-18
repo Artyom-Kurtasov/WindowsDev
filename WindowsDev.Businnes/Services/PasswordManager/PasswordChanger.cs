@@ -1,6 +1,7 @@
 ﻿using WindowsDev.Business.Primitives;
 using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Business.Services.PasswordManager.Interfaces;
 using WindowsDev.Business.Services.UserManager.Interfaces;
 using WindowsDev.Domain.DialogsMessages.Errors;
 using WindowsDev.Domain.UsersModels;

@@ -34,13 +34,6 @@ namespace WindowsDev.Infrastructure
 
         public event EventHandler? CanExecuteChanged;
 
-        /// <summary>
-        /// Notifies the UI that the execution status has changed.
-        /// </summary>
-        public void RaiseCanExecuteChanged() =>
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        public void RaiseCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }
-
-
-

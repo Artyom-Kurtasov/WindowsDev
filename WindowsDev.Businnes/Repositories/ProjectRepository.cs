@@ -14,13 +14,23 @@ namespace WindowsDev.Business.Repositories
             _dbManager = dbManager;
         }
 
-        public async Task<List<ProjectsInfo>> GetProjectsAsync(int page, int size, int userId, string searchFilter = "")
+        public async Task<List<ProjectsInfo>> GetProjectsAsync(
+            int page,
+            int size,
+            int userId,
+            string searchFilter = ""
+        )
         {
             using var dbContext = _dbManager.Create();
 
-            return await dbContext.ProjectsInfo
-                .Where(x => x.UserId == userId &&
-                (string.IsNullOrEmpty(searchFilter) || x.Name.ToLower().Contains(searchFilter.ToLower())))
+            return await dbContext
+                .ProjectsInfo.Where(x =>
+                    x.UserId == userId
+                    && (
+                        string.IsNullOrEmpty(searchFilter)
+                        || x.Name.ToLower().Contains(searchFilter.ToLower())
+                    )
+                )
                 .OrderBy(x => x.Id)
                 .Skip((page - 1) * size)
                 .Take(size)
@@ -31,9 +41,7 @@ namespace WindowsDev.Business.Repositories
         {
             using var dbContext = _dbManager.Create();
 
-            return await dbContext.ProjectsInfo
-                .Where(x => x.UserId == userId)
-                .CountAsync();
+            return await dbContext.ProjectsInfo.Where(x => x.UserId == userId).CountAsync();
         }
 
         public async Task AddAsync(ProjectsInfo project)

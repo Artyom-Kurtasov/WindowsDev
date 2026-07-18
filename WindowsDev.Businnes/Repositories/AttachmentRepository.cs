@@ -13,6 +13,7 @@ namespace WindowsDev.Business.Repositories
         {
             _dbManager = dbManager;
         }
+
         public async Task AddFileInfoToDatabase(TaskAttachment attachment)
         {
             using var dbContext = _dbManager.Create();
@@ -25,9 +26,9 @@ namespace WindowsDev.Business.Repositories
         {
             using var dbContext = _dbManager.Create();
 
-            var attachments = await dbContext.Attachments
-                 .Where(x => x.TaskId == taskId)
-                 .ToListAsync();
+            var attachments = await dbContext
+                .Attachments.Where(x => x.TaskId == taskId)
+                .ToListAsync();
 
             return attachments;
         }

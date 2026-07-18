@@ -39,13 +39,9 @@ namespace WindowsDev.Infrastructure
             await _execute(param);
         }
 
-        /// <summary>
-        /// Notifies the UI that the command execution state has changed.
-        /// </summary>
         public void RaiseCanExecuteChanged()
         {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }
-

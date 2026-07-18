@@ -11,12 +11,10 @@ namespace WindowsDev.Factories
         {
             _provider = provider;
         }
+
         public T Create<T>(params object[] args)
         {
             return ActivatorUtilities.CreateInstance<T>(_provider, args);
         }
     }
 }
-
-
-

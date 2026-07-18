@@ -9,8 +9,9 @@ namespace WindowsDev.Business.Services.Localization
         {
             var languageDictionary = LoadDictionary(languageCode) ?? LoadDictionary("en");
 
-            var oldDictionaryies = Application.Current.Resources.MergedDictionaries
-                .FirstOrDefault(x => x.Source != null && x.Source.OriginalString.Contains("Lang"));
+            var oldDictionaryies = Application.Current.Resources.MergedDictionaries.FirstOrDefault(
+                x => x.Source != null && x.Source.OriginalString.Contains("Lang")
+            );
 
             if (oldDictionaryies != null)
             {
@@ -31,7 +32,10 @@ namespace WindowsDev.Business.Services.Localization
             {
                 return new ResourceDictionary
                 {
-                    Source = new Uri($"/Localization/Language.{languageCode}.xaml", UriKind.Relative)
+                    Source = new Uri(
+                        $"/Localization/Language.{languageCode}.xaml",
+                        UriKind.Relative
+                    ),
                 };
             }
             catch (IOException)
@@ -41,5 +45,3 @@ namespace WindowsDev.Business.Services.Localization
         }
     }
 }
-
-

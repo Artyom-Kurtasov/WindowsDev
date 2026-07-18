@@ -17,5 +17,3 @@ namespace WindowsDev.Business.DataBase
         }
     }
 }
-
-

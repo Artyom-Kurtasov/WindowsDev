@@ -27,37 +27,37 @@ namespace WindowsDev.Business.DataBase
 
         private void CheckUsers(AppDbContext appDbContext)
         {
-            _ = appDbContext.UsersInfo
-                .Select(u => new
+            _ = appDbContext
+                .UsersInfo.Select(u => new
                 {
                     u.Id,
                     u.Login,
                     u.Username,
                     u.PasswordHash,
                     u.HashMethod,
-                    u.Salt
+                    u.Salt,
                 })
                 .FirstOrDefault();
         }
 
         private void CheckProjects(AppDbContext appDbContext)
         {
-            _ = appDbContext.ProjectsInfo
-                .Select(p => new
+            _ = appDbContext
+                .ProjectsInfo.Select(p => new
                 {
                     p.Id,
                     p.Name,
                     p.UserId,
                     p.CreatedAt,
-                    p.Description
+                    p.Description,
                 })
                 .FirstOrDefault();
         }
 
         private void CheckTasks(AppDbContext appDbContext)
         {
-            _ = appDbContext.TasksInfo
-                .Select(t => new
+            _ = appDbContext
+                .TasksInfo.Select(t => new
                 {
                     t.Id,
                     t.Name,
@@ -67,36 +67,36 @@ namespace WindowsDev.Business.DataBase
                     t.Priority,
                     t.Status,
                     t.DeadLine,
-                    t.CreatedAt
+                    t.CreatedAt,
                 })
                 .FirstOrDefault();
         }
 
         private void CheckAttachments(AppDbContext appDbContext)
         {
-            _ = appDbContext.Attachments
-                .Select(a => new
+            _ = appDbContext
+                .Attachments.Select(a => new
                 {
                     a.Id,
                     a.FilePath,
                     a.FileExtension,
                     a.FileSize,
                     a.FileName,
-                    a.TaskId
+                    a.TaskId,
                 })
                 .FirstOrDefault();
         }
 
         private void CheckComments(AppDbContext appDbContext)
         {
-            _ = appDbContext.Comments
-                .Select(c => new
+            _ = appDbContext
+                .Comments.Select(c => new
                 {
                     c.Id,
                     c.Text,
                     c.CreatedAt,
                     c.Author,
-                    c.TaskId
+                    c.TaskId,
                 })
                 .FirstOrDefault();
         }

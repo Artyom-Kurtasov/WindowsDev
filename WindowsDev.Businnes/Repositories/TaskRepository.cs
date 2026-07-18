@@ -4,7 +4,6 @@ using WindowsDev.Business.Repositories.Interfaces;
 using WindowsDev.Business.Services.TaskService;
 using WindowsDev.Domain.TasksModels;
 
-
 namespace WindowsDev.Business.Repositories
 {
     public class TaskRepository : ITaskRepository
@@ -44,8 +43,7 @@ namespace WindowsDev.Business.Repositories
         {
             using var dbContext = _dbManager.Create();
 
-            var task = await dbContext.TasksInfo
-                .FirstOrDefaultAsync(x => x.Id == id);
+            var task = await dbContext.TasksInfo.FirstOrDefaultAsync(x => x.Id == id);
 
             return task;
         }
@@ -68,25 +66,19 @@ namespace WindowsDev.Business.Repositories
                 query = query.Where(x => filter.Statuses.Contains(x.Status));
             }
 
-            return await
-                query
-                .Skip(skip)
-                .Take(pageSize)
-                .ToListAsync();
+            return await query.Skip(skip).Take(pageSize).ToListAsync();
         }
 
         public async Task<int> GetTasksCountAsync(int projectId)
         {
             using var dbContext = _dbManager.Create();
-            return await dbContext.TasksInfo
-                .CountAsync(x => x.ProjectId == projectId);
+            return await dbContext.TasksInfo.CountAsync(x => x.ProjectId == projectId);
         }
 
         public async Task UpdateAsync(TasksInfo task)
         {
             using var dbContext = _dbManager.Create();
-            var existingTask = await dbContext.TasksInfo
-                .FirstOrDefaultAsync(x => x.Id == task.Id);
+            var existingTask = await dbContext.TasksInfo.FirstOrDefaultAsync(x => x.Id == task.Id);
 
             if (existingTask != null)
             {

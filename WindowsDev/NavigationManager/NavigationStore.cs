@@ -18,5 +18,3 @@ namespace WindowsDev.NavigationManager
         public event Action? CurrentViewModelChanged;
     }
 }
-
-

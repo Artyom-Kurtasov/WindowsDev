@@ -5,7 +5,6 @@ namespace WindowsDev.Business.Services.UserManager
 {
     public class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
     {
-
         private string _login = string.Empty;
         public string Login
         {
@@ -61,5 +60,3 @@ namespace WindowsDev.Business.Services.UserManager
         }
     }
 }
-
-

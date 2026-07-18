@@ -53,8 +53,9 @@ namespace WindowsDev.Business.Repositories
         {
             using var dbContext = _dbManager.Create();
 
-            var existingUser = await dbContext.UsersInfo
-                .FirstOrDefaultAsync(x => x.Login == user.Login);
+            var existingUser = await dbContext.UsersInfo.FirstOrDefaultAsync(x =>
+                x.Login == user.Login
+            );
 
             if (existingUser != null)
             {

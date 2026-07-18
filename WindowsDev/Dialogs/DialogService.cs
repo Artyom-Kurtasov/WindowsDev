@@ -1,5 +1,5 @@
-using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
+using MahApps.Metro.Controls.Dialogs;
 using WindowsDev.Dialogs.Interfaces;
 using WindowsDev.Domain;
 using WindowsDev.Factories.Interfaces;
@@ -12,8 +12,10 @@ namespace WindowsDev.Dialogs
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IViewModelFactory _viewModelFactory;
 
-        public DialogService(IDialogCoordinator dialogCoordinator,
-            IViewModelFactory viewModelFactory)
+        public DialogService(
+            IDialogCoordinator dialogCoordinator,
+            IViewModelFactory viewModelFactory
+        )
         {
             _dialogCoordinator = dialogCoordinator;
             _viewModelFactory = viewModelFactory;
@@ -26,10 +28,7 @@ namespace WindowsDev.Dialogs
             var view = new TView();
             var viewModel = _viewModelFactory.Create<TViewModel>(args);
 
-            var dialog = new CustomDialog
-            {
-                Content = view
-            };
+            var dialog = new CustomDialog { Content = view };
 
             view.DataContext = viewModel;
 
@@ -60,7 +59,12 @@ namespace WindowsDev.Dialogs
 
         public async Task ShowErrorDialogAsync(object context, string message, params object[] args)
         {
-            await _dialogCoordinator.ShowMessageAsync(context, DialogTitles.Error, message, MessageDialogStyle.Affirmative);
+            await _dialogCoordinator.ShowMessageAsync(
+                context,
+                DialogTitles.Error,
+                message,
+                MessageDialogStyle.Affirmative
+            );
         }
     }
 }
