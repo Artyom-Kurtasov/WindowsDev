@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.ProjectService;
-using WindowsDev.NavigationManager;
 using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.TestViewModels

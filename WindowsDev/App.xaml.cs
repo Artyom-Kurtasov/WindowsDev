@@ -10,7 +10,7 @@ using WindowsDev.Application.Services.Localization;
 using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Logging;
-using WindowsDev.NavigationManager;
+using WindowsDev.Services.Navigation;
 using WindowsDev.Settings;
 using WindowsDev.Settings.UserSettings;
 using WindowsDev.ViewModels.Authorization;

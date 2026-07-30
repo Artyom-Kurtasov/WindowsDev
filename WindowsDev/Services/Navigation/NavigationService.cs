@@ -2,7 +2,7 @@ using WindowsDev.Factories;
 using WindowsDev.ViewModels;
 using WindowsDev.ViewModels.Main;
 
-namespace WindowsDev.NavigationManager
+namespace WindowsDev.Services.Navigation
 {
     public class NavigationService : INavigationService
     {

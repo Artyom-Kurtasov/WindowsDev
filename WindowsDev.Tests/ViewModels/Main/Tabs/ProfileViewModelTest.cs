@@ -9,7 +9,7 @@ using WindowsDev.Command;
 using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Common.DialogsMessages.Success;
-using WindowsDev.NavigationManager;
+using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main.Tabs;
 

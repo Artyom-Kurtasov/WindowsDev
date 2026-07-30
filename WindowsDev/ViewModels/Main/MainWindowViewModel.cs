@@ -1,5 +1,5 @@
 ﻿using WindowsDev.Factories;
-using WindowsDev.NavigationManager;
+using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
 

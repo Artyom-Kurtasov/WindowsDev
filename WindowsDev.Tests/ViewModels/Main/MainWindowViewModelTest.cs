@@ -1,6 +1,6 @@
 ﻿using Moq;
 using WindowsDev.Factories;
-using WindowsDev.NavigationManager;
+using WindowsDev.Services.Navigation;
 using WindowsDev.Tests.ViewModels.Main.TestViewModels;
 using WindowsDev.ViewModels;
 using WindowsDev.ViewModels.Main;

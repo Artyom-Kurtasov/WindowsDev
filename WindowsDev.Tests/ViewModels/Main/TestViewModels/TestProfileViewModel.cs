@@ -4,7 +4,7 @@ using Moq;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.Profile;
 using WindowsDev.Application.Services.UserManager;
-using WindowsDev.NavigationManager;
+using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.TestViewModels

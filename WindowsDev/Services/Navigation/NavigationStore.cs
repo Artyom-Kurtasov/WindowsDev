@@ -1,6 +1,6 @@
 ﻿using WindowsDev.ViewModels;
 
-namespace WindowsDev.NavigationManager
+namespace WindowsDev.Services.Navigation
 {
     public class NavigationStore
     {
