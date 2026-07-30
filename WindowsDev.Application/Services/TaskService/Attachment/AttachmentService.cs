@@ -2,6 +2,7 @@
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Application.Services.TaskService.Attachment.FileService;
 using WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfaces;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.TaskService.Attachment
@@ -34,7 +35,7 @@ namespace WindowsDev.Application.Services.TaskService.Attachment
             string? fileName = _filePicker.PickFile();
 
             if (fileName is null)
-                return Result<TaskAttachment>.Failure("fd");
+                return Result<TaskAttachment>.Failure(TaskErrors.FileNotSelected);
 
             FileInfo fileInfo = new FileInfo(fileName);
 

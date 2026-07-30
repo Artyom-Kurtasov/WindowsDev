@@ -40,5 +40,6 @@
     <sys:String x:Key="Task_Error_OpenAttachmentFailed">Произошла ошибка при открытии файла. Возможно он был перемещен или удален.</sys:String>
     <sys:String x:Key="Task_Error_LoadCommentsFailed">Произошла ошибка при загрузке комментариев.</sys:String>
     <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Произошла ошибка при загрузке вложений.</sys:String>
+    <sys:String x:Key="Task_Error_FileNotSelected">Файл не выбран</sys:String>
 
 </ResourceDictionary>
