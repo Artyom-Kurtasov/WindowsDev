@@ -1,16 +1,16 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.TaskService.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Warnings;
-using WindowsDev.Domain.TasksModels;
-using WindowsDev.Domain.TasksModels.Enums;
-using WindowsDev.Infrastructure;
-using WindowsDev.ViewModels.Tasks.Dialog;
-using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Warnings;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
+using WindowsDev.ViewModels.Tasks.Dialogs;
+using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
 {

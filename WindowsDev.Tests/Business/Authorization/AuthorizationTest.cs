@@ -1,13 +1,13 @@
-﻿using System.Text;
-using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.Authorization;
-using WindowsDev.Business.Services.PasswordManager.Hasher;
-using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.UsersModels;
-using WindowsDev.Domain.UsersModels.Enums;
+﻿using Moq;
+using System.Text;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.Authorization;
+using WindowsDev.Application.Services.PasswordManager.Hasher;
+using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Tests.Business.Auth
 {

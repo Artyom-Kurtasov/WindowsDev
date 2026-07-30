@@ -1,17 +1,18 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.DebounceService;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.Registration.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Informations;
-using WindowsDev.Infrastructure;
-using WindowsDev.NavigationManager.Interfaces;
-using WindowsDev.ViewModels.Auth;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.DebounceService;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.Registration;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Informations;
+using WindowsDev.NavigationManager;
+using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
+using WindowsDev.ViewModels.Registration;
 
 namespace WindowsDev.Tests.ViewModels.Auth
 {

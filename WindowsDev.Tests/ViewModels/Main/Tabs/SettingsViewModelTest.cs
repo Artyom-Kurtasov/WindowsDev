@@ -1,26 +1,27 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Moq;
-using WindowsDev.Business.DataBase.Interfaces;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Warnings;
+using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Settings;
+using WindowsDev.Settings.UserSettings;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.Tabs
 {
     public class SettingsViewModelTest
     {
-        private readonly Mock<IDbManager> _dbManagerMock;
+        private readonly Mock<IDatabaseConfig> _dbConfigMock;
         private readonly Mock<IDbHealthChecker> _healthCheckerMock;
         private readonly Mock<IDialogCoordinator> _dialogMock;
         private readonly Mock<ILanguageChanger> _languageChangerMock;
 
         public SettingsViewModelTest()
         {
-            _dbManagerMock = new Mock<IDbManager>();
-            _dbManagerMock.SetupProperty(x => x.ConnectionString);
+            _dbConfigMock = new Mock<IDatabaseConfig>();
+            _dbConfigMock.SetupProperty(x => x.ConnectionString);
+
             _healthCheckerMock = new Mock<IDbHealthChecker>();
             _dialogMock = new Mock<IDialogCoordinator>();
             _languageChangerMock = new Mock<ILanguageChanger>();
@@ -28,15 +29,19 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
             _languageChangerMock
                 .Setup(x => x.Translate(It.IsAny<string>()))
                 .Returns((string key) => key);
+
+            _languageChangerMock
+                .Setup(x => x.ChangeLanguage(It.IsAny<string>()))
+                .Verifiable();
         }
 
         private SettingsViewModel CreateViewModel()
         {
             return new SettingsViewModel(
                 _healthCheckerMock.Object,
-                _dbManagerMock.Object,
                 _dialogMock.Object,
-                _languageChangerMock.Object
+                _languageChangerMock.Object,
+                _dbConfigMock.Object
             );
         }
 
@@ -63,7 +68,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             await vm.SetNewConnectionStringAsync();
 
-            Assert.Equal("new_connection", _dbManagerMock.Object.ConnectionString);
+            Assert.Equal("new_connection", _dbConfigMock.Object.ConnectionString);
 
             _healthCheckerMock.Verify(x => x.Check(), Times.Once);
         }
@@ -73,7 +78,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
         {
             SetupWarningDialog();
 
-            _dbManagerMock.Object.ConnectionString = "old_connection";
+            _dbConfigMock.Object.ConnectionString = "old_connection";
 
             _healthCheckerMock.Setup(x => x.Check()).Throws(new Exception());
 
@@ -83,7 +88,7 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs
 
             await vm.SetNewConnectionStringAsync();
 
-            Assert.Equal("old_connection", _dbManagerMock.Object.ConnectionString);
+            Assert.Equal("old_connection", _dbConfigMock.Object.ConnectionString);
 
             _dialogMock.Verify(
                 x =>

@@ -1,24 +1,21 @@
 ﻿using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.PasswordManager;
-using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.UsersModels;
-using WindowsDev.Domain.UsersModels.Enums;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.PasswordManager;
+using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Tests.Business.PasswordManager
 {
     public class PasswordChangerTests
     {
-        private readonly Mock<ICurrentUserService> _currentUserMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IHasherFactory> _hasherFactoryMock;
         private readonly Mock<IHasherBase> _hasherMock;
 
         public PasswordChangerTests()
         {
-            _currentUserMock = new Mock<ICurrentUserService>();
             _userRepositoryMock = new Mock<IUserRepository>();
             _hasherFactoryMock = new Mock<IHasherFactory>();
             _hasherMock = new Mock<IHasherBase>();
@@ -31,7 +28,6 @@ namespace WindowsDev.Tests.Business.PasswordManager
         private PasswordChanger CreateService()
         {
             return new PasswordChanger(
-                _currentUserMock.Object,
                 _userRepositoryMock.Object,
                 _hasherFactoryMock.Object
             );

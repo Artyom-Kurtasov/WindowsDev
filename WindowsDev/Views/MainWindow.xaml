@@ -5,14 +5,16 @@
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
                  xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
-                 xmlns:authVm="clr-namespace:WindowsDev.ViewModels.Auth"
+                 xmlns:authorizationVm="clr-namespace:WindowsDev.ViewModels.Authorization"
+                 xmlns:authorizationView="clr-namespace:WindowsDev.Views.Authorization"
+                 xmlns:registrationVm="clr-namespace:WindowsDev.ViewModels.Registration"
+                 xmlns:registrationView="clr-namespace:WindowsDev.Views.Registration"
                  xmlns:mainVm="clr-namespace:WindowsDev.ViewModels.Main"
-                 xmlns:projectVm="clr-namespace:WindowsDev.ViewModels.Projects"
+                 xmlns:mainView="clr-namespace:WindowsDev.Views.Main"
+                 xmlns:projectVm="clr-namespace:WindowsDev.ViewModels.Project"
+                 xmlns:projectView="clr-namespace:WindowsDev.Views.Project"
                  xmlns:taskVm="clr-namespace:WindowsDev.ViewModels.Tasks"
-                 xmlns:authViews="clr-namespace:WindowsDev.Views.Auth"
-                 xmlns:mainViews="clr-namespace:WindowsDev.Views.Main"
-                 xmlns:projectViews="clr-namespace:WindowsDev.Views.Projects"
-                 xmlns:taskViews="clr-namespace:WindowsDev.Views.Tasks"
+                 xmlns:taskView="clr-namespace:WindowsDev.Views.Tasks"
                  dialogs:DialogParticipation.Register="{Binding CurrentViewModel}"
                  mc:Ignorable="d"
                  Title="TaskManager"
@@ -26,24 +28,24 @@
         <ContentControl Content="{Binding CurrentViewModel}">
             <ContentControl.Resources>
                 <!-- Data Templates for View Models -->
-                <DataTemplate DataType="{x:Type authVm:AuthorizationViewModel}">
-                    <authViews:AuthorizationView />
+                <DataTemplate DataType="{x:Type authorizationVm:AuthorizationViewModel}">
+                    <authorizationView:AuthorizationView />
                 </DataTemplate>
 
-                <DataTemplate DataType="{x:Type authVm:RegistrationViewModel}">
-                    <authViews:RegistrationView />
+                <DataTemplate DataType="{x:Type registrationVm:RegistrationViewModel}">
+                    <registrationView:RegistrationView />
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type mainVm:MainWindowViewModel}">
-                    <mainViews:MainView />
+                    <mainView:MainView />
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type projectVm:ProjectViewModel}">
-                    <projectViews:ProjectView />
+                    <projectView:ProjectView />
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type taskVm:TaskViewModel}">
-                    <taskViews:TaskView />
+                    <taskView:TaskView />
                 </DataTemplate>
             </ContentControl.Resources>
         </ContentControl>

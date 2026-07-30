@@ -1,17 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.Authorization.Interfaces;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Dialogs.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Infrastructure;
-using WindowsDev.NavigationManager.Interfaces;
-using WindowsDev.ViewModels.Auth;
-using WindowsDev.ViewModels.Auth.Dialogs;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.Authorization;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.NavigationManager;
+using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.ViewModels.Authorization;
+using WindowsDev.ViewModels.Authorization.Dialogs;
 using WindowsDev.ViewModels.Main;
-using WindowsDev.Views.Auth.Dialogs;
+using WindowsDev.ViewModels.Registration;
+using WindowsDev.Views.Authorization.Dialogs;
 
 namespace WindowsDev.Tests.ViewModels.Authorization
 {

@@ -1,10 +1,10 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.Profile.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.NavigationManager.Interfaces;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.Profile;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.NavigationManager;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.TestViewModels
@@ -19,6 +19,7 @@ namespace WindowsDev.Tests.ViewModels.Main.TestViewModels
                 Mock.Of<INavigationService>(),
                 Mock.Of<ILogger<ProfileViewModel>>(),
                 Mock.Of<ILanguageChanger>()
-            ) { }
+            )
+        { }
     }
 }

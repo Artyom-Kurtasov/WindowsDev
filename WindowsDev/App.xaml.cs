@@ -1,23 +1,24 @@
-﻿using System.Globalization;
+﻿using ControlzEx.Theming;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Markup;
 using System.Windows.Threading;
-using ControlzEx.Theming;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using WindowsDev.Business.DataBase.Interfaces;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
-using WindowsDev.NavigationManager.Interfaces;
+using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Logging;
+using WindowsDev.NavigationManager;
 using WindowsDev.Settings;
-using WindowsDev.ViewModels.Auth;
+using WindowsDev.Settings.UserSettings;
+using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev
 {
-    public partial class App : Application
+    public partial class App : System.Windows.Application
     {
         public static ServiceProvider ServiceProvider { get; private set; } = null!;
 
@@ -51,9 +52,9 @@ namespace WindowsDev
             try
             {
                 var dbHealthChecker = ServiceProvider.GetRequiredService<IDbHealthChecker>();
-                var dbManager = ServiceProvider.GetRequiredService<IDbManager>();
+                var dbConfig = ServiceProvider.GetRequiredService<IDatabaseConfig>();
 
-                dbManager.ConnectionString = UserSettings.Default.ConnectionString;
+                dbConfig.ConnectionString = UserSettings.Default.ConnectionString;
                 dbHealthChecker.Check();
 
                 return true;

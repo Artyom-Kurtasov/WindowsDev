@@ -1,5 +1,5 @@
 ﻿<UserControl
-  x:Class="WindowsDev.Views.Projects.CreateProjectDialogView"
+  x:Class="WindowsDev.Views.Project.CreateProjectDialogView"
   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"

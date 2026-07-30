@@ -1,22 +1,21 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.TaskService.Attachment.Interfaces;
-using WindowsDev.Business.Services.TaskService.Comment.Interfaces;
-using WindowsDev.Dialogs.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.ProjectsModels;
-using WindowsDev.Domain.TasksModels;
-using WindowsDev.Domain.TasksModels.Enums;
-using WindowsDev.Infrastructure;
-using WindowsDev.NavigationManager.Interfaces;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.TaskService.Attachment;
+using WindowsDev.Application.Services.TaskService.Comment;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
+using WindowsDev.NavigationManager;
+using WindowsDev.Services.Dialogs.Interfaces;
 using WindowsDev.ViewModels.Tasks;
-using WindowsDev.ViewModels.Tasks.Dialog;
+using WindowsDev.ViewModels.Tasks.Dialogs;
 using WindowsDev.Views.Tasks;
-using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
+using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.ViewModels.Tasks
 {
@@ -64,7 +63,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks
         {
             _commentServiceMock
                 .Setup(x => x.GetComments(taskId))
-                .ReturnsAsync(new List<Comments>());
+                .ReturnsAsync(new List<TaskComment>());
 
             _attachmentServiceMock
                 .Setup(x => x.GetAttachmentsAsync(taskId))
@@ -170,7 +169,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks
 
             SetupSuccessfulLoading(task.Id);
 
-            var comment = new Comments
+            var comment = new TaskComment
             {
                 Id = 1,
                 Text = "Test",
@@ -182,7 +181,7 @@ namespace WindowsDev.Tests.ViewModels.Tasks
 
             _commentServiceMock
                 .Setup(x => x.AddComment(task.Id, "Test"))
-                .ReturnsAsync(Result<Comments>.Success(comment));
+                .ReturnsAsync(Result<TaskComment>.Success(comment));
 
             var vm = CreateViewModel(task: task);
 

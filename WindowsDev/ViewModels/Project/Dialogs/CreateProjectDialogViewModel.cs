@@ -1,16 +1,16 @@
-﻿using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Dialogs.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Warnings;
-using WindowsDev.Domain.ProjectsModels;
-using WindowsDev.Infrastructure;
+using System.Windows.Input;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.ProjectService;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Warnings;
+using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Services.Dialogs.Interfaces;
 
 namespace WindowsDev.ViewModels.Projects.Dialogs
 {

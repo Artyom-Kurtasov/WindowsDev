@@ -1,16 +1,15 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Informations;
-using WindowsDev.Domain.PasswordRecoveryModels;
-using WindowsDev.Infrastructure;
-using WindowsDev.ViewModels.Auth.Dialogs;
-using WindowsDev.ViewModels.Auth.Dialogs.Factories;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Informations;
+using WindowsDev.Factories;
+using WindowsDev.ViewModels.Authorization.Dialogs;
 
 namespace WindowsDev.Tests.ViewModels.Authorization.Dialogs
 {

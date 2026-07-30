@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace WindowsDev.Views.Projects
+namespace WindowsDev.Views.Project
 {
     /// <summary>
     /// Interaction logic for CreateProjectDialogView.xaml

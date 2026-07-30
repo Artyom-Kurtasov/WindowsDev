@@ -1,4 +1,4 @@
-﻿using WindowsDev.Factories.Interfaces;
+﻿using WindowsDev.Factories;
 using WindowsDev.NavigationManager;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
@@ -74,11 +74,11 @@ namespace WindowsDev.ViewModels.Main
                 _selectedTabIndex = value;
                 OnPropertyChanged(nameof(SelectedTabIndex));
 
-                LoadTab(_selectedTabIndex);
+                _ = LoadTab(_selectedTabIndex);
             }
         }
 
-        private void LoadTab(int tabIndex)
+        private async Task LoadTab(int tabIndex)
         {
             if (tabIndex == 1)
             {
@@ -93,6 +93,9 @@ namespace WindowsDev.ViewModels.Main
                 {
                     Profile = _factory.Create<ProfileViewModel>();
                 }
+
+                if (Profile is IRefreshableViewModel)
+                    await Profile.RefreshAsync();
             }
         }
 

@@ -24,13 +24,14 @@
 		<PackageReference Include="MahApps.Metro" Version="2.4.11" />
 		<PackageReference Include="MahApps.Metro.IconPacks" Version="6.2.1" />
 		<PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.2.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.3" />
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.3" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Business.csproj" />
+		<ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
+		<ProjectReference Include="..\WindowsDev.Infrastructure\WindowsDev.Infrastructure.csproj" />
+		<ProjectReference Include="..\WindowsDev.Logging\WindowsDev.Logging.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -39,7 +40,7 @@
 			<AutoGen>True</AutoGen>
 			<DependentUpon>Resources.resx</DependentUpon>
 		</Compile>
-		<Compile Update="Settings\UserSettings.Designer.cs">
+		<Compile Update="Settings\UserSettings\UserSettings.Designer.cs">
 		  <DesignTimeSharedInput>True</DesignTimeSharedInput>
 		  <AutoGen>True</AutoGen>
 		  <DependentUpon>UserSettings.settings</DependentUpon>
@@ -54,7 +55,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Settings\UserSettings.settings">
+	  <None Update="Settings\UserSettings\UserSettings.settings">
 	    <Generator>PublicSettingsSingleFileGenerator</Generator>
 	    <LastGenOutput>UserSettings.Designer.cs</LastGenOutput>
 	  </None>

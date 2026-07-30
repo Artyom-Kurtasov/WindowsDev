@@ -1,0 +1,9 @@
+namespace WindowsDev.Domain.Common.DialogsMessages.Tooltips
+{
+    public static class PasswordRecoveryTooltips
+    {
+        public const string UserNotFound = "Recovery_Tooltip_UserNotFound";
+        public const string InvalidRecoveryCode = "Recovery_Tooltip_InvalidRecoveryCode";
+        public const string NextStep = "Recovery_Tooltip_NextStep";
+    }
+}

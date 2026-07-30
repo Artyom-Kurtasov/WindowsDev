@@ -1,9 +1,8 @@
 ﻿using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.UserManager;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.ProjectsModels;
-using Service = WindowsDev.Business.Services.ProjectService;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Domain.Entities;
+using Service = WindowsDev.Application.Services.ProjectService;
 
 namespace WindowsDev.Tests.Business.ProjectService
 {

@@ -1,20 +1,21 @@
-﻿using System.Windows.Input;
-using MahApps.Metro.Controls.Dialogs;
+﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.Profile.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Success;
-using WindowsDev.Infrastructure;
+using System.Windows.Input;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.Profile;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Success;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.NavigationManager.Interfaces;
-using WindowsDev.ViewModels.Auth;
+using WindowsDev.NavigationManager;
+using WindowsDev.ViewModels.Authorization;
+using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProfileViewModel : LocalizedViewModelBase
+    public class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         private readonly INavigationService _navigationService;
         private readonly IDialogCoordinator _dialogCoordinator;
@@ -234,6 +235,11 @@ namespace WindowsDev.ViewModels.Main.Tabs
             Id = _userData.UserId;
             Login = _userData.Login ?? string.Empty;
             Username = _userData.Username ?? string.Empty;
+        }
+
+        public async Task RefreshAsync()
+        {
+            SetUserData();
         }
     }
 }

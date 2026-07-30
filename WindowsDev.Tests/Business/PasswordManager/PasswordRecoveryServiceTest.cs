@@ -1,12 +1,12 @@
 ﻿using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.Interfaces;
-using WindowsDev.Business.Services.PasswordManager.PasswordRecovery;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.UsersModels;
-using WindowsDev.Domain.UsersModels.Enums;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.PasswordManager;
+using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Tests.Business.PasswordManager
 {

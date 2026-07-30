@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using WindowsDev.Factories.Interfaces;
 
 namespace WindowsDev.Factories
 {

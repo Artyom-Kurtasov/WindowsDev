@@ -1,10 +1,9 @@
 ﻿using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.TaskService;
-using WindowsDev.Domain.TasksModels;
-using WindowsDev.Domain.TasksModels.Enums;
-using Service = WindowsDev.Business.Services.TaskService;
-using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
+using Service = WindowsDev.Application.Services.TaskService;
+using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.Business.TaskService
 {

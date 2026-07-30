@@ -1,0 +1,131 @@
+﻿<UserControl x:Class="WindowsDev.Views.Authorization.Dialogs.RecoveryCodeDialogView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:local="clr-namespace:WindowsDev.Views.Authorization.Dialogs"
+             xmlns:RecoveryViewModels="clr-namespace:WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps"
+             xmlns:RecoveryView="clr-namespace:WindowsDev.Views.Authorization.Dialogs.RecoverySteps"
+             xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
+             dialogs:DialogParticipation.Register="{Binding}"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <DataTemplate DataType="{x:Type RecoveryViewModels:FirstStepViewModel}">
+            <RecoveryView:FirstStepView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type RecoveryViewModels:SecondStepViewModel}">
+            <RecoveryView:SecondStepView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type RecoveryViewModels:ThirdStepViewModel}">
+            <RecoveryView:ThirdStepView/>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <!-- Main Grid -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Step Title -->
+        <ContentControl Grid.Row="0" Margin="0,0,0,15">
+            <ContentControl.Style>
+                <Style TargetType="ContentControl">
+                    <Setter Property="Content" Value="{DynamicResource Recovery_Label_FirstStep}"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                            <Setter Property="Content" Value="{DynamicResource Recovery_Label_SecondStep}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                            <Setter Property="Content" Value="{DynamicResource Recovery_Label_ThirdStep}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ContentControl.Style>
+        </ContentControl>
+
+        <!-- Step Content -->
+        <ContentControl Grid.Row="1" Content="{Binding CurrentStepView}" Margin="0,0,0,15"/>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
+
+            <Button Content="{DynamicResource Recovery_Button_Cancel}" 
+                    Margin="10,0,0,0"
+                    Command="{Binding CancelCommand}">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Dialogs.Accent}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Margin="0,0,10,0"
+                    Command="{Binding PrevStepCommand}"
+                    Height="35" Width="35">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Calendar.Previous}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Margin="10,0,0,0"
+                    Command="{Binding NextStepCommand}" Height="35" Width="35"
+                    ToolTipService.ShowOnDisabled="True"
+                    ToolTip="{Binding NextStepToolTip}">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Calendar.Next}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <Button Content="{DynamicResource Recovery_Button_ChangePassword}" 
+                    Margin="10,0,0,0"
+                    Command="{Binding ChangePasswordCommand}">
+                <Button.Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource MahApps.Styles.Button.Dialogs.Accent}">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="2">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="0">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CurrentStep}" Value="1">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+        </StackPanel>
+    </Grid>
+</UserControl>

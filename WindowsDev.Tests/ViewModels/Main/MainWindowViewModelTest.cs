@@ -1,5 +1,5 @@
 ﻿using Moq;
-using WindowsDev.Factories.Interfaces;
+using WindowsDev.Factories;
 using WindowsDev.NavigationManager;
 using WindowsDev.Tests.ViewModels.Main.TestViewModels;
 using WindowsDev.ViewModels;

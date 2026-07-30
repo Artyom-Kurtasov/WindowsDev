@@ -1,8 +1,8 @@
 ﻿using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.TaskService.Comment;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain.TasksModels;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.TaskService.Comment;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Tests.Business.TaskService.Comment
 {
@@ -33,7 +33,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
                 service.AddComment(0, "comment text")
             );
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Never);
+            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Never);
         }
 
         [Fact]
@@ -53,7 +53,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
             Assert.Equal(taskId, result.Value.TaskId);
             Assert.True((DateTime.UtcNow - result.Value.CreatedAt).TotalSeconds < 1);
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<Comments>()), Times.Once);
+            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Once);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
         {
             var taskId = 1;
 
-            var expectedComments = new List<Comments>
+            var expectedComments = new List<TaskComment>
             {
                 new()
                 {
@@ -100,7 +100,7 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
 
             _commentRepositoryMock
                 .Setup(x => x.GetComments(taskId))
-                .ReturnsAsync(new List<Comments>());
+                .ReturnsAsync(new List<TaskComment>());
 
             var service = CreateService();
 

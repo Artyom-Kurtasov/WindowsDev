@@ -1,14 +1,14 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.ProjectService.Interfaces;
-using WindowsDev.Business.Services.UserManager.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Warnings;
-using WindowsDev.Domain.ProjectsModels;
-using WindowsDev.Infrastructure;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.ProjectService;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Warnings;
+using WindowsDev.Domain.Entities;
 using WindowsDev.ViewModels.Projects.Dialogs;
 
 namespace WindowsDev.Tests.ViewModels.Projects.Dialogs

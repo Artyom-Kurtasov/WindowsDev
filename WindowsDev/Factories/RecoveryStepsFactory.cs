@@ -1,4 +1,5 @@
-﻿using WindowsDev.ViewModels.Auth.Dialogs.RecoverySteps;
+﻿using WindowsDev.Factories;
+using WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.Factories
 {

@@ -1,24 +1,22 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.TaskService;
-using WindowsDev.Business.Services.TaskService.Interfaces;
-using WindowsDev.Dialogs.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.ProjectsModels;
-using WindowsDev.Domain.TasksModels;
-using WindowsDev.Domain.TasksModels.Enums;
-using WindowsDev.Infrastructure;
-using WindowsDev.NavigationManager.Interfaces;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Enums;
+using WindowsDev.NavigationManager;
+using WindowsDev.Services.Dialogs.Interfaces;
 using WindowsDev.ViewModels.Main;
-using WindowsDev.ViewModels.Projects;
+using WindowsDev.ViewModels.Project;
 using WindowsDev.ViewModels.Tasks;
-using WindowsDev.ViewModels.Tasks.Dialog;
+using WindowsDev.ViewModels.Tasks.Dialogs;
 using WindowsDev.Views.Tasks;
-using TaskStatus = WindowsDev.Domain.TasksModels.Enums.TaskStatus;
+using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.ViewModels.Projects
 {

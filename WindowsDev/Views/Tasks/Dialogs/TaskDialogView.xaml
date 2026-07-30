@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:converter="clr-namespace:WindowsDev.Business.Services.TaskService.Converters;assembly=WindowsDev.Business"
+             xmlns:converter="clr-namespace:WindowsDev.Converters"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"

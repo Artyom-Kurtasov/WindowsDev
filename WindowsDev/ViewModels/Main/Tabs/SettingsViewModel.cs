@@ -1,14 +1,13 @@
-﻿using System.Windows;
-using System.Windows.Input;
-using ControlzEx.Theming;
+﻿using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
-using WindowsDev.Business.DataBase.Interfaces;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Warnings;
+using System.Windows.Input;
+using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Infrastructure;
-using WindowsDev.Settings;
+using WindowsDev.Settings.UserSettings;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
@@ -19,19 +18,19 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         private readonly IDbHealthChecker _healthChecker;
         private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly IDbManager _dbManager;
+        private readonly IDatabaseConfig _databaseConfig;
 
         public SettingsViewModel(
             IDbHealthChecker dbHealthChecker,
-            IDbManager dbManager,
             IDialogCoordinator dialogCoordinator,
-            ILanguageChanger languageChanger
+            ILanguageChanger languageChanger,
+            IDatabaseConfig databaseConfig
         )
             : base(languageChanger)
         {
             _healthChecker = dbHealthChecker;
-            _dbManager = dbManager;
             _dialogCoordinator = dialogCoordinator;
+            _databaseConfig = databaseConfig;
 
             ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
             SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
@@ -94,9 +93,9 @@ namespace WindowsDev.ViewModels.Main.Tabs
 
         public async Task SetNewConnectionStringAsync()
         {
-            var oldConnection = _dbManager.ConnectionString;
+            var oldConnection = _databaseConfig.ConnectionString;
 
-            _dbManager.ConnectionString = NewConnectionString;
+            _databaseConfig.ConnectionString = NewConnectionString;
 
             try
             {
@@ -114,7 +113,7 @@ namespace WindowsDev.ViewModels.Main.Tabs
                     MessageDialogStyle.Affirmative
                 );
 
-                _dbManager.ConnectionString = oldConnection;
+                _databaseConfig.ConnectionString = oldConnection;
             }
         }
 
@@ -123,13 +122,13 @@ namespace WindowsDev.ViewModels.Main.Tabs
             switch (_selectedTheme)
             {
                 case 0:
-                    ThemeManager.Current.ChangeTheme(Application.Current, DarkTheme);
+                    ThemeManager.Current.ChangeTheme(App.Current, DarkTheme);
 
                     UserSettings.Default.Theme = DarkTheme;
                     break;
 
                 case 1:
-                    ThemeManager.Current.ChangeTheme(Application.Current, LightTheme);
+                    ThemeManager.Current.ChangeTheme(App.Current, LightTheme);
 
                     UserSettings.Default.Theme = LightTheme;
                     break;

@@ -1,22 +1,31 @@
 ﻿using Moq;
-using WindowsDev.Business.Repositories.Interfaces;
-using WindowsDev.Business.Services.TaskService.Attachment;
-using WindowsDev.Domain.TasksModels;
+using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Services.TaskService.Attachment;
+using WindowsDev.Application.Services.TaskService.Attachment.FileService;
+using WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfaces;
+using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Tests.Business.TaskService.Attachment
 {
     public class AttachmentServiceTest
     {
         private readonly Mock<IAttachmentRepository> _attachmentRepositoryMock;
+        private readonly Mock<IFilePicker> _filePickerMock;
+        private readonly Mock<IFileOpener> _fileOpenerMock;
 
         public AttachmentServiceTest()
         {
             _attachmentRepositoryMock = new Mock<IAttachmentRepository>();
+            _filePickerMock = new Mock<IFilePicker>();
+            _fileOpenerMock = new Mock<IFileOpener>();
         }
 
         private AttachmentService CreateService()
         {
-            return new AttachmentService(_attachmentRepositoryMock.Object);
+            return new AttachmentService(
+                _attachmentRepositoryMock.Object,
+                _filePickerMock.Object,
+                _fileOpenerMock.Object);
         }
 
         [Theory]

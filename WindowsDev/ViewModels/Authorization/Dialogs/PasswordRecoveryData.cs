@@ -1,0 +1,81 @@
+﻿using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+namespace WindowsDev.ViewModels.Authorization.Dialogs
+{
+    public class PasswordRecoveryData : INotifyPropertyChanged
+    {
+        private string _login = string.Empty;
+        public string Login
+        {
+            get => _login;
+            set
+            {
+                _login = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _recoveryCode = string.Empty;
+        public string RecoveryCode
+        {
+            get => _recoveryCode;
+            set
+            {
+                _recoveryCode = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _newPassword = string.Empty;
+        public string NewPassword
+        {
+            get => _newPassword;
+            set
+            {
+                _newPassword = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string _confirmPassword = string.Empty;
+        public string ConfirmPassword
+        {
+            get => _confirmPassword;
+            set
+            {
+                _confirmPassword = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isUserExist;
+        public bool IsUserExist
+        {
+            get => _isUserExist;
+            set
+            {
+                _isUserExist = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool _isRecoveryCodeCorrect;
+        public bool IsRecoveryCodeCorrect
+        {
+            get => _isRecoveryCodeCorrect;
+            set
+            {
+                _isRecoveryCodeCorrect = value;
+                OnPropertyChanged(nameof(IsRecoveryCodeCorrect));
+            }
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}

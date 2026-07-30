@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dialogs="clr-namespace:MahApps.Metro.Controls.Dialogs;assembly=MahApps.Metro"
              xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
-             xmlns:converter="clr-namespace:WindowsDev.Business.Services.SettingsManager;assembly=WindowsDev.Business"
+             xmlns:converter="clr-namespace:WindowsDev.Converters"
              xmlns:UserCtrl="clr-namespace:WindowsDev.Controls.Users"
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              dialogs:DialogParticipation.Register="{Binding}"

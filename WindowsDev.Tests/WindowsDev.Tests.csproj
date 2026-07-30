@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Business.csproj" />
+    <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
+    <ProjectReference Include="..\WindowsDev.Businnes\WindowsDev.Application.csproj" />
     <ProjectReference Include="..\WindowsDev\WindowsDev.csproj" />
   </ItemGroup>
 

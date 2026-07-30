@@ -1,16 +1,16 @@
 ﻿using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Business.Primitives;
-using WindowsDev.Business.Services.Localization.Interfaces;
-using WindowsDev.Business.Services.Profile.Interfaces;
-using WindowsDev.Business.Services.UserManager;
-using WindowsDev.Domain;
-using WindowsDev.Domain.DialogsMessages.Errors;
-using WindowsDev.Domain.DialogsMessages.Success;
-using WindowsDev.Infrastructure;
-using WindowsDev.NavigationManager.Interfaces;
-using WindowsDev.ViewModels.Auth;
+using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.Profile;
+using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Command;
+using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Common.DialogsMessages.Success;
+using WindowsDev.NavigationManager;
+using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.Tabs
