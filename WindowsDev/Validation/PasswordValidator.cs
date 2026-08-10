@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Business.Services.Registration.Validation
 {
-    public static class PasswordValidator
+    internal static class PasswordValidator
     {
         public static bool HasMinimumLength(string? password) => password?.Length >= 12;
 

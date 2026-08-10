@@ -11,7 +11,7 @@ using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Project;
@@ -20,7 +20,7 @@ using WindowsDev.Views.Tasks;
 
 namespace WindowsDev.ViewModels.Tasks
 {
-    public class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
+    internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly INavigationService _navigationService;

@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Application.Services.DebounceService
 {
-    public class DebounceService : IDebounceService
+    internal class DebounceService : IDebounceService
     {
         private CancellationTokenSource? _cts;
 

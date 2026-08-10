@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace WindowsDev.Converters
 {
-    public class StringToVisibilityConverter : IValueConverter
+    internal class StringToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

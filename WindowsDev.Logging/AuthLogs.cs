@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class AuthLogs
+    internal static partial class AuthLogs
     {
         [LoggerMessage(
             EventId = EventIds.AuthorizationFailed,

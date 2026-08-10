@@ -7,7 +7,7 @@ using WindowsDev.Command;
 using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 using WindowsDev.ViewModels.Project;

@@ -2,12 +2,11 @@ using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
 using WindowsDev.Domain.Common;
 using WindowsDev.Factories;
-using WindowsDev.Services.Dialogs.Interfaces;
 using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.Services.Dialogs
 {
-    public class DialogService : IDialogService
+    internal class DialogService : IDialogService
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IViewModelFactory _viewModelFactory;

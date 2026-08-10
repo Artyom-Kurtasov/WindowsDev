@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class CommentLogs
+    internal static partial class CommentLogs
     {
         [LoggerMessage(
             EventId = EventIds.CommentCreationFailed,

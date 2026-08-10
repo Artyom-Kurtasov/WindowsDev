@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using WindowsDev.Application.Primitives;
+﻿using WindowsDev.Application.Primitives;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Application.Services.PasswordManager;
 using WindowsDev.Application.Services.UserManager;
@@ -7,7 +6,7 @@ using WindowsDev.Domain.Common.DialogsMessages.Errors;
 
 namespace WindowsDev.Application.Services.Profile
 {
-    public class ProfileService : IProfileService
+    internal class ProfileService : IProfileService
     {
         private readonly ICurrentUserService _currentUserService;
         private readonly IUserRepository _userRepository;

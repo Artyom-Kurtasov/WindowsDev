@@ -5,7 +5,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.TaskService.Comment
 {
-    public class CommentsService : ICommentService
+    internal class CommentsService : ICommentService
     {
         private readonly ICommentRepository _commentRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -36,9 +36,8 @@ namespace WindowsDev.Application.Services.TaskService.Comment
             return Result<TaskComment>.Success(comment);
         }
 
-        public async Task<List<TaskComment>> GetComments(int taskId)
-        {
-            return await _commentRepository.GetComments(taskId);
-        }
+        public async Task<List<TaskComment>> GetComments(int taskId) =>
+            await _commentRepository.GetComments(taskId);
+
     }
 }

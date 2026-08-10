@@ -2,7 +2,7 @@
 
 namespace WindowsDev.Services.Navigation
 {
-    public class NavigationStore
+    internal class NavigationStore
     {
         private ViewModelBase? _currentViewModel;
         public ViewModelBase? CurrentViewModel

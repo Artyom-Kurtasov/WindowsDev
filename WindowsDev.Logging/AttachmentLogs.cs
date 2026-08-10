@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class AttachmentLogs
+    internal static partial class AttachmentLogs
     {
         [LoggerMessage(
             EventId = EventIds.AttachmentUploadFailed,

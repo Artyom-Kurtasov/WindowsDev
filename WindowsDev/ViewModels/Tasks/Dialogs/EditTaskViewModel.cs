@@ -8,11 +8,11 @@ using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs
 {
-    public class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
+    internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
     {
         private readonly ITaskService _taskService;
         private readonly ILogger<EditTaskViewModel> _logger;

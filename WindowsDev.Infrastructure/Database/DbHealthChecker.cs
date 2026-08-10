@@ -3,7 +3,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Database
 {
-    public class DbHealthChecker : IDbHealthChecker
+    internal class DbHealthChecker : IDbHealthChecker
     {
         private readonly IDbCreator _dbManager;
 

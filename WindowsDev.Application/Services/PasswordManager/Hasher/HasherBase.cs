@@ -4,14 +4,14 @@ using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
 
 namespace WindowsDev.Application.Services.PasswordManager.Hasher
 {
-    public abstract class HasherBase : IHasherBase
+    internal abstract class HasherBase : IHasherBase
     {
         private const int SaltSize = 16;
-        private const int RotationBits = 13;
-        private const int ULongBits = 64;
-        public abstract ulong HashSeed { get; }
-        public abstract ulong MixingConstant { get; }
-        public abstract int Iterations { get; }
+        private const int RotationBitsLeft = 13;
+        private const int RotationBitsRight = 51;
+        protected abstract ulong HashSeed { get; }
+        protected abstract ulong MixingConstant { get; }
+        protected abstract int Iterations { get; }
 
         public ulong HashValue(string password, byte[] salt)
         {
@@ -25,7 +25,7 @@ namespace WindowsDev.Application.Services.PasswordManager.Hasher
                 {
                     hash ^= b;
                     hash *= MixingConstant;
-                    hash = (hash << 13) | (hash >> 51);
+                    hash = (hash << RotationBitsLeft) | (hash >> RotationBitsRight);
                 }
             }
 

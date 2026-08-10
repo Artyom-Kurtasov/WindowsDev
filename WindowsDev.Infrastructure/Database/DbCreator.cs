@@ -4,7 +4,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Database
 {
-    public class DbCreator : IDbCreator
+    internal class DbCreator : IDbCreator
     {
         private readonly IDatabaseConfig _config;
 

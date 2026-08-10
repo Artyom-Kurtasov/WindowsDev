@@ -2,7 +2,7 @@
 
 namespace WindowsDev.Factories
 {
-    public class ViewModelFactory : IViewModelFactory
+    internal class ViewModelFactory : IViewModelFactory
     {
         private readonly IServiceProvider _provider;
 

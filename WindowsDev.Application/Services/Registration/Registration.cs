@@ -8,7 +8,7 @@ using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Application.Services.Registration
 {
-    public class Registration : IRegistration
+    internal class Registration : IRegistration
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -55,15 +55,11 @@ namespace WindowsDev.Application.Services.Registration
             return Result<int>.Success(recoveryCode);
         }
 
-        public async Task<bool> IsLoginAvailableAsync(string login)
-        {
-            return !await _userRepository.ExistsByLoginAsync(login);
-        }
+        public async Task<bool> IsLoginAvailableAsync(string login) =>
+            !await _userRepository.ExistsByLoginAsync(login);
 
-        public async Task<bool> IsUsernameAvailableAsync(string username)
-        {
-            return !await _userRepository.ExistsByUsernameAsync(username);
-        }
+        public async Task<bool> IsUsernameAvailableAsync(string username) =>
+            !await _userRepository.ExistsByUsernameAsync(username);
 
         private (string passwordHash, byte[] passwordSalt) HashPassword(string password)
         {

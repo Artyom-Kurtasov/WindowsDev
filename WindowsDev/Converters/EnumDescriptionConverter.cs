@@ -5,7 +5,7 @@ using System.Windows.Data;
 
 namespace WindowsDev.Converters
 {
-    public class EnumDescriptionConverter : IValueConverter
+    internal class EnumDescriptionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

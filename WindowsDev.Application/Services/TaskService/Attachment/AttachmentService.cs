@@ -7,7 +7,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.TaskService.Attachment
 {
-    public class AttachmentService : IAttacmentService
+    internal class AttachmentService : IAttacmentService
     {
         private readonly IAttachmentRepository _attachmentRepository;
         private readonly IFilePicker _filePicker;
@@ -23,10 +23,9 @@ namespace WindowsDev.Application.Services.TaskService.Attachment
             _fileOpener = fileOpener;
         }
 
-        public async Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId)
-        {
-            return await _attachmentRepository.GetAttachmentsAsync(taskId);
-        }
+        public async Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId) =>
+            await _attachmentRepository.GetAttachmentsAsync(taskId);
+
 
         public async Task<Result<TaskAttachment>> AddFile(int taskId)
         {

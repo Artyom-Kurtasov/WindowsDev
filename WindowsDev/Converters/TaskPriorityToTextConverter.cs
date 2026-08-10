@@ -4,7 +4,7 @@ using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Converters
 {
-    public class TaskPriorityToTextConverter : IValueConverter
+    internal class TaskPriorityToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

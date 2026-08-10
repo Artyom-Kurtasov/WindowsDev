@@ -6,6 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="WindowsDev.Tests"/>
+	</ItemGroup>
 </Project>
 
 

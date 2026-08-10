@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+	  <InternalsVisibleTo Include="WindowsDev"/>
+  </ItemGroup>
+
+  <ItemGroup>
+	  <InternalsVisibleTo Include="WindowsDev.Tests"/>
   </ItemGroup>
 
 </Project>

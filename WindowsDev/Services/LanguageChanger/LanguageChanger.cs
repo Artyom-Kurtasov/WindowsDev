@@ -4,7 +4,7 @@ using WindowsDev.Application.Services.Localization;
 
 namespace WindowsDev.Services.LanguageChanger
 {
-    public class LanguageChanger : ILanguageChanger
+    internal class LanguageChanger : ILanguageChanger
     {
         public void ChangeLanguage(string languageCode)
         {

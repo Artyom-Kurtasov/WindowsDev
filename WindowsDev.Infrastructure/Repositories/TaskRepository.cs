@@ -5,7 +5,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Repositories
 {
-    public class TaskRepository : ITaskRepository
+    internal class TaskRepository : ITaskRepository
     {
         private readonly IDbCreator _dbManager;
 

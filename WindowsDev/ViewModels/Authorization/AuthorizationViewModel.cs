@@ -6,7 +6,7 @@ using WindowsDev.Command;
 using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization.Dialogs;
 using WindowsDev.ViewModels.Main;
@@ -15,7 +15,7 @@ using WindowsDev.Views.Authorization.Dialogs;
 
 namespace WindowsDev.ViewModels.Authorization
 {
-    public class AuthorizationViewModel : LocalizedViewModelBase
+    internal class AuthorizationViewModel : LocalizedViewModelBase
     {
         private readonly ILogger<AuthorizationViewModel> _logger;
         private readonly IDialogService _dialogService;

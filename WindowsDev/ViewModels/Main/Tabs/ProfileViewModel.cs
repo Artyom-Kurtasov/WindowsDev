@@ -15,7 +15,7 @@ using WindowsDev.ViewModels.Interfaces;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
+    internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         private readonly INavigationService _navigationService;
         private readonly IDialogCoordinator _dialogCoordinator;

@@ -2,7 +2,7 @@
 
 namespace WindowsDev.Application.Services.UserManager
 {
-    public class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
+    internal class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
     {
         private string _login = string.Empty;
         public string Login

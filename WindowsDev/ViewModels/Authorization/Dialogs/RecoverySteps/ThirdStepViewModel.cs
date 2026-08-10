@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps
 {
-    public class ThirdStepViewModel : ViewModelBase
+    internal class ThirdStepViewModel : ViewModelBase
     {
         private readonly PasswordRecoveryData _passwordRecoveryData;
 

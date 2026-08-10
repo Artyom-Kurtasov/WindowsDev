@@ -5,7 +5,7 @@ using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.ViewModels.Main
 {
-    public class MainWindowViewModel : ViewModelBase, IDisposable
+    internal class MainWindowViewModel : ViewModelBase, IDisposable
     {
         private readonly IViewModelFactory _factory;
         private readonly NavigationStore _navigationStore;

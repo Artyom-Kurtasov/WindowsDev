@@ -1,4 +1,4 @@
-namespace WindowsDev.Services.Dialogs.Interfaces
+namespace WindowsDev.Services.Dialogs
 {
     public interface IDialogViewModel
     {

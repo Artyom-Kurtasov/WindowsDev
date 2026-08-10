@@ -1,6 +1,6 @@
 using System.Windows.Controls;
 
-namespace WindowsDev.Services.Dialogs.Interfaces
+namespace WindowsDev.Services.Dialogs
 {
     public interface IDialogService
     {

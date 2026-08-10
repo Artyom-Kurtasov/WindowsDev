@@ -4,7 +4,7 @@ using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Converters
 {
-    public class TaskStatusToTextConverter : IValueConverter
+    internal class TaskStatusToTextConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

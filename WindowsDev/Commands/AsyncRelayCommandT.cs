@@ -2,7 +2,7 @@
 
 namespace WindowsDev.Command
 {
-    public class AsyncRelayCommandT<T> : ICommand
+    internal class AsyncRelayCommandT<T> : ICommand
     {
         private readonly Func<T, Task> _execute;
         private readonly Func<T, bool>? _canExecute;

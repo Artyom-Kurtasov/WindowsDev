@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class TaskLogs
+    internal static partial class TaskLogs
     {
         [LoggerMessage(
             EventId = EventIds.TaskCreationFailed,

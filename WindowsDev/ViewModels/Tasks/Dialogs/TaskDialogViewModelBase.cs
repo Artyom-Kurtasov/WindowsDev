@@ -7,7 +7,7 @@ using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs
 {
-    public class TaskDialogViewModelBase : LocalizedViewModelBase
+    internal class TaskDialogViewModelBase : LocalizedViewModelBase
     {
         protected readonly IDialogCoordinator _dialogCoordinator;
 

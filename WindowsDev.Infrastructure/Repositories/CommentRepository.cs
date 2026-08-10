@@ -5,7 +5,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Repositories
 {
-    public class CommentRepository : ICommentRepository
+    internal class CommentRepository : ICommentRepository
     {
         private readonly IDbCreator _dbManager;
 

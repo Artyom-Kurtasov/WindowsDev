@@ -11,11 +11,11 @@ using WindowsDev.Domain.Common.DialogsMessages.Informations;
 using WindowsDev.Domain.Common.DialogsMessages.Tooltips;
 using WindowsDev.Factories;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs
 {
-    public class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogViewModel
+    internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogViewModel
     {
         private readonly IPasswordRecoveryService _passwordRecoveryService;
         private readonly IDialogCoordinator _dialogCoordinator;

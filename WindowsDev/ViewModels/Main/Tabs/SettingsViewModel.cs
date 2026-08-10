@@ -11,7 +11,7 @@ using WindowsDev.Settings.UserSettings;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class SettingsViewModel : LocalizedViewModelBase
+    internal class SettingsViewModel : LocalizedViewModelBase
     {
         private const string LightTheme = "Light.Blue";
         private const string DarkTheme = "Dark.Blue";

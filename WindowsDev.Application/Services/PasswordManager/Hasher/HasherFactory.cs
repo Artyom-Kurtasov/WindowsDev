@@ -3,7 +3,7 @@ using WindowsDev.Domain.Enums;
 
 namespace WindowsDev.Application.Services.PasswordManager.Hasher
 {
-    public class HasherFactory : IHasherFactory
+    internal class HasherFactory : IHasherFactory
     {
         private readonly DefaultHasher _defaultHasher;
         private readonly SimpleHasher _simplePasswordHasher;

@@ -16,7 +16,7 @@ using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.ViewModels.Registration
 {
-    public class RegistrationViewModel : LocalizedViewModelBase
+    internal class RegistrationViewModel : LocalizedViewModelBase
     {
         private readonly ILogger<RegistrationViewModel> _logger;
         private readonly IDialogCoordinator _dialogCoordinator;

@@ -7,7 +7,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.Authorization
 {
-    public class Authorization : IAuthorization
+    internal class Authorization : IAuthorization
     {
         private readonly IUserRepository _userRepository;
         private readonly ICurrentUserService _currentUserService;

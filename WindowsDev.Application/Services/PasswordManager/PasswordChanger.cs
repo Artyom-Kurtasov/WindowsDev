@@ -6,7 +6,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.PasswordManager
 {
-    public class PasswordChanger : IPasswordChanger
+    internal class PasswordChanger : IPasswordChanger
     {
         private readonly IUserRepository _userRepository;
         private readonly IHasherFactory _hasherFactory;

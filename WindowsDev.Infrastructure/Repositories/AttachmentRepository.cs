@@ -5,7 +5,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Repositories
 {
-    public class AttachmentRepository : IAttachmentRepository
+    internal class AttachmentRepository : IAttachmentRepository
     {
         private readonly IDbCreator _dbManager;
 

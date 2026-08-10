@@ -3,7 +3,7 @@ using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps
 {
-    public class SecondStepViewModel : ViewModelBase
+    internal class SecondStepViewModel : ViewModelBase
     {
         private readonly PasswordRecoveryData _passwordRecoveryData;
         private readonly IPasswordRecoveryService _passwordRecoveryService;

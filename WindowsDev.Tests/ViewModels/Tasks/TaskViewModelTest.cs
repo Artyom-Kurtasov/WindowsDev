@@ -10,7 +10,7 @@ using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Tasks;
 using WindowsDev.ViewModels.Tasks.Dialogs;

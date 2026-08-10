@@ -9,7 +9,7 @@ using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Project;
@@ -18,7 +18,7 @@ using WindowsDev.Views.Project;
 
 namespace WindowsDev.ViewModels.Main.Tabs
 {
-    public class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
+    internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         private readonly IDialogCoordinator _dialogCoordinator;
         private readonly IProjectService _projectService;

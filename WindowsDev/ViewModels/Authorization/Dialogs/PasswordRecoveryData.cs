@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs
 {
-    public class PasswordRecoveryData : INotifyPropertyChanged
+    internal class PasswordRecoveryData : INotifyPropertyChanged
     {
         private string _login = string.Empty;
         public string Login

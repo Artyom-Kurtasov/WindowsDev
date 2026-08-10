@@ -2,7 +2,7 @@
 
 namespace WindowsDev.ViewModels
 {
-    public class LocalizedViewModelBase : ViewModelBase
+    internal class LocalizedViewModelBase : ViewModelBase
     {
         protected readonly ILanguageChanger LanguageChanger;
 

@@ -2,7 +2,7 @@
 
 namespace WindowsDev.Logging
 {
-    public static partial class AppXamlLogs
+    internal static partial class AppXamlLogs
     {
         [LoggerMessage(
             EventId = EventIds.DispatcherUnhandledException,

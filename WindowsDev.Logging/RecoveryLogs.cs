@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class RecoveryLogs
+    internal static partial class RecoveryLogs
     {
         [LoggerMessage(
             EventId = EventIds.PasswordResetFailed,

@@ -3,7 +3,7 @@ using WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.Factories
 {
-    public class RecoveryStepsFactory : IRecoveryStepsFactory
+    internal class RecoveryStepsFactory : IRecoveryStepsFactory
     {
         private readonly FirstStepViewModel _firstStepViewModel;
         private readonly SecondStepViewModel _secondStepViewModel;

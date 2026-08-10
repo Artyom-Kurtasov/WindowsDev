@@ -5,7 +5,7 @@ using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Repositories
 {
-    public class ProjectRepository : IProjectRepository
+    internal class ProjectRepository : IProjectRepository
     {
         private readonly IDbCreator _dbManager;
 

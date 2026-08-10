@@ -4,7 +4,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.TaskService
 {
-    public class TaskService : ITaskService
+    internal class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
 

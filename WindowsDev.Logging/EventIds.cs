@@ -1,6 +1,6 @@
 ﻿namespace WindowsDev.Logging
 {
-    public static class EventIds
+    internal static class EventIds
     {
         public const int RegistrationFailed = 1000;
         public const int AuthorizationFailed = 1001;

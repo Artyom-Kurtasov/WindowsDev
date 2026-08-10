@@ -3,7 +3,7 @@ using System.Windows.Data;
 
 namespace WindowsDev.Converters
 {
-    public class FileSizeConverter : IValueConverter
+    internal class FileSizeConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

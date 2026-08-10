@@ -3,7 +3,7 @@ using WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfac
 
 namespace WindowsDev.Infrastructure.FileOpener
 {
-    public class FileOpener : IFileOpener
+    internal class FileOpener : IFileOpener
     {
         public void Open(string filePath)
         {

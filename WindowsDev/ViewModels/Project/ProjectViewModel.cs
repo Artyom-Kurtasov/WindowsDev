@@ -9,7 +9,7 @@ using WindowsDev.Domain.Common;
 using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main;
@@ -20,7 +20,7 @@ using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Project
 {
-    public class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
+    internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
     {
         private const int PageSize = 15;
 

@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class ProjectLogs
+    internal static partial class ProjectLogs
     {
         [LoggerMessage(
             EventId = EventIds.ProjectCreationFailed,

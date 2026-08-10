@@ -4,7 +4,7 @@ using WindowsDev.ViewModels.Main;
 
 namespace WindowsDev.Services.Navigation
 {
-    public class NavigationService : INavigationService
+    internal class NavigationService : INavigationService
     {
         private readonly NavigationStore _navigationStore;
         private readonly IViewModelFactory _viewModelFactory;

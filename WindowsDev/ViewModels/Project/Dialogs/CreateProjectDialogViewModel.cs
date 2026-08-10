@@ -10,11 +10,11 @@ using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Services.Dialogs.Interfaces;
+using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Projects.Dialogs
 {
-    public class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
+    internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
     {
         private readonly ICurrentUserService _currentUserData;
         private readonly IProjectService _projectService;

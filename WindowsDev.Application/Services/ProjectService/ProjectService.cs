@@ -4,7 +4,7 @@ using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Application.Services.ProjectService
 {
-    public class ProjectService : IProjectService
+    internal class ProjectService : IProjectService
     {
         private readonly IProjectRepository _projectRepository;
         private readonly ICurrentUserService _currentUserService;
@@ -54,9 +54,8 @@ namespace WindowsDev.Application.Services.ProjectService
             );
         }
 
-        public async Task<int> GetProjectsCountAsync()
-        {
-            return await _projectRepository.GetProjectsCountAsync(_currentUserService.UserId);
-        }
+        public async Task<int> GetProjectsCountAsync() =>
+            await _projectRepository.GetProjectsCountAsync(_currentUserService.UserId);
+
     }
 }

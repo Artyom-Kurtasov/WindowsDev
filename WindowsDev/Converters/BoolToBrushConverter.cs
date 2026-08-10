@@ -5,7 +5,7 @@ using System.Windows.Media;
 
 namespace WindowsDev.Converters
 {
-    public class BoolToBrushConverter : IValueConverter
+    internal class BoolToBrushConverter : IValueConverter
     {
         public object Convert(
             object value,

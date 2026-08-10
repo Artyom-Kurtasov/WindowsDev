@@ -3,7 +3,7 @@ using WindowsDev.Logging;
 
 namespace WindowsDev.Infrastructure.Logging
 {
-    public static partial class ProfileLogs
+    internal static partial class ProfileLogs
     {
         [LoggerMessage(
             EventId = EventIds.PasswordChangeFailed,
