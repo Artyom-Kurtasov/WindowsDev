@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Application.Services.DebounceService
+namespace WindowsDev.Application.Services.DebounceService;
+
+public interface IDebounceService
 {
-    public interface IDebounceService
-    {
-        Task DebounceAsync(Func<Task> action, TimeSpan delay);
-    }
+    Task DebounceAsync(Func<Task> action, TimeSpan delay);
 }

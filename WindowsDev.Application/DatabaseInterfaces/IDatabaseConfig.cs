@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Application.DatabaseInterfaces
+namespace WindowsDev.Application.DatabaseInterfaces;
+
+public interface IDatabaseConfig
 {
-    public interface IDatabaseConfig
-    {
-        string ConnectionString { get; set; }
-    }
+    string ConnectionString { get; set; }
 }

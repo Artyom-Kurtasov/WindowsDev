@@ -1,15 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Main.Tabs
+namespace WindowsDev.Views.Main.Tabs;
+
+/// <summary>
+/// Interaction logic for ProfileTabView.xaml
+/// </summary>
+public partial class ProfileTabView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ProfileTabView.xaml
-    /// </summary>
-    public partial class ProfileTabView : UserControl
+    public ProfileTabView()
     {
-        public ProfileTabView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

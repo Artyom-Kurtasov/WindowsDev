@@ -1,170 +1,169 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.ProjectService;
 using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
-using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.ViewModels.Projects.Dialogs;
 
-namespace WindowsDev.Tests.ViewModels.Projects.Dialogs
+namespace WindowsDev.Tests.ViewModels.Projects.Dialogs;
+
+public class CreateProjectDialogViewModelTest
 {
-    public class CreateProjectDialogViewModelTest
+    private readonly Mock<IProjectService> _projectServiceMock;
+    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ILogger<CreateProjectDialogViewModel>> _loggerMock;
+    private readonly Mock<ILanguageChanger> _languageChangerMock;
+    private readonly Mock<ICurrentUserService> _currentUserMock;
+
+    private bool _completedEventWasRaised;
+    private bool _closeEventWasRaised;
+
+    public CreateProjectDialogViewModelTest()
     {
-        private readonly Mock<IProjectService> _projectServiceMock;
-        private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
-        private readonly Mock<ILogger<CreateProjectDialogViewModel>> _loggerMock;
-        private readonly Mock<ILanguageChanger> _languageChangerMock;
-        private readonly Mock<ICurrentUserService> _currentUserMock;
+        _projectServiceMock = new();
+        _dialogCoordinatorMock = new();
+        _loggerMock = new();
+        _languageChangerMock = new();
+        _currentUserMock = new();
 
-        private bool _completedEventWasRaised;
-        private bool _closeEventWasRaised;
+        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
 
-        public CreateProjectDialogViewModelTest()
+        _languageChangerMock
+            .Setup(x => x.Translate(It.IsAny<string>()))
+            .Returns((string key) => key);
+    }
+
+    private CreateProjectDialogViewModel CreateViewModel()
+    {
+        return new CreateProjectDialogViewModel(
+            _dialogCoordinatorMock.Object,
+            _currentUserMock.Object,
+            _projectServiceMock.Object,
+            _loggerMock.Object,
+            _languageChangerMock.Object
+        );
+    }
+
+    private void SetupEvents(CreateProjectDialogViewModel vm)
+    {
+        _completedEventWasRaised = false;
+        _closeEventWasRaised = false;
+
+        vm.Completed += () =>
         {
-            _projectServiceMock = new();
-            _dialogCoordinatorMock = new();
-            _loggerMock = new();
-            _languageChangerMock = new();
-            _currentUserMock = new();
+            _completedEventWasRaised = true;
+            return Task.CompletedTask;
+        };
 
-            _currentUserMock.SetupGet(x => x.UserId).Returns(1);
-
-            _languageChangerMock
-                .Setup(x => x.Translate(It.IsAny<string>()))
-                .Returns((string key) => key);
-        }
-
-        private CreateProjectDialogViewModel CreateViewModel()
+        vm.CloseRequested += () =>
         {
-            return new CreateProjectDialogViewModel(
-                _dialogCoordinatorMock.Object,
-                _currentUserMock.Object,
-                _projectServiceMock.Object,
-                _loggerMock.Object,
-                _languageChangerMock.Object
-            );
-        }
+            _closeEventWasRaised = true;
+            return Task.CompletedTask;
+        };
+    }
 
-        private void SetupEvents(CreateProjectDialogViewModel vm)
-        {
-            _completedEventWasRaised = false;
-            _closeEventWasRaised = false;
+    [Fact]
+    public async Task CreateProjectCommand_WhenValid_CreatesProjectAndRaisesCompleted()
+    {
+        var vm = CreateViewModel();
 
-            vm.Completed += () =>
-            {
-                _completedEventWasRaised = true;
-                return Task.CompletedTask;
-            };
+        SetupEvents(vm);
 
-            vm.CloseRequested += () =>
-            {
-                _closeEventWasRaised = true;
-                return Task.CompletedTask;
-            };
-        }
+        vm.ProjectName = "Test";
+        vm.ProjectDescription = "Description";
 
-        [Fact]
-        public async Task CreateProjectCommand_WhenValid_CreatesProjectAndRaisesCompleted()
-        {
-            var vm = CreateViewModel();
+        ProjectsInfo? createdProject = null;
 
-            SetupEvents(vm);
+        _projectServiceMock
+            .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
+            .Callback<ProjectsInfo>(x => createdProject = x)
+            .Returns(Task.CompletedTask);
 
-            vm.ProjectName = "Test";
-            vm.ProjectDescription = "Description";
+        await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
 
-            ProjectsInfo? createdProject = null;
+        Assert.True(_completedEventWasRaised);
 
-            _projectServiceMock
-                .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
-                .Callback<ProjectsInfo>(x => createdProject = x)
-                .Returns(Task.CompletedTask);
+        Assert.True(_closeEventWasRaised);
 
-            await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
+        Assert.NotNull(createdProject);
 
-            Assert.True(_completedEventWasRaised);
+        Assert.Equal("Test", createdProject.Name);
 
-            Assert.True(_closeEventWasRaised);
+        Assert.Equal("Description", createdProject.Description);
 
-            Assert.NotNull(createdProject);
+        Assert.Equal(1, createdProject.UserId);
 
-            Assert.Equal("Test", createdProject.Name);
+        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
+    }
 
-            Assert.Equal("Description", createdProject.Description);
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public async Task CreateProjectCommand_WhenNameEmpty_ShowsWarning(string? name)
+    {
+        var vm = CreateViewModel();
 
-            Assert.Equal(1, createdProject.UserId);
+        SetupEvents(vm);
 
-            _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
-        }
+        vm.ProjectName = name!;
+        vm.ProjectDescription = "Description";
 
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        [InlineData(" ")]
-        public async Task CreateProjectCommand_WhenNameEmpty_ShowsWarning(string? name)
-        {
-            var vm = CreateViewModel();
+        await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
 
-            SetupEvents(vm);
+        Assert.False(_completedEventWasRaised);
+        Assert.False(_closeEventWasRaised);
 
-            vm.ProjectName = name!;
-            vm.ProjectDescription = "Description";
+        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Never);
 
-            await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Warning,
+                    CreateProjectWarnings.EnterName,
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
+    }
 
-            Assert.False(_completedEventWasRaised);
-            Assert.False(_closeEventWasRaised);
+    [Fact]
+    public async Task CreateProjectCommand_WhenServiceThrows_ShowsErrorDialog()
+    {
+        var vm = CreateViewModel();
 
-            _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Never);
+        SetupEvents(vm);
 
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Warning,
-                        CreateProjectWarnings.EnterName,
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
-        }
+        vm.ProjectName = "Test";
+        vm.ProjectDescription = "Description";
 
-        [Fact]
-        public async Task CreateProjectCommand_WhenServiceThrows_ShowsErrorDialog()
-        {
-            var vm = CreateViewModel();
+        _projectServiceMock
+            .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
+            .ThrowsAsync(new Exception());
 
-            SetupEvents(vm);
+        await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
 
-            vm.ProjectName = "Test";
-            vm.ProjectDescription = "Description";
+        Assert.False(_completedEventWasRaised);
+        Assert.False(_closeEventWasRaised);
 
-            _projectServiceMock
-                .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
-                .ThrowsAsync(new Exception());
+        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
 
-            await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
-
-            Assert.False(_completedEventWasRaised);
-            Assert.False(_closeEventWasRaised);
-
-            _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
-
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Error,
-                        CommonErrors.UnexpectedError,
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
-        }
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Error,
+                    CommonErrors.UnexpectedError,
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
     }
 }

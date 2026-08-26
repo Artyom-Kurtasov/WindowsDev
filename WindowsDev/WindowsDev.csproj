@@ -29,14 +29,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
-		<ProjectReference Include="..\WindowsDev.Infrastructure\WindowsDev.Infrastructure.csproj" />
-		<ProjectReference Include="..\WindowsDev.Logging\WindowsDev.Logging.csproj" />
+		<ProjectReference Include="..\WindowsDev.Api\WindowsDev.Api.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="WindowsDev.Tests"/>
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2"/>
+		<InternalsVisibleTo Include="WindowsDev.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>

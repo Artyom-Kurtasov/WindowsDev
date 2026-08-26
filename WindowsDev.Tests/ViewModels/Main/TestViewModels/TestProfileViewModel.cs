@@ -1,4 +1,4 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Services.Localization;
@@ -7,19 +7,18 @@ using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 
-namespace WindowsDev.Tests.ViewModels.Main.TestViewModels
+namespace WindowsDev.Tests.ViewModels.Main.TestViewModels;
+
+internal class TestProfileViewModel : ProfileViewModel
 {
-    internal class TestProfileViewModel : ProfileViewModel
-    {
-        public TestProfileViewModel()
-            : base(
-                Mock.Of<ICurrentUserService>(),
-                Mock.Of<IProfileService>(),
-                Mock.Of<IDialogCoordinator>(),
-                Mock.Of<INavigationService>(),
-                Mock.Of<ILogger<ProfileViewModel>>(),
-                Mock.Of<ILanguageChanger>()
-            )
-        { }
-    }
+    public TestProfileViewModel()
+        : base(
+            Mock.Of<ICurrentUserService>(),
+            Mock.Of<IProfileService>(),
+            Mock.Of<IDialogCoordinator>(),
+            Mock.Of<INavigationService>(),
+            Mock.Of<ILogger<ProfileViewModel>>(),
+            Mock.Of<ILanguageChanger>()
+        )
+    { }
 }

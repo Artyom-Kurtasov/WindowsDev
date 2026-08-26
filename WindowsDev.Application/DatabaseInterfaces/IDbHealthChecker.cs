@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Application.DatabaseInterfaces
+namespace WindowsDev.Application.DatabaseInterfaces;
+
+public interface IDbHealthChecker
 {
-    public interface IDbHealthChecker
-    {
-        void Check();
-    }
+    void Check();
 }

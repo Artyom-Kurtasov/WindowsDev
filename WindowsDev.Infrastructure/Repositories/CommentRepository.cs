@@ -1,32 +1,31 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
-namespace WindowsDev.Infrastructure.Repositories
+namespace WindowsDev.Infrastructure.Repositories;
+
+internal class CommentRepository : ICommentRepository
 {
-    internal class CommentRepository : ICommentRepository
+    private readonly IDbCreator _dbManager;
+
+    public CommentRepository(IDbCreator dbManager)
     {
-        private readonly IDbCreator _dbManager;
+        _dbManager = dbManager;
+    }
 
-        public CommentRepository(IDbCreator dbManager)
-        {
-            _dbManager = dbManager;
-        }
+    public async Task AddComments(TaskComment comment)
+    {
+        using var dbContext = _dbManager.Create();
 
-        public async Task AddComments(TaskComment comment)
-        {
-            using var dbContext = _dbManager.Create();
+        await dbContext.Comments.AddAsync(comment);
+        await dbContext.SaveChangesAsync();
+    }
 
-            await dbContext.Comments.AddAsync(comment);
-            await dbContext.SaveChangesAsync();
-        }
+    public async Task<List<TaskComment>> GetComments(int taskId)
+    {
+        using var dbContext = _dbManager.Create();
 
-        public async Task<List<TaskComment>> GetComments(int taskId)
-        {
-            using var dbContext = _dbManager.Create();
-
-            return await dbContext.Comments.Where(x => x.TaskId == taskId).ToListAsync();
-        }
+        return await dbContext.Comments.Where(x => x.TaskId == taskId).ToListAsync();
     }
 }

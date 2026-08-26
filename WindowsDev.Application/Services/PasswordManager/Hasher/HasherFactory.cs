@@ -1,26 +1,25 @@
-﻿using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Domain.Enums;
 
-namespace WindowsDev.Application.Services.PasswordManager.Hasher
+namespace WindowsDev.Application.Services.PasswordManager.Hasher;
+
+internal class HasherFactory : IHasherFactory
 {
-    internal class HasherFactory : IHasherFactory
+    private readonly DefaultHasher _defaultHasher;
+    private readonly SimpleHasher _simplePasswordHasher;
+
+    public HasherFactory(DefaultHasher defaultHasher, SimpleHasher simplePasswordHasher)
     {
-        private readonly DefaultHasher _defaultHasher;
-        private readonly SimpleHasher _simplePasswordHasher;
+        _defaultHasher = defaultHasher;
+        _simplePasswordHasher = simplePasswordHasher;
+    }
 
-        public HasherFactory(DefaultHasher defaultHasher, SimpleHasher simplePasswordHasher)
+    public IHasherBase GetHashMethod(HashMethod method)
+    {
+        return method switch
         {
-            _defaultHasher = defaultHasher;
-            _simplePasswordHasher = simplePasswordHasher;
-        }
-
-        public IHasherBase GetHashMethod(HashMethod method)
-        {
-            return method switch
-            {
-                HashMethod.Simple => _simplePasswordHasher,
-                _ => _defaultHasher,
-            };
-        }
+            HashMethod.Simple => _simplePasswordHasher,
+            _ => _defaultHasher,
+        };
     }
 }

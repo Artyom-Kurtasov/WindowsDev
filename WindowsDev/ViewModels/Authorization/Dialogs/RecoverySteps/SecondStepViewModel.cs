@@ -1,77 +1,76 @@
-﻿using WindowsDev.Application.Services.DebounceService;
+using WindowsDev.Application.Services.DebounceService;
 using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
 
-namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps
+namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
+
+internal class SecondStepViewModel : ViewModelBase
 {
-    internal class SecondStepViewModel : ViewModelBase
+    private readonly PasswordRecoveryData _passwordRecoveryData;
+    private readonly IPasswordRecoveryService _passwordRecoveryService;
+    private readonly IDebounceService _debounceService;
+
+    private const int DebounceDelayMilliseconds = 500;
+
+    public SecondStepViewModel(
+        PasswordRecoveryData passwordRecoveryData,
+        IPasswordRecoveryService passwordRecoveryService,
+        IDebounceService debounceService
+    )
     {
-        private readonly PasswordRecoveryData _passwordRecoveryData;
-        private readonly IPasswordRecoveryService _passwordRecoveryService;
-        private readonly IDebounceService _debounceService;
+        _passwordRecoveryData = passwordRecoveryData;
+        _passwordRecoveryService = passwordRecoveryService;
+        _debounceService = debounceService;
+    }
 
-        private const int DebounceDelayMilliseconds = 500;
-
-        public SecondStepViewModel(
-            PasswordRecoveryData passwordRecoveryData,
-            IPasswordRecoveryService passwordRecoveryService,
-            IDebounceService debounceService
-        )
+    public string RecoveryCode
+    {
+        get => _passwordRecoveryData.RecoveryCode;
+        set
         {
-            _passwordRecoveryData = passwordRecoveryData;
-            _passwordRecoveryService = passwordRecoveryService;
-            _debounceService = debounceService;
+            if (_passwordRecoveryData.RecoveryCode == value)
+                return;
+
+            _passwordRecoveryData.RecoveryCode = value;
+
+            OnPropertyChanged();
+
+            _ = CheckRecoveryCodeAsync();
         }
+    }
 
-        public string RecoveryCode
+    public bool IsRecoveryCodeCorrect
+    {
+        get => _passwordRecoveryData.IsRecoveryCodeCorrect;
+        private set
         {
-            get => _passwordRecoveryData.RecoveryCode;
-            set
+            if (_passwordRecoveryData.IsRecoveryCodeCorrect == value)
+                return;
+
+            _passwordRecoveryData.IsRecoveryCodeCorrect = value;
+
+            OnPropertyChanged();
+        }
+    }
+
+    private async Task CheckRecoveryCodeAsync()
+    {
+        await _debounceService.DebounceAsync(
+            async () =>
             {
-                if (_passwordRecoveryData.RecoveryCode == value)
-                    return;
-
-                _passwordRecoveryData.RecoveryCode = value;
-
-                OnPropertyChanged();
-
-                _ = CheckRecoveryCodeAsync();
-            }
-        }
-
-        public bool IsRecoveryCodeCorrect
-        {
-            get => _passwordRecoveryData.IsRecoveryCodeCorrect;
-            private set
-            {
-                if (_passwordRecoveryData.IsRecoveryCodeCorrect == value)
-                    return;
-
-                _passwordRecoveryData.IsRecoveryCodeCorrect = value;
-
-                OnPropertyChanged();
-            }
-        }
-
-        private async Task CheckRecoveryCodeAsync()
-        {
-            await _debounceService.DebounceAsync(
-                async () =>
+                if (!int.TryParse(RecoveryCode, out int code))
                 {
-                    if (!int.TryParse(RecoveryCode, out int code))
-                    {
-                        IsRecoveryCodeCorrect = false;
-                        return;
-                    }
+                    IsRecoveryCodeCorrect = false;
+                    return;
+                }
 
-                    var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(
-                        code,
-                        _passwordRecoveryData.Login
-                    );
+                var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(
+                    code,
+                    _passwordRecoveryData.Login
+                );
 
-                    IsRecoveryCodeCorrect = result.IsSuccess;
-                },
-                TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
-            );
-        }
+                IsRecoveryCodeCorrect = result.IsSuccess;
+            },
+            TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
+        );
     }
 }

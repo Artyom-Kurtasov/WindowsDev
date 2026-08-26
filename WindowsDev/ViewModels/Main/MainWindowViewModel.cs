@@ -1,128 +1,127 @@
-﻿using WindowsDev.Factories;
+using WindowsDev.Factories;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
 
-namespace WindowsDev.ViewModels.Main
+namespace WindowsDev.ViewModels.Main;
+
+internal class MainWindowViewModel : ViewModelBase, IDisposable
 {
-    internal class MainWindowViewModel : ViewModelBase, IDisposable
+    private readonly IViewModelFactory _factory;
+    private readonly NavigationStore _navigationStore;
+
+    public MainWindowViewModel(NavigationStore navigationStore, IViewModelFactory factory)
     {
-        private readonly IViewModelFactory _factory;
-        private readonly NavigationStore _navigationStore;
+        _navigationStore = navigationStore;
+        _factory = factory;
 
-        public MainWindowViewModel(NavigationStore navigationStore, IViewModelFactory factory)
+        _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
+
+        // NOTE: Initialize the default tab during startup since it is displayed immediately.
+        _projects = _factory.Create<ProjectsViewModel>();
+
+        if (_projects is IRefreshableViewModel refreshable)
         {
-            _navigationStore = navigationStore;
-            _factory = factory;
+            _ = refreshable.RefreshAsync();
+        }
+    }
 
-            _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
+    public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
 
-            // NOTE: Initialize the default tab during startup since it is displayed immediately.
-            _projects = _factory.Create<ProjectsViewModel>();
+    private ProjectsViewModel? _projects;
+    public ProjectsViewModel? Projects
+    {
+        get => _projects;
+        set => _projects = value;
+    }
 
-            if (_projects is IRefreshableViewModel refreshable)
+    private SettingsViewModel? _settings;
+    public SettingsViewModel? Settings
+    {
+        get => _settings;
+        set
+        {
+            if (_settings == value)
+                return;
+            _settings = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private ProfileViewModel? _profile;
+    public ProfileViewModel? Profile
+    {
+        get => _profile;
+        set
+        {
+            if (_profile == value)
+                return;
+            _profile = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int _selectedTabIndex;
+    private bool disposedValue;
+
+    public int SelectedTabIndex
+    {
+        get => _selectedTabIndex;
+        set
+        {
+            if (_selectedTabIndex == value)
+                return;
+            _selectedTabIndex = value;
+            OnPropertyChanged(nameof(SelectedTabIndex));
+
+            _ = LoadTab(_selectedTabIndex);
+        }
+    }
+
+    private async Task LoadTab(int tabIndex)
+    {
+        if (tabIndex == 1)
+        {
+            if (_settings == null)
             {
-                _ = refreshable.RefreshAsync();
+                Settings = _factory.Create<SettingsViewModel>();
             }
         }
-
-        public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
-
-        private ProjectsViewModel? _projects;
-        public ProjectsViewModel? Projects
+        else if (tabIndex == 2)
         {
-            get => _projects;
-            set => _projects = value;
-        }
-
-        private SettingsViewModel? _settings;
-        public SettingsViewModel? Settings
-        {
-            get => _settings;
-            set
+            if (_profile == null)
             {
-                if (_settings == value)
-                    return;
-                _settings = value;
-                OnPropertyChanged();
+                Profile = _factory.Create<ProfileViewModel>();
             }
-        }
 
-        private ProfileViewModel? _profile;
-        public ProfileViewModel? Profile
+            if (Profile is IRefreshableViewModel)
+                await Profile.RefreshAsync();
+        }
+    }
+
+    private void OnCurrentViewModelChanged()
+    {
+        OnPropertyChanged(nameof(CurrentViewModel));
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
         {
-            get => _profile;
-            set
+            if (disposing)
             {
-                if (_profile == value)
-                    return;
-                _profile = value;
-                OnPropertyChanged();
+                Projects = null;
+                Settings = null;
+                Profile = null;
             }
+
+            disposedValue = true;
         }
+    }
 
-        private int _selectedTabIndex;
-        private bool disposedValue;
-
-        public int SelectedTabIndex
-        {
-            get => _selectedTabIndex;
-            set
-            {
-                if (_selectedTabIndex == value)
-                    return;
-                _selectedTabIndex = value;
-                OnPropertyChanged(nameof(SelectedTabIndex));
-
-                _ = LoadTab(_selectedTabIndex);
-            }
-        }
-
-        private async Task LoadTab(int tabIndex)
-        {
-            if (tabIndex == 1)
-            {
-                if (_settings == null)
-                {
-                    Settings = _factory.Create<SettingsViewModel>();
-                }
-            }
-            else if (tabIndex == 2)
-            {
-                if (_profile == null)
-                {
-                    Profile = _factory.Create<ProfileViewModel>();
-                }
-
-                if (Profile is IRefreshableViewModel)
-                    await Profile.RefreshAsync();
-            }
-        }
-
-        private void OnCurrentViewModelChanged()
-        {
-            OnPropertyChanged(nameof(CurrentViewModel));
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    Projects = null;
-                    Settings = null;
-                    Profile = null;
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

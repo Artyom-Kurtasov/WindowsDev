@@ -1,4 +1,4 @@
-﻿using ControlzEx.Theming;
+using ControlzEx.Theming;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
@@ -7,8 +7,8 @@ using System.Windows.Markup;
 using System.Windows.Threading;
 using WindowsDev.Application.DatabaseInterfaces;
 using WindowsDev.Application.Services.Localization;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Logging;
 using WindowsDev.Services.Navigation;
 using WindowsDev.Settings;
@@ -16,161 +16,160 @@ using WindowsDev.Settings.UserSettings;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
 
-namespace WindowsDev
+namespace WindowsDev;
+
+public partial class App : System.Windows.Application
 {
-    public partial class App : System.Windows.Application
+    public static ServiceProvider ServiceProvider { get; private set; } = null!;
+
+    protected override async void OnStartup(StartupEventArgs e)
     {
-        public static ServiceProvider ServiceProvider { get; private set; } = null!;
+        base.OnStartup(e);
 
-        protected override async void OnStartup(StartupEventArgs e)
+        ConfigureServices();
+        SubscribeToExceptionEvents();
+
+        if (!TryWarmUpDatabase())
+            return;
+
+        ApplySavedSettings();
+        SetRussianCulture();
+        await NavigateToAuthorizationAsync();
+
+        ShowMainWindow();
+    }
+
+    private void ConfigureServices()
+    {
+        var services = new ServiceCollection();
+        var configure = new Configure();
+        configure.ConfigureServices(services);
+        ServiceProvider = services.BuildServiceProvider();
+    }
+
+    private bool TryWarmUpDatabase()
+    {
+        try
         {
-            base.OnStartup(e);
+            var dbHealthChecker = ServiceProvider.GetRequiredService<IDbHealthChecker>();
+            var dbConfig = ServiceProvider.GetRequiredService<IDatabaseConfig>();
 
-            ConfigureServices();
-            SubscribeToExceptionEvents();
+            dbConfig.ConnectionString = UserSettings.Default.ConnectionString;
+            dbHealthChecker.Check();
 
-            if (!TryWarmUpDatabase())
-                return;
-
-            ApplySavedSettings();
-            SetRussianCulture();
-            await NavigateToAuthorizationAsync();
-
-            ShowMainWindow();
+            return true;
         }
-
-        private void ConfigureServices()
+        catch (Exception ex)
         {
-            var services = new ServiceCollection();
-            var configure = new Configure();
-            configure.ConfigureServices(services);
-            ServiceProvider = services.BuildServiceProvider();
-        }
-
-        private bool TryWarmUpDatabase()
-        {
-            try
-            {
-                var dbHealthChecker = ServiceProvider.GetRequiredService<IDbHealthChecker>();
-                var dbConfig = ServiceProvider.GetRequiredService<IDatabaseConfig>();
-
-                dbConfig.ConnectionString = UserSettings.Default.ConnectionString;
-                dbHealthChecker.Check();
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
-                AppXamlLogs.LogDatabaseWarmUpFailed(logger, ex);
-
-                var loc = ServiceProvider.GetRequiredService<ILanguageChanger>();
-                MessageBox.Show(
-                    loc.Translate(AppXamlErrors.DatabaseError),
-                    loc.Translate(DialogTitles.CriticalError),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-
-                Shutdown();
-                return false;
-            }
-        }
-
-        private void ApplySavedSettings()
-        {
-            var language = ServiceProvider.GetRequiredService<ILanguageChanger>();
-            language.ChangeLanguage(UserSettings.Default.LanguageCode);
-
-            ThemeManager.Current.ChangeTheme(Current, UserSettings.Default.Theme);
-        }
-
-        private async Task NavigateToAuthorizationAsync()
-        {
-            var navigationService = ServiceProvider.GetRequiredService<INavigationService>();
-            await navigationService.NavigateTo<AuthorizationViewModel>();
-        }
-
-        private void ShowMainWindow()
-        {
-            var main = ServiceProvider.GetRequiredService<MainWindow>();
-            main.DataContext = ServiceProvider.GetRequiredService<MainWindowViewModel>();
-            main.Show();
-        }
-
-        private static void SetRussianCulture()
-        {
-            var culture = new CultureInfo("ru-RU");
-            CultureInfo.CurrentCulture = culture;
-            CultureInfo.CurrentUICulture = culture;
-
-            FrameworkElement.LanguageProperty.OverrideMetadata(
-                typeof(FrameworkElement),
-                new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(culture.IetfLanguageTag))
-            );
-        }
-
-        private void SubscribeToExceptionEvents()
-        {
-            DispatcherUnhandledException += OnDispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
-            TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
-        }
-
-        private void OnDispatcherUnhandledException(
-            object sender,
-            DispatcherUnhandledExceptionEventArgs e
-        )
-        {
-            e.Handled = true;
-            var exception = e.Exception;
             var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
-            AppXamlLogs.LogDispatcherUnhandledException(logger, exception);
-            ShowErrorDialog(e.Exception, isTerminating: false);
-        }
+            AppXamlLogs.LogDatabaseWarmUpFailed(logger, ex);
 
-        private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            var exception = e.ExceptionObject as Exception;
-
-            var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
-            AppXamlLogs.LogAppDomainUnhandledException(logger, exception);
-            ShowErrorDialog(exception, e.IsTerminating);
-        }
-
-        private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
-        {
-            e.SetObserved();
-            var exception = e.Exception;
-            var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
-            AppXamlLogs.LogUnobservedTaskException(logger, exception);
-            ShowErrorDialog(e.Exception, isTerminating: false);
-        }
-
-        private void ShowErrorDialog(Exception? ex, bool isTerminating)
-        {
             var loc = ServiceProvider.GetRequiredService<ILanguageChanger>();
+            MessageBox.Show(
+                loc.Translate(AppXamlErrors.DatabaseError),
+                loc.Translate(DialogTitles.CriticalError),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
 
-            if (!isTerminating)
-            {
-                MessageBox.Show(
-                    loc.Translate(AppXamlErrors.GenericError),
-                    loc.Translate(DialogTitles.Error),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
+            Shutdown();
+            return false;
+        }
+    }
 
-                Shutdown();
-            }
-            else
-            {
-                MessageBox.Show(
-                    loc.Translate(AppXamlErrors.CriticalError),
-                    loc.Translate(DialogTitles.CriticalError),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Error
-                );
-            }
+    private void ApplySavedSettings()
+    {
+        var language = ServiceProvider.GetRequiredService<ILanguageChanger>();
+        language.ChangeLanguage(UserSettings.Default.LanguageCode);
+
+        ThemeManager.Current.ChangeTheme(Current, UserSettings.Default.Theme);
+    }
+
+    private async Task NavigateToAuthorizationAsync()
+    {
+        var navigationService = ServiceProvider.GetRequiredService<INavigationService>();
+        await navigationService.NavigateTo<AuthorizationViewModel>();
+    }
+
+    private void ShowMainWindow()
+    {
+        var main = ServiceProvider.GetRequiredService<MainWindow>();
+        main.DataContext = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+        main.Show();
+    }
+
+    private static void SetRussianCulture()
+    {
+        var culture = new CultureInfo("ru-RU");
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+
+        FrameworkElement.LanguageProperty.OverrideMetadata(
+            typeof(FrameworkElement),
+            new FrameworkPropertyMetadata(XmlLanguage.GetLanguage(culture.IetfLanguageTag))
+        );
+    }
+
+    private void SubscribeToExceptionEvents()
+    {
+        DispatcherUnhandledException += OnDispatcherUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
+        TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
+    }
+
+    private void OnDispatcherUnhandledException(
+        object sender,
+        DispatcherUnhandledExceptionEventArgs e
+    )
+    {
+        e.Handled = true;
+        var exception = e.Exception;
+        var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
+        AppXamlLogs.LogDispatcherUnhandledException(logger, exception);
+        ShowErrorDialog(e.Exception, isTerminating: false);
+    }
+
+    private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
+    {
+        var exception = e.ExceptionObject as Exception;
+
+        var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
+        AppXamlLogs.LogAppDomainUnhandledException(logger, exception);
+        ShowErrorDialog(exception, e.IsTerminating);
+    }
+
+    private void OnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    {
+        e.SetObserved();
+        var exception = e.Exception;
+        var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
+        AppXamlLogs.LogUnobservedTaskException(logger, exception);
+        ShowErrorDialog(e.Exception, isTerminating: false);
+    }
+
+    private void ShowErrorDialog(Exception? ex, bool isTerminating)
+    {
+        var loc = ServiceProvider.GetRequiredService<ILanguageChanger>();
+
+        if (!isTerminating)
+        {
+            MessageBox.Show(
+                loc.Translate(AppXamlErrors.GenericError),
+                loc.Translate(DialogTitles.Error),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
+
+            Shutdown();
+        }
+        else
+        {
+            MessageBox.Show(
+                loc.Translate(AppXamlErrors.CriticalError),
+                loc.Translate(DialogTitles.CriticalError),
+                MessageBoxButton.OK,
+                MessageBoxImage.Error
+            );
         }
     }
 }

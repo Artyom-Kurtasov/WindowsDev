@@ -1,74 +1,73 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
-namespace WindowsDev.Infrastructure.Repositories
+namespace WindowsDev.Infrastructure.Repositories;
+
+internal class UserRepository : IUserRepository
 {
-    internal class UserRepository : IUserRepository
+    private readonly IDbCreator _dbManager;
+
+    public UserRepository(IDbCreator dbManager)
     {
-        private readonly IDbCreator _dbManager;
+        _dbManager = dbManager;
+    }
 
-        public UserRepository(IDbCreator dbManager)
+    public async Task AddAsync(User user)
+    {
+        using var dbContext = _dbManager.Create();
+
+        await dbContext.UsersInfo.AddAsync(user);
+        await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<bool> ExistsByLoginAsync(string login)
+    {
+        using var dbContext = _dbManager.Create();
+
+        if (await dbContext.UsersInfo.AnyAsync(x => x.Login == login))
+            return true;
+
+        return false;
+    }
+
+    public async Task<bool> ExistsByUsernameAsync(string username)
+    {
+        using var dbContext = _dbManager.Create();
+
+        if (await dbContext.UsersInfo.AnyAsync(x => x.Username == username))
+            return true;
+
+        return false;
+    }
+
+    public async Task<User?> GetByLoginAsync(string login)
+    {
+        using var dbContext = _dbManager.Create();
+
+        return await dbContext.UsersInfo.FirstOrDefaultAsync(x => x.Login == login);
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        using var dbContext = _dbManager.Create();
+
+        var existingUser = await dbContext.UsersInfo.FirstOrDefaultAsync(x =>
+            x.Login == user.Login
+        );
+
+        if (existingUser != null)
         {
-            _dbManager = dbManager;
-        }
+            existingUser.Login = user.Login;
+            existingUser.Username = user.Username;
+            existingUser.Salt = user.Salt;
+            existingUser.HashMethod = user.HashMethod;
+            existingUser.PasswordHash = user.PasswordHash;
+            existingUser.RecoveryCodeHash = user.RecoveryCodeHash;
+            existingUser.RecoveryCodeSalt = user.RecoveryCodeSalt;
 
-        public async Task AddAsync(UsersInfo user)
-        {
-            using var dbContext = _dbManager.Create();
-
-            await dbContext.UsersInfo.AddAsync(user);
             await dbContext.SaveChangesAsync();
-        }
-
-        public async Task<bool> ExistsByLoginAsync(string login)
-        {
-            using var dbContext = _dbManager.Create();
-
-            if (await dbContext.UsersInfo.AnyAsync(x => x.Login == login))
-                return true;
-
-            return false;
-        }
-
-        public async Task<bool> ExistsByUsernameAsync(string username)
-        {
-            using var dbContext = _dbManager.Create();
-
-            if (await dbContext.UsersInfo.AnyAsync(x => x.Username == username))
-                return true;
-
-            return false;
-        }
-
-        public async Task<UsersInfo?> GetByLoginAsync(string login)
-        {
-            using var dbContext = _dbManager.Create();
-
-            return await dbContext.UsersInfo.FirstOrDefaultAsync(x => x.Login == login);
-        }
-
-        public async Task UpdateAsync(UsersInfo user)
-        {
-            using var dbContext = _dbManager.Create();
-
-            var existingUser = await dbContext.UsersInfo.FirstOrDefaultAsync(x =>
-                x.Login == user.Login
-            );
-
-            if (existingUser != null)
-            {
-                existingUser.Login = user.Login;
-                existingUser.Username = user.Username;
-                existingUser.Salt = user.Salt;
-                existingUser.HashMethod = user.HashMethod;
-                existingUser.PasswordHash = user.PasswordHash;
-                existingUser.RecoveryCodeHash = user.RecoveryCodeHash;
-                existingUser.RecoveryCodeSalt = user.RecoveryCodeSalt;
-
-                await dbContext.SaveChangesAsync();
-            }
         }
     }
 }

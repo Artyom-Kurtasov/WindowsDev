@@ -1,10 +1,9 @@
-﻿using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Entities;
 
-namespace WindowsDev.Application.RepositoriesInterfaces
+namespace WindowsDev.Application.RepositoriesInterfaces;
+
+public interface ICommentRepository
 {
-    public interface ICommentRepository
-    {
-        Task AddComments(TaskComment comment);
-        Task<List<TaskComment>> GetComments(int taskId);
-    }
+    Task AddComments(TaskComment comment);
+    Task<List<TaskComment>> GetComments(int taskId);
 }

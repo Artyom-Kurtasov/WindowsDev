@@ -1,17 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Main
+namespace WindowsDev.Views.Main;
+
+/// <summary>
+/// Interaction logic for MainView.xaml
+/// </summary>
+public partial class MainView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for MainView.xaml
-    /// </summary>
-    public partial class MainView : UserControl
+    public MainView()
     {
-        public MainView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
-
-

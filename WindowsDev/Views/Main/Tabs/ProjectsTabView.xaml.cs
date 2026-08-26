@@ -1,15 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Main.Tabs
+namespace WindowsDev.Views.Main.Tabs;
+
+/// <summary>
+/// Interaction logic for ProjectsTabView.xaml
+/// </summary>
+public partial class ProjectsTabView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ProjectsTabView.xaml
-    /// </summary>
-    public partial class ProjectsTabView : UserControl
+    public ProjectsTabView()
     {
-        public ProjectsTabView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

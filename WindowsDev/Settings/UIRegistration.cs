@@ -1,5 +1,6 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
+using WindowsDev.ApiClients.AuthClient;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.TaskService.Attachment.FileService;
 using WindowsDev.Factories;
@@ -19,57 +20,62 @@ using WindowsDev.ViewModels.Registration;
 using WindowsDev.ViewModels.Tasks;
 using WindowsDev.ViewModels.Tasks.Dialogs;
 
-namespace WindowsDev.Settings
+namespace WindowsDev.Settings;
+
+internal static class UIRegistration
 {
-    internal static class UIRegistration
+    public static IServiceCollection RegistrateUI(this IServiceCollection services)
     {
-        public static IServiceCollection RegistrateUI(this IServiceCollection services)
+        // Window
+        services.AddSingleton<MainWindow>();
+
+        // ViewModels
+        services.AddTransient<AuthorizationViewModel>();
+        services.AddTransient<RegistrationViewModel>();
+
+        services.AddTransient<ProfileViewModel>();
+        services.AddTransient<ProjectsViewModel>();
+        services.AddTransient<SettingsViewModel>();
+
+        services.AddTransient<MainWindowViewModel>();
+
+        services.AddTransient<ProjectViewModel>();
+        services.AddTransient<CreateProjectDialogViewModel>();
+
+        services.AddTransient<TaskViewModel>();
+
+        services.AddTransient<EditTaskViewModel>();
+        services.AddTransient<CreateTaskViewModel>();
+
+        services.AddTransient<RecoveryCodeDialogViewModel>();
+        services.AddTransient<FirstStepViewModel>();
+        services.AddTransient<SecondStepViewModel>();
+        services.AddTransient<ThirdStepViewModel>();
+
+        // Services
+        services.AddSingleton<IDialogService, DialogService>();
+        services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
+
+        services.AddTransient<IFilePicker, FilePicker>();
+
+        services.AddSingleton<ILanguageChanger, LanguageChanger>();
+
+        services.AddSingleton<NavigationStore>();
+        services.AddSingleton<INavigationService, NavigationService>();
+
+        // Factories
+        services.AddSingleton<IViewModelFactory, ViewModelFactory>();
+        services.AddTransient<IRecoveryStepsFactory, RecoveryStepsFactory>();
+
+        // Password Recovery Data
+        services.AddSingleton<PasswordRecoveryData>();
+
+        services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
         {
-            // Window
-            services.AddSingleton<MainWindow>();
+            client.BaseAddress = new Uri("https://localhost:7145");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
 
-            // ViewModels
-            services.AddTransient<AuthorizationViewModel>();
-            services.AddTransient<RegistrationViewModel>();
-
-            services.AddTransient<ProfileViewModel>();
-            services.AddTransient<ProjectsViewModel>();
-            services.AddTransient<SettingsViewModel>();
-
-            services.AddTransient<MainWindowViewModel>();
-
-            services.AddTransient<ProjectViewModel>();
-            services.AddTransient<CreateProjectDialogViewModel>();
-
-            services.AddTransient<TaskViewModel>();
-
-            services.AddTransient<EditTaskViewModel>();
-            services.AddTransient<CreateTaskViewModel>();
-
-            services.AddTransient<RecoveryCodeDialogViewModel>();
-            services.AddTransient<FirstStepViewModel>();
-            services.AddTransient<SecondStepViewModel>();
-            services.AddTransient<ThirdStepViewModel>();
-
-            // Services
-            services.AddSingleton<IDialogService, DialogService>();
-            services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
-
-            services.AddTransient<IFilePicker, FilePicker>();
-
-            services.AddSingleton<ILanguageChanger, LanguageChanger>();
-
-            services.AddSingleton<NavigationStore>();
-            services.AddSingleton<INavigationService, NavigationService>();
-
-            // Factories
-            services.AddSingleton<IViewModelFactory, ViewModelFactory>();
-            services.AddTransient<IRecoveryStepsFactory, RecoveryStepsFactory>();
-
-            // Password Recovery Data
-            services.AddSingleton<PasswordRecoveryData>();
-
-            return services;
-        }
+        return services;
     }
 }

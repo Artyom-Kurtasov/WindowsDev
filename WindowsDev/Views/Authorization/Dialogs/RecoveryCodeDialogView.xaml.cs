@@ -1,15 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Authorization.Dialogs
+namespace WindowsDev.Views.Authorization.Dialogs;
+
+/// <summary>
+/// Interaction logic for RecoveryCodeDialogView.xaml
+/// </summary>
+public partial class RecoveryCodeDialogView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for RecoveryCodeDialogView.xaml
-    /// </summary>
-    public partial class RecoveryCodeDialogView : UserControl
+    public RecoveryCodeDialogView()
     {
-        public RecoveryCodeDialogView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

@@ -1,219 +1,218 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
-using WindowsDev.Domain.Common.DialogsMessages.Informations;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages.DialogsMessages.Informations;
 using WindowsDev.Factories;
 using WindowsDev.ViewModels.Authorization.Dialogs;
 
-namespace WindowsDev.Tests.ViewModels.Authorization.Dialogs
+namespace WindowsDev.Tests.ViewModels.Authorization.Dialogs;
+
+public class RecoveryCodeDialogViewModelTest
 {
-    public class RecoveryCodeDialogViewModelTest
+    private readonly Mock<IPasswordRecoveryService> _passwordRecoveryServiceMock;
+    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ILogger<RecoveryCodeDialogViewModel>> _loggerMock;
+    private readonly Mock<ILanguageChanger> _languageChangerMock;
+    private readonly Mock<IRecoveryStepsFactory> _recoveryStepsFactoryMock;
+
+    private readonly PasswordRecoveryData _passwordRecoveryData;
+
+    private bool _closeRequested;
+
+    public RecoveryCodeDialogViewModelTest()
     {
-        private readonly Mock<IPasswordRecoveryService> _passwordRecoveryServiceMock;
-        private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
-        private readonly Mock<ILogger<RecoveryCodeDialogViewModel>> _loggerMock;
-        private readonly Mock<ILanguageChanger> _languageChangerMock;
-        private readonly Mock<IRecoveryStepsFactory> _recoveryStepsFactoryMock;
+        _passwordRecoveryServiceMock = new Mock<IPasswordRecoveryService>();
+        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _loggerMock = new Mock<ILogger<RecoveryCodeDialogViewModel>>();
+        _languageChangerMock = new Mock<ILanguageChanger>();
+        _recoveryStepsFactoryMock = new Mock<IRecoveryStepsFactory>();
 
-        private readonly PasswordRecoveryData _passwordRecoveryData;
+        _passwordRecoveryData = new PasswordRecoveryData();
 
-        private bool _closeRequested;
+        _languageChangerMock
+            .Setup(x => x.Translate(It.IsAny<string>()))
+            .Returns((string key) => key);
 
-        public RecoveryCodeDialogViewModelTest()
+        _recoveryStepsFactoryMock
+            .Setup(x => x.CreateSteps())
+            .Returns(new List<object> { new object(), new object(), new object() });
+    }
+
+    private RecoveryCodeDialogViewModel CreateViewModel()
+    {
+        return new RecoveryCodeDialogViewModel(
+            _passwordRecoveryServiceMock.Object,
+            _dialogCoordinatorMock.Object,
+            _loggerMock.Object,
+            _languageChangerMock.Object,
+            _recoveryStepsFactoryMock.Object,
+            _passwordRecoveryData
+        );
+    }
+
+    private void SetupEvents(RecoveryCodeDialogViewModel vm)
+    {
+        _closeRequested = false;
+
+        vm.CloseRequested += () =>
         {
-            _passwordRecoveryServiceMock = new Mock<IPasswordRecoveryService>();
-            _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
-            _loggerMock = new Mock<ILogger<RecoveryCodeDialogViewModel>>();
-            _languageChangerMock = new Mock<ILanguageChanger>();
-            _recoveryStepsFactoryMock = new Mock<IRecoveryStepsFactory>();
+            _closeRequested = true;
+            return Task.CompletedTask;
+        };
+    }
 
-            _passwordRecoveryData = new PasswordRecoveryData();
+    [Fact]
+    public void Constructor_SetsFirstStep()
+    {
+        var vm = CreateViewModel();
 
-            _languageChangerMock
-                .Setup(x => x.Translate(It.IsAny<string>()))
-                .Returns((string key) => key);
+        Assert.Equal(0, vm.CurrentStep);
+        Assert.NotNull(vm.CurrentStepView);
+    }
 
-            _recoveryStepsFactoryMock
-                .Setup(x => x.CreateSteps())
-                .Returns(new List<object> { new object(), new object(), new object() });
-        }
+    [Fact]
+    public void CanBackStep_WhenCurrentStepZero_ReturnsFalse()
+    {
+        var vm = CreateViewModel();
 
-        private RecoveryCodeDialogViewModel CreateViewModel()
-        {
-            return new RecoveryCodeDialogViewModel(
-                _passwordRecoveryServiceMock.Object,
-                _dialogCoordinatorMock.Object,
-                _loggerMock.Object,
-                _languageChangerMock.Object,
-                _recoveryStepsFactoryMock.Object,
-                _passwordRecoveryData
-            );
-        }
+        Assert.False(vm.CanBackStep());
+    }
 
-        private void SetupEvents(RecoveryCodeDialogViewModel vm)
-        {
-            _closeRequested = false;
+    [Fact]
+    public void CanBackStep_WhenCurrentStepGreaterThanZero_ReturnsTrue()
+    {
+        var vm = CreateViewModel();
 
-            vm.CloseRequested += () =>
-            {
-                _closeRequested = true;
-                return Task.CompletedTask;
-            };
-        }
+        vm.CurrentStep = 1;
 
-        [Fact]
-        public void Constructor_SetsFirstStep()
-        {
-            var vm = CreateViewModel();
+        Assert.True(vm.CanBackStep());
+    }
 
-            Assert.Equal(0, vm.CurrentStep);
-            Assert.NotNull(vm.CurrentStepView);
-        }
+    [Fact]
+    public void PrevStep_WhenCurrentStepZero_DoesNothing()
+    {
+        var vm = CreateViewModel();
 
-        [Fact]
-        public void CanBackStep_WhenCurrentStepZero_ReturnsFalse()
-        {
-            var vm = CreateViewModel();
+        ((RelayCommand)vm.PrevStepCommand).Execute(null);
 
-            Assert.False(vm.CanBackStep());
-        }
+        Assert.Equal(0, vm.CurrentStep);
+    }
 
-        [Fact]
-        public void CanBackStep_WhenCurrentStepGreaterThanZero_ReturnsTrue()
-        {
-            var vm = CreateViewModel();
+    [Fact]
+    public void PrevStep_WhenCurrentStepGreaterThanZero_GoesBack()
+    {
+        var vm = CreateViewModel();
 
-            vm.CurrentStep = 1;
+        vm.CurrentStep = 1;
 
-            Assert.True(vm.CanBackStep());
-        }
+        ((RelayCommand)vm.PrevStepCommand).Execute(null);
 
-        [Fact]
-        public void PrevStep_WhenCurrentStepZero_DoesNothing()
-        {
-            var vm = CreateViewModel();
+        Assert.Equal(0, vm.CurrentStep);
+    }
 
-            ((RelayCommand)vm.PrevStepCommand).Execute(null);
+    [Fact]
+    public void NextStepCommand_WhenCurrentStepGreaterZenStepsCount_DoesNothing()
+    {
+        var vm = CreateViewModel();
 
-            Assert.Equal(0, vm.CurrentStep);
-        }
+        vm.CurrentStep = 2;
 
-        [Fact]
-        public void PrevStep_WhenCurrentStepGreaterThanZero_GoesBack()
-        {
-            var vm = CreateViewModel();
+        ((RelayCommand)vm.NextStepCommand).Execute(null);
 
-            vm.CurrentStep = 1;
+        Assert.Equal(2, vm.CurrentStep);
+    }
 
-            ((RelayCommand)vm.PrevStepCommand).Execute(null);
+    [Fact]
+    public void NextStep_WhenCurrentStepZero_GoesNext()
+    {
+        var vm = CreateViewModel();
 
-            Assert.Equal(0, vm.CurrentStep);
-        }
+        ((RelayCommand)vm.NextStepCommand).Execute(null);
 
-        [Fact]
-        public void NextStepCommand_WhenCurrentStepGreaterZenStepsCount_DoesNothing()
-        {
-            var vm = CreateViewModel();
+        Assert.Equal(1, vm.CurrentStep);
+    }
 
-            vm.CurrentStep = 2;
+    [Fact]
+    public async Task CancelCommand_RaisesCloseRequested()
+    {
+        var vm = CreateViewModel();
 
-            ((RelayCommand)vm.NextStepCommand).Execute(null);
+        SetupEvents(vm);
 
-            Assert.Equal(2, vm.CurrentStep);
-        }
+        await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
 
-        [Fact]
-        public void NextStep_WhenCurrentStepZero_GoesNext()
-        {
-            var vm = CreateViewModel();
+        Assert.True(_closeRequested);
+    }
 
-            ((RelayCommand)vm.NextStepCommand).Execute(null);
+    [Fact]
+    public async Task ChangePassword_WhenSuccess_ShowsInformationDialogAndCloses()
+    {
+        var vm = CreateViewModel();
 
-            Assert.Equal(1, vm.CurrentStep);
-        }
+        SetupEvents(vm);
 
-        [Fact]
-        public async Task CancelCommand_RaisesCloseRequested()
-        {
-            var vm = CreateViewModel();
+        _passwordRecoveryData.Login = "test";
+        _passwordRecoveryData.NewPassword = "Password123!";
+        _passwordRecoveryData.ConfirmPassword = "Password123!";
 
-            SetupEvents(vm);
+        vm.CurrentStep = 2;
 
-            await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
+        _passwordRecoveryServiceMock
+            .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(Result<int>.Success(123456));
 
-            Assert.True(_closeRequested);
-        }
+        Assert.True(vm.ChangePasswordCommand.CanExecute(null));
 
-        [Fact]
-        public async Task ChangePassword_WhenSuccess_ShowsInformationDialogAndCloses()
-        {
-            var vm = CreateViewModel();
+        await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
 
-            SetupEvents(vm);
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Information,
+                    $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
 
-            _passwordRecoveryData.Login = "test";
-            _passwordRecoveryData.NewPassword = "Password123!";
-            _passwordRecoveryData.ConfirmPassword = "Password123!";
+        Assert.True(_closeRequested);
+    }
 
-            vm.CurrentStep = 2;
+    [Fact]
+    public async Task ChangePassword_WhenExceptionOccurs_ShowsErrorDialog()
+    {
+        var vm = CreateViewModel();
 
-            _passwordRecoveryServiceMock
-                .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(Result<int>.Success(123456));
+        _passwordRecoveryData.Login = "test";
+        _passwordRecoveryData.NewPassword = "Password123!";
+        _passwordRecoveryData.ConfirmPassword = "Password123!";
 
-            Assert.True(vm.ChangePasswordCommand.CanExecute(null));
+        vm.CurrentStep = 2;
 
-            await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
+        _passwordRecoveryServiceMock
+            .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
+            .ThrowsAsync(new Exception());
 
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Information,
-                        $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
+        Assert.True(vm.ChangePasswordCommand.CanExecute(null));
 
-            Assert.True(_closeRequested);
-        }
+        await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
 
-        [Fact]
-        public async Task ChangePassword_WhenExceptionOccurs_ShowsErrorDialog()
-        {
-            var vm = CreateViewModel();
-
-            _passwordRecoveryData.Login = "test";
-            _passwordRecoveryData.NewPassword = "Password123!";
-            _passwordRecoveryData.ConfirmPassword = "Password123!";
-
-            vm.CurrentStep = 2;
-
-            _passwordRecoveryServiceMock
-                .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ThrowsAsync(new Exception());
-
-            Assert.True(vm.ChangePasswordCommand.CanExecute(null));
-
-            await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
-
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Error,
-                        CommonErrors.UnexpectedError,
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
-        }
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Error,
+                    CommonErrors.UnexpectedError,
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
     }
 }

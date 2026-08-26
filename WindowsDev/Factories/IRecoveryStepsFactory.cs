@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Factories
+namespace WindowsDev.Factories;
+
+public interface IRecoveryStepsFactory
 {
-    public interface IRecoveryStepsFactory
-    {
-        IReadOnlyList<object> CreateSteps();
-    }
+    IReadOnlyList<object> CreateSteps();
 }

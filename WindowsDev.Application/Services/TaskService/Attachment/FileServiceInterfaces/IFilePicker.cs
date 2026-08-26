@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Application.Services.TaskService.Attachment.FileService
+namespace WindowsDev.Application.Services.TaskService.Attachment.FileService;
+
+public interface IFilePicker
 {
-    public interface IFilePicker
-    {
-        string? PickFile();
-    }
+    string? PickFile();
 }

@@ -1,9 +1,8 @@
-﻿using WindowsDev.Domain.Enums;
+using WindowsDev.Domain.Enums;
 
-namespace WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces
+namespace WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+
+public interface IHasherFactory
 {
-    public interface IHasherFactory
-    {
-        IHasherBase GetHashMethod(HashMethod method);
-    }
+    IHasherBase GetHashMethod(HashMethod method);
 }

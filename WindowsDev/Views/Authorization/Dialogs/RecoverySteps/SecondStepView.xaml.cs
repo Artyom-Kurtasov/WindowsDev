@@ -1,15 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Authorization.Dialogs.RecoverySteps
+namespace WindowsDev.Views.Authorization.Dialogs.RecoverySteps;
+
+/// <summary>
+/// Interaction logic for RecoveryPasswordSecondStep.xaml
+/// </summary>
+public partial class SecondStepView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for RecoveryPasswordSecondStep.xaml
-    /// </summary>
-    public partial class SecondStepView : UserControl
+    public SecondStepView()
     {
-        public SecondStepView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

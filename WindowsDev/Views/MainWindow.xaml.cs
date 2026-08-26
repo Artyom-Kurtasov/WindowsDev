@@ -1,17 +1,14 @@
-﻿using MahApps.Metro.Controls;
+using MahApps.Metro.Controls;
 
-namespace WindowsDev
+namespace WindowsDev;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : MetroWindow
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : MetroWindow
+    public MainWindow()
     {
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
-
 }
-

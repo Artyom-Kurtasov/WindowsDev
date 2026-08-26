@@ -1,10 +1,9 @@
-﻿using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Entities;
 
-namespace WindowsDev.Application.RepositoriesInterfaces
+namespace WindowsDev.Application.RepositoriesInterfaces;
+
+public interface IAttachmentRepository
 {
-    public interface IAttachmentRepository
-    {
-        Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId);
-        Task AddFileInfoToDatabase(TaskAttachment attachment);
-    }
+    Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId);
+    Task AddFileInfoToDatabase(TaskAttachment attachment);
 }

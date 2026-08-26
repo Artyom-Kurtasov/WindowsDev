@@ -1,14 +1,13 @@
-﻿using Microsoft.Win32;
+using Microsoft.Win32;
 using WindowsDev.Application.Services.TaskService.Attachment.FileService;
 
-namespace WindowsDev.Services.FilePicker
+namespace WindowsDev.Services.FilePicker;
+
+internal class FilePicker : IFilePicker
 {
-    internal class FilePicker : IFilePicker
+    public string? PickFile()
     {
-        public string? PickFile()
-        {
-            var dialog = new OpenFileDialog();
-            return dialog.ShowDialog() == true ? dialog.FileName : null;
-        }
+        var dialog = new OpenFileDialog();
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
 }

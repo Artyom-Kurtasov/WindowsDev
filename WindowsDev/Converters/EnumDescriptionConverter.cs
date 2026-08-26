@@ -1,39 +1,38 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 using System.Windows.Data;
 
-namespace WindowsDev.Converters
+namespace WindowsDev.Converters;
+
+internal class EnumDescriptionConverter : IValueConverter
 {
-    internal class EnumDescriptionConverter : IValueConverter
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        if (value is Enum enumValue)
         {
-            if (value is Enum enumValue)
-            {
-                return GetEnumDescription(enumValue);
-            }
-
-            return value;
+            return GetEnumDescription(enumValue);
         }
 
-        public object ConvertBack(
-            object value,
-            Type targetType,
-            object parameter,
-            CultureInfo culture
-        )
-        {
-            throw new NotImplementedException();
-        }
+        return value;
+    }
 
-        private string GetEnumDescription(Enum enumValue)
-        {
-            FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
+    public object ConvertBack(
+        object value,
+        Type targetType,
+        object parameter,
+        CultureInfo culture
+    )
+    {
+        throw new NotImplementedException();
+    }
 
-            var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+    private string GetEnumDescription(Enum enumValue)
+    {
+        FieldInfo field = enumValue.GetType().GetField(enumValue.ToString());
 
-            return attribute?.Description ?? enumValue.ToString();
-        }
+        var attribute = field.GetCustomAttribute<DescriptionAttribute>();
+
+        return attribute?.Description ?? enumValue.ToString();
     }
 }

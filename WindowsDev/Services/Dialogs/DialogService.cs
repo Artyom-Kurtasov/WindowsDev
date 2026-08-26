@@ -1,69 +1,68 @@
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
-using WindowsDev.Domain.Common;
+using WindowsDev.Domain.Messages;
 using WindowsDev.Factories;
 using WindowsDev.ViewModels.Interfaces;
 
-namespace WindowsDev.Services.Dialogs
+namespace WindowsDev.Services.Dialogs;
+
+internal class DialogService : IDialogService
 {
-    internal class DialogService : IDialogService
+    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IViewModelFactory _viewModelFactory;
+
+    public DialogService(
+        IDialogCoordinator dialogCoordinator,
+        IViewModelFactory viewModelFactory
+    )
     {
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly IViewModelFactory _viewModelFactory;
+        _dialogCoordinator = dialogCoordinator;
+        _viewModelFactory = viewModelFactory;
+    }
 
-        public DialogService(
-            IDialogCoordinator dialogCoordinator,
-            IViewModelFactory viewModelFactory
-        )
+    public async Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
+        where TView : UserControl, new()
+        where TViewModel : class, IDialogViewModel
+    {
+        var view = new TView();
+        var viewModel = _viewModelFactory.Create<TViewModel>(args);
+
+        var dialog = new CustomDialog { Content = view };
+
+        view.DataContext = viewModel;
+
+        Func<Task>? completedHandler = null;
+        Func<Task>? closeHandler = null;
+
+        completedHandler = async () =>
         {
-            _dialogCoordinator = dialogCoordinator;
-            _viewModelFactory = viewModelFactory;
-        }
-
-        public async Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
-            where TView : UserControl, new()
-            where TViewModel : class, IDialogViewModel
-        {
-            var view = new TView();
-            var viewModel = _viewModelFactory.Create<TViewModel>(args);
-
-            var dialog = new CustomDialog { Content = view };
-
-            view.DataContext = viewModel;
-
-            Func<Task>? completedHandler = null;
-            Func<Task>? closeHandler = null;
-
-            completedHandler = async () =>
+            if (context is IRefreshableViewModel refreshable)
             {
-                if (context is IRefreshableViewModel refreshable)
-                {
-                    await refreshable.RefreshAsync();
-                }
+                await refreshable.RefreshAsync();
+            }
 
-                viewModel.Completed -= completedHandler;
-            };
+            viewModel.Completed -= completedHandler;
+        };
 
-            closeHandler = async () =>
-            {
-                await _dialogCoordinator.HideMetroDialogAsync(context, dialog);
-                viewModel.CloseRequested -= closeHandler;
-            };
-
-            viewModel.Completed += completedHandler;
-            viewModel.CloseRequested += closeHandler;
-
-            await _dialogCoordinator.ShowMetroDialogAsync(context, dialog);
-        }
-
-        public async Task ShowErrorDialogAsync(object context, string message, params object[] args)
+        closeHandler = async () =>
         {
-            await _dialogCoordinator.ShowMessageAsync(
-                context,
-                DialogTitles.Error,
-                message,
-                MessageDialogStyle.Affirmative
-            );
-        }
+            await _dialogCoordinator.HideMetroDialogAsync(context, dialog);
+            viewModel.CloseRequested -= closeHandler;
+        };
+
+        viewModel.Completed += completedHandler;
+        viewModel.CloseRequested += closeHandler;
+
+        await _dialogCoordinator.ShowMetroDialogAsync(context, dialog);
+    }
+
+    public async Task ShowErrorDialogAsync(object context, string message, params object[] args)
+    {
+        await _dialogCoordinator.ShowMessageAsync(
+            context,
+            DialogTitles.Error,
+            message,
+            MessageDialogStyle.Affirmative
+        );
     }
 }

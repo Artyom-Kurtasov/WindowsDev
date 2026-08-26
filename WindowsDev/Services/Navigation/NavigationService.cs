@@ -2,31 +2,30 @@ using WindowsDev.Factories;
 using WindowsDev.ViewModels;
 using WindowsDev.ViewModels.Main;
 
-namespace WindowsDev.Services.Navigation
+namespace WindowsDev.Services.Navigation;
+
+internal class NavigationService : INavigationService
 {
-    internal class NavigationService : INavigationService
+    private readonly NavigationStore _navigationStore;
+    private readonly IViewModelFactory _viewModelFactory;
+
+    public NavigationService(
+        NavigationStore navigationStore,
+        IViewModelFactory viewModelFactory
+    )
     {
-        private readonly NavigationStore _navigationStore;
-        private readonly IViewModelFactory _viewModelFactory;
+        _navigationStore = navigationStore;
+        _viewModelFactory = viewModelFactory;
+    }
 
-        public NavigationService(
-            NavigationStore navigationStore,
-            IViewModelFactory viewModelFactory
-        )
+    public async Task NavigateTo<TViewModel>(params object[] args)
+        where TViewModel : ViewModelBase
+    {
+        if (_navigationStore.CurrentViewModel is MainWindowViewModel viewModel)
         {
-            _navigationStore = navigationStore;
-            _viewModelFactory = viewModelFactory;
+            viewModel.Dispose();
         }
 
-        public async Task NavigateTo<TViewModel>(params object[] args)
-            where TViewModel : ViewModelBase
-        {
-            if (_navigationStore.CurrentViewModel is MainWindowViewModel viewModel)
-            {
-                viewModel.Dispose();
-            }
-
-            _navigationStore.CurrentViewModel = _viewModelFactory.Create<TViewModel>(args);
-        }
+        _navigationStore.CurrentViewModel = _viewModelFactory.Create<TViewModel>(args);
     }
 }

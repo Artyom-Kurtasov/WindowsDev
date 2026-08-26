@@ -1,245 +1,244 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.Profile;
 using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
-using WindowsDev.Domain.Common.DialogsMessages.Success;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages.DialogsMessages.Success;
 using WindowsDev.Infrastructure.Logging;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Interfaces;
 
-namespace WindowsDev.ViewModels.Main.Tabs
+namespace WindowsDev.ViewModels.Main.Tabs;
+
+internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
 {
-    internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
+    private readonly INavigationService _navigationService;
+    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IProfileService _profileService;
+    private readonly ICurrentUserService _userData;
+    private readonly ILogger<ProfileViewModel> _logger;
+
+    public ProfileViewModel(
+        ICurrentUserService currentUserService,
+        IProfileService profileService,
+        IDialogCoordinator dialogCoordinator,
+        INavigationService navigationService,
+        ILogger<ProfileViewModel> logger,
+        ILanguageChanger languageChanger
+    )
+        : base(languageChanger)
     {
-        private readonly INavigationService _navigationService;
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly IProfileService _profileService;
-        private readonly ICurrentUserService _userData;
-        private readonly ILogger<ProfileViewModel> _logger;
+        _userData = currentUserService;
+        _profileService = profileService;
+        _dialogCoordinator = dialogCoordinator;
+        _navigationService = navigationService;
+        _logger = logger;
 
-        public ProfileViewModel(
-            ICurrentUserService currentUserService,
-            IProfileService profileService,
-            IDialogCoordinator dialogCoordinator,
-            INavigationService navigationService,
-            ILogger<ProfileViewModel> logger,
-            ILanguageChanger languageChanger
-        )
-            : base(languageChanger)
+        SaveNewPasswordCommand = new AsyncRelayCommand(SaveNewPasswordAsync);
+        SaveNewUsernameCommand = new AsyncRelayCommand(SaveNewUsernameAsync);
+        LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+
+        SetUserData();
+    }
+
+    public ICommand SaveNewUsernameCommand { get; }
+    public ICommand SaveNewPasswordCommand { get; }
+    public ICommand LogoutCommand { get; }
+
+    private int _id;
+
+    public int Id
+    {
+        get => _id;
+        private set
         {
-            _userData = currentUserService;
-            _profileService = profileService;
-            _dialogCoordinator = dialogCoordinator;
-            _navigationService = navigationService;
-            _logger = logger;
+            if (_id == value)
+                return;
 
-            SaveNewPasswordCommand = new AsyncRelayCommand(SaveNewPasswordAsync);
-            SaveNewUsernameCommand = new AsyncRelayCommand(SaveNewUsernameAsync);
-            LogoutCommand = new AsyncRelayCommand(LogoutAsync);
-
-            SetUserData();
+            _id = value;
+            OnPropertyChanged();
         }
+    }
 
-        public ICommand SaveNewUsernameCommand { get; }
-        public ICommand SaveNewPasswordCommand { get; }
-        public ICommand LogoutCommand { get; }
+    private string _login = string.Empty;
 
-        private int _id;
-
-        public int Id
+    public string Login
+    {
+        get => _login;
+        private set
         {
-            get => _id;
-            private set
-            {
-                if (_id == value)
-                    return;
+            if (_login == value)
+                return;
 
-                _id = value;
-                OnPropertyChanged();
-            }
+            _login = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _login = string.Empty;
+    private string _username = string.Empty;
 
-        public string Login
+    public string Username
+    {
+        get => _username;
+        set
         {
-            get => _login;
-            private set
-            {
-                if (_login == value)
-                    return;
+            if (_username == value)
+                return;
 
-                _login = value;
-                OnPropertyChanged();
-            }
+            _username = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _username = string.Empty;
+    private string _currentPassword = string.Empty;
 
-        public string Username
+    public string CurrentPassword
+    {
+        get => _currentPassword;
+        set
         {
-            get => _username;
-            set
-            {
-                if (_username == value)
-                    return;
+            if (_currentPassword == value)
+                return;
 
-                _username = value;
-                OnPropertyChanged();
-            }
+            _currentPassword = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _currentPassword = string.Empty;
+    private string _newPassword = string.Empty;
 
-        public string CurrentPassword
+    public string NewPassword
+    {
+        get => _newPassword;
+        set
         {
-            get => _currentPassword;
-            set
-            {
-                if (_currentPassword == value)
-                    return;
+            if (_newPassword == value)
+                return;
 
-                _currentPassword = value;
-                OnPropertyChanged();
-            }
+            _newPassword = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _newPassword = string.Empty;
+    private string _confirmPassword = string.Empty;
 
-        public string NewPassword
+    public string ConfirmPassword
+    {
+        get => _confirmPassword;
+        set
         {
-            get => _newPassword;
-            set
-            {
-                if (_newPassword == value)
-                    return;
+            if (_confirmPassword == value)
+                return;
 
-                _newPassword = value;
-                OnPropertyChanged();
-            }
+            _confirmPassword = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _confirmPassword = string.Empty;
-
-        public string ConfirmPassword
+    private async Task SaveNewUsernameAsync()
+    {
+        try
         {
-            get => _confirmPassword;
-            set
+            var result = await _profileService.ChangeUsernameAsync(
+                _userData.Username,
+                Username
+            );
+
+            if (!result.IsSuccess)
             {
-                if (_confirmPassword == value)
-                    return;
-
-                _confirmPassword = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private async Task SaveNewUsernameAsync()
-        {
-            try
-            {
-                var result = await _profileService.ChangeUsernameAsync(
-                    _userData.Username,
-                    Username
-                );
-
-                if (!result.IsSuccess)
-                {
-                    await _dialogCoordinator.ShowMessageAsync(
-                        this,
-                        Translate(DialogTitles.Warning),
-                        Translate(result.Error),
-                        MessageDialogStyle.Affirmative
-                    );
-
-                    return;
-                }
-
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
-                    Translate(DialogTitles.Success),
-                    Translate(ProfileSuccesses.UsernameChanged),
+                    Translate(DialogTitles.Warning),
+                    Translate(result.Error),
                     MessageDialogStyle.Affirmative
                 );
-            }
-            catch (Exception ex)
-            {
-                ProfileLogs.UsernameChangeFailed(_logger, _userData.UserId, ex);
 
+                return;
+            }
+
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Success),
+                Translate(ProfileSuccesses.UsernameChanged),
+                MessageDialogStyle.Affirmative
+            );
+        }
+        catch (Exception ex)
+        {
+            ProfileLogs.UsernameChangeFailed(_logger, _userData.UserId, ex);
+
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Error),
+                Translate(CommonErrors.UnexpectedError),
+                MessageDialogStyle.Affirmative
+            );
+        }
+    }
+
+    private async Task SaveNewPasswordAsync()
+    {
+        try
+        {
+            var result = await _profileService.ChangePasswordAsync(
+                CurrentPassword,
+                NewPassword,
+                ConfirmPassword
+            );
+
+            if (!result.IsSuccess)
+            {
                 await _dialogCoordinator.ShowMessageAsync(
                     this,
-                    Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError),
+                    Translate(DialogTitles.Warning),
+                    Translate(result.Error),
                     MessageDialogStyle.Affirmative
                 );
+
+                return;
             }
-        }
 
-        private async Task SaveNewPasswordAsync()
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Success),
+                $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value}",
+                MessageDialogStyle.Affirmative
+            );
+        }
+        catch (Exception ex)
         {
-            try
-            {
-                var result = await _profileService.ChangePasswordAsync(
-                    CurrentPassword,
-                    NewPassword,
-                    ConfirmPassword
-                );
+            ProfileLogs.PasswordChangeFailed(_logger, _userData.UserId, ex);
 
-                if (!result.IsSuccess)
-                {
-                    await _dialogCoordinator.ShowMessageAsync(
-                        this,
-                        Translate(DialogTitles.Warning),
-                        Translate(result.Error),
-                        MessageDialogStyle.Affirmative
-                    );
-
-                    return;
-                }
-
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
-                    Translate(DialogTitles.Success),
-                    $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value}",
-                    MessageDialogStyle.Affirmative
-                );
-            }
-            catch (Exception ex)
-            {
-                ProfileLogs.PasswordChangeFailed(_logger, _userData.UserId, ex);
-
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
-                    Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative
-                );
-            }
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Error),
+                Translate(CommonErrors.UnexpectedError),
+                MessageDialogStyle.Affirmative
+            );
         }
+    }
 
-        private async Task LogoutAsync()
-        {
-            _userData.ClearUser();
+    private async Task LogoutAsync()
+    {
+        _userData.ClearUser();
 
-            await _navigationService.NavigateTo<AuthorizationViewModel>();
-        }
+        await _navigationService.NavigateTo<AuthorizationViewModel>();
+    }
 
-        private void SetUserData()
-        {
-            Id = _userData.UserId;
-            Login = _userData.Login ?? string.Empty;
-            Username = _userData.Username ?? string.Empty;
-        }
+    private void SetUserData()
+    {
+        Id = _userData.UserId;
+        Login = _userData.Login ?? string.Empty;
+        Username = _userData.Username ?? string.Empty;
+    }
 
-        public async Task RefreshAsync()
-        {
-            SetUserData();
-        }
+    public async Task RefreshAsync()
+    {
+        SetUserData();
     }
 }

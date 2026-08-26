@@ -1,8 +1,7 @@
-namespace WindowsDev.Services.Dialogs
+namespace WindowsDev.Services.Dialogs;
+
+public interface IDialogViewModel
 {
-    public interface IDialogViewModel
-    {
-        event Func<Task>? CloseRequested;
-        event Func<Task>? Completed;
-    }
+    event Func<Task>? CloseRequested;
+    event Func<Task>? Completed;
 }

@@ -1,12 +1,11 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Authorization.Dialogs.RecoverySteps
+namespace WindowsDev.Views.Authorization.Dialogs.RecoverySteps;
+
+public partial class FirstStepView : UserControl
 {
-    public partial class FirstStepView : UserControl
+    public FirstStepView()
     {
-        public FirstStepView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

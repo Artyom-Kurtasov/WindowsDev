@@ -1,10 +1,9 @@
-﻿namespace WindowsDev.Domain.Enums
+namespace WindowsDev.Domain.Enums;
+
+public enum TaskStatus
 {
-    public enum TaskStatus
-    {
-        Completed,
-        InProgress,
-        Closed,
-        Frozen,
-    }
+    Completed,
+    InProgress,
+    Closed,
+    Frozen,
 }

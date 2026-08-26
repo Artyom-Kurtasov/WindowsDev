@@ -1,9 +1,8 @@
 using WindowsDev.ViewModels;
 
-namespace WindowsDev.Services.Navigation
+namespace WindowsDev.Services.Navigation;
+
+public interface INavigationService
 {
-    public interface INavigationService
-    {
-        Task NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase;
-    }
+    Task NavigateTo<TViewModel>(params object[] args) where TViewModel : ViewModelBase;
 }

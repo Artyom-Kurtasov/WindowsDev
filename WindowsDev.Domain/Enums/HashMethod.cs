@@ -1,8 +1,7 @@
-﻿namespace WindowsDev.Domain.Enums
+namespace WindowsDev.Domain.Enums;
+
+public enum HashMethod
 {
-    public enum HashMethod
-    {
-        Default = 1,
-        Simple = 2
-    }
+    Default = 1,
+    Simple = 2
 }

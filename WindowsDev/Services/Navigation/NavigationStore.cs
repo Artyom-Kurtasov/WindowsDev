@@ -1,20 +1,19 @@
-﻿using WindowsDev.ViewModels;
+using WindowsDev.ViewModels;
 
-namespace WindowsDev.Services.Navigation
+namespace WindowsDev.Services.Navigation;
+
+internal class NavigationStore
 {
-    internal class NavigationStore
+    private ViewModelBase? _currentViewModel;
+    public ViewModelBase? CurrentViewModel
     {
-        private ViewModelBase? _currentViewModel;
-        public ViewModelBase? CurrentViewModel
+        get => _currentViewModel;
+        set
         {
-            get => _currentViewModel;
-            set
-            {
-                _currentViewModel = value;
-                CurrentViewModelChanged?.Invoke();
-            }
+            _currentViewModel = value;
+            CurrentViewModelChanged?.Invoke();
         }
-
-        public event Action? CurrentViewModelChanged;
     }
+
+    public event Action? CurrentViewModelChanged;
 }

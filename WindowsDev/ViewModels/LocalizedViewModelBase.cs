@@ -1,19 +1,18 @@
-﻿using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Services.Localization;
 
-namespace WindowsDev.ViewModels
+namespace WindowsDev.ViewModels;
+
+internal class LocalizedViewModelBase : ViewModelBase
 {
-    internal class LocalizedViewModelBase : ViewModelBase
+    protected readonly ILanguageChanger LanguageChanger;
+
+    protected LocalizedViewModelBase(ILanguageChanger languageChanger)
     {
-        protected readonly ILanguageChanger LanguageChanger;
+        LanguageChanger = languageChanger;
+    }
 
-        protected LocalizedViewModelBase(ILanguageChanger languageChanger)
-        {
-            LanguageChanger = languageChanger;
-        }
-
-        protected string Translate(string key)
-        {
-            return LanguageChanger.Translate(key);
-        }
+    protected string Translate(string key)
+    {
+        return LanguageChanger.Translate(key);
     }
 }

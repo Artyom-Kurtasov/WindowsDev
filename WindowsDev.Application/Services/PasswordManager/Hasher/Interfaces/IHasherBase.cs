@@ -1,8 +1,7 @@
-﻿namespace WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces
+namespace WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+
+public interface IHasherBase
 {
-    public interface IHasherBase
-    {
-        ulong HashValue(string password, byte[] salt);
-        byte[] GenerateSalt();
-    }
+    ulong HashValue(string password, byte[] salt);
+    byte[] GenerateSalt();
 }

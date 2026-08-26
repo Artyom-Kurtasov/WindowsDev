@@ -1,61 +1,60 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
-namespace WindowsDev.Application.Services.UserManager
+namespace WindowsDev.Application.Services.UserManager;
+
+internal class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
 {
-    internal class CurrentUserService : INotifyPropertyChanged, ICurrentUserService
+    private string _login = string.Empty;
+    public string Login
     {
-        private string _login = string.Empty;
-        public string Login
+        get => _login;
+        set
         {
-            get => _login;
-            set
-            {
-                _login = value;
-                OnPropertyChanged(nameof(Login));
-            }
+            _login = value;
+            OnPropertyChanged(nameof(Login));
         }
+    }
 
-        private string _username = string.Empty;
-        public string Username
+    private string _username = string.Empty;
+    public string Username
+    {
+        get => _username;
+        set
         {
-            get => _username;
-            set
-            {
-                _username = value;
-                OnPropertyChanged(nameof(Username));
-            }
+            _username = value;
+            OnPropertyChanged(nameof(Username));
         }
+    }
 
-        private int _userId;
-        public int UserId
+    private int _userId;
+    public int UserId
+    {
+        get => _userId;
+        set
         {
-            get => _userId;
-            set
-            {
-                _userId = value;
-                OnPropertyChanged(nameof(UserId));
-            }
+            _userId = value;
+            OnPropertyChanged(nameof(UserId));
         }
+    }
 
-        public void SetUser(int id, string login, string username)
-        {
-            Login = login;
-            UserId = id;
-            Username = username;
-        }
+    public void SetUser(int id, string login, string username)
+    {
+        Login = login;
+        UserId = id;
+        Username = username;
+    }
 
-        public void ClearUser()
-        {
-            Login = string.Empty;
-            UserId = -1;
-            Username = string.Empty;
-        }
+    public void ClearUser()
+    {
+        Login = string.Empty;
+        UserId = -1;
+        Username = string.Empty;
+    }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-        private void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    private void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

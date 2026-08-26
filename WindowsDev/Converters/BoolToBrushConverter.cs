@@ -1,30 +1,29 @@
-﻿using System.Globalization;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Media;
 
-namespace WindowsDev.Converters
-{
-    internal class BoolToBrushConverter : IValueConverter
-    {
-        public object Convert(
-            object value,
-            Type targetType,
-            object parameter,
-            CultureInfo cultureInfo
-        )
-        {
-            return value is bool isValid && isValid ? Brushes.Green : Brushes.Red;
-        }
+namespace WindowsDev.Converters;
 
-        public object ConvertBack(
-            object value,
-            Type targetType,
-            object parameter,
-            CultureInfo cultureInfo
-        )
-        {
-            return DependencyProperty.UnsetValue;
-        }
+internal class BoolToBrushConverter : IValueConverter
+{
+    public object Convert(
+        object value,
+        Type targetType,
+        object parameter,
+        CultureInfo cultureInfo
+    )
+    {
+        return value is bool isValid && isValid ? Brushes.Green : Brushes.Red;
+    }
+
+    public object ConvertBack(
+        object value,
+        Type targetType,
+        object parameter,
+        CultureInfo cultureInfo
+    )
+    {
+        return DependencyProperty.UnsetValue;
     }
 }

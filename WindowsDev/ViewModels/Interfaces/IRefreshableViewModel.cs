@@ -1,7 +1,6 @@
-namespace WindowsDev.ViewModels.Interfaces
+namespace WindowsDev.ViewModels.Interfaces;
+
+public interface IRefreshableViewModel
 {
-    public interface IRefreshableViewModel
-    {
-        Task RefreshAsync();
-    }
+    Task RefreshAsync();
 }

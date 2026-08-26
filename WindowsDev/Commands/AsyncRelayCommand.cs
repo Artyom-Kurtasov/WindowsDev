@@ -1,54 +1,53 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 
-namespace WindowsDev.Command
+namespace WindowsDev.Command;
+
+internal class AsyncRelayCommand : ICommand
 {
-    internal class AsyncRelayCommand : ICommand
+    private readonly Func<Task> _execute;
+    private readonly Func<bool>? _canExecute;
+
+    private bool _isExecuting;
+
+    public AsyncRelayCommand(Func<Task> execute, Func<bool>? canExecute = null)
     {
-        private readonly Func<Task> _execute;
-        private readonly Func<bool>? _canExecute;
+        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        _canExecute = canExecute;
+    }
 
-        private bool _isExecuting;
+    public event EventHandler? CanExecuteChanged;
 
-        public AsyncRelayCommand(Func<Task> execute, Func<bool>? canExecute = null)
+    public bool CanExecute(object? parameter)
+    {
+        return !_isExecuting && (_canExecute?.Invoke() ?? true);
+    }
+
+    public async void Execute(object? parameter)
+    {
+        await ExecuteAsync();
+    }
+
+    public async Task ExecuteAsync(object? parameter = null)
+    {
+        if (!CanExecute(parameter))
+            return;
+
+        try
         {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
+            _isExecuting = true;
+            RaiseCanExecuteChanged();
+
+            await _execute();
         }
-
-        public event EventHandler? CanExecuteChanged;
-
-        public bool CanExecute(object? parameter)
+        finally
         {
-            return !_isExecuting && (_canExecute?.Invoke() ?? true);
+            _isExecuting = false;
+            RaiseCanExecuteChanged();
         }
+    }
 
-        public async void Execute(object? parameter)
-        {
-            await ExecuteAsync();
-        }
-
-        public async Task ExecuteAsync(object? parameter = null)
-        {
-            if (!CanExecute(parameter))
-                return;
-
-            try
-            {
-                _isExecuting = true;
-                RaiseCanExecuteChanged();
-
-                await _execute();
-            }
-            finally
-            {
-                _isExecuting = false;
-                RaiseCanExecuteChanged();
-            }
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+    public void RaiseCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -1,21 +1,20 @@
-﻿namespace WindowsDev.Application.Services.DebounceService
+namespace WindowsDev.Application.Services.DebounceService;
+
+internal class DebounceService : IDebounceService
 {
-    internal class DebounceService : IDebounceService
+    private CancellationTokenSource? _cts;
+
+    public async Task DebounceAsync(Func<Task> action, TimeSpan delay)
     {
-        private CancellationTokenSource? _cts;
+        _cts?.Cancel();
 
-        public async Task DebounceAsync(Func<Task> action, TimeSpan delay)
+        _cts = new CancellationTokenSource();
+
+        try
         {
-            _cts?.Cancel();
-
-            _cts = new CancellationTokenSource();
-
-            try
-            {
-                await Task.Delay(delay, _cts.Token);
-                await action();
-            }
-            catch (TaskCanceledException) { }
+            await Task.Delay(delay, _cts.Token);
+            await action();
         }
+        catch (TaskCanceledException) { }
     }
 }

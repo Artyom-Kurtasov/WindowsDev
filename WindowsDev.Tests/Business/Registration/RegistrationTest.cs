@@ -1,4 +1,4 @@
-﻿using Moq;
+using Moq;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Application.Services.PasswordManager;
 using WindowsDev.Application.Services.PasswordManager.Hasher;
@@ -7,156 +7,155 @@ using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using RegistrationService = WindowsDev.Application.Services.Registration.Registration;
 
-namespace WindowsDev.Tests.Business.Registration
+namespace WindowsDev.Tests.Business.Registration;
+
+public class RegistrationTest
 {
-    public class RegistrationTest
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<ICurrentUserService> _currentUserServiceMock;
+    private readonly DefaultHasher _passwordHasher;
+    private readonly Mock<IPasswordChanger> _passwordChangerMock;
+
+    public RegistrationTest()
     {
-        private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<ICurrentUserService> _currentUserServiceMock;
-        private readonly DefaultHasher _passwordHasher;
-        private readonly Mock<IPasswordChanger> _passwordChangerMock;
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _currentUserServiceMock = new Mock<ICurrentUserService>();
+        _passwordHasher = new DefaultHasher();
+        _passwordChangerMock = new Mock<IPasswordChanger>();
+    }
 
-        public RegistrationTest()
-        {
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _currentUserServiceMock = new Mock<ICurrentUserService>();
-            _passwordHasher = new DefaultHasher();
-            _passwordChangerMock = new Mock<IPasswordChanger>();
-        }
+    private RegistrationService CreateService()
+    {
+        return new RegistrationService(
+            _userRepositoryMock.Object,
+            _currentUserServiceMock.Object,
+            _passwordHasher,
+            _passwordChangerMock.Object
+        );
+    }
 
-        private RegistrationService CreateService()
-        {
-            return new RegistrationService(
-                _userRepositoryMock.Object,
-                _currentUserServiceMock.Object,
-                _passwordHasher,
-                _passwordChangerMock.Object
-            );
-        }
+    [Fact]
+    public async Task Register_WhenAllCorrect_ReturnsRecoveryCode()
+    {
+        var expectedRecoveryCode = 123456;
 
-        [Fact]
-        public async Task Register_WhenAllCorrect_ReturnsRecoveryCode()
-        {
-            var expectedRecoveryCode = 123456;
+        _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(expectedRecoveryCode);
 
-            _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(expectedRecoveryCode);
+        _userRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<User>()))
+            .Returns(Task.CompletedTask);
 
-            _userRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UsersInfo>()))
-                .Returns(Task.CompletedTask);
+        var registration = CreateService();
 
-            var registration = CreateService();
+        var result = await registration.Register("password", "login", "username");
 
-            var result = await registration.Register("password", "login", "username");
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expectedRecoveryCode, result.Value);
 
-            Assert.True(result.IsSuccess);
-            Assert.Equal(expectedRecoveryCode, result.Value);
+        _userRepositoryMock.Verify(
+            x =>
+                x.AddAsync(
+                    It.Is<User>(u =>
+                        u.Login == "login"
+                        && u.Username == "username"
+                        && u.PasswordHash != null
+                        && u.Salt != null
+                        && u.RecoveryCodeHash != null
+                        && u.RecoveryCodeSalt != null
+                    )
+                ),
+            Times.Once
+        );
 
-            _userRepositoryMock.Verify(
-                x =>
-                    x.AddAsync(
-                        It.Is<UsersInfo>(u =>
-                            u.Login == "login"
-                            && u.Username == "username"
-                            && u.PasswordHash != null
-                            && u.Salt != null
-                            && u.RecoveryCodeHash != null
-                            && u.RecoveryCodeSalt != null
-                        )
-                    ),
-                Times.Once
-            );
+        _currentUserServiceMock.Verify(
+            x => x.SetUser(It.IsAny<int>(), "login", "username"),
+            Times.Once
+        );
+    }
 
-            _currentUserServiceMock.Verify(
-                x => x.SetUser(It.IsAny<int>(), "login", "username"),
-                Times.Once
-            );
-        }
+    [Fact]
+    public async Task Register_WhenAllCorrect_GeneratesPasswordAndRecoveryCodeHashes()
+    {
+        var expectedRecoveryCode = 456789;
 
-        [Fact]
-        public async Task Register_WhenAllCorrect_GeneratesPasswordAndRecoveryCodeHashes()
-        {
-            var expectedRecoveryCode = 456789;
+        _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(expectedRecoveryCode);
 
-            _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(expectedRecoveryCode);
+        var registration = CreateService();
 
-            var registration = CreateService();
+        var result = await registration.Register("password", "login", "username");
 
-            var result = await registration.Register("password", "login", "username");
+        Assert.True(result.IsSuccess);
+        Assert.Equal(expectedRecoveryCode, result.Value);
 
-            Assert.True(result.IsSuccess);
-            Assert.Equal(expectedRecoveryCode, result.Value);
+        _userRepositoryMock.Verify(
+            x =>
+                x.AddAsync(
+                    It.Is<User>(u =>
+                        !string.IsNullOrEmpty(u.PasswordHash)
+                        && u.Salt != null
+                        && !string.IsNullOrEmpty(u.RecoveryCodeHash)
+                        && u.RecoveryCodeSalt != null
+                    )
+                ),
+            Times.Once
+        );
+    }
 
-            _userRepositoryMock.Verify(
-                x =>
-                    x.AddAsync(
-                        It.Is<UsersInfo>(u =>
-                            !string.IsNullOrEmpty(u.PasswordHash)
-                            && u.Salt != null
-                            && !string.IsNullOrEmpty(u.RecoveryCodeHash)
-                            && u.RecoveryCodeSalt != null
-                        )
-                    ),
-                Times.Once
-            );
-        }
+    [Fact]
+    public async Task Register_WhenRepositoryThrows_PropagatesException()
+    {
+        _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(123456);
 
-        [Fact]
-        public async Task Register_WhenRepositoryThrows_PropagatesException()
-        {
-            _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(123456);
+        _userRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<User>()))
+            .ThrowsAsync(new InvalidOperationException("Database error"));
 
-            _userRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UsersInfo>()))
-                .ThrowsAsync(new InvalidOperationException("Database error"));
+        var registration = CreateService();
 
-            var registration = CreateService();
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            registration.Register("password", "login", "username")
+        );
 
-            await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                registration.Register("password", "login", "username")
-            );
+        _currentUserServiceMock.Verify(
+            x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never
+        );
+    }
 
-            _currentUserServiceMock.Verify(
-                x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
-                Times.Never
-            );
-        }
+    [Fact]
+    public async Task Register_WhenAllCorrect_SetsCurrentUser()
+    {
+        var userId = 1;
 
-        [Fact]
-        public async Task Register_WhenAllCorrect_SetsCurrentUser()
-        {
-            var userId = 1;
+        _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(789012);
 
-            _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(789012);
+        _userRepositoryMock
+            .Setup(x => x.AddAsync(It.IsAny<User>()))
+            .Callback<User>(u => u.Id = userId);
 
-            _userRepositoryMock
-                .Setup(x => x.AddAsync(It.IsAny<UsersInfo>()))
-                .Callback<UsersInfo>(u => u.Id = userId);
+        var registration = CreateService();
 
-            var registration = CreateService();
+        var result = await registration.Register("password", "login", "username");
 
-            var result = await registration.Register("password", "login", "username");
+        Assert.True(result.IsSuccess);
 
-            Assert.True(result.IsSuccess);
+        _currentUserServiceMock.Verify(x => x.SetUser(userId, "login", "username"), Times.Once);
+    }
 
-            _currentUserServiceMock.Verify(x => x.SetUser(userId, "login", "username"), Times.Once);
-        }
+    [Fact]
+    public async Task Register_WhenAllCorrect_UserHasDefaultHashMethod()
+    {
+        _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(111222);
 
-        [Fact]
-        public async Task Register_WhenAllCorrect_UserHasDefaultHashMethod()
-        {
-            _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(111222);
+        var registration = CreateService();
 
-            var registration = CreateService();
+        var result = await registration.Register("password", "login", "username");
 
-            var result = await registration.Register("password", "login", "username");
+        Assert.True(result.IsSuccess);
 
-            Assert.True(result.IsSuccess);
-
-            _userRepositoryMock.Verify(
-                x => x.AddAsync(It.Is<UsersInfo>(u => u.HashMethod == HashMethod.Default)),
-                Times.Once
-            );
-        }
+        _userRepositoryMock.Verify(
+            x => x.AddAsync(It.Is<User>(u => u.HashMethod == HashMethod.Default)),
+            Times.Once
+        );
     }
 }

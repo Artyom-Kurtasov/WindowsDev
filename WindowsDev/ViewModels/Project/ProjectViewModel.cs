@@ -5,9 +5,9 @@ using System.Windows.Input;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.TaskService;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Infrastructure.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
@@ -18,320 +18,319 @@ using WindowsDev.ViewModels.Tasks.Dialogs;
 using WindowsDev.Views.Tasks;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
-namespace WindowsDev.ViewModels.Project
+namespace WindowsDev.ViewModels.Project;
+
+internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
 {
-    internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
+    private const int PageSize = 15;
+
+    private readonly IDialogService _dialogService;
+    private readonly INavigationService _navigationService;
+    private readonly ITaskService _taskService;
+    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly ILogger<ProjectViewModel> _logger;
+
+    public ProjectViewModel(
+        ProjectsInfo currentProject,
+        IDialogCoordinator dialogCoordinator,
+        INavigationService navigationService,
+        ITaskService taskService,
+        IDialogService dialogService,
+        ILogger<ProjectViewModel> logger,
+        ILanguageChanger languageChanger
+    )
+        : base(languageChanger)
     {
-        private const int PageSize = 15;
+        CurrentProject = currentProject;
 
-        private readonly IDialogService _dialogService;
-        private readonly INavigationService _navigationService;
-        private readonly ITaskService _taskService;
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly ILogger<ProjectViewModel> _logger;
+        _dialogCoordinator = dialogCoordinator;
+        _navigationService = navigationService;
+        _taskService = taskService;
+        _dialogService = dialogService;
+        _logger = logger;
 
-        public ProjectViewModel(
-            ProjectsInfo currentProject,
-            IDialogCoordinator dialogCoordinator,
-            INavigationService navigationService,
-            ITaskService taskService,
-            IDialogService dialogService,
-            ILogger<ProjectViewModel> logger,
-            ILanguageChanger languageChanger
-        )
-            : base(languageChanger)
+        SwitchToMainViewCommand = new RelayCommand(SwitchToMainView);
+        OpenDialogCommand = new AsyncRelayCommand(OpenTaskDialogAsync);
+        OpenTaskCommand = new AsyncRelayCommandT<TasksInfo>(OpenTaskAsync);
+        NextPageCommand = new AsyncRelayCommand(NextPageAsync);
+        PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
+        DeleteSelectedTasksCommand = new AsyncRelayCommand(DeleteSelectedTasksAsync);
+
+        _ = LoadTasksAsync();
+    }
+
+    public ICommand DeleteSelectedTasksCommand { get; }
+    public ICommand SwitchToMainViewCommand { get; }
+    public ICommand OpenDialogCommand { get; }
+    public ICommand OpenTaskCommand { get; }
+    public ICommand NextPageCommand { get; }
+    public ICommand PrevPageCommand { get; }
+
+    public ProjectsInfo? CurrentProject { get; private set; }
+
+    public ObservableCollection<TasksInfo> Tasks { get; private set; } = new();
+
+    public string? Name => CurrentProject?.Name;
+    public string? Description => CurrentProject?.Description;
+
+    private int _currentPage = 1;
+
+    public int CurrentPage
+    {
+        get => _currentPage;
+        set
         {
-            CurrentProject = currentProject;
-
-            _dialogCoordinator = dialogCoordinator;
-            _navigationService = navigationService;
-            _taskService = taskService;
-            _dialogService = dialogService;
-            _logger = logger;
-
-            SwitchToMainViewCommand = new RelayCommand(SwitchToMainView);
-            OpenDialogCommand = new AsyncRelayCommand(OpenTaskDialogAsync);
-            OpenTaskCommand = new AsyncRelayCommandT<TasksInfo>(OpenTaskAsync);
-            NextPageCommand = new AsyncRelayCommand(NextPageAsync);
-            PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
-            DeleteSelectedTasksCommand = new AsyncRelayCommand(DeleteSelectedTasksAsync);
-
-            _ = LoadTasksAsync();
-        }
-
-        public ICommand DeleteSelectedTasksCommand { get; }
-        public ICommand SwitchToMainViewCommand { get; }
-        public ICommand OpenDialogCommand { get; }
-        public ICommand OpenTaskCommand { get; }
-        public ICommand NextPageCommand { get; }
-        public ICommand PrevPageCommand { get; }
-
-        public ProjectsInfo? CurrentProject { get; private set; }
-
-        public ObservableCollection<TasksInfo> Tasks { get; private set; } = new();
-
-        public string? Name => CurrentProject?.Name;
-        public string? Description => CurrentProject?.Description;
-
-        private int _currentPage = 1;
-
-        public int CurrentPage
-        {
-            get => _currentPage;
-            set
-            {
-                if (_currentPage == value)
-                    return;
-
-                _currentPage = value;
-                OnPropertyChanged(nameof(CurrentPage));
-            }
-        }
-
-        private int _totalCountOfTasks;
-
-        public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfTasks / PageSize);
-
-        private string _searchFilter = string.Empty;
-
-        public string SearchFilter
-        {
-            get => _searchFilter;
-            set
-            {
-                if (_searchFilter == value)
-                    return;
-
-                _searchFilter = value;
-                OnPropertyChanged(nameof(SearchFilter));
-
-                _ = GetPageAsync();
-            }
-        }
-
-        private bool _showAll = true;
-
-        public bool ShowAll
-        {
-            get => _showAll;
-            set
-            {
-                if (_showAll == value)
-                    return;
-
-                _showAll = value;
-                OnPropertyChanged(nameof(ShowAll));
-
-                _ = GetPageAsync();
-            }
-        }
-
-        private bool _showClosed;
-
-        public bool ShowClosed
-        {
-            get => _showClosed;
-            set
-            {
-                if (_showClosed == value)
-                    return;
-
-                _showClosed = value;
-                OnPropertyChanged(nameof(ShowClosed));
-
-                _ = GetPageAsync();
-            }
-        }
-
-        private bool _showFrozen;
-        public bool ShowFrozen
-        {
-            get => _showFrozen;
-            set
-            {
-                if (_showFrozen == value)
-                    return;
-
-                _showFrozen = value;
-                OnPropertyChanged(nameof(ShowFrozen));
-
-                _ = GetPageAsync();
-            }
-        }
-
-        private bool _showInProgress;
-        private bool disposedValue;
-
-        public bool ShowInProgress
-        {
-            get => _showInProgress;
-            set
-            {
-                if (_showInProgress == value)
-                    return;
-
-                _showInProgress = value;
-                OnPropertyChanged(nameof(ShowInProgress));
-
-                _ = GetPageAsync();
-            }
-        }
-
-        public async Task RefreshAsync()
-        {
-            await LoadTasksAsync();
-        }
-
-        public async Task NextPageAsync()
-        {
-            if (CurrentPage >= TotalCountOfPages)
+            if (_currentPage == value)
                 return;
 
-            CurrentPage++;
-            await GetPageAsync();
+            _currentPage = value;
+            OnPropertyChanged(nameof(CurrentPage));
         }
+    }
 
-        public async Task PrevPageAsync()
+    private int _totalCountOfTasks;
+
+    public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfTasks / PageSize);
+
+    private string _searchFilter = string.Empty;
+
+    public string SearchFilter
+    {
+        get => _searchFilter;
+        set
         {
-            if (CurrentPage <= 1)
+            if (_searchFilter == value)
                 return;
 
-            CurrentPage--;
+            _searchFilter = value;
+            OnPropertyChanged(nameof(SearchFilter));
+
+            _ = GetPageAsync();
+        }
+    }
+
+    private bool _showAll = true;
+
+    public bool ShowAll
+    {
+        get => _showAll;
+        set
+        {
+            if (_showAll == value)
+                return;
+
+            _showAll = value;
+            OnPropertyChanged(nameof(ShowAll));
+
+            _ = GetPageAsync();
+        }
+    }
+
+    private bool _showClosed;
+
+    public bool ShowClosed
+    {
+        get => _showClosed;
+        set
+        {
+            if (_showClosed == value)
+                return;
+
+            _showClosed = value;
+            OnPropertyChanged(nameof(ShowClosed));
+
+            _ = GetPageAsync();
+        }
+    }
+
+    private bool _showFrozen;
+    public bool ShowFrozen
+    {
+        get => _showFrozen;
+        set
+        {
+            if (_showFrozen == value)
+                return;
+
+            _showFrozen = value;
+            OnPropertyChanged(nameof(ShowFrozen));
+
+            _ = GetPageAsync();
+        }
+    }
+
+    private bool _showInProgress;
+    private bool disposedValue;
+
+    public bool ShowInProgress
+    {
+        get => _showInProgress;
+        set
+        {
+            if (_showInProgress == value)
+                return;
+
+            _showInProgress = value;
+            OnPropertyChanged(nameof(ShowInProgress));
+
+            _ = GetPageAsync();
+        }
+    }
+
+    public async Task RefreshAsync()
+    {
+        await LoadTasksAsync();
+    }
+
+    public async Task NextPageAsync()
+    {
+        if (CurrentPage >= TotalCountOfPages)
+            return;
+
+        CurrentPage++;
+        await GetPageAsync();
+    }
+
+    public async Task PrevPageAsync()
+    {
+        if (CurrentPage <= 1)
+            return;
+
+        CurrentPage--;
+        await GetPageAsync();
+    }
+
+    private async Task OpenTaskAsync(TasksInfo task)
+    {
+        await _navigationService.NavigateTo<TaskViewModel>(CurrentProject, task);
+    }
+
+    private void SwitchToMainView()
+    {
+        Dispose();
+        _navigationService.NavigateTo<MainWindowViewModel>();
+    }
+
+    private async Task OpenTaskDialogAsync()
+    {
+        await _dialogService.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(
+            this,
+            CurrentProject!.Id
+        );
+    }
+
+    private async Task LoadTasksAsync()
+    {
+        try
+        {
+            _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject!.Id);
+
+            OnPropertyChanged(nameof(TotalCountOfPages));
+
             await GetPageAsync();
         }
-
-        private async Task OpenTaskAsync(TasksInfo task)
+        catch (Exception ex)
         {
-            await _navigationService.NavigateTo<TaskViewModel>(CurrentProject, task);
+            await ShowErrorAsync(ex);
         }
+    }
 
-        private void SwitchToMainView()
+    private async Task GetPageAsync()
+    {
+        try
         {
-            Dispose();
-            _navigationService.NavigateTo<MainWindowViewModel>();
-        }
+            var filter = new TaskFilter
+            {
+                ProjectId = CurrentProject!.Id,
+                Page = CurrentPage,
+                PageSize = PageSize,
+                Seacrh = SearchFilter,
+                Statuses = GetSelectedStatuses(),
+            };
 
-        private async Task OpenTaskDialogAsync()
+            var result = await _taskService.GetTasksAsync(filter);
+
+            Tasks.Clear();
+
+            foreach (var task in result.Value)
+                Tasks.Add(task);
+        }
+        catch (Exception ex)
         {
-            await _dialogService.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(
-                this,
-                CurrentProject!.Id
-            );
+            await ShowErrorAsync(ex);
         }
+    }
 
-        private async Task LoadTasksAsync()
+    private async Task DeleteSelectedTasksAsync()
+    {
+        var tasksToDelete = Tasks.Where(x => x.IsSelected).ToList();
+
+        foreach (var task in tasksToDelete)
         {
             try
             {
-                _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject!.Id);
-
-                OnPropertyChanged(nameof(TotalCountOfPages));
-
-                await GetPageAsync();
+                await _taskService.DeleteAsync(task.Id);
+                Tasks.Remove(task);
             }
             catch (Exception ex)
             {
+                TaskLogs.TaskDeleteFailed(_logger, task.Id, ex);
+
                 await ShowErrorAsync(ex);
             }
         }
+    }
 
-        private async Task GetPageAsync()
+    private List<TaskStatus> GetSelectedStatuses()
+    {
+        if (ShowAll)
         {
-            try
-            {
-                var filter = new TaskFilter
-                {
-                    ProjectId = CurrentProject!.Id,
-                    Page = CurrentPage,
-                    PageSize = PageSize,
-                    Seacrh = SearchFilter,
-                    Statuses = GetSelectedStatuses(),
-                };
-
-                var result = await _taskService.GetTasksAsync(filter);
-
-                Tasks.Clear();
-
-                foreach (var task in result.Value)
-                    Tasks.Add(task);
-            }
-            catch (Exception ex)
-            {
-                await ShowErrorAsync(ex);
-            }
+            return new() { TaskStatus.Completed, TaskStatus.InProgress, TaskStatus.Closed, TaskStatus.Frozen };
         }
 
-        private async Task DeleteSelectedTasksAsync()
+        var statuses = new List<TaskStatus>();
+
+        if (ShowClosed)
+            statuses.Add(TaskStatus.Closed);
+
+        if (ShowInProgress)
+            statuses.Add(TaskStatus.InProgress);
+
+        if (ShowFrozen)
+            statuses.Add(TaskStatus.Frozen);
+
+        return statuses;
+    }
+
+    private async Task ShowErrorAsync(Exception exception)
+    {
+        TaskLogs.TaskLoadFailed(_logger, CurrentProject!.Id, exception);
+
+        await _dialogCoordinator.ShowMessageAsync(
+            this,
+            Translate(DialogTitles.Error),
+            Translate(CommonErrors.UnexpectedError),
+            MessageDialogStyle.Affirmative
+        );
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposedValue)
         {
-            var tasksToDelete = Tasks.Where(x => x.IsSelected).ToList();
-
-            foreach (var task in tasksToDelete)
+            if (disposing)
             {
-                try
-                {
-                    await _taskService.DeleteAsync(task.Id);
-                    Tasks.Remove(task);
-                }
-                catch (Exception ex)
-                {
-                    TaskLogs.TaskDeleteFailed(_logger, task.Id, ex);
-
-                    await ShowErrorAsync(ex);
-                }
-            }
-        }
-
-        private List<TaskStatus> GetSelectedStatuses()
-        {
-            if (ShowAll)
-            {
-                return new() { TaskStatus.Completed, TaskStatus.InProgress, TaskStatus.Closed, TaskStatus.Frozen };
+                Tasks = null!;
+                CurrentProject = null;
             }
 
-            var statuses = new List<TaskStatus>();
-
-            if (ShowClosed)
-                statuses.Add(TaskStatus.Closed);
-
-            if (ShowInProgress)
-                statuses.Add(TaskStatus.InProgress);
-
-            if (ShowFrozen)
-                statuses.Add(TaskStatus.Frozen);
-
-            return statuses;
+            disposedValue = true;
         }
+    }
 
-        private async Task ShowErrorAsync(Exception exception)
-        {
-            TaskLogs.TaskLoadFailed(_logger, CurrentProject!.Id, exception);
-
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
-                Translate(DialogTitles.Error),
-                Translate(CommonErrors.UnexpectedError),
-                MessageDialogStyle.Affirmative
-            );
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
-                {
-                    Tasks = null!;
-                    CurrentProject = null;
-                }
-
-                disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

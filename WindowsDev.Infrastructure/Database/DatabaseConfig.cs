@@ -1,9 +1,8 @@
-﻿using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.DatabaseInterfaces;
 
-namespace WindowsDev.Infrastructure.Database
+namespace WindowsDev.Infrastructure.Database;
+
+internal class DatabaseConfig : IDatabaseConfig
 {
-    internal class DatabaseConfig : IDatabaseConfig
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; }
 }

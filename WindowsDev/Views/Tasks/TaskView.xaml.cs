@@ -1,17 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Tasks
+namespace WindowsDev.Views.Tasks;
+
+/// <summary>
+/// Interaction logic for TaskView.xaml
+/// </summary>
+public partial class TaskView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for TaskView.xaml
-    /// </summary>
-    public partial class TaskView : UserControl
+    public TaskView()
     {
-        public TaskView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
-
-

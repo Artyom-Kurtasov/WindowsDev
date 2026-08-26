@@ -1,47 +1,46 @@
-﻿using System.Windows.Input;
+using System.Windows.Input;
 
-namespace WindowsDev.Command
+namespace WindowsDev.Command;
+
+internal class AsyncRelayCommandT<T> : ICommand
 {
-    internal class AsyncRelayCommandT<T> : ICommand
+    private readonly Func<T, Task> _execute;
+    private readonly Func<T, bool>? _canExecute;
+
+    public event EventHandler? CanExecuteChanged;
+
+    public AsyncRelayCommandT(Func<T, Task> execute, Func<T, bool>? canExecute = null)
     {
-        private readonly Func<T, Task> _execute;
-        private readonly Func<T, bool>? _canExecute;
+        _execute = execute ?? throw new ArgumentNullException(nameof(execute));
+        _canExecute = canExecute;
+    }
 
-        public event EventHandler? CanExecuteChanged;
+    public bool CanExecute(object? parameter)
+    {
+        if (parameter is not T param)
+            return false;
 
-        public AsyncRelayCommandT(Func<T, Task> execute, Func<T, bool>? canExecute = null)
-        {
-            _execute = execute ?? throw new ArgumentNullException(nameof(execute));
-            _canExecute = canExecute;
-        }
+        return _canExecute?.Invoke(param) ?? true;
+    }
 
-        public bool CanExecute(object? parameter)
-        {
-            if (parameter is not T param)
-                return false;
+    public async void Execute(object? parameter)
+    {
+        await ExecuteAsync(parameter);
+    }
 
-            return _canExecute?.Invoke(param) ?? true;
-        }
+    public async Task ExecuteAsync(object? parameter = null)
+    {
+        if (parameter is not T param)
+            return;
 
-        public async void Execute(object? parameter)
-        {
-            await ExecuteAsync(parameter);
-        }
+        if (!CanExecute(param))
+            return;
 
-        public async Task ExecuteAsync(object? parameter = null)
-        {
-            if (parameter is not T param)
-                return;
+        await _execute(param);
+    }
 
-            if (!CanExecute(param))
-                return;
-
-            await _execute(param);
-        }
-
-        public void RaiseCanExecuteChanged()
-        {
-            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-        }
+    public void RaiseCanExecuteChanged()
+    {
+        CanExecuteChanged?.Invoke(this, EventArgs.Empty);
     }
 }

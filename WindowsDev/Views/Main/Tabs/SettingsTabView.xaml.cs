@@ -1,15 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Main.Tabs
+namespace WindowsDev.Views.Main.Tabs;
+
+/// <summary>
+/// Interaction logic for SettingsTabView.xaml
+/// </summary>
+public partial class SettingsTabView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for SettingsTabView.xaml
-    /// </summary>
-    public partial class SettingsTabView : UserControl
+    public SettingsTabView()
     {
-        public SettingsTabView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }

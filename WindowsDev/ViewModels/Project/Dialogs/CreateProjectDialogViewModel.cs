@@ -1,128 +1,127 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.ProjectService;
 using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
-using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.Infrastructure.Logging;
 using WindowsDev.Services.Dialogs;
 
-namespace WindowsDev.ViewModels.Projects.Dialogs
+namespace WindowsDev.ViewModels.Projects.Dialogs;
+
+internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
 {
-    internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
+    private readonly ICurrentUserService _currentUserData;
+    private readonly IProjectService _projectService;
+    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly ILogger<CreateProjectDialogViewModel> _logger;
+
+    public CreateProjectDialogViewModel(
+        IDialogCoordinator dialogCoordinator,
+        ICurrentUserService currentUserData,
+        IProjectService projectService,
+        ILogger<CreateProjectDialogViewModel> logger,
+        ILanguageChanger languageChanger
+    )
+        : base(languageChanger)
     {
-        private readonly ICurrentUserService _currentUserData;
-        private readonly IProjectService _projectService;
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly ILogger<CreateProjectDialogViewModel> _logger;
+        _dialogCoordinator = dialogCoordinator;
+        _currentUserData = currentUserData;
+        _projectService = projectService;
+        _logger = logger;
 
-        public CreateProjectDialogViewModel(
-            IDialogCoordinator dialogCoordinator,
-            ICurrentUserService currentUserData,
-            IProjectService projectService,
-            ILogger<CreateProjectDialogViewModel> logger,
-            ILanguageChanger languageChanger
-        )
-            : base(languageChanger)
+        CloseDialogCommand = new AsyncRelayCommand(CloseDialogAsync);
+        CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync);
+    }
+
+    public ICommand CloseDialogCommand { get; }
+    public ICommand CreateProjectCommand { get; }
+
+    private string _projectName = string.Empty;
+
+    public string ProjectName
+    {
+        get => _projectName;
+        set
         {
-            _dialogCoordinator = dialogCoordinator;
-            _currentUserData = currentUserData;
-            _projectService = projectService;
-            _logger = logger;
-
-            CloseDialogCommand = new AsyncRelayCommand(CloseDialogAsync);
-            CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync);
-        }
-
-        public ICommand CloseDialogCommand { get; }
-        public ICommand CreateProjectCommand { get; }
-
-        private string _projectName = string.Empty;
-
-        public string ProjectName
-        {
-            get => _projectName;
-            set
-            {
-                if (_projectName == value)
-                    return;
-
-                _projectName = value;
-                OnPropertyChanged(nameof(ProjectName));
-            }
-        }
-
-        private string _projectDescription = string.Empty;
-
-        public string ProjectDescription
-        {
-            get => _projectDescription;
-            set
-            {
-                if (_projectDescription == value)
-                    return;
-
-                _projectDescription = value;
-                OnPropertyChanged(nameof(ProjectDescription));
-            }
-        }
-
-        public event Func<Task>? CloseRequested;
-        public event Func<Task>? Completed;
-
-        private async Task CreateProjectAsync()
-        {
-            if (string.IsNullOrWhiteSpace(ProjectName))
-            {
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
-                    Translate(DialogTitles.Warning),
-                    Translate(CreateProjectWarnings.EnterName),
-                    MessageDialogStyle.Affirmative
-                );
-
+            if (_projectName == value)
                 return;
-            }
 
-            try
-            {
-                await _projectService.AddAsync(
-                    new ProjectsInfo
-                    {
-                        Name = ProjectName,
-                        UserId = _currentUserData.UserId,
-                        Description = ProjectDescription,
-                        CreatedAt = DateTime.Today.ToUniversalTime(),
-                    }
-                );
-
-                if (Completed != null)
-                    await Completed.Invoke();
-
-                await CloseDialogAsync();
-            }
-            catch (Exception ex)
-            {
-                ProjectLogs.ProjectCreationFailed(_logger, ProjectName, ex);
-
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
-                    Translate(DialogTitles.Error),
-                    Translate(CommonErrors.UnexpectedError),
-                    MessageDialogStyle.Affirmative
-                );
-            }
+            _projectName = value;
+            OnPropertyChanged(nameof(ProjectName));
         }
+    }
 
-        private async Task CloseDialogAsync()
+    private string _projectDescription = string.Empty;
+
+    public string ProjectDescription
+    {
+        get => _projectDescription;
+        set
         {
-            if (CloseRequested != null)
-                await CloseRequested.Invoke();
+            if (_projectDescription == value)
+                return;
+
+            _projectDescription = value;
+            OnPropertyChanged(nameof(ProjectDescription));
         }
+    }
+
+    public event Func<Task>? CloseRequested;
+    public event Func<Task>? Completed;
+
+    private async Task CreateProjectAsync()
+    {
+        if (string.IsNullOrWhiteSpace(ProjectName))
+        {
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Warning),
+                Translate(CreateProjectWarnings.EnterName),
+                MessageDialogStyle.Affirmative
+            );
+
+            return;
+        }
+
+        try
+        {
+            await _projectService.AddAsync(
+                new ProjectsInfo
+                {
+                    Name = ProjectName,
+                    UserId = _currentUserData.UserId,
+                    Description = ProjectDescription,
+                    CreatedAt = DateTime.Today.ToUniversalTime(),
+                }
+            );
+
+            if (Completed != null)
+                await Completed.Invoke();
+
+            await CloseDialogAsync();
+        }
+        catch (Exception ex)
+        {
+            ProjectLogs.ProjectCreationFailed(_logger, ProjectName, ex);
+
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Error),
+                Translate(CommonErrors.UnexpectedError),
+                MessageDialogStyle.Affirmative
+            );
+        }
+    }
+
+    private async Task CloseDialogAsync()
+    {
+        if (CloseRequested != null)
+            await CloseRequested.Invoke();
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace WindowsDev.Application.Services.Localization
+namespace WindowsDev.Application.Services.Localization;
+
+public interface ILanguageChanger
 {
-    public interface ILanguageChanger
-    {
-        void ChangeLanguage(string languageCode);
-        string Translate(string key);
-    }
+    void ChangeLanguage(string languageCode);
+    string Translate(string key);
 }

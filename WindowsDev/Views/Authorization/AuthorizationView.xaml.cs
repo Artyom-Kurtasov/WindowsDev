@@ -1,17 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Authorization
+namespace WindowsDev.Views.Authorization;
+
+/// <summary>
+/// Логика взаимодействия для AuthorizationView.xaml
+/// </summary>
+public partial class AuthorizationView : UserControl
 {
-    /// <summary>
-    /// Логика взаимодействия для AuthorizationView.xaml
-    /// </summary>
-    public partial class AuthorizationView : UserControl
+    public AuthorizationView()
     {
-        public AuthorizationView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
-
-

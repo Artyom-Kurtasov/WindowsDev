@@ -1,4 +1,10 @@
 <Solution>
+  <Project Path="WindowsDev.Api/WindowsDev.Api.csproj" Id="b31c0936-9c1a-4bb2-8e32-a40a1d68b52c">
+    <BuildDependency Project="WindowsDev.Application/WindowsDev.Application.csproj" />
+    <BuildDependency Project="WindowsDev.Domain/WindowsDev.Domain.csproj" />
+    <BuildDependency Project="WindowsDev.Infrastructure/WindowsDev.Infrastructure.csproj" />
+    <BuildDependency Project="WindowsDev.Logging/WindowsDev.Logging.csproj" />
+  </Project>
   <Project Path="WindowsDev.Application/WindowsDev.Application.csproj" />
   <Project Path="WindowsDev.Domain/WindowsDev.Domain.csproj" />
   <Project Path="WindowsDev.Infrastructure/WindowsDev.Infrastructure.csproj" Id="24543aaa-d346-4ce1-96c7-df319c4a468e" />

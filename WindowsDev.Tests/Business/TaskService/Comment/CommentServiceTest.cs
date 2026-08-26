@@ -1,67 +1,67 @@
-﻿using Moq;
+using Moq;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Application.Services.TaskService.Comment;
 using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Domain.Entities;
 
-namespace WindowsDev.Tests.Business.TaskService.Comment
+namespace WindowsDev.Tests.Business.TaskService.Comment;
+
+public class CommentsServiceTest
 {
-    public class CommentsServiceTest
+    private readonly Mock<ICommentRepository> _commentRepositoryMock;
+    private readonly Mock<ICurrentUserService> _currentUserMock;
+
+    public CommentsServiceTest()
     {
-        private readonly Mock<ICommentRepository> _commentRepositoryMock;
-        private readonly Mock<ICurrentUserService> _currentUserMock;
+        _commentRepositoryMock = new Mock<ICommentRepository>();
 
-        public CommentsServiceTest()
-        {
-            _commentRepositoryMock = new Mock<ICommentRepository>();
+        _currentUserMock = new Mock<ICurrentUserService>();
+        _currentUserMock.SetupGet(x => x.Username).Returns("testuser");
+    }
 
-            _currentUserMock = new Mock<ICurrentUserService>();
-            _currentUserMock.SetupGet(x => x.Username).Returns("testuser");
-        }
+    private CommentsService CreateService()
+    {
+        return new CommentsService(_commentRepositoryMock.Object, _currentUserMock.Object);
+    }
 
-        private CommentsService CreateService()
-        {
-            return new CommentsService(_commentRepositoryMock.Object, _currentUserMock.Object);
-        }
+    [Fact]
+    public async Task AddComment_WhenTaskIdLessThan1_ThrowsArgumentOutOfRangeException()
+    {
+        var service = CreateService();
 
-        [Fact]
-        public async Task AddComment_WhenTaskIdLessThan1_ThrowsArgumentOutOfRangeException()
-        {
-            var service = CreateService();
+        await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+            service.AddComment(0, "comment text")
+        );
 
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-                service.AddComment(0, "comment text")
-            );
+        _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Never);
+    }
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Never);
-        }
+    [Fact]
+    public async Task AddComment_WhenValid_SavesCommentAndReturnsIt()
+    {
+        var taskId = 1;
+        var commentText = "test comment";
 
-        [Fact]
-        public async Task AddComment_WhenValid_SavesCommentAndReturnsIt()
-        {
-            var taskId = 1;
-            var commentText = "test comment";
+        var service = CreateService();
 
-            var service = CreateService();
+        var result = await service.AddComment(taskId, commentText);
 
-            var result = await service.AddComment(taskId, commentText);
+        Assert.True(result.IsSuccess);
 
-            Assert.True(result.IsSuccess);
+        Assert.Equal(commentText, result.Value.Text);
+        Assert.Equal("testuser", result.Value.Author);
+        Assert.Equal(taskId, result.Value.TaskId);
+        Assert.True((DateTime.UtcNow - result.Value.CreatedAt).TotalSeconds < 1);
 
-            Assert.Equal(commentText, result.Value.Text);
-            Assert.Equal("testuser", result.Value.Author);
-            Assert.Equal(taskId, result.Value.TaskId);
-            Assert.True((DateTime.UtcNow - result.Value.CreatedAt).TotalSeconds < 1);
+        _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Once);
+    }
 
-            _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Once);
-        }
+    [Fact]
+    public async Task GetComments_WhenCalled_ReturnsCommentsFromRepository()
+    {
+        var taskId = 1;
 
-        [Fact]
-        public async Task GetComments_WhenCalled_ReturnsCommentsFromRepository()
-        {
-            var taskId = 1;
-
-            var expectedComments = new List<TaskComment>
+        var expectedComments = new List<TaskComment>
             {
                 new()
                 {
@@ -81,34 +81,33 @@ namespace WindowsDev.Tests.Business.TaskService.Comment
                 },
             };
 
-            _commentRepositoryMock.Setup(x => x.GetComments(taskId)).ReturnsAsync(expectedComments);
+        _commentRepositoryMock.Setup(x => x.GetComments(taskId)).ReturnsAsync(expectedComments);
 
-            var service = CreateService();
+        var service = CreateService();
 
-            var result = await service.GetComments(taskId);
+        var result = await service.GetComments(taskId);
 
-            Assert.Equal(expectedComments, result);
-            Assert.Equal(2, result.Count);
+        Assert.Equal(expectedComments, result);
+        Assert.Equal(2, result.Count);
 
-            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
-        }
+        _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
+    }
 
-        [Fact]
-        public async Task GetComments_WhenNoComments_ReturnsEmptyList()
-        {
-            var taskId = 1;
+    [Fact]
+    public async Task GetComments_WhenNoComments_ReturnsEmptyList()
+    {
+        var taskId = 1;
 
-            _commentRepositoryMock
-                .Setup(x => x.GetComments(taskId))
-                .ReturnsAsync(new List<TaskComment>());
+        _commentRepositoryMock
+            .Setup(x => x.GetComments(taskId))
+            .ReturnsAsync(new List<TaskComment>());
 
-            var service = CreateService();
+        var service = CreateService();
 
-            var result = await service.GetComments(taskId);
+        var result = await service.GetComments(taskId);
 
-            Assert.Empty(result);
+        Assert.Empty(result);
 
-            _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
-        }
+        _commentRepositoryMock.Verify(x => x.GetComments(taskId), Times.Once);
     }
 }

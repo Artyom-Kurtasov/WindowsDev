@@ -1,165 +1,164 @@
-﻿using Moq;
+using Moq;
 using WindowsDev.Application.RepositoriesInterfaces;
 using WindowsDev.Application.Services.PasswordManager;
 using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
-namespace WindowsDev.Tests.Business.PasswordManager
+namespace WindowsDev.Tests.Business.PasswordManager;
+
+public class PasswordChangerTests
 {
-    public class PasswordChangerTests
+    private readonly Mock<IUserRepository> _userRepositoryMock;
+    private readonly Mock<IHasherFactory> _hasherFactoryMock;
+    private readonly Mock<IHasherBase> _hasherMock;
+
+    public PasswordChangerTests()
     {
-        private readonly Mock<IUserRepository> _userRepositoryMock;
-        private readonly Mock<IHasherFactory> _hasherFactoryMock;
-        private readonly Mock<IHasherBase> _hasherMock;
+        _userRepositoryMock = new Mock<IUserRepository>();
+        _hasherFactoryMock = new Mock<IHasherFactory>();
+        _hasherMock = new Mock<IHasherBase>();
 
-        public PasswordChangerTests()
+        _hasherFactoryMock
+            .Setup(x => x.GetHashMethod(It.IsAny<HashMethod>()))
+            .Returns(_hasherMock.Object);
+    }
+
+    private PasswordChanger CreateService()
+    {
+        return new PasswordChanger(
+            _userRepositoryMock.Object,
+            _hasherFactoryMock.Object
+        );
+    }
+
+    private User CreateUser()
+    {
+        return new User
         {
-            _userRepositoryMock = new Mock<IUserRepository>();
-            _hasherFactoryMock = new Mock<IHasherFactory>();
-            _hasherMock = new Mock<IHasherBase>();
+            Id = 1,
+            Login = "test",
+            PasswordHash = "0000000000001234",
+            Salt = new byte[] { 1, 2, 3 },
+            HashMethod = HashMethod.Default,
+            Username = "Test User",
+        };
+    }
 
-            _hasherFactoryMock
-                .Setup(x => x.GetHashMethod(It.IsAny<HashMethod>()))
-                .Returns(_hasherMock.Object);
-        }
+    [Fact]
+    public async Task ChangeUserPassword_WhenPasswordCorrect_UpdatesUserAndReturnsRecoveryCode()
+    {
+        var user = CreateUser();
+        var changer = CreateService();
 
-        private PasswordChanger CreateService()
-        {
-            return new PasswordChanger(
-                _userRepositoryMock.Object,
-                _hasherFactoryMock.Object
-            );
-        }
+        _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
 
-        private UsersInfo CreateUser()
-        {
-            return new UsersInfo
-            {
-                Id = 1,
-                Login = "test",
-                PasswordHash = "0000000000001234",
-                Salt = new byte[] { 1, 2, 3 },
-                HashMethod = HashMethod.Default,
-                Username = "Test User",
-            };
-        }
+        _hasherMock
+            .Setup(x => x.HashValue(It.IsAny<string>(), It.IsAny<byte[]>()))
+            .Returns(12345);
 
-        [Fact]
-        public async Task ChangeUserPassword_WhenPasswordCorrect_UpdatesUserAndReturnsRecoveryCode()
-        {
-            var user = CreateUser();
-            var changer = CreateService();
+        _hasherMock
+            .Setup(x => x.HashValue("oldPassword", user.Salt))
+            .Returns(ConvertHexToUlong(user.PasswordHash));
 
-            _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
+        _hasherMock.Setup(x => x.GenerateSalt()).Returns(new byte[] { 5, 6, 7 });
 
-            _hasherMock
-                .Setup(x => x.HashValue(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(12345);
+        _userRepositoryMock.Setup(x => x.UpdateAsync(user)).Returns(Task.CompletedTask);
 
-            _hasherMock
-                .Setup(x => x.HashValue("oldPassword", user.Salt))
-                .Returns(ConvertHexToUlong(user.PasswordHash));
+        var result = await changer.ChangeUserPasswordAsync(
+            "test",
+            "newPassword",
+            "oldPassword"
+        );
 
-            _hasherMock.Setup(x => x.GenerateSalt()).Returns(new byte[] { 5, 6, 7 });
+        Assert.True(result.IsSuccess);
+        Assert.InRange(result.Value, 100000, 999999);
 
-            _userRepositoryMock.Setup(x => x.UpdateAsync(user)).Returns(Task.CompletedTask);
+        Assert.Equal("0000000000003039", user.PasswordHash);
+        Assert.Equal("0000000000003039", user.RecoveryCodeHash);
 
-            var result = await changer.ChangeUserPasswordAsync(
-                "test",
-                "newPassword",
-                "oldPassword"
-            );
+        _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
+    }
 
-            Assert.True(result.IsSuccess);
-            Assert.InRange(result.Value, 100000, 999999);
+    [Fact]
+    public async Task ChangeUserPassword_WhenCurrentPasswordIncorrect_ReturnsFailure()
+    {
+        var user = CreateUser();
+        var changer = CreateService();
 
-            Assert.Equal("0000000000003039", user.PasswordHash);
-            Assert.Equal("0000000000003039", user.RecoveryCodeHash);
+        _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
 
-            _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
-        }
+        _hasherMock.Setup(x => x.HashValue("wrongPassword", user.Salt)).Returns(999);
 
-        [Fact]
-        public async Task ChangeUserPassword_WhenCurrentPasswordIncorrect_ReturnsFailure()
-        {
-            var user = CreateUser();
-            var changer = CreateService();
+        var result = await changer.ChangeUserPasswordAsync(
+            "test",
+            "newPassword",
+            "wrongPassword"
+        );
 
-            _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
+        Assert.True(result.IsFailure);
 
-            _hasherMock.Setup(x => x.HashValue("wrongPassword", user.Salt)).Returns(999);
+        Assert.Equal(ProfileErrors.InvalidCurrentPassword, result.Error);
 
-            var result = await changer.ChangeUserPasswordAsync(
-                "test",
-                "newPassword",
-                "wrongPassword"
-            );
+        _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<User>()), Times.Never);
+    }
 
-            Assert.True(result.IsFailure);
+    [Fact]
+    public async Task ChangeUserPassword_WhenRecoveryModeEnabled_DoesNotCheckCurrentPassword()
+    {
+        var user = CreateUser();
+        var changer = CreateService();
 
-            Assert.Equal(ProfileErrors.InvalidCurrentPassword, result.Error);
+        changer.IsRecoveryMode = true;
 
-            _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UsersInfo>()), Times.Never);
-        }
+        _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
 
-        [Fact]
-        public async Task ChangeUserPassword_WhenRecoveryModeEnabled_DoesNotCheckCurrentPassword()
-        {
-            var user = CreateUser();
-            var changer = CreateService();
+        _hasherMock.Setup(x => x.GenerateSalt()).Returns(new byte[] { 1, 2, 3 });
 
-            changer.IsRecoveryMode = true;
+        _hasherMock
+            .Setup(x => x.HashValue(It.IsAny<string>(), It.IsAny<byte[]>()))
+            .Returns(123);
 
-            _userRepositoryMock.Setup(x => x.GetByLoginAsync("test")).ReturnsAsync(user);
+        _userRepositoryMock.Setup(x => x.UpdateAsync(user)).Returns(Task.CompletedTask);
 
-            _hasherMock.Setup(x => x.GenerateSalt()).Returns(new byte[] { 1, 2, 3 });
+        var result = await changer.ChangeUserPasswordAsync(
+            "test",
+            "newPassword",
+            "wrongPassword"
+        );
 
-            _hasherMock
-                .Setup(x => x.HashValue(It.IsAny<string>(), It.IsAny<byte[]>()))
-                .Returns(123);
+        Assert.True(result.IsSuccess);
 
-            _userRepositoryMock.Setup(x => x.UpdateAsync(user)).Returns(Task.CompletedTask);
+        _hasherMock.Verify(x => x.HashValue("wrongPassword", user.Salt), Times.Never);
+    }
 
-            var result = await changer.ChangeUserPasswordAsync(
-                "test",
-                "newPassword",
-                "wrongPassword"
-            );
+    [Fact]
+    public async Task ChangeUserPassword_WhenUserDoesNotExist_ThrowsException()
+    {
+        var changer = CreateService();
 
-            Assert.True(result.IsSuccess);
+        _userRepositoryMock
+            .Setup(x => x.GetByLoginAsync("unknown"))
+            .ReturnsAsync((User)null);
 
-            _hasherMock.Verify(x => x.HashValue("wrongPassword", user.Salt), Times.Never);
-        }
+        await Assert.ThrowsAsync<ArgumentNullException>(() =>
+            changer.ChangeUserPasswordAsync("unknown", "password")
+        );
+    }
 
-        [Fact]
-        public async Task ChangeUserPassword_WhenUserDoesNotExist_ThrowsException()
-        {
-            var changer = CreateService();
+    [Fact]
+    public void GenerateRecoveryCode_ReturnsSixDigitNumber()
+    {
+        var changer = CreateService();
 
-            _userRepositoryMock
-                .Setup(x => x.GetByLoginAsync("unknown"))
-                .ReturnsAsync((UsersInfo)null);
+        var code = changer.GenerateRecoveryCode();
 
-            await Assert.ThrowsAsync<ArgumentNullException>(() =>
-                changer.ChangeUserPasswordAsync("unknown", "password")
-            );
-        }
+        Assert.InRange(code, 100000, 999999);
+    }
 
-        [Fact]
-        public void GenerateRecoveryCode_ReturnsSixDigitNumber()
-        {
-            var changer = CreateService();
-
-            var code = changer.GenerateRecoveryCode();
-
-            Assert.InRange(code, 100000, 999999);
-        }
-
-        private static ulong ConvertHexToUlong(string hex)
-        {
-            return ulong.Parse(hex, System.Globalization.NumberStyles.HexNumber);
-        }
+    private static ulong ConvertHexToUlong(string hex)
+    {
+        return ulong.Parse(hex, System.Globalization.NumberStyles.HexNumber);
     }
 }

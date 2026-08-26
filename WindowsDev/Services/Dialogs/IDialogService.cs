@@ -1,13 +1,12 @@
 using System.Windows.Controls;
 
-namespace WindowsDev.Services.Dialogs
-{
-    public interface IDialogService
-    {
-        Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
-            where TView : UserControl, new()
-            where TViewModel : class, IDialogViewModel;
+namespace WindowsDev.Services.Dialogs;
 
-        Task ShowErrorDialogAsync(object context, string message, params object[] args);
-    }
+public interface IDialogService
+{
+    Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
+        where TView : UserControl, new()
+        where TViewModel : class, IDialogViewModel;
+
+    Task ShowErrorDialogAsync(object context, string message, params object[] args);
 }

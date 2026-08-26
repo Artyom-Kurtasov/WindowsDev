@@ -1,9 +1,8 @@
-﻿using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Primitives;
 
-namespace WindowsDev.Application.Services.Authorization
+namespace WindowsDev.Application.Services.Authorization;
+
+public interface IAuthorization
 {
-    public interface IAuthorization
-    {
-        Task<Result<bool>> Authorize(string login, string password);
-    }
+    Task<Result<bool>> Authorize(string login, string password);
 }

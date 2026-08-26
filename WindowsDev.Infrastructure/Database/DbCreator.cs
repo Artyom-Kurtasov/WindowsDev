@@ -1,25 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WindowsDev.Application.DatabaseInterfaces;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
-namespace WindowsDev.Infrastructure.Database
+namespace WindowsDev.Infrastructure.Database;
+
+internal class DbCreator : IDbCreator
 {
-    internal class DbCreator : IDbCreator
+    private readonly IDatabaseConfig _config;
+
+    public DbCreator(IDatabaseConfig config)
     {
-        private readonly IDatabaseConfig _config;
+        _config = config;
+    }
 
-        public DbCreator(IDatabaseConfig config)
-        {
-            _config = config;
-        }
+    public AppDbContext Create()
+    {
+        var options = new DbContextOptionsBuilder<AppDbContext>()
+            .UseNpgsql(_config.ConnectionString)
+            .Options;
 
-        public AppDbContext Create()
-        {
-            var options = new DbContextOptionsBuilder<AppDbContext>()
-                .UseNpgsql(_config.ConnectionString)
-                .Options;
-
-            return new AppDbContext(options);
-        }
+        return new AppDbContext(options);
     }
 }

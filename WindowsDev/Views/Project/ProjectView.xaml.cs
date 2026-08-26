@@ -1,17 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Project
+namespace WindowsDev.Views.Project;
+
+/// <summary>
+/// Interaction logic for ProjectView.xaml
+/// </summary>
+public partial class ProjectView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for ProjectView.xaml
-    /// </summary>
-    public partial class ProjectView : UserControl
+    public ProjectView()
     {
-        public ProjectView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
-
-

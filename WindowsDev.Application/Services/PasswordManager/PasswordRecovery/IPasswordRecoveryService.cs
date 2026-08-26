@@ -1,11 +1,10 @@
-﻿using WindowsDev.Application.Primitives;
+using WindowsDev.Application.Primitives;
 
-namespace WindowsDev.Application.Services.PasswordManager.PasswordRecovery
+namespace WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
+
+public interface IPasswordRecoveryService
 {
-    public interface IPasswordRecoveryService
-    {
-        Task<Result<bool>> IsRecoverCodeCorrectAsync(int recoveryCode, string login);
-        Task<Result<int>> ChangePasswordAsync(string login, string password);
-        Task<bool> IsUserExistAsync(string login);
-    }
+    Task<Result<bool>> IsRecoverCodeCorrectAsync(int recoveryCode, string login);
+    Task<Result<int>> ChangePasswordAsync(string login, string password);
+    Task<bool> IsUserExistAsync(string login);
 }

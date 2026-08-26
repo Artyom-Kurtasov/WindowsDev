@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfaces
+namespace WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfaces;
+
+public interface IFileOpener
 {
-    public interface IFileOpener
-    {
-        void Open(string filePath);
-    }
+    void Open(string filePath);
 }

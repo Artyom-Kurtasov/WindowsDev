@@ -1,19 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WindowsDev.Domain.Entities
-{
-    public class ProjectsInfo
-    {
-        [Key]
-        public int Id { get; set; }
-        public required string Name { get; set; }
-        public string? Description { get; set; }
-        public required DateTime CreatedAt { get; set; }
-        public required int UserId { get; set; }
+namespace WindowsDev.Domain.Entities;
 
-        [NotMapped]
-        public bool IsSelected { get; set; }
-        public DateTime CreatedAtLocal => CreatedAt.ToLocalTime();
-    }
+public class ProjectsInfo
+{
+    [Key]
+    public int Id { get; set; }
+    public required string Name { get; set; }
+    public string? Description { get; set; }
+    public required DateTime CreatedAt { get; set; }
+    public required int UserId { get; set; }
+
+    [NotMapped]
+    public bool IsSelected { get; set; }
+    public DateTime CreatedAtLocal => CreatedAt.ToLocalTime();
 }

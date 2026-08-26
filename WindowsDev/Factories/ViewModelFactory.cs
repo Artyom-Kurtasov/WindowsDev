@@ -1,19 +1,18 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace WindowsDev.Factories
+namespace WindowsDev.Factories;
+
+internal class ViewModelFactory : IViewModelFactory
 {
-    internal class ViewModelFactory : IViewModelFactory
+    private readonly IServiceProvider _provider;
+
+    public ViewModelFactory(IServiceProvider provider)
     {
-        private readonly IServiceProvider _provider;
+        _provider = provider;
+    }
 
-        public ViewModelFactory(IServiceProvider provider)
-        {
-            _provider = provider;
-        }
-
-        public T Create<T>(params object[] args)
-        {
-            return ActivatorUtilities.CreateInstance<T>(_provider, args);
-        }
+    public T Create<T>(params object[] args)
+    {
+        return ActivatorUtilities.CreateInstance<T>(_provider, args);
     }
 }

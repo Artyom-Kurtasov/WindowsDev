@@ -1,17 +1,14 @@
-﻿using System.Windows.Controls;
+using System.Windows.Controls;
 
-namespace WindowsDev.Views.Project
+namespace WindowsDev.Views.Project;
+
+/// <summary>
+/// Interaction logic for CreateProjectDialogView.xaml
+/// </summary>
+public partial class CreateProjectDialogView : UserControl
 {
-    /// <summary>
-    /// Interaction logic for CreateProjectDialogView.xaml
-    /// </summary>
-    public partial class CreateProjectDialogView : UserControl
+    public CreateProjectDialogView()
     {
-        public CreateProjectDialogView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
 }
-
-

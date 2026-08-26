@@ -1,28 +1,27 @@
-﻿using WindowsDev.Factories;
+using WindowsDev.Factories;
 using WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
-namespace WindowsDev.ViewModels.Auth.Dialogs.Factories
+namespace WindowsDev.ViewModels.Auth.Dialogs.Factories;
+
+internal class RecoveryStepsFactory : IRecoveryStepsFactory
 {
-    internal class RecoveryStepsFactory : IRecoveryStepsFactory
+    private readonly FirstStepViewModel _firstStepViewModel;
+    private readonly SecondStepViewModel _secondStepViewModel;
+    private readonly ThirdStepViewModel _thirdStepViewModel;
+
+    public RecoveryStepsFactory(
+        FirstStepViewModel firstStepViewModel,
+        SecondStepViewModel secondStepViewModel,
+        ThirdStepViewModel thirdStepViewModel
+    )
     {
-        private readonly FirstStepViewModel _firstStepViewModel;
-        private readonly SecondStepViewModel _secondStepViewModel;
-        private readonly ThirdStepViewModel _thirdStepViewModel;
+        _firstStepViewModel = firstStepViewModel;
+        _secondStepViewModel = secondStepViewModel;
+        _thirdStepViewModel = thirdStepViewModel;
+    }
 
-        public RecoveryStepsFactory(
-            FirstStepViewModel firstStepViewModel,
-            SecondStepViewModel secondStepViewModel,
-            ThirdStepViewModel thirdStepViewModel
-        )
-        {
-            _firstStepViewModel = firstStepViewModel;
-            _secondStepViewModel = secondStepViewModel;
-            _thirdStepViewModel = thirdStepViewModel;
-        }
-
-        public IReadOnlyList<object> CreateSteps()
-        {
-            return [_firstStepViewModel, _secondStepViewModel, _thirdStepViewModel];
-        }
+    public IReadOnlyList<object> CreateSteps()
+    {
+        return [_firstStepViewModel, _secondStepViewModel, _thirdStepViewModel];
     }
 }

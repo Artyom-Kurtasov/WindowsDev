@@ -1,7 +1,6 @@
-﻿namespace WindowsDev.Infrastructure.Database.Interfaces
+namespace WindowsDev.Infrastructure.Database.Interfaces;
+
+public interface IDbCreator
 {
-    public interface IDbCreator
-    {
-        AppDbContext Create();
-    }
+    AppDbContext Create();
 }

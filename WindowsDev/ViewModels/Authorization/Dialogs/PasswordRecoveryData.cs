@@ -1,81 +1,80 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace WindowsDev.ViewModels.Authorization.Dialogs
+namespace WindowsDev.ViewModels.Authorization.Dialogs;
+
+internal class PasswordRecoveryData : INotifyPropertyChanged
 {
-    internal class PasswordRecoveryData : INotifyPropertyChanged
+    private string _login = string.Empty;
+    public string Login
     {
-        private string _login = string.Empty;
-        public string Login
+        get => _login;
+        set
         {
-            get => _login;
-            set
-            {
-                _login = value;
-                OnPropertyChanged();
-            }
+            _login = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _recoveryCode = string.Empty;
-        public string RecoveryCode
+    private string _recoveryCode = string.Empty;
+    public string RecoveryCode
+    {
+        get => _recoveryCode;
+        set
         {
-            get => _recoveryCode;
-            set
-            {
-                _recoveryCode = value;
-                OnPropertyChanged();
-            }
+            _recoveryCode = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _newPassword = string.Empty;
-        public string NewPassword
+    private string _newPassword = string.Empty;
+    public string NewPassword
+    {
+        get => _newPassword;
+        set
         {
-            get => _newPassword;
-            set
-            {
-                _newPassword = value;
-                OnPropertyChanged();
-            }
+            _newPassword = value;
+            OnPropertyChanged();
         }
+    }
 
-        private string _confirmPassword = string.Empty;
-        public string ConfirmPassword
+    private string _confirmPassword = string.Empty;
+    public string ConfirmPassword
+    {
+        get => _confirmPassword;
+        set
         {
-            get => _confirmPassword;
-            set
-            {
-                _confirmPassword = value;
-                OnPropertyChanged();
-            }
+            _confirmPassword = value;
+            OnPropertyChanged();
         }
+    }
 
-        private bool _isUserExist;
-        public bool IsUserExist
+    private bool _isUserExist;
+    public bool IsUserExist
+    {
+        get => _isUserExist;
+        set
         {
-            get => _isUserExist;
-            set
-            {
-                _isUserExist = value;
-                OnPropertyChanged();
-            }
+            _isUserExist = value;
+            OnPropertyChanged();
         }
+    }
 
-        private bool _isRecoveryCodeCorrect;
-        public bool IsRecoveryCodeCorrect
+    private bool _isRecoveryCodeCorrect;
+    public bool IsRecoveryCodeCorrect
+    {
+        get => _isRecoveryCodeCorrect;
+        set
         {
-            get => _isRecoveryCodeCorrect;
-            set
-            {
-                _isRecoveryCodeCorrect = value;
-                OnPropertyChanged(nameof(IsRecoveryCodeCorrect));
-            }
+            _isRecoveryCodeCorrect = value;
+            OnPropertyChanged(nameof(IsRecoveryCodeCorrect));
         }
+    }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

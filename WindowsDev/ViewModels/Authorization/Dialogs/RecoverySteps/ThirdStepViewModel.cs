@@ -1,38 +1,37 @@
-﻿namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps
+namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
+
+internal class ThirdStepViewModel : ViewModelBase
 {
-    internal class ThirdStepViewModel : ViewModelBase
+    private readonly PasswordRecoveryData _passwordRecoveryData;
+
+    public ThirdStepViewModel(PasswordRecoveryData passwordRecoveryData)
     {
-        private readonly PasswordRecoveryData _passwordRecoveryData;
+        _passwordRecoveryData = passwordRecoveryData;
+    }
 
-        public ThirdStepViewModel(PasswordRecoveryData passwordRecoveryData)
+    public string NewPassword
+    {
+        get => _passwordRecoveryData.NewPassword;
+        set
         {
-            _passwordRecoveryData = passwordRecoveryData;
+            if (_passwordRecoveryData.NewPassword == value)
+                return;
+
+            _passwordRecoveryData.NewPassword = value;
+            OnPropertyChanged(nameof(NewPassword));
         }
+    }
 
-        public string NewPassword
+    public string ConfirmPassword
+    {
+        get => _passwordRecoveryData.ConfirmPassword;
+        set
         {
-            get => _passwordRecoveryData.NewPassword;
-            set
-            {
-                if (_passwordRecoveryData.NewPassword == value)
-                    return;
+            if (_passwordRecoveryData.ConfirmPassword == value)
+                return;
 
-                _passwordRecoveryData.NewPassword = value;
-                OnPropertyChanged(nameof(NewPassword));
-            }
-        }
-
-        public string ConfirmPassword
-        {
-            get => _passwordRecoveryData.ConfirmPassword;
-            set
-            {
-                if (_passwordRecoveryData.ConfirmPassword == value)
-                    return;
-
-                _passwordRecoveryData.ConfirmPassword = value;
-                OnPropertyChanged(nameof(ConfirmPassword));
-            }
+            _passwordRecoveryData.ConfirmPassword = value;
+            OnPropertyChanged(nameof(ConfirmPassword));
         }
     }
 }

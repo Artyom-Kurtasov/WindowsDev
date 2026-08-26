@@ -1,168 +1,167 @@
-﻿using ControlzEx.Theming;
+using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Input;
 using WindowsDev.Application.DatabaseInterfaces;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Enums;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.Settings.UserSettings;
 
-namespace WindowsDev.ViewModels.Main.Tabs
+namespace WindowsDev.ViewModels.Main.Tabs;
+
+internal class SettingsViewModel : LocalizedViewModelBase
 {
-    internal class SettingsViewModel : LocalizedViewModelBase
+    private const string LightTheme = "Light.Blue";
+    private const string DarkTheme = "Dark.Blue";
+
+    private readonly IDbHealthChecker _healthChecker;
+    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IDatabaseConfig _databaseConfig;
+
+    public SettingsViewModel(
+        IDbHealthChecker dbHealthChecker,
+        IDialogCoordinator dialogCoordinator,
+        ILanguageChanger languageChanger,
+        IDatabaseConfig databaseConfig
+    )
+        : base(languageChanger)
     {
-        private const string LightTheme = "Light.Blue";
-        private const string DarkTheme = "Dark.Blue";
+        _healthChecker = dbHealthChecker;
+        _dialogCoordinator = dialogCoordinator;
+        _databaseConfig = databaseConfig;
 
-        private readonly IDbHealthChecker _healthChecker;
-        private readonly IDialogCoordinator _dialogCoordinator;
-        private readonly IDatabaseConfig _databaseConfig;
+        ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
+        SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
+        ApplyLanguageCommand = new RelayCommand(ApplyLanguage);
 
-        public SettingsViewModel(
-            IDbHealthChecker dbHealthChecker,
-            IDialogCoordinator dialogCoordinator,
-            ILanguageChanger languageChanger,
-            IDatabaseConfig databaseConfig
-        )
-            : base(languageChanger)
+        Initialize();
+    }
+
+    public ICommand ApplyLanguageCommand { get; }
+    public ICommand ChangeThemeCommand { get; }
+    public ICommand SetNewConnectionStringCommand { get; }
+
+    private string _newConnectionString = string.Empty;
+    public string NewConnectionString
+    {
+        get => _newConnectionString;
+        set
         {
-            _healthChecker = dbHealthChecker;
-            _dialogCoordinator = dialogCoordinator;
-            _databaseConfig = databaseConfig;
+            if (_newConnectionString == value)
+                return;
 
-            ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
-            SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
-            ApplyLanguageCommand = new RelayCommand(ApplyLanguage);
-
-            Initialize();
+            _newConnectionString = value;
+            OnPropertyChanged(nameof(NewConnectionString));
         }
+    }
 
-        public ICommand ApplyLanguageCommand { get; }
-        public ICommand ChangeThemeCommand { get; }
-        public ICommand SetNewConnectionStringCommand { get; }
+    private Language _selectedLang;
 
-        private string _newConnectionString = string.Empty;
-        public string NewConnectionString
+    public Language SelectedLang
+    {
+        get => _selectedLang;
+        set
         {
-            get => _newConnectionString;
-            set
-            {
-                if (_newConnectionString == value)
-                    return;
+            if (_selectedLang == value)
+                return;
 
-                _newConnectionString = value;
-                OnPropertyChanged(nameof(NewConnectionString));
-            }
+            _selectedLang = value;
+            OnPropertyChanged(nameof(SelectedLang));
         }
+    }
 
-        private Language _selectedLang;
+    private double _selectedTheme;
 
-        public Language SelectedLang
+    public double SelectedTheme
+    {
+        get => _selectedTheme;
+        set
         {
-            get => _selectedLang;
-            set
-            {
-                if (_selectedLang == value)
-                    return;
+            if (_selectedTheme == value)
+                return;
 
-                _selectedLang = value;
-                OnPropertyChanged(nameof(SelectedLang));
-            }
+            _selectedTheme = value;
+            OnPropertyChanged(nameof(SelectedTheme));
+
+            _ = ChangeThemeAsync();
         }
+    }
 
-        private double _selectedTheme;
+    public IEnumerable<Language> Languages { get; } = Enum.GetValues<Language>();
 
-        public double SelectedTheme
+    public async Task SetNewConnectionStringAsync()
+    {
+        var oldConnection = _databaseConfig.ConnectionString;
+
+        _databaseConfig.ConnectionString = NewConnectionString;
+
+        try
         {
-            get => _selectedTheme;
-            set
-            {
-                if (_selectedTheme == value)
-                    return;
+            _healthChecker.Check();
 
-                _selectedTheme = value;
-                OnPropertyChanged(nameof(SelectedTheme));
-
-                _ = ChangeThemeAsync();
-            }
-        }
-
-        public IEnumerable<Language> Languages { get; } = Enum.GetValues<Language>();
-
-        public async Task SetNewConnectionStringAsync()
-        {
-            var oldConnection = _databaseConfig.ConnectionString;
-
-            _databaseConfig.ConnectionString = NewConnectionString;
-
-            try
-            {
-                _healthChecker.Check();
-
-                UserSettings.Default.ConnectionString = NewConnectionString;
-                UserSettings.Default.Save();
-            }
-            catch (Exception)
-            {
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
-                    Translate(DialogTitles.Warning),
-                    Translate(SettingsWarnings.InvalidConnectionString),
-                    MessageDialogStyle.Affirmative
-                );
-
-                _databaseConfig.ConnectionString = oldConnection;
-            }
-        }
-
-        public async Task ChangeThemeAsync()
-        {
-            switch (_selectedTheme)
-            {
-                case 0:
-                    ThemeManager.Current.ChangeTheme(App.Current, DarkTheme);
-
-                    UserSettings.Default.Theme = DarkTheme;
-                    break;
-
-                case 1:
-                    ThemeManager.Current.ChangeTheme(App.Current, LightTheme);
-
-                    UserSettings.Default.Theme = LightTheme;
-                    break;
-            }
-
-            UserSettings.Default.Save();
-
-            await Task.CompletedTask;
-        }
-
-        public void ApplyLanguage()
-        {
-            var languageCode = SelectedLang.ToString().ToLower();
-
-            LanguageChanger.ChangeLanguage(languageCode);
-
-            UserSettings.Default.LanguageCode = languageCode;
+            UserSettings.Default.ConnectionString = NewConnectionString;
             UserSettings.Default.Save();
         }
-
-        private void Initialize()
+        catch (Exception)
         {
-            LoadSavedLanguages();
-            LoadSavedTheme();
+            await _dialogCoordinator.ShowMessageAsync(
+                this,
+                Translate(DialogTitles.Warning),
+                Translate(SettingsWarnings.InvalidConnectionString),
+                MessageDialogStyle.Affirmative
+            );
+
+            _databaseConfig.ConnectionString = oldConnection;
+        }
+    }
+
+    public async Task ChangeThemeAsync()
+    {
+        switch (_selectedTheme)
+        {
+            case 0:
+                ThemeManager.Current.ChangeTheme(App.Current, DarkTheme);
+
+                UserSettings.Default.Theme = DarkTheme;
+                break;
+
+            case 1:
+                ThemeManager.Current.ChangeTheme(App.Current, LightTheme);
+
+                UserSettings.Default.Theme = LightTheme;
+                break;
         }
 
-        private void LoadSavedTheme()
-        {
-            SelectedTheme = UserSettings.Default.Theme == DarkTheme ? 0 : 1;
-        }
+        UserSettings.Default.Save();
 
-        private void LoadSavedLanguages()
-        {
-            SelectedLang = Enum.Parse<Language>(UserSettings.Default.LanguageCode, true);
-        }
+        await Task.CompletedTask;
+    }
+
+    public void ApplyLanguage()
+    {
+        var languageCode = SelectedLang.ToString().ToLower();
+
+        LanguageChanger.ChangeLanguage(languageCode);
+
+        UserSettings.Default.LanguageCode = languageCode;
+        UserSettings.Default.Save();
+    }
+
+    private void Initialize()
+    {
+        LoadSavedLanguages();
+        LoadSavedTheme();
+    }
+
+    private void LoadSavedTheme()
+    {
+        SelectedTheme = UserSettings.Default.Theme == DarkTheme ? 0 : 1;
+    }
+
+    private void LoadSavedLanguages()
+    {
+        SelectedLang = Enum.Parse<Language>(UserSettings.Default.LanguageCode, true);
     }
 }

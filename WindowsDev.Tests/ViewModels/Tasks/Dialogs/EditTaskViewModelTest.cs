@@ -1,223 +1,222 @@
-﻿using MahApps.Metro.Controls.Dialogs;
+using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Services.Localization;
 using WindowsDev.Application.Services.TaskService;
 using WindowsDev.Command;
-using WindowsDev.Domain.Common;
-using WindowsDev.Domain.Common.DialogsMessages.Errors;
-using WindowsDev.Domain.Common.DialogsMessages.Warnings;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
+using WindowsDev.Domain.Messages;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.ViewModels.Tasks.Dialogs;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
-namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs
+namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs;
+
+public class EditTaskViewModelTest
 {
-    public class EditTaskViewModelTest
+    private readonly Mock<ITaskService> _taskServiceMock;
+    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ILogger<EditTaskViewModel>> _loggerMock;
+    private readonly Mock<ILanguageChanger> _languageChangerMock;
+
+    private bool _completedEventWasRaised;
+    private bool _closeEventWasRaised;
+
+    public EditTaskViewModelTest()
     {
-        private readonly Mock<ITaskService> _taskServiceMock;
-        private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
-        private readonly Mock<ILogger<EditTaskViewModel>> _loggerMock;
-        private readonly Mock<ILanguageChanger> _languageChangerMock;
+        _taskServiceMock = new Mock<ITaskService>();
+        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _loggerMock = new Mock<ILogger<EditTaskViewModel>>();
+        _languageChangerMock = new Mock<ILanguageChanger>();
 
-        private bool _completedEventWasRaised;
-        private bool _closeEventWasRaised;
+        _languageChangerMock
+            .Setup(x => x.Translate(It.IsAny<string>()))
+            .Returns((string key) => key);
+    }
 
-        public EditTaskViewModelTest()
+    private EditTaskViewModel CreateViewModel(TasksInfo? task = null)
+    {
+        task ??= CreateTestTask();
+
+        return new EditTaskViewModel(
+            task,
+            _taskServiceMock.Object,
+            _dialogCoordinatorMock.Object,
+            _loggerMock.Object,
+            _languageChangerMock.Object
+        );
+    }
+
+    private TasksInfo CreateTestTask(
+        int id = 1,
+        string name = "Test Task",
+        string description = "Test Description"
+    )
+    {
+        return new TasksInfo
         {
-            _taskServiceMock = new Mock<ITaskService>();
-            _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
-            _loggerMock = new Mock<ILogger<EditTaskViewModel>>();
-            _languageChangerMock = new Mock<ILanguageChanger>();
+            Id = id,
+            Name = name,
+            Description = description,
+            ProjectId = 1,
+            Priority = TaskPriority.Medium,
+            Progress = 0,
+            Status = TaskStatus.InProgress,
+            DeadLine = DateTime.UtcNow.AddDays(7),
+            CreatedAt = DateTime.UtcNow,
+        };
+    }
 
-            _languageChangerMock
-                .Setup(x => x.Translate(It.IsAny<string>()))
-                .Returns((string key) => key);
-        }
+    private void SetupEvents(EditTaskViewModel vm)
+    {
+        _completedEventWasRaised = false;
+        _closeEventWasRaised = false;
 
-        private EditTaskViewModel CreateViewModel(TasksInfo? task = null)
+        vm.Completed += () =>
         {
-            task ??= CreateTestTask();
+            _completedEventWasRaised = true;
+            return Task.CompletedTask;
+        };
 
-            return new EditTaskViewModel(
-                task,
-                _taskServiceMock.Object,
-                _dialogCoordinatorMock.Object,
-                _loggerMock.Object,
-                _languageChangerMock.Object
-            );
-        }
-
-        private TasksInfo CreateTestTask(
-            int id = 1,
-            string name = "Test Task",
-            string description = "Test Description"
-        )
+        vm.CloseRequested += () =>
         {
-            return new TasksInfo
-            {
-                Id = id,
-                Name = name,
-                Description = description,
-                ProjectId = 1,
-                Priority = TaskPriority.Medium,
-                Progress = 0,
-                Status = TaskStatus.InProgress,
-                DeadLine = DateTime.UtcNow.AddDays(7),
-                CreatedAt = DateTime.UtcNow,
-            };
-        }
+            _closeEventWasRaised = true;
+            return Task.CompletedTask;
+        };
+    }
 
-        private void SetupEvents(EditTaskViewModel vm)
-        {
-            _completedEventWasRaised = false;
-            _closeEventWasRaised = false;
+    [Fact]
+    public void Constructor_WhenTaskProvided_LoadsTaskData()
+    {
+        var task = CreateTestTask();
 
-            vm.Completed += () =>
-            {
-                _completedEventWasRaised = true;
-                return Task.CompletedTask;
-            };
+        var vm = CreateViewModel(task);
 
-            vm.CloseRequested += () =>
-            {
-                _closeEventWasRaised = true;
-                return Task.CompletedTask;
-            };
-        }
+        Assert.Equal(task.Name, vm.Name);
+        Assert.Equal(task.Description, vm.Description);
+        Assert.Equal(task.Priority, vm.Priority);
+        Assert.Equal(task.Progress, vm.Progress);
+        Assert.Equal(task.Status, vm.Status);
+        Assert.Equal(task.DeadLine.ToLocalTime(), vm.DeadLine.ToLocalTime());
+        Assert.True(vm.IsEditMode);
+    }
 
-        [Fact]
-        public void Constructor_WhenTaskProvided_LoadsTaskData()
-        {
-            var task = CreateTestTask();
+    [Fact]
+    public async Task EditTask_WhenSuccessful_UpdatesTask_RaisesCompletedEvent()
+    {
+        var task = CreateTestTask();
+        var vm = CreateViewModel(task);
 
-            var vm = CreateViewModel(task);
+        SetupEvents(vm);
 
-            Assert.Equal(task.Name, vm.Name);
-            Assert.Equal(task.Description, vm.Description);
-            Assert.Equal(task.Priority, vm.Priority);
-            Assert.Equal(task.Progress, vm.Progress);
-            Assert.Equal(task.Status, vm.Status);
-            Assert.Equal(task.DeadLine.ToLocalTime(), vm.DeadLine.ToLocalTime());
-            Assert.True(vm.IsEditMode);
-        }
+        vm.Name = "Updated Name";
+        vm.Description = "Updated Description";
+        vm.Priority = TaskPriority.Medium;
+        vm.Progress = 50;
+        vm.Status = TaskStatus.Completed;
 
-        [Fact]
-        public async Task EditTask_WhenSuccessful_UpdatesTask_RaisesCompletedEvent()
-        {
-            var task = CreateTestTask();
-            var vm = CreateViewModel(task);
+        _taskServiceMock
+            .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
+            .Returns(Task.CompletedTask);
 
-            SetupEvents(vm);
+        await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
-            vm.Name = "Updated Name";
-            vm.Description = "Updated Description";
-            vm.Priority = TaskPriority.Medium;
-            vm.Progress = 50;
-            vm.Status = TaskStatus.Completed;
+        Assert.True(_completedEventWasRaised);
+        Assert.True(_closeEventWasRaised);
 
-            _taskServiceMock
-                .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
-                .Returns(Task.CompletedTask);
+        _taskServiceMock.Verify(
+            x =>
+                x.UpdateAsync(
+                    It.Is<TasksInfo>(t =>
+                        t.Id == task.Id
+                        && t.Name == "Updated Name"
+                        && t.Description == "Updated Description"
+                        && t.Priority == TaskPriority.Medium
+                        && t.Progress == 50
+                        && t.Status == TaskStatus.Completed
+                    )
+                ),
+            Times.Once
+        );
+    }
 
-            await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    [InlineData(" ")]
+    public async Task EditTask_WhenNameEmpty_ShowsWarning(string? taskName)
+    {
+        var task = CreateTestTask();
+        var vm = CreateViewModel(task);
 
-            Assert.True(_completedEventWasRaised);
-            Assert.True(_closeEventWasRaised);
+        SetupEvents(vm);
 
-            _taskServiceMock.Verify(
-                x =>
-                    x.UpdateAsync(
-                        It.Is<TasksInfo>(t =>
-                            t.Id == task.Id
-                            && t.Name == "Updated Name"
-                            && t.Description == "Updated Description"
-                            && t.Priority == TaskPriority.Medium
-                            && t.Progress == 50
-                            && t.Status == TaskStatus.Completed
-                        )
-                    ),
-                Times.Once
-            );
-        }
+        vm.Name = taskName;
 
-        [Theory]
-        [InlineData("")]
-        [InlineData(null)]
-        [InlineData(" ")]
-        public async Task EditTask_WhenNameEmpty_ShowsWarning(string? taskName)
-        {
-            var task = CreateTestTask();
-            var vm = CreateViewModel(task);
+        await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
-            SetupEvents(vm);
+        Assert.False(_completedEventWasRaised);
+        Assert.False(_closeEventWasRaised);
 
-            vm.Name = taskName;
+        _taskServiceMock.Verify(x => x.UpdateAsync(It.IsAny<TasksInfo>()), Times.Never);
 
-            await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Warning,
+                    TaskDialogWarnings.EnterName,
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
+    }
 
-            Assert.False(_completedEventWasRaised);
-            Assert.False(_closeEventWasRaised);
+    [Fact]
+    public async Task EditTask_WhenExceptionOccurs_ShowsErrorDialog()
+    {
+        var task = CreateTestTask();
+        var vm = CreateViewModel(task);
 
-            _taskServiceMock.Verify(x => x.UpdateAsync(It.IsAny<TasksInfo>()), Times.Never);
+        SetupEvents(vm);
 
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Warning,
-                        TaskDialogWarnings.EnterName,
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
-        }
+        _taskServiceMock
+            .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
+            .ThrowsAsync(new Exception());
 
-        [Fact]
-        public async Task EditTask_WhenExceptionOccurs_ShowsErrorDialog()
-        {
-            var task = CreateTestTask();
-            var vm = CreateViewModel(task);
+        await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
 
-            SetupEvents(vm);
+        Assert.False(_completedEventWasRaised);
+        Assert.False(_closeEventWasRaised);
 
-            _taskServiceMock
-                .Setup(x => x.UpdateAsync(It.IsAny<TasksInfo>()))
-                .ThrowsAsync(new Exception());
+        _taskServiceMock.Verify(x => x.UpdateAsync(It.IsAny<TasksInfo>()), Times.Once);
 
-            await ((AsyncRelayCommand)vm.EditTaskCommand).ExecuteAsync(null);
+        _dialogCoordinatorMock.Verify(
+            x =>
+                x.ShowMessageAsync(
+                    vm,
+                    DialogTitles.Error,
+                    CommonErrors.UnexpectedError,
+                    MessageDialogStyle.Affirmative
+                ),
+            Times.Once
+        );
+    }
 
-            Assert.False(_completedEventWasRaised);
-            Assert.False(_closeEventWasRaised);
+    [Fact]
+    public async Task CloseCommand_WhenExecuted_RaisesCloseEventAndDisablesEditMode()
+    {
+        var vm = CreateViewModel();
 
-            _taskServiceMock.Verify(x => x.UpdateAsync(It.IsAny<TasksInfo>()), Times.Once);
+        SetupEvents(vm);
 
-            _dialogCoordinatorMock.Verify(
-                x =>
-                    x.ShowMessageAsync(
-                        vm,
-                        DialogTitles.Error,
-                        CommonErrors.UnexpectedError,
-                        MessageDialogStyle.Affirmative
-                    ),
-                Times.Once
-            );
-        }
+        Assert.True(vm.IsEditMode);
 
-        [Fact]
-        public async Task CloseCommand_WhenExecuted_RaisesCloseEventAndDisablesEditMode()
-        {
-            var vm = CreateViewModel();
+        await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
 
-            SetupEvents(vm);
-
-            Assert.True(vm.IsEditMode);
-
-            await ((AsyncRelayCommand)vm.CancelCommand).ExecuteAsync(null);
-
-            Assert.True(_closeEventWasRaised);
-            Assert.False(vm.IsEditMode);
-        }
+        Assert.True(_closeEventWasRaised);
+        Assert.False(vm.IsEditMode);
     }
 }

@@ -1,10 +1,9 @@
-﻿namespace WindowsDev.Domain.Enums
+namespace WindowsDev.Domain.Enums;
+
+public enum TaskPriority
 {
-    public enum TaskPriority
-    {
-        Critical,
-        High,
-        Medium,
-        Low,
-    }
+    Critical,
+    High,
+    Medium,
+    Low,
 }
