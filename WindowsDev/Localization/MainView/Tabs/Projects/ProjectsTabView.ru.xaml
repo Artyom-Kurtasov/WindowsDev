@@ -19,4 +19,10 @@
     <!-- Watermarks -->
     <sys:String x:Key="Projects_Watermark_Search">Поиск...</sys:String>
 
+    <!-- Dialogs -->
+    <sys:String x:Key="Projects_Dialog_Success_Deleted">Проект успешно удален.</sys:String>
+    <sys:String x:Key="Projects_Dialog_Error_UpdateNotFound">Не удалось обновить проект. Возможно, он был удален или больше не существует.</sys:String>
+
+
+
 </ResourceDictionary>

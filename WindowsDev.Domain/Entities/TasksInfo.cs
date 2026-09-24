@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using WindowsDev.Domain.Enums;
@@ -17,11 +16,9 @@ public class TasksInfo
     public required TaskStatus Status { get; set; }
     public required int ProjectId { get; set; }
     public required DateTime CreatedAt { get; set; }
-    public required DateTime DeadLine { get; set; }
-    public ObservableCollection<TaskComment>? Comments { get; set; }
-    public ObservableCollection<TaskAttachment>? Attachments { get; set; }
+    public required DateTime Deadline { get; set; }
 
     [NotMapped]
     public bool IsSelected { get; set; }
-    public DateTime DeadLineAtLocal => DeadLine.ToLocalTime();
+    public DateTime DeadLineAtLocal => Deadline.ToLocalTime();
 }

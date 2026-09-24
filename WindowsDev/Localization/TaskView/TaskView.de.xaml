@@ -41,5 +41,7 @@
     <sys:String x:Key="Task_Error_LoadCommentsFailed">Fehler beim Laden der Kommentare.</sys:String>
     <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Fehler beim Laden der Anhänge.</sys:String>
     <sys:String x:Key="Task_Error_FileNotSelected">Keine Datei ausgewählt</sys:String>
+    <sys:String x:Key="Task_Error_TaskNotFound">Aufgabe nicht gefunden. Wurde sie vielleicht gelöscht?</sys:String>
+
 
 </ResourceDictionary>

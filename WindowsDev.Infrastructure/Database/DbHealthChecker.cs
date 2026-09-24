@@ -1,4 +1,4 @@
-using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Database;
@@ -24,6 +24,7 @@ internal class DbHealthChecker : IDbHealthChecker
         CheckAttachments(dbContext);
         CheckTasks(dbContext);
         CheckComments(dbContext);
+        CheckRefreshTokens(dbContext);
     }
 
     private void CheckUsers(AppDbContext appDbContext)
@@ -67,7 +68,7 @@ internal class DbHealthChecker : IDbHealthChecker
                 t.ProjectId,
                 t.Priority,
                 t.Status,
-                t.DeadLine,
+                t.Deadline,
                 t.CreatedAt,
             })
             .FirstOrDefault();
@@ -100,5 +101,18 @@ internal class DbHealthChecker : IDbHealthChecker
                 c.TaskId,
             })
             .FirstOrDefault();
+    }
+
+    private void CheckRefreshTokens(AppDbContext appDbContext)
+    {
+        _ = appDbContext
+            .RefreshToken.Select(rt => new
+        {
+            rt.Id,
+            rt.UserId,
+            rt.TokenHash,
+            rt.ExpiresAt
+        }).
+        FirstOrDefault();
     }
 }

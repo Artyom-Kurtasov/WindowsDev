@@ -1,8 +1,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
@@ -61,7 +61,7 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
                     Priority = Priority,
                     Progress = Progress,
                     Status = Status,
-                    DeadLine = DeadLine.ToUniversalTime(),
+                    Deadline = DeadLine.ToUniversalTime(),
                     CreatedAt = DateTime.UtcNow,
                     ProjectId = _projectId,
                 }

@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Services.Authorization;
-using WindowsDev.Application.Services.Localization;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -18,7 +18,7 @@ namespace WindowsDev.Tests.ViewModels.Authorization;
 
 public class AuthorizationViewModelTest
 {
-    private readonly Mock<IAuthorization> _authorizationMock;
+    private readonly Mock<IAuthentication> _authorizationMock;
     private readonly Mock<INavigationService> _navigationServiceMock;
     private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<ILogger<AuthorizationViewModel>> _loggerMock;
@@ -26,7 +26,7 @@ public class AuthorizationViewModelTest
 
     public AuthorizationViewModelTest()
     {
-        _authorizationMock = new Mock<IAuthorization>();
+        _authorizationMock = new Mock<IAuthentication>();
         _navigationServiceMock = new Mock<INavigationService>();
         _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<AuthorizationViewModel>>();
@@ -52,7 +52,7 @@ public class AuthorizationViewModelTest
     public async Task AuthorizeCommand_WhenSuccess_NavigateToMain()
     {
         _authorizationMock
-            .Setup(x => x.Authorize("login", "password"))
+            .Setup(x => x.Authenticate("login", "password"))
             .ReturnsAsync(Result<bool>.Success(true));
 
         var vm = CreateViewModel();
@@ -71,7 +71,7 @@ public class AuthorizationViewModelTest
     public async Task AuthorizeCommand_WhenFailed_ShowsErrorMessageAndDoNotNavigate()
     {
         _authorizationMock
-            .Setup(x => x.Authorize(It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(Result<bool>.Failure(AuthErrors.InvalidCredentials));
 
         var vm = CreateViewModel();
@@ -92,7 +92,7 @@ public class AuthorizationViewModelTest
     public async Task AuthorizeCommand_WhenException_ShowsErrorDialog()
     {
         _authorizationMock
-            .Setup(x => x.Authorize(It.IsAny<string>(), It.IsAny<string>()))
+            .Setup(x => x.Authenticate(It.IsAny<string>(), It.IsAny<string>()))
             .ThrowsAsync(new Exception());
 
         var vm = CreateViewModel();

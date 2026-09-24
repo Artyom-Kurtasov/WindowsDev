@@ -8,4 +8,7 @@
     <sys:String x:Key="Common_Error_UserNotFound">
         Пользователь с таким логином не найден.
     </sys:String>
+    <sys:String x:Key="Common_Error_InvalidSession">
+        Не удалось проверить авторизацию. Пожалуйста, войдите в систему еще раз.
+    </sys:String>
 </ResourceDictionary>

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Projects;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
@@ -69,5 +69,17 @@ internal class ProjectRepository : IProjectRepository
         using var dbContext = _dbManager.Create();
         dbContext.ProjectsInfo.Update(project);
         await dbContext.SaveChangesAsync();
+    }
+
+    public async Task<ProjectsInfo> GetProjectById(int projectId)
+    {
+        using var dbContext = _dbManager.Create();
+
+        var project = await dbContext.ProjectsInfo.Where(x => x.Id == projectId).FirstOrDefaultAsync();
+
+        if (project is not null)
+            return project;
+
+        return null!; // Replace!
     }
 }

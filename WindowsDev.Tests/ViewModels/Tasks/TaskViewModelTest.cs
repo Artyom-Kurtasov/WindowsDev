@@ -1,10 +1,10 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService.Attachment;
-using WindowsDev.Application.Services.TaskService.Comment;
+using WindowsDev.Application.Tasks.Attachment;
+using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
@@ -24,7 +24,7 @@ public class TaskViewModelTest
     private readonly Mock<ICommentService> _commentServiceMock;
     private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<INavigationService> _navigationServiceMock;
-    private readonly Mock<IAttacmentService> _attachmentServiceMock;
+    private readonly Mock<IAttachmentService> _attachmentServiceMock;
     private readonly Mock<ILogger<TaskViewModel>> _loggerMock;
     private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
@@ -62,7 +62,7 @@ public class TaskViewModelTest
     private void SetupSuccessfulLoading(int taskId)
     {
         _commentServiceMock
-            .Setup(x => x.GetComments(taskId))
+            .Setup(x => x.GetCommentsAsync(taskId))
             .ReturnsAsync(new List<TaskComment>());
 
         _attachmentServiceMock
@@ -93,7 +93,7 @@ public class TaskViewModelTest
             Status = TaskStatus.InProgress,
             Progress = 0,
             CreatedAt = DateTime.UtcNow,
-            DeadLine = DateTime.UtcNow.AddDays(7),
+            Deadline = DateTime.UtcNow.AddDays(7),
         };
     }
 
@@ -117,7 +117,7 @@ public class TaskViewModelTest
     {
         var task = CreateTask();
 
-        _commentServiceMock.Setup(x => x.GetComments(task.Id)).ThrowsAsync(new Exception());
+        _commentServiceMock.Setup(x => x.GetCommentsAsync(task.Id)).ThrowsAsync(new Exception());
 
         var vm = CreateViewModel(task: task);
 
@@ -180,7 +180,7 @@ public class TaskViewModelTest
         };
 
         _commentServiceMock
-            .Setup(x => x.AddComment(task.Id, "Test"))
+            .Setup(x => x.AddCommentAsync(task.Id, "Test"))
             .ReturnsAsync(Result<TaskComment>.Success(comment));
 
         var vm = CreateViewModel(task: task);
@@ -212,7 +212,7 @@ public class TaskViewModelTest
         await ((AsyncRelayCommand)vm.AddCommentCommand).ExecuteAsync(null);
 
         _commentServiceMock.Verify(
-            x => x.AddComment(It.IsAny<int>(), It.IsAny<string>()),
+            x => x.AddCommentAsync(It.IsAny<int>(), It.IsAny<string>()),
             Times.Never
         );
     }

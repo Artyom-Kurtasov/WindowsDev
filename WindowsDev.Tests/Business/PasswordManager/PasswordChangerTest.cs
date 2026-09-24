@@ -1,7 +1,7 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.PasswordManager;
-using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
+using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.PasswordChanger;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -33,9 +33,9 @@ public class PasswordChangerTests
         );
     }
 
-    private User CreateUser()
+    private UserInfo CreateUser()
     {
-        return new User
+        return new UserInfo
         {
             Id = 1,
             Login = "test",
@@ -101,7 +101,7 @@ public class PasswordChangerTests
 
         Assert.Equal(ProfileErrors.InvalidCurrentPassword, result.Error);
 
-        _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<User>()), Times.Never);
+        _userRepositoryMock.Verify(x => x.UpdateAsync(It.IsAny<UserInfo>()), Times.Never);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class PasswordChangerTests
 
         _userRepositoryMock
             .Setup(x => x.GetByLoginAsync("unknown"))
-            .ReturnsAsync((User)null);
+            .ReturnsAsync((UserInfo)null);
 
         await Assert.ThrowsAsync<ArgumentNullException>(() =>
             changer.ChangeUserPasswordAsync("unknown", "password")

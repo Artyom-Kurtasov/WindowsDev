@@ -1,5 +1,5 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using Service = WindowsDev.Application.Services.TaskService;
@@ -16,7 +16,7 @@ public class TaskServiceTest
         _taskRepositoryMock = new Mock<ITaskRepository>();
     }
 
-    private Service.TaskService CreateService()
+    private Application.Tasks.TaskService CreateService()
     {
         return new Service.TaskService(_taskRepositoryMock.Object);
     }
@@ -183,7 +183,7 @@ public class TaskServiceTest
 
         Assert.Equal(0, result);
 
-        _taskRepositoryMock.Verify(x => x.GetTasksCountAsync(It.IsAny<int>()), Times.Never);
+        _taskRepositoryMock.Verify(x => x.GetCountAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class TaskServiceTest
         var expectedCount = 5;
 
         _taskRepositoryMock
-            .Setup(x => x.GetTasksCountAsync(projectId))
+            .Setup(x => x.GetCountAsync(projectId))
             .ReturnsAsync(expectedCount);
 
         var service = CreateService();
@@ -202,7 +202,7 @@ public class TaskServiceTest
 
         Assert.Equal(expectedCount, result);
 
-        _taskRepositoryMock.Verify(x => x.GetTasksCountAsync(projectId), Times.Once);
+        _taskRepositoryMock.Verify(x => x.GetCountAsync(projectId), Times.Once);
     }
 
     private TasksInfo CreateTestTask()
@@ -215,7 +215,7 @@ public class TaskServiceTest
             Status = TaskStatus.InProgress,
             ProjectId = 1,
             CreatedAt = DateTime.UtcNow,
-            DeadLine = DateTime.UtcNow.AddDays(7),
+            Deadline = DateTime.UtcNow.AddDays(7),
         };
     }
 }

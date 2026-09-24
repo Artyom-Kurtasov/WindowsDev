@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Authorization;
-using WindowsDev.Application.Services.Localization;
+using WindowsDev.Api.DTO.Request.AuthController;
+using WindowsDev.ApiClients.AuthClient;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Identity;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -17,24 +19,27 @@ namespace WindowsDev.ViewModels.Authorization;
 
 internal class AuthorizationViewModel : LocalizedViewModelBase
 {
+    private readonly ISecureTokenStorage _tokenStorage;
     private readonly ILogger<AuthorizationViewModel> _logger;
     private readonly IDialogService _dialogService;
-    private readonly IAuthorization _authorization;
+    private readonly IAuthApiClient _authApiClient;
     private readonly INavigationService _navigationService;
 
     public AuthorizationViewModel(
         INavigationService navigationService,
-        IAuthorization authorization,
         IDialogService dialogService,
+        IAuthApiClient authApiClient,
         ILogger<AuthorizationViewModel> logger,
-        ILanguageChanger languageChanger
+        ILanguageChanger languageChanger,
+        ISecureTokenStorage tokenStorage
     )
         : base(languageChanger)
     {
+        _authApiClient = authApiClient;
         _navigationService = navigationService;
-        _authorization = authorization;
         _dialogService = dialogService;
         _logger = logger;
+        _tokenStorage = tokenStorage;
 
         SwitchToRegViewCommand = new AsyncRelayCommand(SwitchToRegViewAsync);
         AuthorizeCommand = new AsyncRelayCommand(AuthorizeAsync);
@@ -107,7 +112,13 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
 
         try
         {
-            var result = await _authorization.Authorize(Login, Password);
+            var request = new UserLoginRequest
+            {
+                Login = Login,
+                Password = Password
+            };
+
+            var result = await _authApiClient.LoginAsync(request);
 
             if (result.IsFailure)
             {
@@ -115,6 +126,7 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
                 return;
             }
 
+            _tokenStorage.AccessToken = result.Value.JwtToken;
             await _navigationService.NavigateTo<MainWindowViewModel>();
         }
         catch (Exception ex)
@@ -122,7 +134,6 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
             AuthLogs.AuthorizationFailed(_logger, ex);
 
             await _dialogService.ShowErrorDialogAsync(
-                this,
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError)
             );
@@ -136,4 +147,5 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
             RecoveryCodeDialogViewModel
         >(this);
     }
+
 }

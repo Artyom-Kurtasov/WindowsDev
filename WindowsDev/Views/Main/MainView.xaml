@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:WindowsDev.Views.Main.Tabs"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <UserControl.Resources>
         <!-- Data templates for viewmodels -->
         <DataTemplate DataType="{x:Type tabVM:ProjectsViewModel}">
@@ -25,7 +26,7 @@
     <!-- Main Tab Control -->
     <Grid>
         <TabControl Style="{DynamicResource MahApps.Styles.TabControl.AnimatedSingleRow}" SelectedIndex="{Binding SelectedTabIndex}">
-            <TabItem Header="{DynamicResource MainWindow_Label_Projects}" Content="{Binding Projects}"/>
+            <TabItem Header="{DynamicResource MainWindow_Label_Projects}" Content="{Binding Projects}" TabIndex="0"/>
             <TabItem Header="{DynamicResource MainWindow_Label_Settings}" Content="{Binding Settings}"/>
             <TabItem Header="{DynamicResource MainWindow_Label_Profile}" Content="{Binding Profile}"/>
         </TabControl>

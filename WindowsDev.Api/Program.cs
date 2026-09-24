@@ -1,6 +1,9 @@
+using AutoMapper;
+using WindowsDev.Api.Mappings;
 using WindowsDev.Application;
-using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure;
+using WindowsDev.Infrastructure.JWT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +13,14 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.RegistrateApplication();
+builder.Services.AddJwt(builder.Configuration);
 builder.Services.RegistrateInfrastructure();
+builder.Services.AddAutoMapper(cfg => { }, typeof(ApiMappingProfile));
 
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -21,11 +29,10 @@ if (app.Environment.IsDevelopment())
 }
 
 var dbConfig = app.Services.GetRequiredService<IDatabaseConfig>();
-dbConfig.ConnectionString = "Host=localhost;Port=5432;Database=WindowsDev;Username=postgres;Password=q29384756";
+var connectionString = builder.Configuration["ConnectionString"];
+dbConfig.ConnectionString = connectionString;
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

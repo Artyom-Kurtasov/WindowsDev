@@ -7,7 +7,7 @@ internal static partial class AuthControllerLogs
     [LoggerMessage(
         EventId = AuthEventId.LoginExist,
         Level = LogLevel.Warning,
-        Message = "Login {Login} already exist"
+        Message = "LoginAsync {Login} already exist"
     )]
     public static partial void LoginAlreadyExist(ILogger logger, string login);
 
@@ -23,12 +23,33 @@ internal static partial class AuthControllerLogs
         Level = LogLevel.Information,
         Message = "Registration was succesfull for {Login}"
     )]
-    public static partial void RegistrationSucces(ILogger logger, string login);
+    public static partial void RegistrationSuccess(ILogger logger, string login);
 
     [LoggerMessage(
         EventId = AuthEventId.RegistrationFailed,
         Level = LogLevel.Warning,
-        Message = "Registration failed for {Login}"
+        Message = "Error during registration for {Login}"
     )]
-    public static partial void RegistrationFailed(ILogger logger, string login);
+    public static partial void RegistrationError(ILogger logger, string login);
+
+    [LoggerMessage(
+        EventId = AuthEventId.LoginFailed,
+        Level = LogLevel.Warning,
+        Message = "Failed login attempt for {Login}"
+    )]
+    public static partial void LoginFailed(ILogger logger, string login);
+
+    [LoggerMessage(
+        EventId = AuthEventId.LoginSucces,
+        Level = LogLevel.Warning,
+        Message = "Succes login attempt for {Login}"
+    )]
+    public static partial void LoginSuccess(ILogger logger, string login);
+
+    [LoggerMessage(
+        EventId = AuthEventId.LoginSucces,
+        Level = LogLevel.Warning,
+        Message = "Error during loginfor {Login}"
+    )]
+    public static partial void LoginError(ILogger logger, string login);
 }

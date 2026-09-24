@@ -1,5 +1,5 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Projects;
 using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Domain.Entities;
 using Service = WindowsDev.Application.Services.ProjectService;
@@ -18,7 +18,7 @@ public class ProjectServiceTest
         _currentUser.SetUser(1, "testuser", "Test User");
     }
 
-    private Service.ProjectService CreateService()
+    private Application.Projects.ProjectService CreateService()
     {
         return new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
     }

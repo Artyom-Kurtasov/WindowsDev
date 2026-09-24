@@ -1,9 +1,8 @@
 using Moq;
+using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.PasswordManager;
-using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
-using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -37,7 +36,7 @@ public class PasswordRecoveryServiceTest
     {
         var login = "unknown";
 
-        _userRepositoryMock.Setup(x => x.GetByLoginAsync(login)).ReturnsAsync((User?)null);
+        _userRepositoryMock.Setup(x => x.GetByLoginAsync(login)).ReturnsAsync((UserInfo?)null);
 
         var service = CreateService();
 
@@ -167,9 +166,9 @@ public class PasswordRecoveryServiceTest
         Assert.False(result);
     }
 
-    private User CreateTestUser(string login)
+    private UserInfo CreateTestUser(string login)
     {
-        return new User
+        return new UserInfo
         {
             Login = login,
             Username = login,

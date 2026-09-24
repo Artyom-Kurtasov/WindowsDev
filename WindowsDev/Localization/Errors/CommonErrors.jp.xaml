@@ -8,4 +8,8 @@
     <sys:String x:Key="Common_Error_UserNotFound">
         このログインIDのユーザーは見つかりませんでした。
     </sys:String>
+    <sys:String x:Key="Common_Error_InvalidSession">
+        認証を確認できませんでした。お手数ですが、再度ログインしてください。
+    </sys:String>
+
 </ResourceDictionary>

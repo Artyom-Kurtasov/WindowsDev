@@ -1,8 +1,8 @@
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Input;
-using WindowsDev.Application.DatabaseInterfaces;
-using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Database;
 using WindowsDev.Command;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;

@@ -1,11 +1,11 @@
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.ProjectService;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
+using WindowsDev.Api.DTO.Response.ProjectsController;
+using WindowsDev.ApiClients.ProjectsClient;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Infrastructure.Logging;
@@ -20,8 +20,7 @@ namespace WindowsDev.ViewModels.Main.Tabs;
 
 internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 {
-    private readonly IDialogCoordinator _dialogCoordinator;
-    private readonly IProjectService _projectService;
+    private readonly IProjectsApiClient _projectsApiClient;
     private readonly INavigationService _navigationService;
     private readonly ILogger<ProjectsViewModel> _logger;
     private readonly IDialogService _dialogService;
@@ -29,24 +28,22 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     private const int PageSize = 15;
 
     public ProjectsViewModel(
-        IDialogCoordinator dialogCoordinator,
-        IProjectService projectService,
         INavigationService navigationService,
         ILogger<ProjectsViewModel> logger,
         IDialogService dialogService,
-        ILanguageChanger languageChanger
+        ILanguageChanger languageChanger,
+        IProjectsApiClient projectsApiClient
     )
         : base(languageChanger)
     {
-        _dialogCoordinator = dialogCoordinator;
-        _projectService = projectService;
         _navigationService = navigationService;
         _logger = logger;
         _dialogService = dialogService;
+        _projectsApiClient = projectsApiClient;
 
         DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjectsAsync);
         OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialogAsync);
-        OpenProjectCommand = new AsyncRelayCommandT<ProjectsInfo>(OpenProjectAsync);
+        OpenProjectCommand = new AsyncRelayCommandT<GetProjectsResponse>(OpenProjectAsync);
         SearchCommand = new AsyncRelayCommand(SearchAsync);
         NextPageCommand = new AsyncRelayCommand(NextPageAsync);
         PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
@@ -59,10 +56,10 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     public ICommand PrevPageCommand { get; }
     public ICommand SearchCommand { get; }
 
-    public ObservableCollection<ProjectsInfo> ProjectsList { get; } = new();
+    public ObservableCollection<SelectableItemViewModel> SelectedItems { get; } = new();
+    public ObservableCollection<GetProjectsResponse> ProjectsList { get; } = new();
 
     private string _searchFilter = string.Empty;
-
     public string SearchFilter
     {
         get => _searchFilter;
@@ -78,7 +75,6 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     }
 
     private int _currentPage = 1;
-
     public int CurrentPage
     {
         get => _currentPage;
@@ -94,7 +90,6 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     }
 
     private int _totalCountOfProjects;
-
     public int TotalCountOfPages => (int)Math.Ceiling((double)_totalCountOfProjects / PageSize);
 
     public async Task RefreshAsync()
@@ -106,7 +101,15 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         try
         {
-            _totalCountOfProjects = await _projectService.GetProjectsCountAsync();
+            var result = await _projectsApiClient.GetCountAsync();
+
+            if (result.IsFailure)
+            {
+                await _dialogService.ShowMessageAsync(DialogTitles.Error, result.Error, MessageDialogStyle.Affirmative);
+                return;
+            }
+
+            _totalCountOfProjects = result.Value.TotalCount;
 
             OnPropertyChanged(nameof(TotalCountOfPages));
 
@@ -129,35 +132,38 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
     private async Task DeleteSelectedProjectsAsync()
     {
-        var projectsToDelete = ProjectsList.Where(x => x.IsSelected).ToList();
+        var projectsToDelete = SelectedItems.Where(x => x.IsSelected).ToList();
+
+        if (!projectsToDelete.Any())
+            return;
 
         foreach (var project in projectsToDelete)
         {
             try
             {
-                await _projectService.DeleteAsync(project.Id);
-                ProjectsList.Remove(project);
+                await _projectsApiClient.DeleteAsync(project.Project.Id);
+                SelectedItems.Remove(project);
+                ProjectsList.Remove(project.Project);
             }
             catch (Exception ex)
             {
-                ProjectLogs.ProjectDeleteFailed(_logger, project.Id, ex);
+                ProjectLogs.ProjectDeleteFailed(_logger, project.Project.Id, ex);
 
                 await ShowErrorDialogAsync();
             }
         }
     }
 
-    private async Task OpenProjectAsync(ProjectsInfo project)
+    private async Task OpenProjectAsync(GetProjectsResponse project)
     {
         await _navigationService.NavigateTo<ProjectViewModel>(project);
     }
 
     private async Task ShowCreateProjectDialogAsync()
     {
-        await _dialogService.ShowDialogAsync<
-            CreateProjectDialogView,
-            CreateProjectDialogViewModel
-        >(this);
+        await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(
+            this
+        );
     }
 
     private async Task NextPageAsync()
@@ -185,16 +191,18 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
         try
         {
             ProjectsList.Clear();
+            SelectedItems.Clear();
 
-            var projects = await _projectService.GetProjectsAsync(
+            var projects = await _projectsApiClient.GetProjectsAsync(
                 CurrentPage,
                 PageSize,
                 searchFilter
             );
 
-            foreach (var project in projects)
+            foreach (var project in projects.Value)
             {
                 ProjectsList.Add(project);
+                SelectedItems.Add(new SelectableItemViewModel(project));
             }
         }
         catch (Exception ex)
@@ -207,8 +215,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
     private async Task ShowErrorDialogAsync()
     {
-        await _dialogCoordinator.ShowMessageAsync(
-            this,
+        await _dialogService.ShowMessageAsync(
             Translate(DialogTitles.Error),
             Translate(CommonErrors.UnexpectedError),
             MessageDialogStyle.Affirmative

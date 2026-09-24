@@ -8,4 +8,8 @@
     <sys:String x:Key="Common_Error_UserNotFound">
         Benutzer mit diesem Benutzernamen wurde nicht gefunden.
     </sys:String>
+    <sys:String x:Key="Common_Error_InvalidSession">
+        Autorisierung konnte nicht überprüft werden. Bitte melden Sie sich erneut anzumelden.
+    </sys:String>
+
 </ResourceDictionary>

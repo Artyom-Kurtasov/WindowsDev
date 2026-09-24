@@ -1,9 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
@@ -78,7 +78,7 @@ public class ProjectViewModelTest
             Status = TaskStatus.InProgress,
             Priority = TaskPriority.Medium,
             CreatedAt = DateTime.Today,
-            DeadLine = DateTime.Today.AddDays(7),
+            Deadline = DateTime.Today.AddDays(7),
             Progress = 0,
         };
     }

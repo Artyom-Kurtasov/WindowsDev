@@ -1,8 +1,9 @@
-﻿using System.Net;
+﻿    using Microsoft.AspNetCore.Authorization;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
-using WindowsDev.Api.DTOs.Request;
-using WindowsDev.Api.DTOs.Response;
+using WindowsDev.Api.DTO.Request.AuthController;
+using WindowsDev.Api.DTO.Response.AuthController;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
@@ -17,40 +18,65 @@ internal sealed class AuthApiClient : IAuthApiClient
         _httpClient = httpClient;
     }
 
+    public async Task<Result<UserLoginResponse>> LoginAsync(
+        UserLoginRequest request,
+        CancellationToken cancellationToken = default
+    )
+    {
+        using var response = await _httpClient.PostAsJsonAsync(
+            "api/auth/login",
+            request,
+            cancellationToken
+        );
+
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+            return Result<UserLoginResponse>.Failure(AuthErrors.InvalidCredentials);
+
+        if (response.StatusCode == HttpStatusCode.BadRequest)
+            return Result<UserLoginResponse>.Failure(CommonErrors.UnexpectedError);
+
+        var result = await response.Content.ReadFromJsonAsync<UserLoginResponse>(cancellationToken: cancellationToken);
+
+        return Result<UserLoginResponse>.Success(result);
+    }
+
     public async Task<Result<UserRegisterResponse>> RegisterAsync(
         UserRegisterRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default
+    )
     {
         using var response = await _httpClient.PostAsJsonAsync(
             "api/auth/register",
             request,
-            cancellationToken);
+            cancellationToken
+        );
 
         if (response.StatusCode == HttpStatusCode.Conflict)
         {
-            return Result<UserRegisterResponse>.Failure(
-                AuthErrors.RegistrationFailed);
+            return Result<UserRegisterResponse>.Failure(AuthErrors.RegistrationFailed);
         }
 
         if (response.StatusCode == HttpStatusCode.BadRequest)
         {
-            return Result<UserRegisterResponse>.Failure(
-                AuthErrors.RegistrationFailed);
+            return Result<UserRegisterResponse>.Failure(AuthErrors.RegistrationFailed);
         }
 
         if (!response.IsSuccessStatusCode)
         {
             throw new HttpRequestException(
-                $"Registration API returned HTTP {(int)response.StatusCode} ({response.ReasonPhrase}).");
+                $"Registration API returned HTTP {(int)response.StatusCode} ({response.ReasonPhrase})."
+            );
         }
 
         var result = await response.Content.ReadFromJsonAsync<UserRegisterResponse>(
-            cancellationToken: cancellationToken);
+            cancellationToken: cancellationToken
+        );
 
         if (result is null)
         {
             throw new InvalidOperationException(
-                "Registration API returned an empty or invalid response body.");
+                "Registration API returned an empty or invalid response body."
+            );
         }
 
         return Result<UserRegisterResponse>.Success(result);

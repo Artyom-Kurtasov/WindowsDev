@@ -18,4 +18,9 @@
     <!-- Watermarks -->
     <sys:String x:Key="Projects_Watermark_Search">検索...</sys:String>
 
+    <!-- Dialogs -->
+    <sys:String x:Key="Projects_Dialog_Success_Deleted">プロジェクトが正常に削除されました。</sys:String>
+    <sys:String x:Key="Projects_Dialog_Error_UpdateNotFound">プロジェクトを更新できませんでした。削除されたか、存在しない可能性があります。</sys:String>
+
+
 </ResourceDictionary>

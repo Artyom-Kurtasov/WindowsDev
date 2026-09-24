@@ -1,11 +1,11 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.ProjectService;
-using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Api.DTO.Request.ProjectService;
+using WindowsDev.ApiClients.ProjectsClient;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Identity;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
@@ -16,24 +16,24 @@ namespace WindowsDev.ViewModels.Projects.Dialogs;
 
 internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
 {
-    private readonly ICurrentUserService _currentUserData;
-    private readonly IProjectService _projectService;
+    private readonly IUserSession _userSession;
+    private readonly IProjectsApiClient _projectsApiClient;
     private readonly IDialogCoordinator _dialogCoordinator;
     private readonly ILogger<CreateProjectDialogViewModel> _logger;
 
     public CreateProjectDialogViewModel(
         IDialogCoordinator dialogCoordinator,
-        ICurrentUserService currentUserData,
-        IProjectService projectService,
+        IProjectsApiClient projectsApiClient,
         ILogger<CreateProjectDialogViewModel> logger,
-        ILanguageChanger languageChanger
+        ILanguageChanger languageChanger,
+        IUserSession userSession
     )
         : base(languageChanger)
     {
         _dialogCoordinator = dialogCoordinator;
-        _currentUserData = currentUserData;
-        _projectService = projectService;
+        _projectsApiClient = projectsApiClient;
         _logger = logger;
+        _userSession = userSession;
 
         CloseDialogCommand = new AsyncRelayCommand(CloseDialogAsync);
         CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync);
@@ -91,13 +91,11 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
 
         try
         {
-            await _projectService.AddAsync(
-                new ProjectsInfo
+            await _projectsApiClient.AddAsync(
+                new AddProjectRequest
                 {
                     Name = ProjectName,
-                    UserId = _currentUserData.UserId,
-                    Description = ProjectDescription,
-                    CreatedAt = DateTime.Today.ToUniversalTime(),
+                    Description = ProjectDescription
                 }
             );
 

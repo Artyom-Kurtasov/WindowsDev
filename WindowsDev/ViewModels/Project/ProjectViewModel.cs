@@ -2,8 +2,9 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Api.DTO.Response.ProjectsController;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
@@ -31,7 +32,7 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     private readonly ILogger<ProjectViewModel> _logger;
 
     public ProjectViewModel(
-        ProjectsInfo currentProject,
+        GetProjectsResponse currentProject,
         IDialogCoordinator dialogCoordinator,
         INavigationService navigationService,
         ITaskService taskService,
@@ -66,7 +67,7 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     public ICommand NextPageCommand { get; }
     public ICommand PrevPageCommand { get; }
 
-    public ProjectsInfo? CurrentProject { get; private set; }
+    public GetProjectsResponse? CurrentProject { get; private set; }
 
     public ObservableCollection<TasksInfo> Tasks { get; private set; } = new();
 

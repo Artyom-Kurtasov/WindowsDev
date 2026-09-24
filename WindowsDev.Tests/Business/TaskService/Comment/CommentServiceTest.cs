@@ -1,7 +1,6 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.TaskService.Comment;
 using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Tests.Business.TaskService.Comment;
@@ -30,7 +29,7 @@ public class CommentsServiceTest
         var service = CreateService();
 
         await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-            service.AddComment(0, "comment text")
+            service.AddCommentAsync(0, "comment text")
         );
 
         _commentRepositoryMock.Verify(x => x.AddComments(It.IsAny<TaskComment>()), Times.Never);
@@ -44,7 +43,7 @@ public class CommentsServiceTest
 
         var service = CreateService();
 
-        var result = await service.AddComment(taskId, commentText);
+        var result = await service.AddCommentAsync(taskId, commentText);
 
         Assert.True(result.IsSuccess);
 
@@ -85,7 +84,7 @@ public class CommentsServiceTest
 
         var service = CreateService();
 
-        var result = await service.GetComments(taskId);
+        var result = await service.GetCommentsAsync(taskId);
 
         Assert.Equal(expectedComments, result);
         Assert.Equal(2, result.Count);
@@ -104,7 +103,7 @@ public class CommentsServiceTest
 
         var service = CreateService();
 
-        var result = await service.GetComments(taskId);
+        var result = await service.GetCommentsAsync(taskId);
 
         Assert.Empty(result);
 

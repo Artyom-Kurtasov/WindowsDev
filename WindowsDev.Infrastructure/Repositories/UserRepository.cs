@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
@@ -14,7 +14,7 @@ internal class UserRepository : IUserRepository
         _dbManager = dbManager;
     }
 
-    public async Task AddAsync(User user)
+    public async Task AddAsync(UserInfo user)
     {
         using var dbContext = _dbManager.Create();
 
@@ -42,14 +42,14 @@ internal class UserRepository : IUserRepository
         return false;
     }
 
-    public async Task<User?> GetByLoginAsync(string login)
+    public async Task<UserInfo?> GetByLoginAsync(string login)
     {
         using var dbContext = _dbManager.Create();
 
         return await dbContext.UsersInfo.FirstOrDefaultAsync(x => x.Login == login);
     }
 
-    public async Task UpdateAsync(User user)
+    public async Task UpdateAsync(UserInfo user)
     {
         using var dbContext = _dbManager.Create();
 

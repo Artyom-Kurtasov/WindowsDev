@@ -1,10 +1,10 @@
 using Moq;
 using System.Text;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.Authorization;
+using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Services.PasswordManager.Hasher;
-using WindowsDev.Application.Services.PasswordManager.Hasher.Interfaces;
 using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -28,9 +28,9 @@ public class AuthorizationTest
         _hasherFactory = new HasherFactory(defaultHasher, simpleHasher);
     }
 
-    private Authorization CreateService()
+    private Authentication CreateService()
     {
-        return new Authorization(
+        return new Authentication(
             _userRepositoryMock.Object,
             _currentUserServiceMock.Object,
             _hasherFactory
@@ -46,7 +46,7 @@ public class AuthorizationTest
     {
         var auth = CreateService();
 
-        var result = await auth.Authorize(login, password);
+        var result = await auth.Authenticate(login, password);
 
         Assert.False(result.IsSuccess);
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
@@ -64,11 +64,11 @@ public class AuthorizationTest
     {
         _userRepositoryMock
             .Setup(x => x.GetByLoginAsync("login"))
-            .ReturnsAsync((User?)null);
+            .ReturnsAsync((UserInfo?)null);
 
         var auth = CreateService();
 
-        var result = await auth.Authorize("login", "password");
+        var result = await auth.Authenticate("login", "password");
 
         Assert.False(result.IsSuccess);
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
@@ -89,7 +89,7 @@ public class AuthorizationTest
         var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
         var correctHash = hasher.HashValue("correct", salt).ToString("x16");
 
-        var user = new User
+        var user = new UserInfo
         {
             Id = 1,
             Login = "admin",
@@ -103,7 +103,7 @@ public class AuthorizationTest
 
         var auth = CreateService();
 
-        var result = await auth.Authorize("admin", "wrong");
+        var result = await auth.Authenticate("admin", "wrong");
 
         Assert.False(result.IsSuccess);
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
@@ -122,7 +122,7 @@ public class AuthorizationTest
         var hasher = _hasherFactory.GetHashMethod(HashMethod.Default);
         var hash = hasher.HashValue("password", salt).ToString("x16");
 
-        var user = new User
+        var user = new UserInfo
         {
             Id = 1,
             Login = "admin",
@@ -136,7 +136,7 @@ public class AuthorizationTest
 
         var auth = CreateService();
 
-        var result = await auth.Authorize("admin", "password");
+        var result = await auth.Authenticate("admin", "password");
 
         Assert.True(result.IsSuccess);
         Assert.True(result.Value);

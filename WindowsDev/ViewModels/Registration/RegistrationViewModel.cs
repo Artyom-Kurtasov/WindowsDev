@@ -1,12 +1,11 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.Controllers;
-using WindowsDev.Api.DTOs.Request;
+using WindowsDev.Api.DTO.Request;
+using WindowsDev.Api.DTO.Request.AuthController;
 using WindowsDev.ApiClients.AuthClient;
-using WindowsDev.Application.Services.DebounceService;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.Registration;
+using WindowsDev.Application.Common.Utils.DebounceService;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
@@ -247,7 +246,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
     //private async Task CheckLoginAvailabilityAsync()
     //{
     //    await CheckFieldAvailabilityAsync(
-    //        async () => IsLoginAvailable = await _registration.IsLoginAvailableAsync(Login),
+    //        async () => IsLoginAvailable = await _registration.IsLoginAvailableAsync(LoginAsync),
     //        ex => AuthLogs.LoginAvailabilityCheckFailed(_logger, ex)
     //    );
     //}

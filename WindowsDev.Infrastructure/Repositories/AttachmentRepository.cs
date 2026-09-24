@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
@@ -31,5 +31,12 @@ internal class AttachmentRepository : IAttachmentRepository
             .ToListAsync();
 
         return attachments;
+    }
+
+    public async Task<TaskAttachment?> GetAttachmentAsync(int attachmentId)
+    {
+        using var dbContext = _dbManager.Create();
+
+        return await dbContext.Attachments.FirstOrDefaultAsync(x => x.Id == attachmentId);
     }
 }

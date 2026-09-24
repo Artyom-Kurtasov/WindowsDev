@@ -1,11 +1,11 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.PasswordManager;
 using WindowsDev.Application.Services.PasswordManager.Hasher;
 using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
-using RegistrationService = WindowsDev.Application.Services.Registration.Registration;
+using WindowsDev.Infrastructure.Security;
+using RegistrationService = WindowsDev.Application.Identity.Registration.Registration;
 
 namespace WindowsDev.Tests.Business.Registration;
 
@@ -42,7 +42,7 @@ public class RegistrationTest
         _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(expectedRecoveryCode);
 
         _userRepositoryMock
-            .Setup(x => x.AddAsync(It.IsAny<User>()))
+            .Setup(x => x.AddAsync(It.IsAny<UserInfo>()))
             .Returns(Task.CompletedTask);
 
         var registration = CreateService();
@@ -55,7 +55,7 @@ public class RegistrationTest
         _userRepositoryMock.Verify(
             x =>
                 x.AddAsync(
-                    It.Is<User>(u =>
+                    It.Is<UserInfo>(u =>
                         u.Login == "login"
                         && u.Username == "username"
                         && u.PasswordHash != null
@@ -90,7 +90,7 @@ public class RegistrationTest
         _userRepositoryMock.Verify(
             x =>
                 x.AddAsync(
-                    It.Is<User>(u =>
+                    It.Is<UserInfo>(u =>
                         !string.IsNullOrEmpty(u.PasswordHash)
                         && u.Salt != null
                         && !string.IsNullOrEmpty(u.RecoveryCodeHash)
@@ -107,7 +107,7 @@ public class RegistrationTest
         _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(123456);
 
         _userRepositoryMock
-            .Setup(x => x.AddAsync(It.IsAny<User>()))
+            .Setup(x => x.AddAsync(It.IsAny<UserInfo>()))
             .ThrowsAsync(new InvalidOperationException("Database error"));
 
         var registration = CreateService();
@@ -130,8 +130,8 @@ public class RegistrationTest
         _passwordChangerMock.Setup(x => x.GenerateRecoveryCode()).Returns(789012);
 
         _userRepositoryMock
-            .Setup(x => x.AddAsync(It.IsAny<User>()))
-            .Callback<User>(u => u.Id = userId);
+            .Setup(x => x.AddAsync(It.IsAny<UserInfo>()))
+            .Callback<UserInfo>(u => u.Id = userId);
 
         var registration = CreateService();
 
@@ -154,7 +154,7 @@ public class RegistrationTest
         Assert.True(result.IsSuccess);
 
         _userRepositoryMock.Verify(
-            x => x.AddAsync(It.Is<User>(u => u.HashMethod == HashMethod.Default)),
+            x => x.AddAsync(It.Is<UserInfo>(u => u.HashMethod == HashMethod.Default)),
             Times.Once
         );
     }

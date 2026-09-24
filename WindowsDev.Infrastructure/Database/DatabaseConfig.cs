@@ -1,4 +1,4 @@
-using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Database;
 
 namespace WindowsDev.Infrastructure.Database;
 

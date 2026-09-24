@@ -1,4 +1,7 @@
+using System.Windows.Input;
+using WindowsDev.Command;
 using WindowsDev.Factories;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
 using WindowsDev.ViewModels.Main.Tabs;
@@ -7,24 +10,22 @@ namespace WindowsDev.ViewModels.Main;
 
 internal class MainWindowViewModel : ViewModelBase, IDisposable
 {
+    private readonly IDialogContextProvider _contextProvider;
     private readonly IViewModelFactory _factory;
     private readonly NavigationStore _navigationStore;
 
-    public MainWindowViewModel(NavigationStore navigationStore, IViewModelFactory factory)
+    public MainWindowViewModel(NavigationStore navigationStore, IViewModelFactory factory, IDialogContextProvider dialogContextProvider)
     {
         _navigationStore = navigationStore;
         _factory = factory;
+        _contextProvider = dialogContextProvider;
 
         _navigationStore.CurrentViewModelChanged += OnCurrentViewModelChanged;
 
-        // NOTE: Initialize the default tab during startup since it is displayed immediately.
-        _projects = _factory.Create<ProjectsViewModel>();
-
-        if (_projects is IRefreshableViewModel refreshable)
-        {
-            _ = refreshable.RefreshAsync();
-        }
+        LoadedCommand = new AsyncRelayCommand(OnLoadedAsync);
     }
+
+    public ICommand LoadedCommand { get; }
 
     public ViewModelBase? CurrentViewModel => _navigationStore.CurrentViewModel;
 
@@ -32,7 +33,13 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
     public ProjectsViewModel? Projects
     {
         get => _projects;
-        set => _projects = value;
+        set
+        {
+            if (_projects == value)
+                return;
+            _projects = value;
+            OnPropertyChanged();
+        }
     }
 
     private SettingsViewModel? _settings;
@@ -61,9 +68,9 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
         }
     }
 
-    private int _selectedTabIndex;
-    private bool disposedValue;
+    private bool _disposedValue;
 
+        private int _selectedTabIndex;
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;
@@ -80,22 +87,41 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
 
     private async Task LoadTab(int tabIndex)
     {
-        if (tabIndex == 1)
+        switch (tabIndex)
         {
-            if (_settings == null)
-            {
-                Settings = _factory.Create<SettingsViewModel>();
-            }
-        }
-        else if (tabIndex == 2)
-        {
-            if (_profile == null)
-            {
-                Profile = _factory.Create<ProfileViewModel>();
-            }
+            case 0:
+                {
+                    if (_projects == null)
+                    {
+                        Projects = _factory.Create<ProjectsViewModel>();
+                    }
 
-            if (Profile is IRefreshableViewModel)
-                await Profile.RefreshAsync();
+                    if (Projects is IRefreshableViewModel)
+                        await Projects.RefreshAsync();
+
+                    break;
+                }
+            case 1:
+                {
+                    if (_settings == null)
+                    {
+                        Settings = _factory.Create<SettingsViewModel>();
+                    }
+
+                    break;
+                }
+            case 2:
+                {
+                    if (_profile == null)
+                    {
+                        Profile = _factory.Create<ProfileViewModel>();
+                    }
+
+                    if (Profile is IRefreshableViewModel)
+                        await Profile.RefreshAsync();
+
+                    break;
+                }     
         }
     }
 
@@ -106,7 +132,7 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -115,7 +141,7 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
                 Profile = null;
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 
@@ -123,5 +149,12 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    private async Task OnLoadedAsync()
+    {
+        _contextProvider.Context = this;
+
+        await LoadTab(SelectedTabIndex);
     }
 }

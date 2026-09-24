@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.DatabaseInterfaces;
+using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
 namespace WindowsDev.Infrastructure.Database;

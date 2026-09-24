@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
@@ -30,7 +30,7 @@ internal class TaskRepository : ITaskRepository
         await dbContext.SaveChangesAsync();
     }
 
-    public async Task<TasksInfo> FindTaskById(int id)
+    public async Task<TasksInfo?> FindTaskById(int id)
     {
         using var dbContext = _dbManager.Create();
         var task = await dbContext.TasksInfo.FindAsync(id);
@@ -38,7 +38,7 @@ internal class TaskRepository : ITaskRepository
         return task;
     }
 
-    public async Task<TasksInfo> GetTaskByIdAsync(int id)
+    public async Task<TasksInfo?> GetAsync(int id)
     {
         using var dbContext = _dbManager.Create();
 
@@ -68,7 +68,7 @@ internal class TaskRepository : ITaskRepository
         return await query.Skip(skip).Take(pageSize).ToListAsync();
     }
 
-    public async Task<int> GetTasksCountAsync(int projectId)
+    public async Task<int> GetCountAsync(int projectId)
     {
         using var dbContext = _dbManager.Create();
         return await dbContext.TasksInfo.CountAsync(x => x.ProjectId == projectId);
@@ -86,7 +86,7 @@ internal class TaskRepository : ITaskRepository
             existingTask.Progress = task.Progress;
             existingTask.Priority = task.Priority;
             existingTask.Status = task.Status;
-            existingTask.DeadLine = task.DeadLine;
+            existingTask.Deadline = task.Deadline;
 
             await dbContext.SaveChangesAsync();
         }

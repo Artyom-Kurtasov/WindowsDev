@@ -41,5 +41,7 @@
     <sys:String x:Key="Task_Error_LoadCommentsFailed">Failed to load comments.</sys:String>
     <sys:String x:Key="Task_Error_LoadAttachmentsFailed">Failed to load attachments.</sys:String>
     <sys:String x:Key="Task_Error_FileNotSelected">File not selected</sys:String>
+    <sys:String x:Key="Task_Error_TaskNotFound">Task not found. Could it have been deleted?</sys:String>
+
 
 </ResourceDictionary>

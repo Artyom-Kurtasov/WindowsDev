@@ -1,5 +1,5 @@
 using MahApps.Metro.Controls.Dialogs;
-using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;

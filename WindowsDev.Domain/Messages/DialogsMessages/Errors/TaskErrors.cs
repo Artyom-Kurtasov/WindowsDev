@@ -6,4 +6,5 @@ public static class TaskErrors
     public const string LoadAttachmentsFailed = "Task_Error_LoadAttachmentsFailed";
     public const string OpenAttachmentFailed = "Task_Error_FileNotFound";
     public const string FileNotSelected = "Task_Error_FileNotSelected";
+    public const string TaskNotFound = "Task_Error_TaskNotFound";
 }

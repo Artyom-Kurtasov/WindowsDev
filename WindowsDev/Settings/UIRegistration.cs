@@ -1,8 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.ApiClients.AuthClient;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService.Attachment.FileService;
+using WindowsDev.ApiClients.ProjectsClient;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Factories;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.FilePicker;
@@ -62,6 +63,7 @@ internal static class UIRegistration
 
         services.AddSingleton<NavigationStore>();
         services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<IDialogContextProvider, DialogContextProvider>();
 
         // Factories
         services.AddSingleton<IViewModelFactory, ViewModelFactory>();
@@ -71,6 +73,11 @@ internal static class UIRegistration
         services.AddSingleton<PasswordRecoveryData>();
 
         services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://localhost:7145");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddHttpClient<IProjectsApiClient, ProjectsApiClient>(client =>
         {
             client.BaseAddress = new Uri("https://localhost:7145");
             client.Timeout = TimeSpan.FromSeconds(15);

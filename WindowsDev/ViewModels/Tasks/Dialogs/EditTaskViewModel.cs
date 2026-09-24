@@ -1,8 +1,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
@@ -82,7 +82,7 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         _currentTask.Priority = Priority;
         _currentTask.Progress = Progress;
         _currentTask.Status = Status;
-        _currentTask.DeadLine = DeadLine.ToUniversalTime();
+        _currentTask.Deadline = DeadLine.ToUniversalTime();
     }
 
     private void SetEditDialog()
@@ -92,7 +92,7 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         Priority = _currentTask.Priority;
         Progress = _currentTask.Progress;
         Status = _currentTask.Status;
-        DeadLine = _currentTask.DeadLine.ToLocalTime();
+        DeadLine = _currentTask.Deadline.ToLocalTime();
 
         IsEditMode = true;
     }

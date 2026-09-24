@@ -1,9 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.Profile;
-using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Identity;
+using WindowsDev.Application.Users;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -20,28 +20,28 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     private readonly INavigationService _navigationService;
     private readonly IDialogCoordinator _dialogCoordinator;
     private readonly IProfileService _profileService;
-    private readonly ICurrentUserService _userData;
     private readonly ILogger<ProfileViewModel> _logger;
+    private readonly IUserSession _userSession;
 
     public ProfileViewModel(
-        ICurrentUserService currentUserService,
         IProfileService profileService,
         IDialogCoordinator dialogCoordinator,
         INavigationService navigationService,
         ILogger<ProfileViewModel> logger,
-        ILanguageChanger languageChanger
+        ILanguageChanger languageChanger,
+        IUserSession userSession
     )
         : base(languageChanger)
     {
-        _userData = currentUserService;
         _profileService = profileService;
         _dialogCoordinator = dialogCoordinator;
         _navigationService = navigationService;
         _logger = logger;
+        _userSession = userSession;
 
         SaveNewPasswordCommand = new AsyncRelayCommand(SaveNewPasswordAsync);
         SaveNewUsernameCommand = new AsyncRelayCommand(SaveNewUsernameAsync);
-        LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+        //LogoutCommand = new AsyncRelayCommand(LogoutAsync);
 
         SetUserData();
     }
@@ -145,7 +145,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         try
         {
             var result = await _profileService.ChangeUsernameAsync(
-                _userData.Username,
+                _userSession.Username,
                 Username
             );
 
@@ -170,7 +170,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
         catch (Exception ex)
         {
-            ProfileLogs.UsernameChangeFailed(_logger, _userData.UserId, ex);
+            ProfileLogs.UsernameChangeFailed(_logger, _userSession.UserId, ex);
 
             await _dialogCoordinator.ShowMessageAsync(
                 this,
@@ -212,7 +212,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
         catch (Exception ex)
         {
-            ProfileLogs.PasswordChangeFailed(_logger, _userData.UserId, ex);
+            ProfileLogs.PasswordChangeFailed(_logger, _userSession.UserId, ex);
 
             await _dialogCoordinator.ShowMessageAsync(
                 this,
@@ -223,18 +223,18 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
     }
 
-    private async Task LogoutAsync()
-    {
-        _userData.ClearUser();
+    //private async Task LogoutAsync()
+    //{
+    //    _userData.ClearUser();
 
-        await _navigationService.NavigateTo<AuthorizationViewModel>();
-    }
+    //    await _navigationService.NavigateTo<AuthorizationViewModel>();
+    //}
 
     private void SetUserData()
     {
-        Id = _userData.UserId;
-        Login = _userData.Login ?? string.Empty;
-        Username = _userData.Username ?? string.Empty;
+        Id = _userSession.UserId;
+        Login = _userSession.Login ?? string.Empty;
+        Username = _userSession.Username ?? string.Empty;
     }
 
     public async Task RefreshAsync()

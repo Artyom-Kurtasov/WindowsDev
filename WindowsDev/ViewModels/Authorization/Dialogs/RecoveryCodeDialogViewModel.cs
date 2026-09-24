@@ -1,8 +1,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.PasswordManager.PasswordRecovery;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.RepositoriesInterfaces;
+using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 
@@ -27,5 +27,12 @@ internal class CommentRepository : ICommentRepository
         using var dbContext = _dbManager.Create();
 
         return await dbContext.Comments.Where(x => x.TaskId == taskId).ToListAsync();
+    }
+
+    public async Task<TaskComment?> GetComment(int id)
+    {
+        using var dbContext = _dbManager.Create();
+
+        return await dbContext.Comments.FirstOrDefaultAsync(x => x.Id == id);
     }
 }

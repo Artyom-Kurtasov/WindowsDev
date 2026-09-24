@@ -1,8 +1,5 @@
 using Moq;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.TaskService.Attachment;
-using WindowsDev.Application.Services.TaskService.Attachment.FileService;
-using WindowsDev.Application.Services.TaskService.Attachment.FileServiceInterfaces;
+using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Tests.Business.TaskService.Attachment;

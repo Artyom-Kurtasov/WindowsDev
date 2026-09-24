@@ -28,7 +28,7 @@
     <sys:String x:Key="Registration_Helper_AlreadyHaveAccount">Уже есть аккаунт?</sys:String>
 
     <!-- Errors -->
-    <sys:String x:Key="Registration_Error_RegistrationFailed">Заполните все поля корректно!</sys:String>
+    <sys:String x:Key="Registration_Error_RegistrationFailed">Произошла непредвиденная ошибка при регистрации. Проверьте корректность полей и повторите еще раз.</sys:String>
     
 
 

@@ -1,9 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.Profile;
+using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Users;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 

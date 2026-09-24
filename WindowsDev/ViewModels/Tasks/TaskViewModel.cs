@@ -2,9 +2,8 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService.Attachment;
-using WindowsDev.Application.Services.TaskService.Comment;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
@@ -25,7 +24,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     private readonly IDialogCoordinator _dialogCoordinator;
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
-    //private readonly IAttacmentService _attacmentService;
+    //private readonly IAttachmentService _attacmentService;
     private readonly ICommentService _commentService;
     private readonly ILogger<TaskViewModel> _logger;
 
@@ -37,7 +36,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         ICommentService commentService,
         IDialogService dialogService,
         INavigationService navigationService,
-        //IAttacmentService attacmentService,
+        //IAttachmentService attacmentService,
         ILogger<TaskViewModel> logger,
         IDialogCoordinator dialogCoordinator,
         ILanguageChanger languageChanger
@@ -170,13 +169,13 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
     public DateTime DeadLine
     {
-        get => CurrentTask!.DeadLine.ToLocalTime();
+        get => CurrentTask!.Deadline.ToLocalTime();
         set
         {
-            if (CurrentTask!.DeadLine == value)
+            if (CurrentTask!.Deadline == value)
                 return;
 
-            CurrentTask.DeadLine = value;
+            CurrentTask.Deadline = value;
             OnPropertyChanged(nameof(DeadLine));
         }
     }
@@ -210,7 +209,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         {
             Comments!.Clear();
 
-            var comments = await _commentService.GetComments(CurrentTask!.Id);
+            var comments = await _commentService.GetCommentsAsync(CurrentTask!.Id);
 
             foreach (var comment in comments)
                 Comments.Add(comment);
@@ -300,7 +299,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
         try
         {
-            var result = await _commentService.AddComment(CurrentTask!.Id, NewComment);
+            var result = await _commentService.AddCommentAsync(CurrentTask!.Id, NewComment);
 
             if (result.IsSuccess)
             {

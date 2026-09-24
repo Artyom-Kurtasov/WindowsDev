@@ -1,6 +1,6 @@
 using System.IO;
 using System.Windows;
-using WindowsDev.Application.Services.Localization;
+using WindowsDev.Application.Common.Utils.Localization;
 
 namespace WindowsDev.Services.LanguageChanger;
 

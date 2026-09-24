@@ -1,8 +1,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Application.Services.Localization;
-using WindowsDev.Application.Services.TaskService;
+using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
@@ -64,7 +64,7 @@ public class EditTaskViewModelTest
             Priority = TaskPriority.Medium,
             Progress = 0,
             Status = TaskStatus.InProgress,
-            DeadLine = DateTime.UtcNow.AddDays(7),
+            Deadline = DateTime.UtcNow.AddDays(7),
             CreatedAt = DateTime.UtcNow,
         };
     }
@@ -99,7 +99,7 @@ public class EditTaskViewModelTest
         Assert.Equal(task.Priority, vm.Priority);
         Assert.Equal(task.Progress, vm.Progress);
         Assert.Equal(task.Status, vm.Status);
-        Assert.Equal(task.DeadLine.ToLocalTime(), vm.DeadLine.ToLocalTime());
+        Assert.Equal(task.Deadline.ToLocalTime(), vm.DeadLine.ToLocalTime());
         Assert.True(vm.IsEditMode);
     }
 

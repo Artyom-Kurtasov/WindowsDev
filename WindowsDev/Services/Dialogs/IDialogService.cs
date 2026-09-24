@@ -1,12 +1,14 @@
+using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
 
 namespace WindowsDev.Services.Dialogs;
 
 public interface IDialogService
 {
-    Task ShowDialogAsync<TView, TViewModel>(object context, params object[] args)
+    Task ShowDialogAsync<TView, TViewModel>(params object[] args)
         where TView : UserControl, new()
         where TViewModel : class, IDialogViewModel;
 
-    Task ShowErrorDialogAsync(object context, string message, params object[] args);
+    Task ShowErrorDialogAsync(string message, params object[] args);
+    Task ShowMessageAsync(string title, string message, MessageDialogStyle style);
 }

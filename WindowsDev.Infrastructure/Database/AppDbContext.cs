@@ -15,12 +15,13 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<TasksInfo>().Property(x => x.Status).HasConversion<string>();
         modelBuilder.Entity<TasksInfo>().Property(x => x.Priority).HasConversion<string>();
         modelBuilder.Entity<TasksInfo>().Property(x => x.Progress).HasConversion<string>();
-        modelBuilder.Entity<User>().Property(x => x.HashMethod).HasConversion<string>();
+        modelBuilder.Entity<UserInfo>().Property(x => x.HashMethod).HasConversion<string>();
     }
 
-    public virtual DbSet<User> UsersInfo { get; set; }
+    public virtual DbSet<UserInfo> UsersInfo { get; set; }
     public virtual DbSet<ProjectsInfo> ProjectsInfo { get; set; }
     public virtual DbSet<TasksInfo> TasksInfo { get; set; }
     public virtual DbSet<TaskComment> Comments { get; set; }
     public virtual DbSet<TaskAttachment> Attachments { get; set; }
+    public virtual DbSet<UserRefreshToken> RefreshToken { get; set; }
 }

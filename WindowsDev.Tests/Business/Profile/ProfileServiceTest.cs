@@ -1,9 +1,7 @@
 using Moq;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.RepositoriesInterfaces;
-using WindowsDev.Application.Services.PasswordManager;
-using WindowsDev.Application.Services.Profile;
 using WindowsDev.Application.Services.UserManager;
+using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -74,7 +72,7 @@ public class ProfileServiceTest
     {
         _currentUserService.Login = "user";
 
-        _userRepositoryMock.Setup(x => x.GetByLoginAsync("user")).ReturnsAsync((User)null);
+        _userRepositoryMock.Setup(x => x.GetByLoginAsync("user")).ReturnsAsync((UserInfo)null);
 
         var service = CreateService();
 
@@ -149,7 +147,7 @@ public class ProfileServiceTest
         var result = await service.ChangeUsernameAsync("old", "new");
 
         Assert.False(result.IsSuccess);
-        Assert.Equal(ProfileErrors.UsernamAlreadyTake, result.Error);
+        Assert.Equal(ProfileErrors.UsernamAlreadyTaken, result.Error);
     }
 
     [Fact]
@@ -175,9 +173,9 @@ public class ProfileServiceTest
         _userRepositoryMock.Verify(x => x.UpdateAsync(user), Times.Once);
     }
 
-    private User CreateUser()
+    private UserInfo CreateUser()
     {
-        return new User
+        return new UserInfo
         {
             Login = "user",
             Username = "old",

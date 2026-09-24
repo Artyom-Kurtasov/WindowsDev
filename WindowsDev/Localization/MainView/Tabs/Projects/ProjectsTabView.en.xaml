@@ -18,4 +18,10 @@
     <!-- Watermarks -->
     <sys:String x:Key="Projects_Watermark_Search">Search...</sys:String>
 
+    <!-- Dialogs -->
+    <sys:String x:Key="Projects_Dialog_Success_Deleted">Project deleted successfully.</sys:String>
+    <sys:String x:Key="Projects_Dialog_Error_UpdateNotFound">Failed to update the project. It may have been deleted or no longer exists.</sys:String>
+
+
+
 </ResourceDictionary>
