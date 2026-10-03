@@ -1,4 +1,3 @@
-using AutoMapper;
 using WindowsDev.Api.Mappings;
 using WindowsDev.Application;
 using WindowsDev.Application.Database;
@@ -15,7 +14,7 @@ builder.Services.AddOpenApi();
 builder.Services.RegistrateApplication();
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.RegistrateInfrastructure();
-builder.Services.AddAutoMapper(cfg => { }, typeof(ApiMappingProfile));
+builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ApiMappingProfile>(); });
 
 var app = builder.Build();
 

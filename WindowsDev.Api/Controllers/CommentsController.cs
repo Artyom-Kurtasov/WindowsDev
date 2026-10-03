@@ -1,87 +1,78 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.DTO.Request.CommentsController;
 using WindowsDev.Api.DTO.Response.CommentsController;
+using WindowsDev.Api.Logging;
 using WindowsDev.Application.Tasks.Comment;
 
 namespace WindowsDev.Api.Controllers;
 
+[Authorize]
 [Route("api/[controller]")]
 [ApiController]
-public class CommentsController : ControllerBase
+public class CommentsController : ApiControllerBase
 {
+    private readonly IMapper _mapper;
     private readonly ICommentService _commentService;
+    private readonly ILogger<CommentsController> _logger;
 
-    public CommentsController(ICommentService commentService)
+    public CommentsController(
+        ICommentService commentService,
+        IMapper mapper,
+        ILogger<CommentsController> logger
+    )
     {
         _commentService = commentService;
+        _mapper = mapper;
+        _logger = logger;
     }
 
-    [Authorize]
-    [HttpGet("GetComment")]
-    [ActionName("GetComment")]
-    public async Task<ActionResult<GetCommentResponse>> GetCommentAsync(int id)
+    private const string GetCommentActionName = "GetComment";
+
+    [HttpGet("{id:int}")]
+    [ActionName(GetCommentActionName)]
+    public async Task<ActionResult<GetCommentResponse>> GetCommentAsync([FromRoute] int id)
     {
         var result = await _commentService.GetCommentAsync(id);
 
-        if (result is not null) 
+        if (result.IsSuccess)
         {
-            var response = new GetCommentResponse
-            {
-                Id = result.Id,
-                Author = result.Author,
-                Text = result.Text,
-                CreatedAt = result.CreatedAt,
-                TaskId = result.TaskId
-            };
-
+            var response = _mapper.Map<GetCommentResponse>(result.Value);
+            CommentsControllerLogs.GetCommentSuccessful(_logger, id);
             return Ok(response);
         }
 
-        return NotFound();
+        CommentsControllerLogs.CommentNotFound(_logger, id);
+        return CustomProblem(
+            StatusCodes.Status404NotFound,
+            "Comment Not Found",
+            $"Comment with {id} not found.",
+            result.Error
+        );
     }
 
-    [Authorize]
-    [HttpGet("GetComments")]
-    public async Task<ActionResult<List<GetCommentResponse>>> GetCommentsAsync(int taskId)
+    [HttpGet("task/{taskId:int}")]
+    public async Task<ActionResult<List<GetCommentResponse>>> GetCommentsAsync(
+        [FromRoute] int taskId
+    )
     {
         var result = await _commentService.GetCommentsAsync(taskId);
+        var response = _mapper.Map<List<GetCommentResponse>>(result);
 
-        var response = new List<GetCommentResponse>();
-
-        for(int i = 0; i < result.Count; i++)
-        {
-            var item = new GetCommentResponse
-            {
-                Id = result[i].Id,
-                Author = result[i].Author,
-                TaskId = result[i].TaskId,
-                Text = result[i].Text,
-                CreatedAt = result[i].CreatedAt
-            };
-
-            response.Add(item);
-        }
-
+        CommentsControllerLogs.GetCommentsSuccessful(_logger, taskId);
         return Ok(response);
     }
 
-    [Authorize]
-    [HttpPost("AddComment")]
-    public async Task<ActionResult<AddCommentResponse>> AddCommentAsync(AddCommentRequest request)
+    [HttpPost]
+    public async Task<ActionResult<AddCommentResponse>> AddCommentAsync(
+        [FromBody] AddCommentRequest request
+    )
     {
         var result = await _commentService.AddCommentAsync(request.TaskId, request.CommentText);
+        var response = _mapper.Map<AddCommentResponse>(result);
 
-        var response = new AddCommentResponse
-        {
-            Id = result.Value.Id,
-            TaskId = result.Value.TaskId,
-            Text = result.Value.Text,
-            Author = result.Value.Author,
-            CreatedAt = result.Value.CreatedAt
-        };
-
-        return CreatedAtAction(nameof(GetCommentAsync), new { id = result.Value.Id }, response);
+        CommentsControllerLogs.AddCommentSuccessful(_logger, result.Id, request.TaskId);
+        return CreatedAtAction(GetCommentActionName, new { id = result.Id }, response);
     }
 }

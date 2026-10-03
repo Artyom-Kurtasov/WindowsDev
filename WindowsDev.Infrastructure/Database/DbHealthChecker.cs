@@ -107,12 +107,12 @@ internal class DbHealthChecker : IDbHealthChecker
     {
         _ = appDbContext
             .RefreshToken.Select(rt => new
-        {
-            rt.Id,
-            rt.UserId,
-            rt.TokenHash,
-            rt.ExpiresAt
-        }).
+            {
+                rt.Id,
+                rt.UserId,
+                rt.TokenHash,
+                rt.ExpiresAt
+            }).
         FirstOrDefault();
     }
 }

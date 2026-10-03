@@ -45,7 +45,7 @@
 
         <!-- Projects Data Grid -->
         <Grid Grid.Row="1">
-            <DataGrid ItemsSource="{Binding SelectedItems}"
+            <DataGrid ItemsSource="{Binding Projects}"
                   AutoGenerateColumns="False"
                   SelectionMode="Extended"
                   SelectionUnit="Cell"

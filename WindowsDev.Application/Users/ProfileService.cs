@@ -1,7 +1,7 @@
 using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Application.Identity.PasswordChanger;
 
 namespace WindowsDev.Application.Users;
 

@@ -45,6 +45,7 @@ public class ProfilesController : ApiControllerBase
 
         if (result.IsFailure)
         {
+            ProfilesControllerLogs.ChangePasswordFailed(_logger, _userSession.Login);
             return result.Error switch
             {
                 ProfileErrors.NewPasswordSameAsCurrent => CustomProblem(
@@ -87,6 +88,7 @@ public class ProfilesController : ApiControllerBase
             RecoveryCode = recoveryCode,
         };
 
+        ProfilesControllerLogs.ChangePasswordSuccessful(_logger, _userSession.Login);
         return Ok(response);
     }
 
@@ -103,6 +105,7 @@ public class ProfilesController : ApiControllerBase
 
         if (result.IsFailure)
         {
+            ProfilesControllerLogs.ChangeUsernameFailed(_logger, _userSession.Login);
             return result.Error switch
             {
                 ProfileErrors.NewUsernameSameAsCurrent => CustomProblem(
@@ -131,6 +134,8 @@ public class ProfilesController : ApiControllerBase
         }
 
         var response = new UsernameChangeResponse { AccessToken = result.Value };
+
+        ProfilesControllerLogs.ChangeUsernameSuccessful(_logger, _userSession.Login);
         return Ok(response);
     }
 
@@ -145,6 +150,7 @@ public class ProfilesController : ApiControllerBase
             Username = _userSession.Username,
         };
 
+        ProfilesControllerLogs.GetProfileSuccessful(_logger, _userSession.UserId);
         return Ok(response);
     }
 }

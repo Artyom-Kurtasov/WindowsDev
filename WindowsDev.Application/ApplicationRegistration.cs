@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Application.Common.Utils.DebounceService;
-using WindowsDev.Application.Identity;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Identity.Registration;
 using WindowsDev.Application.Projects;
 using WindowsDev.Application.Tasks;
+using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Application.Users;
 
@@ -30,7 +30,7 @@ public static class ApplicationRegistration
         // Tasks
         services.AddTransient<ITaskService, TaskService>();
         services.AddTransient<ICommentService, CommentsService>();
-        //services.AddTransient<IAttachmentService, AttachmentService>();
+        services.AddTransient<IAttachmentService, AttachmentService>();
 
         // Profile
         services.AddTransient<IProfileService, ProfileService>();

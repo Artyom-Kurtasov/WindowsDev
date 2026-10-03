@@ -16,24 +16,21 @@ namespace WindowsDev.ViewModels.Projects.Dialogs;
 
 internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogViewModel
 {
-    private readonly IUserSession _userSession;
     private readonly IProjectsApiClient _projectsApiClient;
-    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IDialogService _dialogService;
     private readonly ILogger<CreateProjectDialogViewModel> _logger;
 
     public CreateProjectDialogViewModel(
-        IDialogCoordinator dialogCoordinator,
+        IDialogService dialogService,
         IProjectsApiClient projectsApiClient,
         ILogger<CreateProjectDialogViewModel> logger,
-        ILanguageChanger languageChanger,
-        IUserSession userSession
+        ILanguageChanger languageChanger
     )
         : base(languageChanger)
     {
-        _dialogCoordinator = dialogCoordinator;
+        _dialogService = dialogService;
         _projectsApiClient = projectsApiClient;
         _logger = logger;
-        _userSession = userSession;
 
         CloseDialogCommand = new AsyncRelayCommand(CloseDialogAsync);
         CreateProjectCommand = new AsyncRelayCommand(CreateProjectAsync);
@@ -79,8 +76,7 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
     {
         if (string.IsNullOrWhiteSpace(ProjectName))
         {
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Warning),
                 Translate(CreateProjectWarnings.EnterName),
                 MessageDialogStyle.Affirmative
@@ -108,8 +104,7 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
         {
             ProjectLogs.ProjectCreationFailed(_logger, ProjectName, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative

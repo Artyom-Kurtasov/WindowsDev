@@ -1,14 +1,16 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.Api.DTO.Request.ProfilesController;
+using WindowsDev.ApiClients.ProfileClient;
 using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Identity;
-using WindowsDev.Application.Users;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Success;
 using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Interfaces;
@@ -18,14 +20,14 @@ namespace WindowsDev.ViewModels.Main.Tabs;
 internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
 {
     private readonly INavigationService _navigationService;
-    private readonly IDialogCoordinator _dialogCoordinator;
-    private readonly IProfileService _profileService;
+    private readonly IDialogService _dialogService;
+    private readonly IProfileApiClient _profileApiClient;
     private readonly ILogger<ProfileViewModel> _logger;
     private readonly IUserSession _userSession;
 
     public ProfileViewModel(
-        IProfileService profileService,
-        IDialogCoordinator dialogCoordinator,
+        IProfileApiClient profileApiClient,
+        IDialogService dialogService,
         INavigationService navigationService,
         ILogger<ProfileViewModel> logger,
         ILanguageChanger languageChanger,
@@ -33,15 +35,15 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     )
         : base(languageChanger)
     {
-        _profileService = profileService;
-        _dialogCoordinator = dialogCoordinator;
+        _profileApiClient = profileApiClient;
+        _dialogService = dialogService;
         _navigationService = navigationService;
         _logger = logger;
         _userSession = userSession;
 
         SaveNewPasswordCommand = new AsyncRelayCommand(SaveNewPasswordAsync);
         SaveNewUsernameCommand = new AsyncRelayCommand(SaveNewUsernameAsync);
-        //LogoutCommand = new AsyncRelayCommand(LogoutAsync);
+        LogoutCommand = new AsyncRelayCommand(LogoutAsync);
 
         SetUserData();
     }
@@ -144,15 +146,18 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         try
         {
-            var result = await _profileService.ChangeUsernameAsync(
-                _userSession.Username,
-                Username
+            var result = await _profileApiClient.ChangeUsernameAsync(
+                new UsernameChangeRequest
+                {
+                    CurrentUsername = _userSession.Username,
+                    NewUsername = Username,
+                },
+                CancellationToken.None
             );
 
             if (!result.IsSuccess)
             {
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
+                await _dialogService.ShowMessageAsync(
                     Translate(DialogTitles.Warning),
                     Translate(result.Error),
                     MessageDialogStyle.Affirmative
@@ -161,8 +166,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
                 return;
             }
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Success),
                 Translate(ProfileSuccesses.UsernameChanged),
                 MessageDialogStyle.Affirmative
@@ -172,8 +176,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         {
             ProfileLogs.UsernameChangeFailed(_logger, _userSession.UserId, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative
@@ -185,16 +188,20 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         try
         {
-            var result = await _profileService.ChangePasswordAsync(
-                CurrentPassword,
-                NewPassword,
-                ConfirmPassword
+            var result = await _profileApiClient.ChangePasswordAsync(
+                new ProfileChangePasswordRequest
+                {
+                    CurrentPassword = CurrentPassword,
+                    NewPassword = NewPassword,
+                    ConfirmPassword = ConfirmPassword,
+                    Login = Login,
+                },
+                CancellationToken.None
             );
 
             if (!result.IsSuccess)
             {
-                await _dialogCoordinator.ShowMessageAsync(
-                    this,
+                await _dialogService.ShowMessageAsync(
                     Translate(DialogTitles.Warning),
                     Translate(result.Error),
                     MessageDialogStyle.Affirmative
@@ -203,10 +210,9 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
                 return;
             }
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Success),
-                $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value}",
+                $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value.RecoveryCode}",
                 MessageDialogStyle.Affirmative
             );
         }
@@ -214,8 +220,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         {
             ProfileLogs.PasswordChangeFailed(_logger, _userSession.UserId, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative
@@ -223,12 +228,10 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
     }
 
-    //private async Task LogoutAsync()
-    //{
-    //    _userData.ClearUser();
-
-    //    await _navigationService.NavigateTo<AuthorizationViewModel>();
-    //}
+    private async Task LogoutAsync()
+    {
+        await _navigationService.NavigateTo<AuthorizationViewModel>();
+    }
 
     private void SetUserData()
     {

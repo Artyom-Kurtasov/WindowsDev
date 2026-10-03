@@ -1,6 +1,7 @@
 using WindowsDev.Application.Identity;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Domain.Entities;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Application.Tasks.Comment;
 
@@ -18,7 +19,7 @@ internal class CommentsService : ICommentService
         _userSession = userSession;
     }
 
-    public async Task<Result<TaskComment>> AddCommentAsync(int taskId, string commentText)
+    public async Task<TaskComment> AddCommentAsync(int taskId, string commentText)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
 
@@ -32,13 +33,22 @@ internal class CommentsService : ICommentService
 
         await _commentRepository.AddComments(comment);
 
-        return Result<TaskComment>.Success(comment);
+        return comment;
     }
 
     public async Task<List<TaskComment>> GetCommentsAsync(int taskId) =>
         await _commentRepository.GetComments(taskId);
 
-    public async Task<TaskComment?> GetCommentAsync(int id) =>
-        await _commentRepository.GetComment(id);
+    public async Task<Result<TaskComment>> GetCommentAsync(int id)
+    {
+        var comment = await _commentRepository.GetComment(id);
+
+        if (comment == null)
+        {
+            return Result<TaskComment>.Failure(CommentErrors.CommentNotFound);
+        }
+
+        return Result<TaskComment>.Success(comment);
+    }
 
 }

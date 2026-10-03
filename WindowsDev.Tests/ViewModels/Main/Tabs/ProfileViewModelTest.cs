@@ -3,7 +3,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Application.Users;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;

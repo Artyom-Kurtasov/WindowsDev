@@ -8,24 +8,32 @@ using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Api.Controllers;
 
+[AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]
-public class PasswordRecoveryController : ControllerBase
+public class PasswordRecoveryController : ApiControllerBase
 {
     private readonly ILogger<PasswordRecoveryController> _logger;
     private readonly IPasswordRecoveryService _passwordRecoveryService;
 
-    public PasswordRecoveryController(IPasswordRecoveryService passwordRecoveryService, ILogger<PasswordRecoveryController> logger)
+    public PasswordRecoveryController(
+        IPasswordRecoveryService passwordRecoveryService,
+        ILogger<PasswordRecoveryController> logger
+    )
     {
         _passwordRecoveryService = passwordRecoveryService;
         _logger = logger;
     }
 
-    [AllowAnonymous]
-    [HttpPost("verifyRecoveryCode")]
-    public async Task<ActionResult<VerifyPasswordRecoveryCodeResponse>> IsRecoveryCodeCorrectAsync(VerifyPasswordRecoveryCodeRequest request)
+    [HttpPost("verify-code")]
+    public async Task<ActionResult<VerifyPasswordRecoveryCodeResponse>> IsRecoveryCodeCorrectAsync(
+        [FromBody] VerifyPasswordRecoveryCodeRequest request
+    )
     {
-        var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(request.recoveryCode, request.login);
+        var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(
+            request.recoveryCode,
+            request.login
+        );
 
         if (result.IsFailure)
         {
@@ -33,11 +41,21 @@ public class PasswordRecoveryController : ControllerBase
             {
                 case PasswordRecoveryErrors.InvalidRecoveryCode:
                     PasswordRecoveryControllerLogs.InvalidRecoveryCode(_logger, request.login);
-                    return UnprocessableEntity();
+                    return CustomProblem(
+                        StatusCodes.Status422UnprocessableEntity,
+                        "Invalid Recovery Code",
+                        "The recovery code provided is invalid or has expired.",
+                        result.Error
+                    );
 
                 default:
                     PasswordRecoveryControllerLogs.UnexpectedError(_logger, request.login);
-                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    return CustomProblem(
+                        StatusCodes.Status500InternalServerError,
+                        "Unexpected Error",
+                        "An unexpected error occurred during code verification.",
+                        result.Error
+                    );
             }
         }
 
@@ -47,11 +65,15 @@ public class PasswordRecoveryController : ControllerBase
         return Ok(response);
     }
 
-    [AllowAnonymous]
-    [HttpPost("recoveryPassword")]
-    public async Task<ActionResult<ChangePasswordResponse>> ChangePasswordAsync(ChangePasswordRequest request)
+    [HttpPost("change-password")]
+    public async Task<ActionResult<ChangePasswordResponse>> ChangePasswordAsync(
+        [FromBody] ChangePasswordRequest request
+    )
     {
-        var result = await _passwordRecoveryService.ChangePasswordAsync(request.Login, request.Password);
+        var result = await _passwordRecoveryService.ChangePasswordAsync(
+            request.Login,
+            request.Password
+        );
 
         if (result.IsFailure)
         {
@@ -59,26 +81,37 @@ public class PasswordRecoveryController : ControllerBase
             {
                 case CommonErrors.UserNotFound:
                     CommonLogs.UserNotFound(_logger, request.Login);
-                    return BadRequest();
+                    return CustomProblem(
+                        StatusCodes.Status400BadRequest,
+                        "User Not Found",
+                        $"User with login '{request.Login}' was not found.",
+                        result.Error
+                    );
                 default:
                     PasswordRecoveryControllerLogs.UnexpectedError(_logger, request.Login);
-                    return StatusCode(StatusCodes.Status500InternalServerError);
+                    return CustomProblem(
+                        StatusCodes.Status500InternalServerError,
+                        "Unexpected Error",
+                        "An unexpected error occurred during password changes.",
+                        result.Error
+                    );
             }
         }
 
         PasswordRecoveryControllerLogs.PasswordRecoverySuccesful(_logger, request.Login);
-        var response = new ChangePasswordResponse { RecoveryCode = result.Value };
+        var response = new ChangePasswordResponse { RecoveryCode = result.Value.Item1 };
         return Ok(response);
-
     }
 
-    [AllowAnonymous]
-    [HttpPost("isUserExist")]
-    public async Task<ActionResult<IsUserExistResponse>> IsUserExist(IsUserExistRequest request)
+    [HttpPost("check-user")]
+    public async Task<ActionResult<IsUserExistResponse>> IsUserExist(
+        [FromBody] IsUserExistRequest request
+    )
     {
         var result = await _passwordRecoveryService.IsUserExistAsync(request.Login);
         var response = new IsUserExistResponse { IsExist = result.Value };
 
+        PasswordRecoveryControllerLogs.CheckUserSuccessful(_logger, request.Login, result.Value);
         return Ok(response);
     }
 }

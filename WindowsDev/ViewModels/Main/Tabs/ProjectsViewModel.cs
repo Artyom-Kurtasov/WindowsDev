@@ -1,7 +1,7 @@
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
 using WindowsDev.Api.DTO.Response.ProjectsController;
 using WindowsDev.ApiClients.ProjectsClient;
 using WindowsDev.Application.Common.Utils.Localization;
@@ -56,8 +56,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     public ICommand PrevPageCommand { get; }
     public ICommand SearchCommand { get; }
 
-    public ObservableCollection<SelectableItemViewModel> SelectedItems { get; } = new();
-    public ObservableCollection<GetProjectsResponse> ProjectsList { get; } = new();
+    public ObservableCollection<SelectablelProjectViewModel> Projects { get; } = new();
 
     private string _searchFilter = string.Empty;
     public string SearchFilter
@@ -132,7 +131,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
     private async Task DeleteSelectedProjectsAsync()
     {
-        var projectsToDelete = SelectedItems.Where(x => x.IsSelected).ToList();
+        var projectsToDelete = Projects.Where(x => x.IsSelected).ToList();
 
         if (!projectsToDelete.Any())
             return;
@@ -142,8 +141,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
             try
             {
                 await _projectsApiClient.DeleteAsync(project.Project.Id);
-                SelectedItems.Remove(project);
-                ProjectsList.Remove(project.Project);
+                Projects.Remove(project);
             }
             catch (Exception ex)
             {
@@ -162,7 +160,6 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     private async Task ShowCreateProjectDialogAsync()
     {
         await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(
-            this
         );
     }
 
@@ -190,8 +187,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         try
         {
-            ProjectsList.Clear();
-            SelectedItems.Clear();
+            Projects.Clear();
 
             var projects = await _projectsApiClient.GetProjectsAsync(
                 CurrentPage,
@@ -201,8 +197,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
             foreach (var project in projects.Value)
             {
-                ProjectsList.Add(project);
-                SelectedItems.Add(new SelectableItemViewModel(project));
+                Projects.Add(new SelectablelProjectViewModel(project));
             }
         }
         catch (Exception ex)

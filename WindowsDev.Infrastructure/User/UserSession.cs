@@ -1,10 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using WindowsDev.Application.Identity;
-using WindowsDev.Application.Primitives;
-using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Infrastructure.User;
 

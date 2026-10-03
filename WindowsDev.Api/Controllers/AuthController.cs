@@ -11,6 +11,7 @@ using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 
 namespace WindowsDev.Api.Controllers;
 
+[AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
@@ -33,7 +34,6 @@ public class AuthController : ControllerBase
         _jwtService = jwtService;
     }
 
-    [AllowAnonymous]
     [HttpPost("register")]
     public async Task<ActionResult<UserRegisterResponse>> RegisterAsync(UserRegisterRequest request)
     {
@@ -66,7 +66,6 @@ public class AuthController : ControllerBase
         return Created(string.Empty, response);
     }
 
-    [AllowAnonymous]
     [HttpPost("login")]
     public async Task<ActionResult<UserLoginResponse>> LoginAsync(UserLoginRequest request)
     {
@@ -91,11 +90,4 @@ public class AuthController : ControllerBase
         AuthControllerLogs.LoginSuccess(_logger, request.Login);
         return Ok(response);
     }
-
-    //[AllowAnonymous]
-    //[HttpPost("refresh")]
-    //public async Task<ActionResult<RefreshTokensResponse>> RefreshTokens(int userId)
-    //{
-    //    var user = 
-    //}
 }

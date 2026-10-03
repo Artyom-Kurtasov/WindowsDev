@@ -1,7 +1,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request;
 using WindowsDev.Api.DTO.Request.AuthController;
 using WindowsDev.ApiClients.AuthClient;
 using WindowsDev.Application.Common.Utils.DebounceService;
@@ -12,6 +11,7 @@ using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
 using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
@@ -22,7 +22,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 {
     private readonly IAuthApiClient _authApiClient;
     private readonly ILogger<RegistrationViewModel> _logger;
-    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
     private readonly IDebounceService _debounceService;
 
@@ -31,7 +31,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
     public RegistrationViewModel(
         IAuthApiClient authApiClient,
         INavigationService navigationService,
-        IDialogCoordinator dialogCoordinator,
+        IDialogService dialogService,
         ILogger<RegistrationViewModel> logger,
         IDebounceService debounceService,
         ILanguageChanger languageChanger
@@ -39,7 +39,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
         : base(languageChanger)
     {
         _navigationService = navigationService;
-        _dialogCoordinator = dialogCoordinator;
+        _dialogService = dialogService;
         _logger = logger;
         _debounceService = debounceService;
         _authApiClient = authApiClient;
@@ -207,8 +207,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
             };
             var result = await _authApiClient.RegisterAsync(request);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Information),
                 $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
                 MessageDialogStyle.Affirmative
@@ -220,8 +219,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
         {
             AuthLogs.RegistrationFailed(_logger, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative

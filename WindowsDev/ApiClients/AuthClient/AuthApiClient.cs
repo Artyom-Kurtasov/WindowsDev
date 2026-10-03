@@ -1,5 +1,4 @@
-﻿    using Microsoft.AspNetCore.Authorization;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using WindowsDev.Api.DTO.Request.AuthController;

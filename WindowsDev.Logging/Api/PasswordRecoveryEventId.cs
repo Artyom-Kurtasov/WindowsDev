@@ -6,4 +6,5 @@ public class PasswordRecoveryEventId
     public const int RecoveryCodeCheckError = 2001;
     public const int ValidRecoveryCode = 2002;
     public const int PasswordRecoverySuccesful = 2003;
+    public const int CheckUserSuccessful = 2004;
 }

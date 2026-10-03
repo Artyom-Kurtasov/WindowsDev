@@ -1,10 +1,12 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Windows.Input;
+using WindowsDev.Api.DTO.Request.TasksController;
+using WindowsDev.Api.DTO.Response.TasksController;
+using WindowsDev.ApiClients.TaskClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Infrastructure.Logging;
@@ -14,22 +16,22 @@ namespace WindowsDev.ViewModels.Tasks.Dialogs;
 
 internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 {
-    private readonly ITaskService _taskService;
+    private readonly ITaskApiClient _apiClient;
     private readonly ILogger<EditTaskViewModel> _logger;
-    private readonly TasksInfo _currentTask;
+    private readonly GetTasksResponse _currentTask;
 
     public EditTaskViewModel(
-        TasksInfo currentTask,
-        ITaskService taskService,
-        IDialogCoordinator dialogCoordinator,
+        GetTasksResponse currentTask,
+        ITaskApiClient apiClient,
+        IDialogService dialogService,
         ILogger<EditTaskViewModel> logger,
         ILanguageChanger languageChanger
     )
-        : base(languageChanger, dialogCoordinator)
+        : base(languageChanger, dialogService)
     {
         _currentTask = currentTask;
-        _taskService = taskService;
         _logger = logger;
+        _apiClient = apiClient;
 
         EditTaskCommand = new AsyncRelayCommand(EditTaskAsync);
         CancelCommand = new AsyncRelayCommand(CloseAsync);
@@ -55,7 +57,18 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         {
             UpdateTask();
 
-            await _taskService.UpdateAsync(_currentTask);
+            var taskToUpdate = new UpdateTaskRequest
+            {
+                Name = _currentTask.Name,
+                Description = _currentTask.Description,
+                Deadline = _currentTask.Deadline,
+                Priority = _currentTask.Priority,
+                Status = _currentTask.Status,
+                Progress = _currentTask.Progress,
+            };
+
+            Debug.WriteLine(_currentTask.Id);
+            await _apiClient.UpdateAsync(_currentTask.Id, taskToUpdate);
 
             if (Completed != null)
                 await Completed.Invoke();
@@ -66,8 +79,7 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         {
             TaskLogs.TaskUpdateFailed(_logger, _currentTask.Id, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative

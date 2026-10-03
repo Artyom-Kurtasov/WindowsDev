@@ -1,11 +1,18 @@
-using MahApps.Metro.Controls.Dialogs;
-using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
+using WindowsDev.Api.DTO.Request.AttachmentsController;
+using WindowsDev.Api.DTO.Request.CommentsController;
+using WindowsDev.Api.DTO.Response.AttachmentsController;
+using WindowsDev.Api.DTO.Response.CommentsController;
+using WindowsDev.Api.DTO.Response.ProjectsController;
+using WindowsDev.Api.DTO.Response.TasksController;
+using WindowsDev.ApiClients.AttachmentClient;
+using WindowsDev.ApiClients.CommentClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -21,24 +28,22 @@ namespace WindowsDev.ViewModels.Tasks;
 
 internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, IDisposable
 {
-    private readonly IDialogCoordinator _dialogCoordinator;
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
-    //private readonly IAttachmentService _attacmentService;
-    private readonly ICommentService _commentService;
+    private readonly IAttachmentApiClient _attachmentApiClient;
+    private readonly ICommentApiClient _commentApiClient;
     private readonly ILogger<TaskViewModel> _logger;
 
     private bool disposedValue;
 
     public TaskViewModel(
-        ProjectsInfo project,
-        TasksInfo currentTask,
-        ICommentService commentService,
+        GetProjectsResponse project,
+        GetTasksResponse currentTask,
+        ICommentApiClient commentApiClient,
         IDialogService dialogService,
         INavigationService navigationService,
-        //IAttachmentService attacmentService,
+        IAttachmentApiClient attachmentApiClient,
         ILogger<TaskViewModel> logger,
-        IDialogCoordinator dialogCoordinator,
         ILanguageChanger languageChanger
     )
         : base(languageChanger)
@@ -49,18 +54,17 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         Project = project;
         _currentTask = currentTask;
 
-        _commentService = commentService;
+        _commentApiClient = commentApiClient;
         _dialogService = dialogService;
         _navigationService = navigationService;
-        //_attacmentService = attacmentService;
+        _attachmentApiClient = attachmentApiClient;
         _logger = logger;
-        _dialogCoordinator = dialogCoordinator;
 
         AddCommentCommand = new AsyncRelayCommand(AddComment);
         EditTaskCommand = new AsyncRelayCommand(EditTask);
         SwitchToProjectCommand = new RelayCommand(SwitchToProject);
-        //AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
-        //OpenAttachmentCommand = new AsyncRelayCommandT<TaskAttachment>(OpenAttachment);
+        AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
+        OpenAttachmentCommand = new AsyncRelayCommandT<string>(OpenAttachment);
 
         _ = LoadDetailsAsync();
     }
@@ -68,13 +72,13 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     public ICommand SwitchToProjectCommand { get; }
     public ICommand EditTaskCommand { get; }
     public ICommand AddCommentCommand { get; }
-    //public ICommand AddAttachmentCommand { get; }
-    //public ICommand OpenAttachmentCommand { get; }
+    public ICommand AddAttachmentCommand { get; }
+    public ICommand OpenAttachmentCommand { get; }
 
-    public ProjectsInfo? Project { get; private set; }
+    public GetProjectsResponse? Project { get; private set; }
 
-    private TasksInfo? _currentTask;
-    public TasksInfo? CurrentTask
+    private GetTasksResponse? _currentTask;
+    public GetTasksResponse? CurrentTask
     {
         get => _currentTask;
         set
@@ -87,9 +91,9 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         }
     }
 
-    public ObservableCollection<TaskComment>? Comments { get; private set; } = new();
+    public ObservableCollection<GetCommentResponse>? Comments { get; private set; } = new();
 
-    public ObservableCollection<TaskAttachment>? Attachments { get; private set; } = new();
+    public ObservableCollection<AddFileResponse>? Attachments { get; private set; } = new();
 
     private string? _newComment;
     public string? NewComment
@@ -185,10 +189,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     public string DateRange
     {
         get => $"{CreatedAt:dd.MM.yyyy} - {DeadLine:dd.MM.yyyy}";
-        set
-        {
-            OnPropertyChanged(nameof(DateRange));
-        }
+        set { OnPropertyChanged(nameof(DateRange)); }
     }
 
     public async Task RefreshAsync()
@@ -200,7 +201,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     private async Task LoadDetailsAsync()
     {
         await LoadCommentsAsync();
-        //await LoadAttachmentsAsync();
+        await LoadAttachmentsAsync();
     }
 
     private async Task LoadCommentsAsync()
@@ -209,9 +210,18 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         {
             Comments!.Clear();
 
-            var comments = await _commentService.GetCommentsAsync(CurrentTask!.Id);
+            var result = await _commentApiClient.GetCommentsAsync(
+                CurrentTask!.Id,
+                CancellationToken.None
+            );
 
-            foreach (var comment in comments)
+            if (!result.IsSuccess || result.Value is null)
+            {
+                await ShowErrorAsync(TaskErrors.LoadCommentsFailed);
+                return;
+            }
+
+            foreach (var comment in result.Value)
                 Comments.Add(comment);
         }
         catch (Exception ex)
@@ -222,75 +232,90 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         }
     }
 
-    //private async Task LoadAttachmentsAsync()
-    //{
-    //    try
-    //    {
-    //        Attachments!.Clear();
+    private async Task LoadAttachmentsAsync()
+    {
+        try
+        {
+            Attachments!.Clear();
 
-    //        var attachments = await _attacmentService.GetAttachmentsAsync(CurrentTask!.Id);
+            var attachments = await _attachmentApiClient.GetAttachmentsAsync(CurrentTask.Id);
 
-    //        foreach (var attachment in attachments)
-    //            Attachments.Add(attachment);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        AttachmentLogs.AttachmentLoadFailed(_logger, CurrentTask!.Id.ToString(), ex);
+            foreach (var item in attachments.Value)
+            {
+                var attachment = new AddFileResponse
+                {
+                    FileExtension = item.FileExtension,
+                    FilePath = item.FilePath,
+                    FileName = item.FileName,
+                    FileSize = item.FileSize,
+                    TaskId = item.TaskId,
+                };
 
-    //        await ShowErrorAsync(TaskErrors.LoadAttachmentsFailed);
-    //    }
-    //}
+                Attachments.Add(attachment);
+            }
+        }
+        catch (Exception ex)
+        {
+            AttachmentLogs.AttachmentLoadFailed(_logger, CurrentTask!.Id.ToString(), ex);
 
-    //private async Task OpenAttachment(TaskAttachment attachment)
-    //{
-    //    if (attachment == null)
-    //        return;
+            await ShowErrorAsync(TaskErrors.LoadAttachmentsFailed);
+        }
+    }
 
-    //    try
-    //    {
-    //        await _attacmentService.OpenFile(attachment);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        AttachmentLogs.AttachmentOpenFailed(
-    //            _logger,
-    //            attachment.Id.ToString(),
-    //            attachment.FilePath,
-    //            ex
-    //        );
+    private async Task OpenAttachment(string filePath)
+    {
+        try
+        {
+            await _attachmentApiClient.OpenAttachmentAsync(filePath);
+        }
+        catch (Exception ex)
+        {
+            //AttachmentLogs.AttachmentOpenFailed(
+            //    _logger,
+            //    attachment.Id.ToString(),
+            //    attachment.FilePath,
+            //    ex
+            //);
 
-    //        await ShowErrorAsync(TaskErrors.OpenAttachmentFailed);
-    //    }
-    //}
+            await ShowErrorAsync(TaskErrors.OpenAttachmentFailed);
+        }
+    }
 
-    //private async Task AddAttachment()
-    //{
-    //    try
-    //    {
-    //        var result = await _attacmentService.AddFile(CurrentTask!.Id);
+    private async Task AddAttachment()
+    {
+        try
+        {
+            var file = PickFile();
 
-    //        if (result.IsSuccess)
-    //        {
-    //            Attachments!.Add(result.Value);
-    //            return;
-    //        }
+            if (file != null)
+            {
+                var fileInfo = new AddFileRequest { TaskId = CurrentTask.Id, FileName = file };
 
-    //        AttachmentLogs.AttachmentUploadFailed(
-    //            _logger,
-    //            "unknown",
-    //            0,
-    //            new InvalidOperationException(result.Error)
-    //        );
+                var result = await _attachmentApiClient.AddFileAsync(fileInfo);
 
-    //        await ShowErrorAsync(result.Error);
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        AttachmentLogs.AttachmentUploadFailed(_logger, "unknown", 0, ex);
+                if (result.IsSuccess)
+                {
+                    Attachments!.Add(result.Value);
+                    return;
+                }
 
-    //        await ShowErrorAsync(CommonErrors.UnexpectedError);
-    //    }
-    //}
+                AttachmentLogs.AttachmentUploadFailed(
+                    _logger,
+                    "unknown",
+                    0,
+                    new InvalidOperationException(result.Error)
+                );
+
+                await ShowErrorAsync(result.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            AttachmentLogs.AttachmentUploadFailed(_logger, "unknown", 0, ex);
+
+            await ShowErrorAsync(CommonErrors.UnexpectedError);
+        }
+    }
 
     private async Task AddComment()
     {
@@ -299,11 +324,23 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
         try
         {
-            var result = await _commentService.AddCommentAsync(CurrentTask!.Id, NewComment);
+            var result = await _commentApiClient.AddCommentAsync(
+                new AddCommentRequest { TaskId = CurrentTask!.Id, CommentText = NewComment },
+                CancellationToken.None
+            );
 
-            if (result.IsSuccess)
+            if (result.IsSuccess && result.Value is not null)
             {
-                Comments!.Add(result.Value);
+                Comments!.Add(
+                    new GetCommentResponse
+                    {
+                        Id = result.Value.Id,
+                        Text = result.Value.Text,
+                        CreatedAt = result.Value.CreatedAt,
+                        Author = result.Value.Author,
+                        TaskId = result.Value.TaskId,
+                    }
+                );
                 NewComment = string.Empty;
             }
         }
@@ -317,10 +354,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
     private async Task EditTask()
     {
-        await _dialogService.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(
-            this,
-            CurrentTask!
-        );
+        await _dialogService.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(CurrentTask!);
     }
 
     private void SwitchToProject()
@@ -331,8 +365,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
     private async Task ShowErrorAsync(string error)
     {
-        await _dialogCoordinator.ShowMessageAsync(
-            this,
+        await _dialogService.ShowMessageAsync(
             Translate(DialogTitles.Error),
             Translate(error),
             MessageDialogStyle.Affirmative
@@ -349,6 +382,12 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         OnPropertyChanged(nameof(DeadLine));
         OnPropertyChanged(nameof(CreatedAt));
         OnPropertyChanged(nameof(DateRange));
+    }
+
+    private string? PickFile()
+    {
+        var dialog = new OpenFileDialog();
+        return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
 
     protected virtual void Dispose(bool disposing)

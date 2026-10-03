@@ -108,18 +108,13 @@
                     <DataGrid.Columns>
 
                         <!-- Selection Checkbox Column -->
-                        <DataGridTemplateColumn>
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}" 
-                                      Style="{DynamicResource MetroDataGridCheckBox}"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                        <DataGridCheckBoxColumn ElementStyle="{StaticResource MahApps.Styles.CheckBox.DataGrid}"
+                                            EditingElementStyle="{StaticResource MahApps.Styles.CheckBox.DataGrid}"
+                                            Binding="{Binding IsSelected, UpdateSourceTrigger=PropertyChanged}"/>
 
                         <!-- ID Column -->
                         <DataGridTextColumn Header="{DynamicResource Project_Label_Id}"
-                                                Binding="{Binding Id}"
+                                                Binding="{Binding Task.Id}"
                                                 Width="Auto"/>
 
                         <!-- Name Column -->
@@ -128,8 +123,8 @@
                                 <DataTemplate>
                                     <TextBlock TextTrimming="CharacterEllipsis">
                                             <Hyperlink Command="{Binding DataContext.OpenTaskCommand, RelativeSource={RelativeSource AncestorType=DataGrid}}"
-                                                       CommandParameter="{Binding}">
-                                                <Run Text="{Binding Name}"/>
+                                                       CommandParameter="{Binding Task}">
+                                                <Run Text="{Binding Task.Name}"/>
                                             </Hyperlink>
                                     </TextBlock>
                                 </DataTemplate>
@@ -140,7 +135,7 @@
                         <DataGridTemplateColumn Header="{DynamicResource Project_Label_Description}" Width="2*">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Description}"
+                                    <TextBlock Text="{Binding Task.Description}"
                                                    TextTrimming="CharacterEllipsis"
                                                    TextWrapping="NoWrap"/>
                                 </DataTemplate>
@@ -149,12 +144,12 @@
 
                         <!-- Deadline Column -->
                         <DataGridTextColumn Header="{DynamicResource Project_Label_Deadline}"
-                                                Binding="{Binding DeadLineAtLocal, StringFormat=d}"
+                                                Binding="{Binding Task.Deadline, StringFormat=d}"
                                                 Width="*"/>
 
                         <!-- Created Date Column -->
                         <DataGridTextColumn Header="{DynamicResource Project_Label_CreatedAt}"
-                                                Binding="{Binding CreatedAt, StringFormat=d}"
+                                                Binding="{Binding Task.CreatedAt, StringFormat=d}"
                                                 Width="*"/>
 
                     </DataGrid.Columns>

@@ -70,7 +70,7 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
 
     private bool _disposedValue;
 
-        private int _selectedTabIndex;
+    private int _selectedTabIndex;
     public int SelectedTabIndex
     {
         get => _selectedTabIndex;
@@ -121,7 +121,7 @@ internal class MainWindowViewModel : ViewModelBase, IDisposable
                         await Profile.RefreshAsync();
 
                     break;
-                }     
+                }
         }
     }
 

@@ -8,7 +8,7 @@ internal class DialogContextProvider : IDialogContextProvider
         get => _context;
         set
         {
-            if (_context != value) 
+            if (_context != value)
                 _context = value;
         }
     }

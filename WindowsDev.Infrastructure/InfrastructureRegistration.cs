@@ -43,8 +43,6 @@ public static class InfrastructureRegistration
         services.AddTransient<IUserSession, UserSession>();
         services.AddHttpContextAccessor();
 
-        services.AddSingleton<ISecureTokenStorage, SecureTokenStorage>();
-
         return services;
     }
 }

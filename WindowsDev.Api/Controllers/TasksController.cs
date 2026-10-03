@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.DTO.Request.TasksController;
-using WindowsDev.Api.DTO.Response.ProjectsController;
 using WindowsDev.Api.DTO.Response.TasksController;
+using WindowsDev.Api.Logging;
 using WindowsDev.Application.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -18,15 +18,21 @@ public class TasksController : ApiControllerBase
 {
     private readonly ITaskService _taskService;
     private readonly IMapper _mapper;
+    private readonly ILogger<TasksController> _logger;
 
-    public TasksController(ITaskService taskService, IMapper mapper)
+    public TasksController(
+        ITaskService taskService,
+        IMapper mapper,
+        ILogger<TasksController> logger
+    )
     {
         _taskService = taskService;
         _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpPost]
-    public async Task<ActionResult<AddResponse>> AddAsync(AddTaskRequest request)
+    public async Task<ActionResult<AddTaskResponse>> AddAsync(AddTaskRequest request)
     {
         var entity = _mapper.Map<TasksInfo>(request);
         entity.CreatedAt = DateTime.Now.ToUniversalTime();
@@ -35,35 +41,43 @@ public class TasksController : ApiControllerBase
 
         var response = _mapper.Map<AddTaskResponse>(entity);
 
+        TasksControllerLogs.AddSuccessful(_logger, entity.Id, entity.ProjectId);
         return CreatedAtAction(nameof(GetTaskByIdAsync), new { id = entity.Id }, response);
     }
 
     [HttpDelete("{id:int}")]
-    public async Task<IActionResult> DeleteAsync([FromQuery] int id)
+    public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         await _taskService.DeleteAsync(id);
+
+        TasksControllerLogs.DeleteSuccessful(_logger, id);
         return NoContent();
     }
 
     [HttpPatch("{id:int}")]
     public async Task<ActionResult<UpdateTaskResponse>> UpdateAsync(
-        [FromQuery] int id,
+        [FromRoute] int id,
         [FromBody] UpdateTaskRequest request
     )
     {
         var task = await _taskService.GetAsync(id);
         if (task is null)
+        {
+            TasksControllerLogs.TaskNotFound(_logger, id);
             return CustomProblem(
                 StatusCodes.Status404NotFound,
                 "Task Not Found",
                 $"The requested task (ID: {id}) does not exist. Could it have been deleted?",
                 TaskErrors.TaskNotFound
             );
+        }
 
         _mapper.Map(request, task);
         await _taskService.UpdateAsync(task);
 
         var response = _mapper.Map<UpdateTaskResponse>(task);
+
+        TasksControllerLogs.UpdateSuccessful(_logger, id);
         return Ok(response);
     }
 
@@ -86,7 +100,9 @@ public class TasksController : ApiControllerBase
         };
 
         var result = await _taskService.GetTasksAsync(entity);
-        var response = _mapper.Map<List<GetTasksResponse>>(result);
+        var response = result.Value.Select(task => _mapper.Map<GetTasksResponse>(task)).ToList();
+
+        TasksControllerLogs.GetTasksSuccessful(_logger, projectId, page, pageSize, search);
         return Ok(response);
     }
 
@@ -98,6 +114,7 @@ public class TasksController : ApiControllerBase
         var result = await _taskService.GetTasksCountAsync(projectId);
         var response = new GetTasksCountResponse { TotalCount = result };
 
+        TasksControllerLogs.GetTasksCountSuccessful(_logger, projectId);
         return Ok(response);
     }
 
@@ -107,14 +124,19 @@ public class TasksController : ApiControllerBase
     {
         var task = await _taskService.GetAsync(id);
         if (task is null)
+        {
+            TasksControllerLogs.TaskNotFound(_logger, id);
             return CustomProblem(
                 StatusCodes.Status404NotFound,
                 "Task Not Found",
                 $"The requested task (ID: {id}) does not exist. Could it have been deleted?",
                 TaskErrors.TaskNotFound
             );
+        }
 
         var response = _mapper.Map<GetTaskByIdResponse>(task);
+
+        TasksControllerLogs.GetTaskSuccessful(_logger, id);
         return Ok(response);
     }
 }

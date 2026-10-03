@@ -7,23 +7,19 @@ namespace WindowsDev.Application.Tasks.Attachment;
 internal class AttachmentService : IAttachmentService
 {
     private readonly IAttachmentRepository _attachmentRepository;
-    private readonly IFilePicker _filePicker;
     private readonly IFileOpener _fileOpener;
 
     public AttachmentService(
         IAttachmentRepository attachmentRepository,
-        IFilePicker filePicker,
         IFileOpener fileOpener)
     {
         _attachmentRepository = attachmentRepository;
-        _filePicker = filePicker;
         _fileOpener = fileOpener;
     }
 
-    public async Task<Result<List<TaskAttachment>>> GetAttachmentsAsync(int taskId)
+    public async Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId)
     {
-        var attachments = await _attachmentRepository.GetAttachmentsAsync(taskId);
-        return Result<List<TaskAttachment>>.Success(attachments);
+        return await _attachmentRepository.GetAttachmentsAsync(taskId);
     }
 
     public async Task<Result<TaskAttachment>> GetAttachmentAsync(int attachmentId)
@@ -36,29 +32,29 @@ internal class AttachmentService : IAttachmentService
         return Result<TaskAttachment>.Success(attachment);
     }
 
-    public async Task<Result<TaskAttachment>> AddFile(int taskId)
+    public async Task<Result<TaskAttachment>> AddFile(string fileName, int taskId)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(taskId);
 
-        string? fileName = _filePicker.PickFile();
-
-        if (fileName is null)
-            return Result<TaskAttachment>.Failure(TaskErrors.FileNotSelected);
-
         FileInfo fileInfo = new FileInfo(fileName);
 
-        TaskAttachment attachment = new TaskAttachment
+        if (fileInfo.Exists)
         {
-            FileName = fileInfo.Name,
-            FilePath = fileInfo.FullName,
-            FileExtension = fileInfo.Extension,
-            FileSize = fileInfo.Length,
-            TaskId = taskId,
-        };
+            TaskAttachment attachment = new TaskAttachment
+            {
+                FileName = fileInfo.Name,
+                FilePath = fileInfo.FullName,
+                FileExtension = fileInfo.Extension,
+                FileSize = fileInfo.Length,
+                TaskId = taskId,
+            };
 
-        await _attachmentRepository.AddFileInfoToDatabase(attachment);
+            await _attachmentRepository.AddFileInfoToDatabase(attachment);
 
-        return Result<TaskAttachment>.Success(attachment);
+            return Result<TaskAttachment>.Success(attachment);
+        }
+
+        return Result<TaskAttachment>.Failure(TaskErrors.FileNotSelected);
     }
 
     public async Task OpenFile(string filePath)

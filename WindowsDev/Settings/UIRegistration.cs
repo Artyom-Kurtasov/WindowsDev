@@ -1,12 +1,17 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.DependencyInjection;
+using WindowsDev.ApiClients.AttachmentClient;
 using WindowsDev.ApiClients.AuthClient;
+using WindowsDev.ApiClients.CommentClient;
+using WindowsDev.ApiClients.PasswordRecoveryClient;
+using WindowsDev.ApiClients.ProfileClient;
 using WindowsDev.ApiClients.ProjectsClient;
+using WindowsDev.ApiClients.TaskClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Tasks.Attachment;
+using WindowsDev.Application.Identity;
 using WindowsDev.Factories;
+using WindowsDev.Services;
 using WindowsDev.Services.Dialogs;
-using WindowsDev.Services.FilePicker;
 using WindowsDev.Services.LanguageChanger;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Auth.Dialogs.Factories;
@@ -57,13 +62,13 @@ internal static class UIRegistration
         services.AddSingleton<IDialogService, DialogService>();
         services.AddSingleton<IDialogCoordinator, DialogCoordinator>();
 
-        services.AddTransient<IFilePicker, FilePicker>();
-
         services.AddSingleton<ILanguageChanger, LanguageChanger>();
 
         services.AddSingleton<NavigationStore>();
         services.AddSingleton<INavigationService, NavigationService>();
         services.AddSingleton<IDialogContextProvider, DialogContextProvider>();
+
+        services.AddSingleton<ISecureTokenStorage, SecureTokenStorage>();
 
         // Factories
         services.AddSingleton<IViewModelFactory, ViewModelFactory>();
@@ -74,14 +79,40 @@ internal static class UIRegistration
 
         services.AddHttpClient<IAuthApiClient, AuthApiClient>(client =>
         {
-            client.BaseAddress = new Uri("https://localhost:7145");
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
             client.Timeout = TimeSpan.FromSeconds(15);
         });
         services.AddHttpClient<IProjectsApiClient, ProjectsApiClient>(client =>
         {
-            client.BaseAddress = new Uri("https://localhost:7145");
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
             client.Timeout = TimeSpan.FromSeconds(15);
         });
+        services.AddHttpClient<ITaskApiClient, TaskApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddHttpClient<IProfileApiClient, ProfileApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddHttpClient<ICommentApiClient, CommentApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddHttpClient<IAttachmentApiClient, AttachmentApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+        services.AddHttpClient<IPasswordRecoveryApiClient, PasswordRecoveryApiClient>(client =>
+        {
+            client.BaseAddress = new Uri("http://192.168.0.133:5004");
+            client.Timeout = TimeSpan.FromSeconds(15);
+        });
+
 
         return services;
     }

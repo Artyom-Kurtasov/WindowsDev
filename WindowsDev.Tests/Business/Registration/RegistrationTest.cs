@@ -1,6 +1,4 @@
 using Moq;
-using WindowsDev.Application.Services.PasswordManager.Hasher;
-using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -111,13 +110,13 @@ public class ProjectsController : ControllerBase
         );
 
         return Ok(response);
-       
+
     }
 
     [Authorize]
     [HttpGet("count")]
     public async Task<ActionResult<GetProjectsCountResponse>> GetCountAsync()
-    { 
+    {
         var result = await _projectService.GetProjectsCountAsync(_userSession.UserId);
 
         var response = new GetProjectsCountResponse { TotalCount = result };

@@ -2,7 +2,7 @@
 
 namespace WindowsDev.ViewModels.Main.Tabs;
 
-internal class SelectableItemViewModel : ViewModelBase
+internal class SelectablelProjectViewModel : ViewModelBase
 {
     private bool _isSelected;
     public bool IsSelected
@@ -16,7 +16,7 @@ internal class SelectableItemViewModel : ViewModelBase
     }
     public GetProjectsResponse Project { get; init; }
 
-    public SelectableItemViewModel(GetProjectsResponse project)
+    public SelectablelProjectViewModel(GetProjectsResponse project)
     {
         Project = project;
     }

@@ -1,9 +1,10 @@
-﻿using System.Reflection;
+﻿using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using WindowsDev.Application.Identity;
 
-namespace WindowsDev.Infrastructure.JWT;
+namespace WindowsDev.Services;
 
 internal class SecureTokenStorage : ISecureTokenStorage
 {
@@ -54,7 +55,7 @@ internal class SecureTokenStorage : ISecureTokenStorage
 
     private string? LoadTokenFromDisk()
     {
-        if (!File.Exists(_filePath)) 
+        if (!File.Exists(_filePath))
             return null;
 
         try

@@ -2,5 +2,5 @@
 
 internal class CommonEventId
 {
-    
+
 }

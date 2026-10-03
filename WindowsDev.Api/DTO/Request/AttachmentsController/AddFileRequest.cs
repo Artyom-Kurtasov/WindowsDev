@@ -1,7 +1,10 @@
-﻿namespace WindowsDev.Api.DTO.Request.AttachmentsController
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WindowsDev.Api.DTO.Request.AttachmentsController
 {
     public class AddFileRequest
     {
-        public int TaskId { get; set; }
+        public required string FileName { get; set; } = string.Empty;
+        public required int TaskId { get; set; }
     }
 }

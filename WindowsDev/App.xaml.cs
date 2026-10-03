@@ -29,9 +29,6 @@ public partial class App : System.Windows.Application
         ConfigureServices();
         SubscribeToExceptionEvents();
 
-        if (!TryWarmUpDatabase())
-            return;
-
         ApplySavedSettings();
         SetRussianCulture();
         await NavigateToAuthorizationAsync();
@@ -45,36 +42,6 @@ public partial class App : System.Windows.Application
         var configure = new Configure();
         configure.ConfigureServices(services);
         ServiceProvider = services.BuildServiceProvider();
-    }
-
-    private bool TryWarmUpDatabase()
-    {
-        try
-        {
-            var dbHealthChecker = ServiceProvider.GetRequiredService<IDbHealthChecker>();
-            var dbConfig = ServiceProvider.GetRequiredService<IDatabaseConfig>();
-
-            dbConfig.ConnectionString = UserSettings.Default.ConnectionString;
-            dbHealthChecker.Check();
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            var logger = ServiceProvider.GetRequiredService<ILogger<App>>();
-            AppXamlLogs.LogDatabaseWarmUpFailed(logger, ex);
-
-            var loc = ServiceProvider.GetRequiredService<ILanguageChanger>();
-            MessageBox.Show(
-                loc.Translate(AppXamlErrors.DatabaseError),
-                loc.Translate(DialogTitles.CriticalError),
-                MessageBoxButton.OK,
-                MessageBoxImage.Error
-            );
-
-            Shutdown();
-            return false;
-        }
     }
 
     private void ApplySavedSettings()

@@ -1,12 +1,10 @@
+using System.Windows.Input;
 using ControlzEx.Theming;
 using MahApps.Metro.Controls.Dialogs;
-using System.Windows.Input;
 using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Application.Database;
 using WindowsDev.Command;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Domain.Messages;
-using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.Settings.UserSettings;
 
 namespace WindowsDev.ViewModels.Main.Tabs;
@@ -16,24 +14,10 @@ internal class SettingsViewModel : LocalizedViewModelBase
     private const string LightTheme = "Light.Blue";
     private const string DarkTheme = "Dark.Blue";
 
-    private readonly IDbHealthChecker _healthChecker;
-    private readonly IDialogCoordinator _dialogCoordinator;
-    private readonly IDatabaseConfig _databaseConfig;
-
-    public SettingsViewModel(
-        IDbHealthChecker dbHealthChecker,
-        IDialogCoordinator dialogCoordinator,
-        ILanguageChanger languageChanger,
-        IDatabaseConfig databaseConfig
-    )
+    public SettingsViewModel(ILanguageChanger languageChanger)
         : base(languageChanger)
     {
-        _healthChecker = dbHealthChecker;
-        _dialogCoordinator = dialogCoordinator;
-        _databaseConfig = databaseConfig;
-
         ChangeThemeCommand = new AsyncRelayCommand(ChangeThemeAsync);
-        SetNewConnectionStringCommand = new AsyncRelayCommand(SetNewConnectionStringAsync);
         ApplyLanguageCommand = new RelayCommand(ApplyLanguage);
 
         Initialize();
@@ -41,7 +25,6 @@ internal class SettingsViewModel : LocalizedViewModelBase
 
     public ICommand ApplyLanguageCommand { get; }
     public ICommand ChangeThemeCommand { get; }
-    public ICommand SetNewConnectionStringCommand { get; }
 
     private string _newConnectionString = string.Empty;
     public string NewConnectionString
@@ -90,32 +73,6 @@ internal class SettingsViewModel : LocalizedViewModelBase
     }
 
     public IEnumerable<Language> Languages { get; } = Enum.GetValues<Language>();
-
-    public async Task SetNewConnectionStringAsync()
-    {
-        var oldConnection = _databaseConfig.ConnectionString;
-
-        _databaseConfig.ConnectionString = NewConnectionString;
-
-        try
-        {
-            _healthChecker.Check();
-
-            UserSettings.Default.ConnectionString = NewConnectionString;
-            UserSettings.Default.Save();
-        }
-        catch (Exception)
-        {
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
-                Translate(DialogTitles.Warning),
-                Translate(SettingsWarnings.InvalidConnectionString),
-                MessageDialogStyle.Affirmative
-            );
-
-            _databaseConfig.ConnectionString = oldConnection;
-        }
-    }
 
     public async Task ChangeThemeAsync()
     {

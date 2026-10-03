@@ -44,7 +44,7 @@ public class PasswordRecoveryService : IPasswordRecoveryService
             : Result<bool>.Failure(PasswordRecoveryErrors.InvalidRecoveryCode);
     }
 
-    public async Task<Result<int>> ChangePasswordAsync(string login, string password)
+    public async Task<Result<(int, string)>> ChangePasswordAsync(string login, string password)
     {
         _passwordChanger.IsRecoveryMode = true;
         return await _passwordChanger.ChangeUserPasswordAsync(login, password);

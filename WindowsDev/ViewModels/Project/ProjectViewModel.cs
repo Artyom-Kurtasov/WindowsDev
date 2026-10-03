@@ -3,8 +3,9 @@ using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using WindowsDev.Api.DTO.Response.ProjectsController;
+using WindowsDev.Api.DTO.Response.TasksController;
+using WindowsDev.ApiClients.TaskClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
@@ -27,16 +28,14 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
 
     private readonly IDialogService _dialogService;
     private readonly INavigationService _navigationService;
-    private readonly ITaskService _taskService;
-    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly ITaskApiClient _apiClient;
     private readonly ILogger<ProjectViewModel> _logger;
 
     public ProjectViewModel(
         GetProjectsResponse currentProject,
-        IDialogCoordinator dialogCoordinator,
         INavigationService navigationService,
-        ITaskService taskService,
         IDialogService dialogService,
+        ITaskApiClient taskApiClient,
         ILogger<ProjectViewModel> logger,
         ILanguageChanger languageChanger
     )
@@ -44,15 +43,14 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     {
         CurrentProject = currentProject;
 
-        _dialogCoordinator = dialogCoordinator;
         _navigationService = navigationService;
-        _taskService = taskService;
+        _apiClient = taskApiClient;
         _dialogService = dialogService;
         _logger = logger;
 
         SwitchToMainViewCommand = new RelayCommand(SwitchToMainView);
         OpenDialogCommand = new AsyncRelayCommand(OpenTaskDialogAsync);
-        OpenTaskCommand = new AsyncRelayCommandT<TasksInfo>(OpenTaskAsync);
+        OpenTaskCommand = new AsyncRelayCommandT<GetTasksResponse>(OpenTaskAsync);
         NextPageCommand = new AsyncRelayCommand(NextPageAsync);
         PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
         DeleteSelectedTasksCommand = new AsyncRelayCommand(DeleteSelectedTasksAsync);
@@ -68,8 +66,7 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     public ICommand PrevPageCommand { get; }
 
     public GetProjectsResponse? CurrentProject { get; private set; }
-
-    public ObservableCollection<TasksInfo> Tasks { get; private set; } = new();
+    public ObservableCollection<SelectableTaskViewModel> Tasks { get; private set; } = new();
 
     public string? Name => CurrentProject?.Name;
     public string? Description => CurrentProject?.Description;
@@ -201,7 +198,7 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
         await GetPageAsync();
     }
 
-    private async Task OpenTaskAsync(TasksInfo task)
+    private async Task OpenTaskAsync(GetTasksResponse task)
     {
         await _navigationService.NavigateTo<TaskViewModel>(CurrentProject, task);
     }
@@ -215,7 +212,6 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     private async Task OpenTaskDialogAsync()
     {
         await _dialogService.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(
-            this,
             CurrentProject!.Id
         );
     }
@@ -224,7 +220,11 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     {
         try
         {
-            _totalCountOfTasks = await _taskService.GetTasksCountAsync(CurrentProject!.Id);
+            var result = await _apiClient.GetTasksCountAsync(CurrentProject.Id);
+            if (result.IsSuccess)
+            {
+                _totalCountOfTasks = result.Value.TotalCount;
+            }
 
             OnPropertyChanged(nameof(TotalCountOfPages));
 
@@ -249,12 +249,12 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
                 Statuses = GetSelectedStatuses(),
             };
 
-            var result = await _taskService.GetTasksAsync(filter);
+            var result = await _apiClient.GetTasksAsync(filter.ProjectId, filter.Seacrh, filter.Page, filter.PageSize, filter.Statuses);
 
             Tasks.Clear();
 
             foreach (var task in result.Value)
-                Tasks.Add(task);
+                Tasks.Add(new SelectableTaskViewModel(task));
         }
         catch (Exception ex)
         {
@@ -266,16 +266,19 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     {
         var tasksToDelete = Tasks.Where(x => x.IsSelected).ToList();
 
+        if (!tasksToDelete.Any())
+            return;
+
         foreach (var task in tasksToDelete)
         {
             try
             {
-                await _taskService.DeleteAsync(task.Id);
+                await _apiClient.DeleteAsync(task.Task.Id);
                 Tasks.Remove(task);
             }
             catch (Exception ex)
             {
-                TaskLogs.TaskDeleteFailed(_logger, task.Id, ex);
+                TaskLogs.TaskDeleteFailed(_logger, task.Task.Id, ex);
 
                 await ShowErrorAsync(ex);
             }
@@ -307,8 +310,7 @@ internal class ProjectViewModel : LocalizedViewModelBase, IRefreshableViewModel,
     {
         TaskLogs.TaskLoadFailed(_logger, CurrentProject!.Id, exception);
 
-        await _dialogCoordinator.ShowMessageAsync(
-            this,
+        await _dialogService.ShowMessageAsync(
             Translate(DialogTitles.Error),
             Translate(CommonErrors.UnexpectedError),
             MessageDialogStyle.Affirmative

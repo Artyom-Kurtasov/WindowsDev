@@ -31,4 +31,11 @@ public static partial class PasswordRecoveryControllerLogs
         Message = "Password recovery for {login} succesful"
     )]
     public static partial void PasswordRecoverySuccesful(ILogger logger, string login);
+
+    [LoggerMessage(
+        EventId = PasswordRecoveryEventId.CheckUserSuccessful,
+        Level = LogLevel.Information,
+        Message = "User existence check completed for {login}. Is exist: {isExist}"
+    )]
+    public static partial void CheckUserSuccessful(ILogger logger, string login, bool isExist);
 }

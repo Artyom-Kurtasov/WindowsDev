@@ -5,8 +5,8 @@ namespace WindowsDev.Application.Tasks.Attachment;
 
 public interface IAttachmentService
 {
-    Task<Result<List<TaskAttachment>>> GetAttachmentsAsync(int taskId);
-    Task<Result<TaskAttachment>> AddFile(int taskId);
+    Task<List<TaskAttachment>> GetAttachmentsAsync(int taskId);
+    Task<Result<TaskAttachment>> AddFile(string fileName, int taskId);
     Task OpenFile(string filePath);
     Task<Result<TaskAttachment>> GetAttachmentAsync(int attachmentId);
 }

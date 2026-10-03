@@ -1,6 +1,5 @@
 using Moq;
 using WindowsDev.Application.Projects;
-using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Domain.Entities;
 using Service = WindowsDev.Application.Services.ProjectService;
 

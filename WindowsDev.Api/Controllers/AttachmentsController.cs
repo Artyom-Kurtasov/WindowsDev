@@ -1,97 +1,98 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using WindowsDev.Api.DTO.Request.AttachmentsController;
 using WindowsDev.Api.DTO.Response.AttachmentsController;
+using WindowsDev.Api.Logging;
 using WindowsDev.Application.Tasks.Attachment;
+using WindowsDev.Domain.Entities;
 
-namespace WindowsDev.Api.Controllers
+namespace WindowsDev.Api.Controllers;
+
+[Authorize]
+[Route("api/[controller]")]
+[ApiController]
+public class AttachmentsController : ApiControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class AttachmentsController : ControllerBase
+    private readonly IMapper _mapper;
+    private readonly ILogger<AttachmentsController> _logger;
+    private readonly IAttachmentService _attachmentService;
+
+    private const string GetAttachmentActionName = "GetAttachment";
+
+    public AttachmentsController(
+        IAttachmentService attachmentService,
+        ILogger<AttachmentsController> logger,
+        IMapper mapper
+    )
     {
-        private readonly ILogger<AttachmentsController> _logger;
-        private readonly IAttachmentService _attacmentService;
+        _attachmentService = attachmentService;
+        _logger = logger;
+        _mapper = mapper;
+    }
 
-        public AttachmentsController(IAttachmentService attacmentService, 
-            ILogger<AttachmentsController> logger)
+    [HttpPost]
+    public async Task<ActionResult<AddFileResponse>> AddFileAsync([FromBody] AddFileRequest request)
+    {
+        var result = await _attachmentService.AddFile(request.FileName, request.TaskId);
+
+        if (result.IsSuccess)
         {
-            _attacmentService = attacmentService;
-            _logger = logger;
+            var response = _mapper.Map<AddFileResponse>(result.Value);
+            AttachmentsControllerLogs.AddFileSuccessful(_logger, result.Value.Id, request.TaskId);
+            return CreatedAtAction(GetAttachmentActionName, new { id = result.Value.Id }, response);
         }
 
-        [Authorize]
-        [HttpPost("AddFile")]
-        public async Task<ActionResult<AddFileResponse>> AddFileAsync(AddFileRequest request)
+        AttachmentsControllerLogs.FileNotSelected(_logger, request.TaskId);
+        return CustomProblem(
+            StatusCodes.Status400BadRequest,
+            "File Not Selected",
+            "File not selected.",
+            result.Error
+        );
+    }
+
+    [HttpGet("task/{taskId:int}")]
+    public async Task<ActionResult<List<GetAttachmentResponse>>> GetAttachmentsAsync(
+        [FromRoute] int taskId
+    )
+    {
+        var result = await _attachmentService.GetAttachmentsAsync(taskId);
+        var response = _mapper.Map<List<GetAttachmentResponse>>(result);
+
+        AttachmentsControllerLogs.GetAttachmentsSuccessful(_logger, taskId);
+        return Ok(response);
+    }
+
+    [HttpGet("open")]
+    public async Task<IActionResult> OpenAttachmentAsync([FromQuery] string filePath)
+    {
+        await _attachmentService.OpenFile(filePath);
+
+        AttachmentsControllerLogs.OpenAttachmentSuccessful(_logger, filePath);
+        return Ok();
+    }
+
+    [HttpGet("{id:int}")]
+    [ActionName(GetAttachmentActionName)]
+    public async Task<ActionResult<GetAttachmentResponse>> GetAttachmentAsync([FromRoute] int id)
+    {
+        var result = await _attachmentService.GetAttachmentAsync(id);
+
+        if (!result.IsSuccess)
         {
-            var result = await _attacmentService.AddFile(request.TaskId);
-
-            var response = new AddFileResponse
-            {
-                FileExtension = result.Value.FileExtension,
-                FileName = result.Value.FileName,
-                FilePath = result.Value.FilePath,
-                FileSize = result.Value.FileSize,
-                TaskId = result.Value.TaskId
-            };
-
-            return CreatedAtAction(nameof(GetAttachmentAsync), new { id = result.Value.Id }, response);
+            AttachmentsControllerLogs.AttachmentNotFound(_logger, id);
+            return CustomProblem(
+                StatusCodes.Status404NotFound,
+                "Attachment Not Found",
+                $"Attachment with id {id} not found.",
+                result.Error
+            );
         }
 
-        [Authorize]
-        [HttpGet("GetAttachments")]
-        public async Task<ActionResult<List<GetAttachmentResponse>>> GetAttachmentsAsync(int id)
-        {
-            var result = await _attacmentService.GetAttachmentsAsync(id);
+        var response = _mapper.Map<GetAttachmentResponse>(result.Value);
 
-            var response = new List<GetAttachmentResponse>();
-
-            int countOfAttachments = result.Value.Count;
-
-            for (int i = 0;  i < countOfAttachments; i++)
-            {
-                var item = new GetAttachmentResponse
-                {
-                    FileExtension = result.Value[i].FileExtension,
-                    FileName = result.Value[i].FileName,
-                    FilePath = result.Value[i].FilePath,
-                    FileSize = result.Value[i].FileSize,
-                    TaskId = result.Value[i].TaskId
-                };
-
-                response.Add(item);
-            }
-
-            return Ok(response);
-        }
-
-        [Authorize]
-        [HttpGet("OpenAttachment")]
-        public async Task<IActionResult> OpenAttachmentAsync(OpenAttachmentRequest request)
-        {
-            await _attacmentService.OpenFile(request.FilePath);
-            return Ok();
-        }
-
-        [Authorize]
-        [HttpGet("{id:int}")]
-        [ActionName("GetAttachmentAsync")]
-        public async Task<ActionResult<GetAttachmentResponse>> GetAttachmentAsync(int id)
-        {
-            var attachment = _attacmentService.GetAttachmentAsync(id);
-
-            var response = new GetAttachmentResponse
-            {
-                FileExtension = attachment.Result.Value.FileExtension,
-                FileName = attachment.Result.Value.FileName,
-                FilePath = attachment.Result.Value.FilePath,
-                FileSize = attachment.Result.Value.FileSize,
-                TaskId = attachment.Result.Value.TaskId
-            };
-
-            return Ok(response);
-        }
+        AttachmentsControllerLogs.GetAttachmentSuccessful(_logger, id);
+        return Ok(response);
     }
 }

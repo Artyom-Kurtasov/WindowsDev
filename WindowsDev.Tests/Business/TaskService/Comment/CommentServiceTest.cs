@@ -1,5 +1,4 @@
 using Moq;
-using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Domain.Entities;
 

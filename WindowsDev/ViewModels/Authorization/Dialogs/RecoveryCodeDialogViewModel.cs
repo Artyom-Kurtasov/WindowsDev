@@ -1,8 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.Api.DTO.Request;
+using WindowsDev.ApiClients.PasswordRecoveryClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
@@ -17,8 +18,8 @@ namespace WindowsDev.ViewModels.Authorization.Dialogs;
 
 internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogViewModel
 {
-    private readonly IPasswordRecoveryService _passwordRecoveryService;
-    private readonly IDialogCoordinator _dialogCoordinator;
+    private readonly IPasswordRecoveryApiClient _passwordRecoveryApiClient;
+    private readonly IDialogService _dialogService;
     private readonly ILogger<RecoveryCodeDialogViewModel> _logger;
     private readonly IRecoveryStepsFactory _recoveryStepsFactory;
     private readonly PasswordRecoveryData _passwordRecoveryData;
@@ -26,8 +27,8 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
     private readonly IReadOnlyList<object> _steps;
 
     public RecoveryCodeDialogViewModel(
-        IPasswordRecoveryService passwordRecoveryService,
-        IDialogCoordinator dialogCoordinator,
+        IPasswordRecoveryApiClient passwordRecoveryApiClient,
+        IDialogService dialogService,
         ILogger<RecoveryCodeDialogViewModel> logger,
         ILanguageChanger languageChanger,
         IRecoveryStepsFactory recoveryStepsFactory,
@@ -35,8 +36,8 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
     )
         : base(languageChanger)
     {
-        _passwordRecoveryService = passwordRecoveryService;
-        _dialogCoordinator = dialogCoordinator;
+        _passwordRecoveryApiClient = passwordRecoveryApiClient;
+        _dialogService = dialogService;
         _logger = logger;
         _recoveryStepsFactory = recoveryStepsFactory;
         _passwordRecoveryData = passwordRecoveryData;
@@ -146,15 +147,30 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
     {
         try
         {
-            var result = await _passwordRecoveryService.ChangePasswordAsync(
-                _passwordRecoveryData.Login,
-                _passwordRecoveryData.NewPassword
+            var result = await _passwordRecoveryApiClient.ChangePasswordAsync(
+                new ChangePasswordRequest
+                {
+                    Login = _passwordRecoveryData.Login,
+                    Password = _passwordRecoveryData.NewPassword,
+                },
+                CancellationToken.None
             );
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            if (!result.IsSuccess || result.Value is null)
+            {
+                await _dialogService.ShowMessageAsync(
+                    Translate(DialogTitles.Error),
+                    Translate(string.IsNullOrWhiteSpace(result.Error)
+                        ? CommonErrors.UnexpectedError
+                        : result.Error),
+                    MessageDialogStyle.Affirmative
+                );
+                return;
+            }
+
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Information),
-                $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value.RecoveryCode}",
                 MessageDialogStyle.Affirmative
             );
 
@@ -168,8 +184,7 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
                 ex
             );
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative

@@ -3,18 +3,19 @@ using WindowsDev.Application.Common.Utils.Localization;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
+using WindowsDev.Services.Dialogs;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs;
 
 internal class TaskDialogViewModelBase : LocalizedViewModelBase
 {
-    protected readonly IDialogCoordinator _dialogCoordinator;
+    protected readonly IDialogService _dialogService;
 
     protected TaskDialogViewModelBase(ILanguageChanger languageChanger,
-        IDialogCoordinator dialogCoordinator) : base(languageChanger)
+        IDialogService dialogService) : base(languageChanger)
     {
-        _dialogCoordinator = dialogCoordinator;
+        _dialogService = dialogService;
     }
 
     private bool _isEditMode;
@@ -96,7 +97,7 @@ internal class TaskDialogViewModelBase : LocalizedViewModelBase
 
     protected async Task ShowWarningAsync()
     {
-        await _dialogCoordinator.ShowMessageAsync(this,
+        await _dialogService.ShowMessageAsync(
             Translate(DialogTitles.Warning),
             Translate(TaskDialogWarnings.EnterName),
             MessageDialogStyle.Affirmative);

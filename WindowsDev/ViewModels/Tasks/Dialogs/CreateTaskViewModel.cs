@@ -1,10 +1,10 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.Api.DTO.Request.TasksController;
+using WindowsDev.ApiClients.TaskClient;
 using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Infrastructure.Logging;
@@ -14,24 +14,24 @@ namespace WindowsDev.ViewModels.Tasks.Dialogs;
 
 internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 {
-    private readonly ITaskService _taskService;
+    private readonly ITaskApiClient _apiClient;
     private readonly ILogger<CreateTaskViewModel> _logger;
     private readonly int _projectId;
 
     public CreateTaskViewModel(
         int projectId,
-        ITaskService taskService,
-        IDialogCoordinator dialogCoordinator,
+        ITaskApiClient apiClient,
+        IDialogService dialogService,
         ILogger<CreateTaskViewModel> logger,
         ILanguageChanger languageChanger
     )
-        : base(languageChanger, dialogCoordinator)
+        : base(languageChanger, dialogService)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(projectId);
 
         _projectId = projectId;
-        _taskService = taskService;
         _logger = logger;
+        _apiClient = apiClient;
 
         CreateTaskCommand = new AsyncRelayCommand(CreateTaskAsync);
         CancelCommand = new AsyncRelayCommand(CancelAsync);
@@ -53,8 +53,8 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 
         try
         {
-            await _taskService.AddAsync(
-                new TasksInfo
+            await _apiClient.AddAsync(
+                new AddTaskRequest
                 {
                     Name = Name,
                     Description = Description,
@@ -62,7 +62,6 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
                     Progress = Progress,
                     Status = Status,
                     Deadline = DeadLine.ToUniversalTime(),
-                    CreatedAt = DateTime.UtcNow,
                     ProjectId = _projectId,
                 }
             );
@@ -77,8 +76,7 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         {
             TaskLogs.TaskCreationFailed(_logger, Name, _projectId, ex);
 
-            await _dialogCoordinator.ShowMessageAsync(
-                this,
+            await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
                 Translate(CommonErrors.UnexpectedError),
                 MessageDialogStyle.Affirmative

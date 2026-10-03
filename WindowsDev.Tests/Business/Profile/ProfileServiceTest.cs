@@ -1,6 +1,5 @@
 using Moq;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Services.UserManager;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;

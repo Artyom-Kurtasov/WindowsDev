@@ -1,5 +1,4 @@
 using System.Text;
-using WindowsDev.Application.Services.PasswordManager.Hasher;
 using WindowsDev.Infrastructure.Security;
 
 namespace WindowsDev.Tests.Business.PasswordManager;
