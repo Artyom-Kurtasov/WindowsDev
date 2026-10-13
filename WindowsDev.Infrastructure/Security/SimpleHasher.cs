@@ -1,4 +1,4 @@
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 
 namespace WindowsDev.Infrastructure.Security;
 

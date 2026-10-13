@@ -1,11 +1,10 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request.ProjectService;
-using WindowsDev.ApiClients.ProjectsClient;
-using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Identity;
+using WindowsDev.ApiClient.ProjectsClient;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
+using WindowsDev.Contracts.Projects;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;

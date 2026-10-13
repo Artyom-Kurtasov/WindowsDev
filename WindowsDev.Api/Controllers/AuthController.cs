@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.AuthController;
-using WindowsDev.Api.DTO.Response.AuthController;
 using WindowsDev.Api.Logging;
-using WindowsDev.Application.Identity;
+using WindowsDev.Api.ProblemDetails;
 using WindowsDev.Application.Identity.Authentication;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Identity.Registration;
+using WindowsDev.Contracts.Api.Identity;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 
@@ -14,7 +14,7 @@ namespace WindowsDev.Api.Controllers;
 [AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController : ControllerBase
+public class AuthController : ApiControllerBase
 {
     private readonly IJwtService _jwtService;
     private readonly IAuthentication _authentication;
@@ -49,11 +49,19 @@ public class AuthController : ControllerBase
             {
                 case AuthDialogWarnings.LoginTaken:
                     AuthControllerLogs.LoginAlreadyExist(_logger, request.Login);
-                    return Conflict();
+                    return CustomProblem(
+                        StatusCodes.Status409Conflict,
+                        AuthProblemDetails.LoginConflict,
+                        AuthProblemDetails.LoginConflictDetail(request.Login),
+                        AuthDialogWarnings.LoginTaken);
 
                 case AuthDialogWarnings.UsernameTaken:
                     AuthControllerLogs.UsernameAlreadyExist(_logger, request.Username);
-                    return Conflict();
+                    return CustomProblem(
+                        StatusCodes.Status409Conflict,
+                        AuthProblemDetails.UsernameConflict,
+                        AuthProblemDetails.UsernameConflictDetail(request.Username),
+                        AuthDialogWarnings.UsernameTaken);
 
                 default:
                     AuthControllerLogs.RegistrationError(_logger, request.Login);
@@ -78,7 +86,11 @@ public class AuthController : ControllerBase
             switch (result.Error)
             {
                 case AuthErrors.InvalidCredentials:
-                    return Unauthorized();
+                    return CustomProblem(
+                        StatusCodes.Status401Unauthorized,
+                        AuthProblemDetails.InvalidCredentials,
+                        AuthProblemDetails.InvalidCredentialsDetail,
+                        AuthErrors.InvalidCredentials);
 
                 default:
                     return StatusCode(StatusCodes.Status500InternalServerError);

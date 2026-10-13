@@ -1,11 +1,11 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request;
-using WindowsDev.ApiClients.PasswordRecoveryClient;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.ApiClient.PasswordRecovery;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
+using WindowsDev.Contracts.PasswordRecovery;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
@@ -148,7 +148,7 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
         try
         {
             var result = await _passwordRecoveryApiClient.ChangePasswordAsync(
-                new ChangePasswordRequest
+                new ResetPasswordRequest
                 {
                     Login = _passwordRecoveryData.Login,
                     Password = _passwordRecoveryData.NewPassword,

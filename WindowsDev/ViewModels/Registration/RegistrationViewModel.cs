@@ -1,10 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request.AuthController;
-using WindowsDev.ApiClients.AuthClient;
-using WindowsDev.Application.Common.Utils.DebounceService;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.ApiClient.AuthClient;
+using WindowsDev.Application.Common.DebounceService;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
@@ -199,13 +198,13 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 
         try
         {
-            var request = new UserRegisterRequest
+            var result = await _authApiClient.RegisterAsync(new(Login, Password, Username));
+
+            if (result.IsFailure)
             {
-                Login = Login,
-                Password = Password,
-                Username = Username
-            };
-            var result = await _authApiClient.RegisterAsync(request);
+                ErrorMessage = Translate(result.Error);
+                return;
+            }
 
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Information),

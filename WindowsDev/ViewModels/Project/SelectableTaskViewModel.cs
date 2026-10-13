@@ -1,4 +1,4 @@
-﻿using WindowsDev.Api.DTO.Response.TasksController;
+﻿using WindowsDev.Contracts.Api.Tasks;
 
 namespace WindowsDev.ViewModels.Project;
 

@@ -1,12 +1,8 @@
 ﻿using AutoMapper;
-using WindowsDev.Api.DTO.Request.AttachmentsController;
-using WindowsDev.Api.DTO.Request.ProjectsController;
-using WindowsDev.Api.DTO.Request.ProjectService;
-using WindowsDev.Api.DTO.Request.TasksController;
-using WindowsDev.Api.DTO.Response.AttachmentsController;
-using WindowsDev.Api.DTO.Response.CommentsController;
-using WindowsDev.Api.DTO.Response.ProjectsController;
-using WindowsDev.Api.DTO.Response.TasksController;
+using WindowsDev.Contracts.Api.Attachments;
+using WindowsDev.Contracts.Api.Comments;
+using WindowsDev.Contracts.Api.Projects;
+using WindowsDev.Contracts.Api.Tasks;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Api.Mappings;
@@ -16,11 +12,11 @@ public class ApiMappingProfile : Profile
     public ApiMappingProfile()
     {
         // Projects Controller
-        CreateMap<ProjectsInfo, AddResponse>();
-        CreateMap<ProjectsInfo, UpdateResponse>();
+        CreateMap<ProjectsInfo, AddProjectResponse>();
+        CreateMap<ProjectsInfo, UpdateProjectResponse>();
         CreateMap<AddProjectRequest, ProjectsInfo>();
         CreateMap<ProjectsInfo, GetProjectsResponse>();
-        CreateMap<ProjectsInfo, GetByIdResponse>();
+        CreateMap<ProjectsInfo, GetProjectByIdResponse>();
         CreateMap<UpdateProjectRequest, ProjectsInfo>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
@@ -40,7 +36,7 @@ public class ApiMappingProfile : Profile
 
         // Attachment Controller
         CreateMap<TaskAttachment, GetAttachmentResponse>();
-        CreateMap<TaskAttachment, AddFileResponse>();
-        CreateMap<AddFileRequest, TaskAttachment>();
+        CreateMap<TaskAttachment, AddAttachmentResponse>();
+        CreateMap<AddAttachmentRequest, TaskAttachment>();
     }
 }

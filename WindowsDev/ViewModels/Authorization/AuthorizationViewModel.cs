@@ -1,19 +1,19 @@
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request.AuthController;
-using WindowsDev.ApiClients.AuthClient;
-using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization.Dialogs;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Registration;
 using WindowsDev.Views.Authorization.Dialogs;
+using WindowsDev.ApiClient.AuthClient;
+using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Application.Common.Localization;
+
 
 namespace WindowsDev.ViewModels.Authorization;
 
@@ -112,13 +112,7 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
 
         try
         {
-            var request = new UserLoginRequest
-            {
-                Login = Login,
-                Password = Password
-            };
-
-            var result = await _authApiClient.LoginAsync(request);
+            var result = await _authApiClient.LoginAsync(new(Login, Password));
 
             if (result.IsFailure)
             {
@@ -126,7 +120,7 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
                 return;
             }
 
-            _tokenStorage.AccessToken = result.Value.JwtToken;
+            _tokenStorage.AccessToken = result.Value.Token;
             await _navigationService.NavigateTo<MainWindowViewModel>();
         }
         catch (Exception ex)

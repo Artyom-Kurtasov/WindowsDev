@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Application.Database;
 using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Application.Identity.Repositories;
 using WindowsDev.Application.Projects;
 using WindowsDev.Application.Tasks;
 using WindowsDev.Application.Tasks.Attachment;
@@ -8,7 +10,6 @@ using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Application.Users;
 using WindowsDev.Infrastructure.Database;
 using WindowsDev.Infrastructure.Database.Interfaces;
-using WindowsDev.Infrastructure.JWT;
 using WindowsDev.Infrastructure.Repositories;
 using WindowsDev.Infrastructure.Security;
 using WindowsDev.Infrastructure.User;

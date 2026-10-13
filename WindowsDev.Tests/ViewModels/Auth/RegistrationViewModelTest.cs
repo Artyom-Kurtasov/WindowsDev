@@ -1,8 +1,8 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Application.Common.Utils.DebounceService;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Common.DebounceService;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
 using WindowsDev.Domain.Messages;

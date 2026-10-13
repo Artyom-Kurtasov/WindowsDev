@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.TasksController;
-using WindowsDev.Api.DTO.Response.TasksController;
 using WindowsDev.Api.Logging;
 using WindowsDev.Application.Tasks;
+using WindowsDev.Contracts.Api.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Repositories;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Infrastructure.Database.Interfaces;
 

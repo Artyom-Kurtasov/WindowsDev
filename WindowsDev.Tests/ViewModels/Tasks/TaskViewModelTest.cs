@@ -1,7 +1,7 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Application.Tasks.Comment;

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request;
-using WindowsDev.Api.DTO.Response;
 using WindowsDev.Api.Logging;
 using WindowsDev.Application.Identity.PasswordRecovery;
+using WindowsDev.Contracts.Api.PasswordRecovery;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Api.Controllers;
@@ -26,8 +25,8 @@ public class PasswordRecoveryController : ApiControllerBase
     }
 
     [HttpPost("verify-code")]
-    public async Task<ActionResult<VerifyPasswordRecoveryCodeResponse>> IsRecoveryCodeCorrectAsync(
-        [FromBody] VerifyPasswordRecoveryCodeRequest request
+    public async Task<ActionResult<VerifyRecoveryCodeResponse>> IsRecoveryCodeCorrectAsync(
+        [FromBody] VerifyRecoveryCodeRequest request
     )
     {
         var result = await _passwordRecoveryService.IsRecoverCodeCorrectAsync(
@@ -60,14 +59,14 @@ public class PasswordRecoveryController : ApiControllerBase
         }
 
         PasswordRecoveryControllerLogs.RecoveryCodeIsValid(_logger, request.login);
-        var response = new VerifyPasswordRecoveryCodeResponse { IsValid = result.Value };
+        var response = new VerifyRecoveryCodeResponse { IsValid = result.Value };
 
         return Ok(response);
     }
 
     [HttpPost("change-password")]
-    public async Task<ActionResult<ChangePasswordResponse>> ChangePasswordAsync(
-        [FromBody] ChangePasswordRequest request
+    public async Task<ActionResult<ResetPasswordResponse>> ChangePasswordAsync(
+        [FromBody] ResetPasswordRequest request
     )
     {
         var result = await _passwordRecoveryService.ChangePasswordAsync(
@@ -99,7 +98,7 @@ public class PasswordRecoveryController : ApiControllerBase
         }
 
         PasswordRecoveryControllerLogs.PasswordRecoverySuccesful(_logger, request.Login);
-        var response = new ChangePasswordResponse { RecoveryCode = result.Value.Item1 };
+        var response = new ResetPasswordResponse { RecoveryCode = result.Value.Item1 };
         return Ok(response);
     }
 

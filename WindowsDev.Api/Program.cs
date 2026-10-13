@@ -3,6 +3,7 @@ using WindowsDev.Application;
 using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.JWT;
+using WindowsDev.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,7 @@ builder.Services.AddOpenApi();
 builder.Services.RegistrateApplication();
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.RegistrateInfrastructure();
+builder.Services.RegistrateLogging();
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ApiMappingProfile>(); });
 
 var app = builder.Build();

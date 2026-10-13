@@ -2,7 +2,6 @@ using Moq;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Infrastructure.Security;
 using RegistrationService = WindowsDev.Application.Identity.Registration.Registration;
 
 namespace WindowsDev.Tests.Business.Registration;

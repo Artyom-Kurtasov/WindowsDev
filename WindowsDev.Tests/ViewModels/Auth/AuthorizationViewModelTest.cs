@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Command;

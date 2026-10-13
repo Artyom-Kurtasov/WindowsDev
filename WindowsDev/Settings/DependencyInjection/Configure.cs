@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.ApiClient;
+using WindowsDev.Logging;
 
 namespace WindowsDev.Settings;
 
@@ -9,5 +10,6 @@ internal class Configure
     {
         services.RegistrateLogging();
         services.RegistrateUI();
+        services.RegistrateApiClient();
     }
 }

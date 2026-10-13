@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.AttachmentsController;
-using WindowsDev.Api.DTO.Response.AttachmentsController;
 using WindowsDev.Api.Logging;
+using WindowsDev.Api.ProblemDetails;
 using WindowsDev.Application.Tasks.Attachment;
-using WindowsDev.Domain.Entities;
+using WindowsDev.Contracts.Api.Attachments;
 
 namespace WindowsDev.Api.Controllers;
 
@@ -32,13 +31,13 @@ public class AttachmentsController : ApiControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<AddFileResponse>> AddFileAsync([FromBody] AddFileRequest request)
+    public async Task<ActionResult<AddAttachmentResponse>> AddFileAsync([FromBody] AddAttachmentRequest request)
     {
         var result = await _attachmentService.AddFile(request.FileName, request.TaskId);
 
         if (result.IsSuccess)
         {
-            var response = _mapper.Map<AddFileResponse>(result.Value);
+            var response = _mapper.Map<AddAttachmentResponse>(result.Value);
             AttachmentsControllerLogs.AddFileSuccessful(_logger, result.Value.Id, request.TaskId);
             return CreatedAtAction(GetAttachmentActionName, new { id = result.Value.Id }, response);
         }
@@ -46,8 +45,8 @@ public class AttachmentsController : ApiControllerBase
         AttachmentsControllerLogs.FileNotSelected(_logger, request.TaskId);
         return CustomProblem(
             StatusCodes.Status400BadRequest,
-            "File Not Selected",
-            "File not selected.",
+            AttachmentProblemDetails.FileDidNotSelect,
+            AttachmentProblemDetails.FileDidNotSelectDetail,
             result.Error
         );
     }
@@ -84,8 +83,8 @@ public class AttachmentsController : ApiControllerBase
             AttachmentsControllerLogs.AttachmentNotFound(_logger, id);
             return CustomProblem(
                 StatusCodes.Status404NotFound,
-                "Attachment Not Found",
-                $"Attachment with id {id} not found.",
+                AttachmentProblemDetails.AttachmentNotFound,
+                AttachmentProblemDetails.AttachmentNotFoundDeatil(id),
                 result.Error
             );
         }

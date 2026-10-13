@@ -13,6 +13,7 @@
   </ItemGroup>
 
   <ItemGroup>
+	  <ProjectReference Include="..\WindowsDev.Contracts\WindowsDev.Contracts.csproj" />
 	  <ProjectReference Include="..\WindowsDev.Domain\WindowsDev.Domain.csproj" />
 	  <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
 	  <ProjectReference Include="..\WindowsDev.Infrastructure\WindowsDev.Infrastructure.csproj" />

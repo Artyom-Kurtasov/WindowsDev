@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.ProfilesController;
-using WindowsDev.Api.DTO.Response.ProfilesController;
 using WindowsDev.Api.Logging;
 using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Users;
+using WindowsDev.Contracts.Api.Profiles;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Api.Controllers;
@@ -33,8 +33,8 @@ public class ProfilesController : ApiControllerBase
 
     [Authorize]
     [HttpPost("changePassword")]
-    public async Task<ActionResult<ProfileChangePasswordResponse>> ChangePasswordAsync(
-        ProfileChangePasswordRequest request
+    public async Task<ActionResult<ChangePasswordResponse>> ChangePasswordAsync(
+        ChangePasswordRequest request
     )
     {
         var result = await _profileService.ChangePasswordAsync(
@@ -82,7 +82,7 @@ public class ProfilesController : ApiControllerBase
 
         var jwtToken = result.Value.Item2;
         var recoveryCode = result.Value.Item1;
-        var response = new ProfileChangePasswordResponse
+        var response = new ChangePasswordResponse
         {
             JwtToken = jwtToken,
             RecoveryCode = recoveryCode,
@@ -94,8 +94,8 @@ public class ProfilesController : ApiControllerBase
 
     [Authorize]
     [HttpPost("changeUsername")]
-    public async Task<ActionResult<UsernameChangeResponse>> ChangeUsernameAsync(
-        UsernameChangeRequest request
+    public async Task<ActionResult<ChangeUsernameResponse>> ChangeUsernameAsync(
+        ChangeUsernameRequest request
     )
     {
         var result = await _profileService.ChangeUsernameAsync(
@@ -133,7 +133,7 @@ public class ProfilesController : ApiControllerBase
             };
         }
 
-        var response = new UsernameChangeResponse { AccessToken = result.Value };
+        var response = new ChangeUsernameResponse { AccessToken = result.Value };
 
         ProfilesControllerLogs.ChangeUsernameSuccessful(_logger, _userSession.Login);
         return Ok(response);
@@ -141,9 +141,9 @@ public class ProfilesController : ApiControllerBase
 
     [Authorize]
     [HttpGet]
-    public async Task<ActionResult<GetAsyncResponse>> GetAsync()
+    public async Task<ActionResult<GetProfileResponse>> GetAsync()
     {
-        var response = new GetAsyncResponse
+        var response = new GetProfileResponse
         {
             Id = _userSession.UserId,
             Login = _userSession.Login,

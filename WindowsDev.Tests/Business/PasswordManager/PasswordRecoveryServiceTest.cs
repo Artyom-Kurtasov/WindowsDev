@@ -1,5 +1,5 @@
 using Moq;
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;

@@ -30,12 +30,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\WindowsDev.Api\WindowsDev.Api.csproj" />
+		<InternalsVisibleTo Include="WindowsDev.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<InternalsVisibleTo Include="WindowsDev.Tests" />
-		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	  <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
+	  <ProjectReference Include="..\WindowsDev.ApiClient\WindowsDev.ApiClient.csproj" />
+	  <ProjectReference Include="..\WindowsDev.Logging\WindowsDev.Logging.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -54,7 +56,7 @@
 	<ItemGroup>
 		<EmbeddedResource Update="Localization\Resources.resx">
 			<Generator>PublicResXFileCodeGenerator</Generator>
-			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>	
 		</EmbeddedResource>
 	</ItemGroup>
 

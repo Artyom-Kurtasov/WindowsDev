@@ -9,7 +9,7 @@ public class ApiControllerBase : ControllerBase
         int statusCode,
         string title,
         string detail,
-        string errorCode
+        string errorMessageCode
     )
     {
         return Problem(
@@ -18,7 +18,7 @@ public class ApiControllerBase : ControllerBase
             detail: detail,
             type: "about:blank",
             instance: HttpContext.Request.Path,
-            extensions: new Dictionary<string, object?> { { "errorCode", errorCode } }
+            extensions: new Dictionary<string, object?> { { "errorMessageCode", errorMessageCode } }
         );
     }
 }

@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.CommentsController;
-using WindowsDev.Api.DTO.Response.CommentsController;
 using WindowsDev.Api.Logging;
 using WindowsDev.Application.Tasks.Comment;
+using WindowsDev.Contracts.Api.Comments;
 
 namespace WindowsDev.Api.Controllers;
 
@@ -69,7 +68,7 @@ public class CommentsController : ApiControllerBase
         [FromBody] AddCommentRequest request
     )
     {
-        var result = await _commentService.AddCommentAsync(request.TaskId, request.CommentText);
+        var result = await _commentService.AddCommentAsync(request.TaskId, request.Text);
         var response = _mapper.Map<AddCommentResponse>(result);
 
         CommentsControllerLogs.AddCommentSuccessful(_logger, result.Id, request.TaskId);

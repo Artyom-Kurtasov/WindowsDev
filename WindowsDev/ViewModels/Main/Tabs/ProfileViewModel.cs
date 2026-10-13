@@ -1,11 +1,11 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
-using WindowsDev.Api.DTO.Request.ProfilesController;
-using WindowsDev.ApiClients.ProfileClient;
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.ApiClient.ProfileClient;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Identity;
 using WindowsDev.Command;
+using WindowsDev.Contracts.Profiles;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Success;
@@ -147,7 +147,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         try
         {
             var result = await _profileApiClient.ChangeUsernameAsync(
-                new UsernameChangeRequest
+                new ChangeUsernameRequest
                 {
                     CurrentUsername = _userSession.Username,
                     NewUsername = Username,
@@ -189,7 +189,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         try
         {
             var result = await _profileApiClient.ChangePasswordAsync(
-                new ProfileChangePasswordRequest
+                new ChangePasswordRequest
                 {
                     CurrentPassword = CurrentPassword,
                     NewPassword = NewPassword,

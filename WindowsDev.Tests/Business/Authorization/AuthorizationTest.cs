@@ -1,7 +1,7 @@
 using Moq;
 using System.Text;
-using WindowsDev.Application.Identity;
 using WindowsDev.Application.Identity.Authentication;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;

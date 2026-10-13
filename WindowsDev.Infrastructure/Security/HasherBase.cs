@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 
 namespace WindowsDev.Infrastructure.Security;
 

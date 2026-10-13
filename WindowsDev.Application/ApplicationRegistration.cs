@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using WindowsDev.Application.Common.Utils.DebounceService;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.PasswordRecovery;
@@ -34,9 +33,6 @@ public static class ApplicationRegistration
 
         // Profile
         services.AddTransient<IProfileService, ProfileService>();
-
-        // Debounce
-        services.AddTransient<IDebounceService, DebounceService>();
 
         return services;
     }

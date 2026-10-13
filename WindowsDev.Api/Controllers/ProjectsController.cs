@@ -1,12 +1,10 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WindowsDev.Api.DTO.Request.ProjectsController;
-using WindowsDev.Api.DTO.Request.ProjectService;
-using WindowsDev.Api.DTO.Response.ProjectsController;
 using WindowsDev.Api.Logging;
 using WindowsDev.Application.Identity;
 using WindowsDev.Application.Projects;
+using WindowsDev.Contracts.Api.Projects;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Api.Controllers;
@@ -35,7 +33,7 @@ public class ProjectsController : ControllerBase
 
     [Authorize]
     [HttpPost]
-    public async Task<ActionResult<AddResponse>> AddAsync([FromBody] AddProjectRequest request)
+    public async Task<ActionResult<AddProjectResponse>> AddAsync([FromBody] AddProjectRequest request)
     {
         var entity = _mapper.Map<ProjectsInfo>(request);
         entity.UserId = _userSession.UserId;
@@ -43,7 +41,7 @@ public class ProjectsController : ControllerBase
 
         await _projectService.AddAsync(entity);
 
-        var response = _mapper.Map<AddResponse>(entity);
+        var response = _mapper.Map<AddProjectResponse>(entity);
 
         ProjectsControllerLogs.AddSuccessful(_logger, _userSession.Login, entity.Id);
         return StatusCode(StatusCodes.Status201Created, response);
@@ -61,7 +59,7 @@ public class ProjectsController : ControllerBase
 
     [Authorize]
     [HttpPatch("{id:int}")]
-    public async Task<ActionResult<UpdateResponse>> UpdateAsync(
+    public async Task<ActionResult<UpdateProjectResponse>> UpdateAsync(
         [FromRoute] int id,
         [FromBody] UpdateProjectRequest request
     )
@@ -77,7 +75,7 @@ public class ProjectsController : ControllerBase
 
         await _projectService.UpdateAsync(project);
 
-        var response = _mapper.Map<UpdateResponse>(project);
+        var response = _mapper.Map<UpdateProjectResponse>(project);
 
         ProjectsControllerLogs.UpdateSuccessful(_logger, response.Id);
         return Ok(response);
@@ -128,13 +126,13 @@ public class ProjectsController : ControllerBase
     [Authorize]
     [HttpGet("{id:int}")]
     [ActionName(nameof(GetByIdAsync))]
-    public async Task<ActionResult<GetByIdResponse>> GetByIdAsync(int id)
+    public async Task<ActionResult<GetProjectByIdResponse>> GetByIdAsync(int id)
     {
         var project = await _projectService.GetProjectById(id);
         if (project is null)
             return NotFound();
 
-        var response = _mapper.Map<GetByIdResponse>(project);
+        var response = _mapper.Map<GetProjectByIdResponse>(project);
 
         ProjectsControllerLogs.GetProjectSuccessful(_logger, id);
         return Ok(response);

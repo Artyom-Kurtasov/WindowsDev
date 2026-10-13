@@ -1,18 +1,17 @@
-using System.Collections.ObjectModel;
-using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
-using WindowsDev.Api.DTO.Request.AttachmentsController;
-using WindowsDev.Api.DTO.Request.CommentsController;
-using WindowsDev.Api.DTO.Response.AttachmentsController;
-using WindowsDev.Api.DTO.Response.CommentsController;
-using WindowsDev.Api.DTO.Response.ProjectsController;
-using WindowsDev.Api.DTO.Response.TasksController;
-using WindowsDev.ApiClients.AttachmentClient;
-using WindowsDev.ApiClients.CommentClient;
-using WindowsDev.Application.Common.Utils.Localization;
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using WindowsDev.ApiClient.AttachmentClient;
+using WindowsDev.ApiClient.CommentClient;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
+using WindowsDev.Contracts.Api.Attachments;
+using WindowsDev.Contracts.Api.Comments;
+using WindowsDev.Contracts.Api.Projects;
+using WindowsDev.Contracts.Api.Tasks;
+using WindowsDev.Contracts.UI;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -93,7 +92,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
     public ObservableCollection<GetCommentResponse>? Comments { get; private set; } = new();
 
-    public ObservableCollection<AddFileResponse>? Attachments { get; private set; } = new();
+    public ObservableCollection<AttachmentInfo>? Attachments { get; private set; } = new();
 
     private string? _newComment;
     public string? NewComment
@@ -242,16 +241,11 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
             foreach (var item in attachments.Value)
             {
-                var attachment = new AddFileResponse
-                {
-                    FileExtension = item.FileExtension,
-                    FilePath = item.FilePath,
-                    FileName = item.FileName,
-                    FileSize = item.FileSize,
-                    TaskId = item.TaskId,
-                };
-
-                Attachments.Add(attachment);
+                Attachments.Add(new(item.FileExtension,
+                    item.FilePath,
+                    item.FileName,
+                    item.FileSize,
+                    item.TaskId));
             }
         }
         catch (Exception ex)
@@ -289,9 +283,8 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
             if (file != null)
             {
-                var fileInfo = new AddFileRequest { TaskId = CurrentTask.Id, FileName = file };
-
-                var result = await _attachmentApiClient.AddFileAsync(fileInfo);
+                var result = await _attachmentApiClient.AddFileAsync(new(file,
+                    CurrentTask.Id));
 
                 if (result.IsSuccess)
                 {
@@ -325,7 +318,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         try
         {
             var result = await _commentApiClient.AddCommentAsync(
-                new AddCommentRequest { TaskId = CurrentTask!.Id, CommentText = NewComment },
+                new AddCommentRequest { TaskId = CurrentTask!.Id, Text = NewComment },
                 CancellationToken.None
             );
 

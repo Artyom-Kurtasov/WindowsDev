@@ -1,7 +1,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using Moq;
-using WindowsDev.Application.Common.Utils.Localization;
-using WindowsDev.Application.Database;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.ViewModels.Main.Tabs;
 
 namespace WindowsDev.Tests.ViewModels.Main.TestViewModels;

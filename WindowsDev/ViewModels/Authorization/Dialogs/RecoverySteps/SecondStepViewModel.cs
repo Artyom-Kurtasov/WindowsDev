@@ -1,6 +1,6 @@
-using WindowsDev.Api.DTO.Request;
-using WindowsDev.ApiClients.PasswordRecoveryClient;
-using WindowsDev.Application.Common.Utils.DebounceService;
+using WindowsDev.ApiClient.PasswordRecovery;
+using WindowsDev.Application.Common.DebounceService;
+using WindowsDev.Contracts.PasswordRecovery;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
@@ -65,7 +65,7 @@ internal class SecondStepViewModel : ViewModelBase
                 }
 
                 var result = await _passwordRecoveryApiClient.IsRecoveryCodeCorrectAsync(
-                    new VerifyPasswordRecoveryCodeRequest
+                    new VerifyRecoveryCodeRequest
                     {
                         recoveryCode = code,
                         login = _passwordRecoveryData.Login,

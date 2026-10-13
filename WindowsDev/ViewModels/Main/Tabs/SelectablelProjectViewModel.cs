@@ -1,4 +1,4 @@
-﻿using WindowsDev.Api.DTO.Response.ProjectsController;
+﻿using WindowsDev.Contracts.Api.Projects;
 
 namespace WindowsDev.ViewModels.Main.Tabs;
 

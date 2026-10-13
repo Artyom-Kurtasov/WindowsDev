@@ -1,4 +1,5 @@
-﻿using WindowsDev.Application.Identity.PasswordChanger;
+﻿using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;

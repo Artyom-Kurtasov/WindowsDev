@@ -1,4 +1,4 @@
-using WindowsDev.Application.Common.Utils.Localization;
+using WindowsDev.Application.Common.Localization;
 
 namespace WindowsDev.ViewModels;
 
