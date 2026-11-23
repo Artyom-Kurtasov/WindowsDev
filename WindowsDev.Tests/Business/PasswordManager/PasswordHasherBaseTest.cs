@@ -1,4 +1,5 @@
 using System.Text;
+using WindowsDev.Infrastructure.Security;
 
 namespace WindowsDev.Tests.Business.PasswordManager;
 
@@ -51,7 +52,7 @@ public class PasswordHasherBaseTest
         byte[] salt1 = _passwordHasher.GenerateSalt();
         byte[] salt2 = _passwordHasher.GenerateSalt();
 
-        Assert.NotEqual(salt1, salt2);
+        Assert.False(salt1.SequenceEqual(salt2));
     }
 
     [Fact]

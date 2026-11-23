@@ -20,9 +20,6 @@ public static class InfrastructureRegistration
 {
     public static IServiceCollection RegistrateInfrastructure(this IServiceCollection services)
     {
-        // File
-        services.AddTransient<IFileOpener, FileOpener.FileOpener>();
-
         // Repositories
         services.AddTransient<IUserRepository, UserRepository>();
         services.AddTransient<IProjectRepository, ProjectRepository>();

@@ -5,13 +5,13 @@ using WindowsDev.ApiClient.PasswordRecovery;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
-using WindowsDev.Contracts.PasswordRecovery;
+using WindowsDev.Contracts.UI.PasswordRecovery;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
 using WindowsDev.Domain.Messages.DialogsMessages.Tooltips;
 using WindowsDev.Factories;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs;
@@ -42,7 +42,7 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
         _recoveryStepsFactory = recoveryStepsFactory;
         _passwordRecoveryData = passwordRecoveryData;
 
-        _steps = _recoveryStepsFactory.CreateSteps();
+        _steps = _recoveryStepsFactory.CreateSteps(_passwordRecoveryData);
 
         NextStepCommand = new RelayCommand(NextStep, CanNextStep);
         PrevStepCommand = new RelayCommand(PrevStep, CanBackStep);
@@ -148,11 +148,7 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
         try
         {
             var result = await _passwordRecoveryApiClient.ChangePasswordAsync(
-                new ResetPasswordRequest
-                {
-                    Login = _passwordRecoveryData.Login,
-                    Password = _passwordRecoveryData.NewPassword,
-                },
+                new ResetPasswordForm(_passwordRecoveryData.Login, _passwordRecoveryData.NewPassword),
                 CancellationToken.None
             );
 
@@ -201,7 +197,6 @@ internal class RecoveryCodeDialogViewModel : LocalizedViewModelBase, IDialogView
     private void PasswordRecoveryDataChanged(object? sender, EventArgs e)
     {
         UpdateCommands();
-
         OnPropertyChanged(nameof(NextStepToolTip));
     }
 

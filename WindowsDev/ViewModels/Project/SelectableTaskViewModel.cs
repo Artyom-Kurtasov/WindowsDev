@@ -1,4 +1,4 @@
-﻿using WindowsDev.Contracts.Api.Tasks;
+﻿using WindowsDev.Contracts.UI.Tasks;
 
 namespace WindowsDev.ViewModels.Project;
 
@@ -14,9 +14,9 @@ internal class SelectableTaskViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
-    public GetTasksResponse Task { get; init; }
+    public TaskInfo Task { get; init; }
 
-    public SelectableTaskViewModel(GetTasksResponse task)
+    public SelectableTaskViewModel(TaskInfo task)
     {
         Task = task;
     }

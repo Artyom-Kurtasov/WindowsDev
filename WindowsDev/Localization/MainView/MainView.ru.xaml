@@ -7,4 +7,6 @@
     <sys:String x:Key="MainWindow_Label_Settings">Настройки</sys:String>
     <sys:String x:Key="MainWindow_Label_Profile">Профиль</sys:String>
     
+    <!-- Informations -->
+    <sys:String x:Key="MainWindow_Information_SessionExpired">Ваша сессия истекла или стала недействительной. Пожалуйста, войдите снова.</sys:String>
 </ResourceDictionary>

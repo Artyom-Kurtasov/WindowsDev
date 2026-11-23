@@ -1,9 +1,6 @@
-using MahApps.Metro.Controls.Dialogs;
 using Moq;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Domain.Messages;
-using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 using WindowsDev.Settings.UserSettings;
 using WindowsDev.ViewModels.Main.Tabs;
 
@@ -11,18 +8,10 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs;
 
 public class SettingsViewModelTest
 {
-    private readonly Mock<IDatabaseConfig> _dbConfigMock;
-    private readonly Mock<IDbHealthChecker> _healthCheckerMock;
-    private readonly Mock<IDialogCoordinator> _dialogMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
 
     public SettingsViewModelTest()
     {
-        _dbConfigMock = new Mock<IDatabaseConfig>();
-        _dbConfigMock.SetupProperty(x => x.ConnectionString);
-
-        _healthCheckerMock = new Mock<IDbHealthChecker>();
-        _dialogMock = new Mock<IDialogCoordinator>();
         _languageChangerMock = new Mock<ILanguageChanger>();
 
         _languageChangerMock
@@ -37,80 +26,8 @@ public class SettingsViewModelTest
     private SettingsViewModel CreateViewModel()
     {
         return new SettingsViewModel(
-            _healthCheckerMock.Object,
-            _dialogMock.Object,
-            _languageChangerMock.Object,
-            _dbConfigMock.Object
+            _languageChangerMock.Object
         );
-    }
-
-    private void SetupWarningDialog()
-    {
-        _dialogMock
-            .Setup(x =>
-                x.ShowMessageAsync(
-                    It.IsAny<SettingsViewModel>(),
-                    DialogTitles.Warning,
-                    SettingsWarnings.InvalidConnectionString,
-                    MessageDialogStyle.Affirmative
-                )
-            )
-            .ReturnsAsync(MessageDialogResult.Affirmative);
-    }
-
-    [Fact]
-    public async Task SetNewConnectionStringCommand_WhenValid_SavesConnection()
-    {
-        var vm = CreateViewModel();
-
-        vm.NewConnectionString = "new_connection";
-
-        await vm.SetNewConnectionStringAsync();
-
-        Assert.Equal("new_connection", _dbConfigMock.Object.ConnectionString);
-
-        _healthCheckerMock.Verify(x => x.Check(), Times.Once);
-    }
-
-    [Fact]
-    public async Task SetNewConnectionStringCommand_WhenInvalid_RestoresOldConnection()
-    {
-        SetupWarningDialog();
-
-        _dbConfigMock.Object.ConnectionString = "old_connection";
-
-        _healthCheckerMock.Setup(x => x.Check()).Throws(new Exception());
-
-        var vm = CreateViewModel();
-
-        vm.NewConnectionString = "bad_connection";
-
-        await vm.SetNewConnectionStringAsync();
-
-        Assert.Equal("old_connection", _dbConfigMock.Object.ConnectionString);
-
-        _dialogMock.Verify(
-            x =>
-                x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Warning,
-                    SettingsWarnings.InvalidConnectionString,
-                    MessageDialogStyle.Affirmative
-                ),
-            Times.Once
-        );
-    }
-
-    [Fact]
-    public async Task SetNewConnectionStringCommand_WhenValid_SavesUserSettings()
-    {
-        var vm = CreateViewModel();
-
-        vm.NewConnectionString = "valid_connection";
-
-        await vm.SetNewConnectionStringAsync();
-
-        Assert.Equal("valid_connection", UserSettings.Default.ConnectionString);
     }
 
     [Fact]

@@ -29,7 +29,7 @@ internal class PasswordChanger : IPasswordChanger
         _jwtService = jwtService;
     }
 
-    public async Task<Result<(int, string)>> ChangeUserPasswordAsync(
+    public async Task<Result<(int, string, UserRefreshToken)>> ChangeUserPasswordAsync(
         string login,
         string newPassword,
         string currentPassword = ""
@@ -37,7 +37,7 @@ internal class PasswordChanger : IPasswordChanger
     {
         var user = await _userRepository.GetByLoginAsync(login);
         if (user is null)
-            return Result<(int, string)>.Failure(CommonErrors.UserNotFound);
+            return Result<(int, string, UserRefreshToken)>.Failure(CommonErrors.UserNotFound);
 
         var hasher = _hasherFactory.GetHashMethod(user.HashMethod);
 
@@ -52,13 +52,14 @@ internal class PasswordChanger : IPasswordChanger
         );
 
         if (updateResult.IsFailure)
-            return Result<(int, string)>.Failure(updateResult.Error);
+            return Result<(int, string, UserRefreshToken)>.Failure(updateResult.Error);
 
         await _userRepository.UpdateAsync(user);
 
         var jwtToken = _jwtService.GenerateToken(user.Id, user.Login, user.Username);
+        var refreshToken = _jwtService.GenerateRefreshToken(user.Id);
 
-        return Result<(int, string)>.Success((recoveryCode, jwtToken));
+        return Result<(int, string, UserRefreshToken)>.Success((recoveryCode, jwtToken, refreshToken));
     }
 
     public int GenerateRecoveryCode() => Random.Shared.Next(MinRecoveryCode, MaxRecoveryCode);

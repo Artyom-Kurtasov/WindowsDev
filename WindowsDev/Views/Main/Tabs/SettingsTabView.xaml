@@ -90,36 +90,6 @@
                 </StackPanel>
 
             </Border>
-
-            <!-- Database Settings -->
-            <TextBlock Text="{DynamicResource Settings_Label_Database}"
-                       FontSize="14"
-                       FontWeight="Bold"
-                       Foreground="{DynamicResource MahApps.Brushes.Accent}"
-                       Margin="0,0,0,15"/>
-
-            <Border Background="{DynamicResource MahApps.Brushes.ControlBackground}"
-                    CornerRadius="8"
-                    Padding="20">
-
-                <StackPanel>
-
-                    <!-- Connection String Input -->
-                    <UserCtrl:HeaderTextBox
-                        Header="{DynamicResource Settings_Label_ConnectionString}"
-                        HeaderFontSize="12"
-                        Text="{Binding NewConnectionString, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                        Watermark="{DynamicResource Settings_Watermark_ConnectionString}"/>
-
-                    <!-- Apply Button -->
-                    <Button Content="{DynamicResource Settings_Button_Apply}"
-                            Command="{Binding SetNewConnectionStringCommand}"
-                            Style="{DynamicResource MahApps.Styles.Button.Dialogs.Accent}"
-                            Width="120"
-                            Margin="0,15,0,0"
-                            HorizontalAlignment="Right"/>
-                </StackPanel>
-            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

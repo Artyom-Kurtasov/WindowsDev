@@ -100,7 +100,7 @@ internal class ProfileService : IProfileService
             return Result<bool>.Failure(ProfileErrors.NewUsernameSameAsCurrent);
 
         if (await _userRepository.ExistsByUsernameAsync(newUsername))
-            return Result<bool>.Failure(ProfileErrors.UsernamAlreadyTaken);
+            return Result<bool>.Failure(ProfileErrors.UsernameAlreadyTaken);
 
         return Result<bool>.Success(true);
     }

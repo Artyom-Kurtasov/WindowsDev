@@ -26,18 +26,21 @@
 		<PackageReference Include="MahApps.Metro.SimpleChildWindow" Version="2.2.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+		<PackageReference Include="Serilog" Version="4.4.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.161" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<InternalsVisibleTo Include="WindowsDev.Tests" />
+		<InternalsVisibleTo Include="WindowsDev.IntegrationTests" />
 		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
 	</ItemGroup>
 
 	<ItemGroup>
 	  <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
 	  <ProjectReference Include="..\WindowsDev.ApiClient\WindowsDev.ApiClient.csproj" />
-	  <ProjectReference Include="..\WindowsDev.Logging\WindowsDev.Logging.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

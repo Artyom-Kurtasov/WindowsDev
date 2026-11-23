@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Services;
 
@@ -20,7 +21,7 @@ internal class SecureTokenStorage : ISecureTokenStorage
         Directory.CreateDirectory(appFolder);
         _filePath = Path.Combine(appFolder, "token.dat");
 
-        LoadTokenFromDisk();
+        _refreshToken.Token = LoadTokenFromDisk();
     }
     private string? _accessToken;
     public string? AccessToken
@@ -29,7 +30,17 @@ internal class SecureTokenStorage : ISecureTokenStorage
         set
         {
             _accessToken = value;
-            SaveTokenToDisk(value);
+        }
+    }
+
+    private UserRefreshToken? _refreshToken = new();
+    public UserRefreshToken? RefreshToken
+    {
+        get => _refreshToken;
+        set
+        {
+            _refreshToken = value;
+            SaveTokenToDisk(value.Token);
         }
     }
 

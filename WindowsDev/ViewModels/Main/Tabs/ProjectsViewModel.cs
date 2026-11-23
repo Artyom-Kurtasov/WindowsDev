@@ -5,10 +5,10 @@ using System.Windows.Input;
 using WindowsDev.ApiClient.ProjectsClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Api.Projects;
+using WindowsDev.Contracts.UI.Projects;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
@@ -43,7 +43,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
         DeleteSelectedProjectsCommand = new AsyncRelayCommand(DeleteSelectedProjectsAsync);
         OpenDialogCommand = new AsyncRelayCommand(ShowCreateProjectDialogAsync);
-        OpenProjectCommand = new AsyncRelayCommandT<GetProjectsResponse>(OpenProjectAsync);
+        OpenProjectCommand = new AsyncRelayCommandT<ProjectInfo>(OpenProjectAsync);
         SearchCommand = new AsyncRelayCommand(SearchAsync);
         NextPageCommand = new AsyncRelayCommand(NextPageAsync);
         PrevPageCommand = new AsyncRelayCommand(PrevPageAsync);
@@ -104,11 +104,14 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
             if (result.IsFailure)
             {
-                await _dialogService.ShowMessageAsync(DialogTitles.Error, result.Error, MessageDialogStyle.Affirmative);
+                await _dialogService.ShowMessageAsync(
+                    DialogTitles.Error,
+                    result.Error,
+                    MessageDialogStyle.Affirmative);
                 return;
             }
 
-            _totalCountOfProjects = result.Value.TotalCount;
+            _totalCountOfProjects = result.Value;
 
             OnPropertyChanged(nameof(TotalCountOfPages));
 
@@ -152,7 +155,7 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
     }
 
-    private async Task OpenProjectAsync(GetProjectsResponse project)
+    private async Task OpenProjectAsync(ProjectInfo project)
     {
         await _navigationService.NavigateTo<ProjectViewModel>(project);
     }
@@ -161,6 +164,8 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(
         );
+
+        await LoadProjectsAsync();
     }
 
     private async Task NextPageAsync()
@@ -203,7 +208,6 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
         catch (Exception ex)
         {
             ProjectLogs.ProjectLoadFailed(_logger, ex);
-
             await ShowErrorDialogAsync();
         }
     }

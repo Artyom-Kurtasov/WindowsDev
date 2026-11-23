@@ -1,13 +1,18 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.AuthClient;
 using WindowsDev.Application.Common.DebounceService;
 using WindowsDev.Application.Common.Localization;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.Identity;
+using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
@@ -17,21 +22,23 @@ namespace WindowsDev.Tests.ViewModels.Auth;
 
 public class RegistrationViewModelTest
 {
+    private readonly Mock<IAuthApiClient> _authApiClientMock;
     private readonly Mock<INavigationService> _navigationServiceMock;
-    private readonly Mock<IRegistration> _registrationMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<ILogger<RegistrationViewModel>> _loggerMock;
     private readonly Mock<IDebounceService> _debounceServiceMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
+    private readonly Mock<ISecureTokenStorage> _secureTokenStorageMock;
 
     public RegistrationViewModelTest()
     {
+        _authApiClientMock = new Mock<IAuthApiClient>();
         _navigationServiceMock = new Mock<INavigationService>();
-        _registrationMock = new Mock<IRegistration>();
-        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<RegistrationViewModel>>();
         _debounceServiceMock = new Mock<IDebounceService>();
         _languageChangerMock = new Mock<ILanguageChanger>();
+        _secureTokenStorageMock = new Mock<ISecureTokenStorage>();
 
         _languageChangerMock
             .Setup(x => x.Translate(It.IsAny<string>()))
@@ -39,32 +46,26 @@ public class RegistrationViewModelTest
 
         _debounceServiceMock
             .Setup(x => x.DebounceAsync(It.IsAny<Func<Task>>(), It.IsAny<TimeSpan>()))
-            .Returns<Func<Task>, TimeSpan>(
-                async (action, _) =>
-                {
-                    await action();
-                }
-            );
+            .Returns<Func<Task>, TimeSpan>(async (action, _) => await action());
+
+        _authApiClientMock
+            .Setup(x => x.IsLoginAvailableAsync(It.IsAny<LoginAvailabilityForm>()))
+            .ReturnsAsync(Result<AvailabilityInfo>.Success(new AvailabilityInfo(true)));
+        _authApiClientMock
+            .Setup(x => x.IsUsernameAvailableAsync(It.IsAny<UsernameAvailabilityForm>()))
+            .ReturnsAsync(Result<AvailabilityInfo>.Success(new AvailabilityInfo(true)));
     }
 
-    private RegistrationViewModel CreateViewModel()
-    {
-        return new RegistrationViewModel(
+    private RegistrationViewModel CreateViewModel() =>
+        new RegistrationViewModel(
+            _authApiClientMock.Object,
             _navigationServiceMock.Object,
-            _registrationMock.Object,
-            _dialogCoordinatorMock.Object,
+            _dialogServiceMock.Object,
             _loggerMock.Object,
             _debounceServiceMock.Object,
-            _languageChangerMock.Object
+            _languageChangerMock.Object,
+            _secureTokenStorageMock.Object
         );
-    }
-
-    private void SetupAvailableUsers()
-    {
-        _registrationMock.Setup(x => x.IsLoginAvailableAsync("login")).ReturnsAsync(true);
-
-        _registrationMock.Setup(x => x.IsUsernameAvailableAsync("username")).ReturnsAsync(true);
-    }
 
     private void FillValidData(RegistrationViewModel vm)
     {
@@ -77,82 +78,87 @@ public class RegistrationViewModelTest
     [Fact]
     public async Task SignUpCommand_WhenSuccess_ShowsInformationDialogAndNavigates()
     {
-        SetupAvailableUsers();
+        var registerResponse = new RegisterInfo(
+            RecoveryCode: 123456,
+            JwtToken: "jwt-token",
+            RefreshToken: new UserRefreshToken
+            {
+                Id = 1,
+                UserId = 42,
+                Token = "refresh-token",
+                IsRevoked = false,
+                ExpiresAt = DateTime.UtcNow.AddDays(7),
+            }
+        );
 
-        _registrationMock
-            .Setup(x => x.Register("Password123!", "login", "username"))
-            .ReturnsAsync(Result<int>.Success(123456));
+        _authApiClientMock
+            .Setup(x => x.RegisterAsync(It.IsAny<RegisterForm>()))
+            .ReturnsAsync(Result<RegisterInfo>.Success(registerResponse));
 
         var vm = CreateViewModel();
-
         FillValidData(vm);
 
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
-            x =>
-                x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Information,
-                    $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
-                    MessageDialogStyle.Affirmative
-                ),
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Information,
+                $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
+                MessageDialogStyle.Affirmative
+            ),
             Times.Once
         );
-
+        _secureTokenStorageMock.VerifySet(x => x.AccessToken = "jwt-token", Times.Once);
+        _secureTokenStorageMock.VerifySet(
+            x => x.RefreshToken = It.Is<UserRefreshToken>(t => t.Token == "refresh-token"),
+            Times.Once
+        );
         _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Once);
     }
 
     [Fact]
     public async Task SignUpCommand_WhenRegistrationFails_DoesNotNavigate()
     {
-        SetupAvailableUsers();
-
-        _registrationMock
-            .Setup(x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(Result<int>.Failure(AuthErrors.RegistrationFailed));
+        _authApiClientMock
+            .Setup(x => x.RegisterAsync(It.IsAny<RegisterForm>()))
+            .ReturnsAsync(Result<RegisterInfo>.Failure(AuthErrors.RegistrationFailed));
 
         var vm = CreateViewModel();
-
         FillValidData(vm);
 
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
+        Assert.True(vm.HasError);
+        Assert.Equal(AuthErrors.RegistrationFailed, vm.ErrorMessage);
         _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Never);
     }
 
     [Fact]
     public async Task SignUpCommand_WhenException_ShowsErrorDialog()
     {
-        SetupAvailableUsers();
-
-        _registrationMock
-            .Setup(x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ThrowsAsync(new Exception());
+        _authApiClientMock
+            .Setup(x => x.RegisterAsync(It.IsAny<RegisterForm>()))
+            .ThrowsAsync(new Exception("boom"));
 
         var vm = CreateViewModel();
-
         FillValidData(vm);
 
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
-            x =>
-                x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Error,
-                    CommonErrors.UnexpectedError,
-                    MessageDialogStyle.Affirmative
-                ),
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Error,
+                CommonErrors.UnexpectedError,
+                MessageDialogStyle.Affirmative
+            ),
             Times.Once
         );
+        _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Never);
     }
 
     [Fact]
     public async Task SignUpCommand_WhenPasswordsDoNotMatch_DoesNotRegisterAndShowErrorMessage()
     {
-        SetupAvailableUsers();
-
         var vm = CreateViewModel();
 
         vm.Login = "login";
@@ -163,11 +169,9 @@ public class RegistrationViewModelTest
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
         Assert.True(vm.HasError);
-
         Assert.Equal(AuthErrors.RegistrationFailed, vm.ErrorMessage);
-
-        _registrationMock.Verify(
-            x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+        _authApiClientMock.Verify(
+            x => x.RegisterAsync(It.IsAny<RegisterForm>()),
             Times.Never
         );
     }
@@ -175,22 +179,19 @@ public class RegistrationViewModelTest
     [Fact]
     public async Task SignUpCommand_WhenLoginUnavailable_DoesNotRegisterAndShowErrorMessage()
     {
-        _registrationMock.Setup(x => x.IsLoginAvailableAsync("login")).ReturnsAsync(false);
-
-        _registrationMock.Setup(x => x.IsUsernameAvailableAsync("username")).ReturnsAsync(true);
+        _authApiClientMock
+            .Setup(x => x.IsLoginAvailableAsync(It.IsAny<LoginAvailabilityForm>()))
+            .ReturnsAsync(Result<AvailabilityInfo>.Success(new AvailabilityInfo(false)));
 
         var vm = CreateViewModel();
-
         FillValidData(vm);
 
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
         Assert.True(vm.HasError);
-
         Assert.Equal(AuthErrors.RegistrationFailed, vm.ErrorMessage);
-
-        _registrationMock.Verify(
-            x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+        _authApiClientMock.Verify(
+            x => x.RegisterAsync(It.IsAny<RegisterForm>()),
             Times.Never
         );
     }
@@ -198,24 +199,19 @@ public class RegistrationViewModelTest
     [Fact]
     public async Task SignUpCommand_WhenUsernameUnavailable_DoesNotRegisterAndShowErrorMessage()
     {
-        _registrationMock.Setup(x => x.IsLoginAvailableAsync("login")).ReturnsAsync(true);
-
-        _registrationMock
-            .Setup(x => x.IsUsernameAvailableAsync("username"))
-            .ReturnsAsync(false);
+        _authApiClientMock
+            .Setup(x => x.IsUsernameAvailableAsync(It.IsAny<UsernameAvailabilityForm>()))
+            .ReturnsAsync(Result<AvailabilityInfo>.Success(new AvailabilityInfo(false)));
 
         var vm = CreateViewModel();
-
         FillValidData(vm);
 
         await ((AsyncRelayCommand)vm.SignUpCommand).ExecuteAsync(null);
 
         Assert.True(vm.HasError);
-
         Assert.Equal(AuthErrors.RegistrationFailed, vm.ErrorMessage);
-
-        _registrationMock.Verify(
-            x => x.Register(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()),
+        _authApiClientMock.Verify(
+            x => x.RegisterAsync(It.IsAny<RegisterForm>()),
             Times.Never
         );
     }
@@ -236,7 +232,6 @@ public class RegistrationViewModelTest
         var vm = CreateViewModel();
 
         vm.ErrorMessage = "error";
-
         vm.Login = "newLogin";
 
         Assert.False(vm.HasError);

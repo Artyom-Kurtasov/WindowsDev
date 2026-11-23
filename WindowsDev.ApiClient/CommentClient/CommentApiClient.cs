@@ -1,28 +1,28 @@
-﻿using System.Net.Http.Json;
+﻿using AutoMapper;
+using System.Net.Http.Json;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Comments;
 using WindowsDev.Contracts.Api.Common;
+using WindowsDev.Contracts.UI.Comments;
 
 namespace WindowsDev.ApiClient.CommentClient;
 
-public class CommentApiClient : ICommentApiClient
+public class CommentApiClient : ApiClientBase, ICommentApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly ISecureTokenStorage _tokenStorage;
+    private readonly IMapper _mapper;
 
-    public CommentApiClient(HttpClient httpClient, ISecureTokenStorage tokenStorage)
+    public CommentApiClient(HttpClient httpClient, ISecureTokenStorage tokenStorage, IMapper mapper) : base(httpClient, tokenStorage)
     {
-        _httpClient = httpClient;
-        _tokenStorage = tokenStorage;
+        _mapper = mapper;
     }
 
-    public async Task<Result<GetCommentResponse>> GetCommentAsync(
+    public async Task<Result<CommentInfo>> GetCommentAsync(
         int id,
         CancellationToken cancellationToken
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.GetAsync($"api/comments/{id}", cancellationToken);
 
         if (response.IsSuccessStatusCode)
@@ -30,44 +30,27 @@ public class CommentApiClient : ICommentApiClient
             var result = await response.Content.ReadFromJsonAsync<GetCommentResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<GetCommentResponse>.Success(result);
+
+            var info = _mapper.Map<CommentInfo>(result);
+            return Result<CommentInfo>.Success(info);
         }
 
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
-        var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<GetCommentResponse>.Failure(errorCode);
-    }
-
-    public async Task<Result<List<GetCommentResponse>>> GetCommentsAsync(
-        int taskId,
-        CancellationToken cancellationToken
-    )
-    {
-        AppendAuthorizationHeader();
-        using var response = await _httpClient.GetAsync(
-            $"api/comments/task/{taskId}",
-            cancellationToken
-        );
-
-        if (response.IsSuccessStatusCode)
+        if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
         {
-            var result = await response.Content.ReadFromJsonAsync<List<GetCommentResponse>>(
-                cancellationToken: cancellationToken
-            );
-            return Result<List<GetCommentResponse>>.Success(result);
+            return Result<CommentInfo>.Failure("Unauthorized"); // Change string!
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<List<GetCommentResponse>>.Failure(errorCode);
+        return Result<CommentInfo>.Failure(errorCode);
     }
 
-    public async Task<Result<AddCommentResponse>> AddCommentAsync(
-        AddCommentRequest request,
+    public async Task<Result<CommentInfo>> AddCommentAsync(
+        AddCommentForm request,
         CancellationToken cancellationToken
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.PostAsJsonAsync(
             "api/comments",
             request,
@@ -79,22 +62,38 @@ public class CommentApiClient : ICommentApiClient
             var result = await response.Content.ReadFromJsonAsync<AddCommentResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<AddCommentResponse>.Success(result);
+
+            var info = _mapper.Map<CommentInfo>(result);
+            return Result<CommentInfo>.Success(info);
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<AddCommentResponse>.Failure(errorCode);
+        return Result<CommentInfo>.Failure(errorCode);
     }
 
-    private void AppendAuthorizationHeader()
+    public async Task<Result<List<CommentInfo>>> GetCommentsAsync(
+        int taskId,
+        CancellationToken cancellationToken
+    )
     {
-        _httpClient.DefaultRequestHeaders.Authorization = null;
+        await AppendAuthorizationHeaderAsync(cancellationToken);
+        using var response = await _httpClient.GetAsync(
+            $"api/comments/task/{taskId}",
+            cancellationToken
+        );
 
-        if (_tokenStorage.IsAuthenticated)
+        if (response.IsSuccessStatusCode)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenStorage.AccessToken);
+            var result = await response.Content.ReadFromJsonAsync<List<GetCommentResponse>>(
+                cancellationToken: cancellationToken
+            );
+            var info = _mapper.Map<List<CommentInfo>>(result);
+            return Result<List<CommentInfo>>.Success(info);
         }
+
+        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
+        var errorCode = problem?.GetErrorCode() ?? string.Empty;
+        return Result<List<CommentInfo>>.Failure(errorCode);
     }
 }

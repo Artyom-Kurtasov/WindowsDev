@@ -53,6 +53,10 @@ internal class ProjectService : IProjectService
 
     public async Task<ProjectsInfo> GetProjectById(int projectId)
     {
-        return await _projectRepository.GetProjectById(projectId);
+        var project = await _projectRepository.GetProjectById(projectId);
+
+        ArgumentNullException.ThrowIfNull(project);
+
+        return project;
     }
 }

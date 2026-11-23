@@ -1,30 +1,33 @@
-﻿using System.Net.Http.Json;
+﻿using AutoMapper;
+using System.Net.Http.Json;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Common;
 using WindowsDev.Contracts.Api.PasswordRecovery;
+using WindowsDev.Contracts.UI.PasswordRecovery;
 
 namespace WindowsDev.ApiClient.PasswordRecovery;
-
-public record IsUserExistRequest(string login);
-public record IsUserExistResponse(bool isExist);
 
 public class PasswordRecoveryApiClient : IPasswordRecoveryApiClient
 {
     private readonly HttpClient _httpClient;
+    private readonly IMapper _mapper;
 
-    public PasswordRecoveryApiClient(HttpClient httpClient)
+    public PasswordRecoveryApiClient(HttpClient httpClient, IMapper mapper)
     {
         _httpClient = httpClient;
+        _mapper = mapper;
     }
 
-    public async Task<Result<VerifyRecoveryCodeResponse>> IsRecoveryCodeCorrectAsync(
-        VerifyRecoveryCodeRequest request,
+    public async Task<Result<VerifyRecoveryCodeInfo>> IsRecoveryCodeCorrectAsync(
+        VerifyRecoveryCodeForm request,
         CancellationToken cancellationToken
     )
     {
+        var apiRequest = _mapper.Map<VerifyRecoveryCodeRequest>(request);
+
         using var response = await _httpClient.PostAsJsonAsync(
             "api/passwordrecovery/verify-code",
-            request,
+            apiRequest,
             cancellationToken
         );
 
@@ -33,22 +36,26 @@ public class PasswordRecoveryApiClient : IPasswordRecoveryApiClient
             var result = await response.Content.ReadFromJsonAsync<VerifyRecoveryCodeResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<VerifyRecoveryCodeResponse>.Success(result);
+
+            var info = _mapper.Map<VerifyRecoveryCodeInfo>(result);
+            return Result<VerifyRecoveryCodeInfo>.Success(info);
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<VerifyRecoveryCodeResponse>.Failure(errorCode);
+        return Result<VerifyRecoveryCodeInfo>.Failure(errorCode);
     }
 
-    public async Task<Result<ResetPasswordResponse>> ChangePasswordAsync(
-        ResetPasswordRequest request,
+    public async Task<Result<ResetPasswordInfo>> ChangePasswordAsync(
+        ResetPasswordForm request,
         CancellationToken cancellationToken
     )
     {
+        var apiRequest = _mapper.Map<ResetPasswordRequest>(request);
+
         using var response = await _httpClient.PostAsJsonAsync(
             "api/passwordrecovery/change-password",
-            request,
+            apiRequest,
             cancellationToken
         );
 
@@ -57,28 +64,34 @@ public class PasswordRecoveryApiClient : IPasswordRecoveryApiClient
             var result = await response.Content.ReadFromJsonAsync<ResetPasswordResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<ResetPasswordResponse>.Success(result);
+
+            var info = _mapper.Map<ResetPasswordInfo>(result);
+            return Result<ResetPasswordInfo>.Success(info);
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<ResetPasswordResponse>.Failure(errorCode);
+        return Result<ResetPasswordInfo>.Failure(errorCode);
     }
 
-    public async Task<IsUserExistResponse> IsUserExistAsync(
-        IsUserExistRequest request,
+    public async Task<Result<IsUserExistInfo>> IsUserExistAsync(
+        IsUserExistForm request,
         CancellationToken cancellationToken
     )
     {
+        var apiRequest = _mapper.Map<IsUserExistRequest>(request);
+
         using var response = await _httpClient.PostAsJsonAsync(
             "api/passwordrecovery/check-user",
-            request,
+            apiRequest,
             cancellationToken
         );
 
         var result = await response.Content.ReadFromJsonAsync<IsUserExistResponse>(
             cancellationToken: cancellationToken
         );
-        return result!;
+
+        var info = _mapper.Map<IsUserExistInfo>(result);
+        return Result<IsUserExistInfo>.Success(info);
     }
 }

@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.Logging;
+using WindowsDev.Api.ProblemDetails;
+using WindowsDev.Api.Urls;
 using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Contracts.Api.Comments;
 
@@ -29,7 +31,7 @@ public class CommentsController : ApiControllerBase
 
     private const string GetCommentActionName = "GetComment";
 
-    [HttpGet("{id:int}")]
+    [HttpGet(CommentUrls.GetCommentUrl)]
     [ActionName(GetCommentActionName)]
     public async Task<ActionResult<GetCommentResponse>> GetCommentAsync([FromRoute] int id)
     {
@@ -45,13 +47,13 @@ public class CommentsController : ApiControllerBase
         CommentsControllerLogs.CommentNotFound(_logger, id);
         return CustomProblem(
             StatusCodes.Status404NotFound,
-            "Comment Not Found",
-            $"Comment with {id} not found.",
+            CommentProblemDetails.CommentNotFound,
+            CommentProblemDetails.CommentNotFoundDetail(id),
             result.Error
         );
     }
 
-    [HttpGet("task/{taskId:int}")]
+    [HttpGet(CommentUrls.GetCommentsUrl)]
     public async Task<ActionResult<List<GetCommentResponse>>> GetCommentsAsync(
         [FromRoute] int taskId
     )

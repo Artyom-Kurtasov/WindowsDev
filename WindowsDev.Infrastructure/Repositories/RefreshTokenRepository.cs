@@ -41,15 +41,24 @@ internal class RefreshTokenRepository : IRefreshTokenRepository
 
         if (existingRefreshToken is not null)
         {
-            existingRefreshToken.TokenHash = refreshToken.TokenHash;
+            existingRefreshToken.Token = refreshToken.Token;
             existingRefreshToken.ExpiresAt = refreshToken.ExpiresAt;
 
             await dbContext.SaveChangesAsync();
         }
     }
 
-    //public async Task<UserRefreshToken> GetByUserIdAsync(int userId)
-    //{
+    public async Task<UserRefreshToken> GetByUserIdAsync(int userId)
+    {
+        using var dbContext = _dbCreator.Create();
 
-    //}
+        return await dbContext.RefreshToken.FirstOrDefaultAsync(x => x.UserId == userId) ?? null!;
+    }
+
+    public async Task<UserRefreshToken> GetByTokenAsync(string token)
+    {
+        using var dbContext = _dbCreator.Create();
+
+        return await dbContext.RefreshToken.FirstOrDefaultAsync(x => x.Token == token) ?? null!;
+    }
 }

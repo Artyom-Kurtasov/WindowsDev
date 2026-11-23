@@ -1,8 +1,7 @@
-using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.ProjectsClient;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Projects;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
@@ -13,12 +12,11 @@ internal sealed class TestProjectsViewModel : ProjectsViewModel
 {
     public TestProjectsViewModel()
         : base(
-            Mock.Of<IDialogCoordinator>(),
-            Mock.Of<IProjectService>(),
             Mock.Of<INavigationService>(),
             Mock.Of<ILogger<ProjectsViewModel>>(),
             Mock.Of<IDialogService>(),
-            Mock.Of<ILanguageChanger>()
+            Mock.Of<ILanguageChanger>(),
+            Mock.Of<IProjectsApiClient>()
         )
     { }
 }

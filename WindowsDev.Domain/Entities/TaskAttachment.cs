@@ -8,5 +8,4 @@ public class TaskAttachment
     public required string FileName { get; set; }
     public required long FileSize { get; set; }
     public required int TaskId { get; set; }
-    public TasksInfo Task { get; set; }
 }

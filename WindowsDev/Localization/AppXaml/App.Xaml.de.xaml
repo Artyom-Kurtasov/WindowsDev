@@ -5,6 +5,5 @@
     <!-- Errors --> 
     <sys:String x:Key="AppXaml_Error_Generic">Ein unerwarteter Fehler ist aufgetreten. Bitte starten Sie die Anwendung neu.</sys:String>
     <sys:String x:Key="AppXaml_Error_Shutdown">Ein schwerwiegender Fehler ist aufgetreten. Die Anwendung wird geschlossen.</sys:String>
-    <sys:String x:Key="AppXaml_Error_DatabaseFatal">Verbindung zur Datenbank fehlgeschlagen. Die Anwendung wird geschlossen.</sys:String>
 
 </ResourceDictionary>

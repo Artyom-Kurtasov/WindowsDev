@@ -1,4 +1,4 @@
-﻿using WindowsDev.Contracts.Api.Projects;
+﻿using WindowsDev.Contracts.UI.Projects;
 
 namespace WindowsDev.ViewModels.Main.Tabs;
 
@@ -14,9 +14,9 @@ internal class SelectablelProjectViewModel : ViewModelBase
             OnPropertyChanged();
         }
     }
-    public GetProjectsResponse Project { get; init; }
+    public ProjectInfo Project { get; init; }
 
-    public SelectablelProjectViewModel(GetProjectsResponse project)
+    public SelectablelProjectViewModel(ProjectInfo project)
     {
         Project = project;
     }

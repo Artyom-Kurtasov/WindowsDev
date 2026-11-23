@@ -1,11 +1,12 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.TaskClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Tasks;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
+using WindowsDev.Contracts.UI.Projects;
+using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
@@ -24,8 +25,7 @@ public class ProjectViewModelTest
 {
     private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<INavigationService> _navigationServiceMock;
-    private readonly Mock<ITaskService> _taskServiceMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ITaskApiClient> _apiClientMock;
     private readonly Mock<ILogger<ProjectViewModel>> _loggerMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
 
@@ -33,57 +33,68 @@ public class ProjectViewModelTest
     {
         _dialogServiceMock = new();
         _navigationServiceMock = new();
-        _taskServiceMock = new();
-        _dialogCoordinatorMock = new();
+        _apiClientMock = new();
         _loggerMock = new();
         _languageChangerMock = new();
 
         _languageChangerMock
             .Setup(x => x.Translate(It.IsAny<string>()))
             .Returns((string key) => key);
+
+        _apiClientMock
+            .Setup(x => x.GetTasksCountAsync(It.IsAny<int>()))
+            .ReturnsAsync(Result<int>.Success(0));
+        _apiClientMock
+            .Setup(x =>
+                x.GetTasksAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                )
+            )
+            .ReturnsAsync(Result<List<TaskInfo>>.Success(new List<TaskInfo>()));
     }
 
-    private ProjectViewModel CreateViewModel(ProjectsInfo? project = null)
+    private ProjectViewModel CreateViewModel(ProjectInfo? project = null)
     {
         return new ProjectViewModel(
             project ?? CreateProject(),
-            _dialogCoordinatorMock.Object,
             _navigationServiceMock.Object,
-            _taskServiceMock.Object,
             _dialogServiceMock.Object,
+            _apiClientMock.Object,
             _loggerMock.Object,
             _languageChangerMock.Object
         );
     }
 
-    private ProjectsInfo CreateProject()
+    private ProjectInfo CreateProject()
     {
-        return new()
-        {
-            Id = 1,
-            Name = "Test Project",
-            Description = "Description",
-            UserId = 1,
-            CreatedAt = DateTime.Today,
-        };
+        return new ProjectInfo(
+            1,
+            "Test Project",
+            "Description",
+            DateTime.Today
+        );
     }
 
-    private TasksInfo CreateTask(int id)
+    private TaskInfo CreateTask(int id)
     {
-        return new()
-        {
+        return new TaskInfo {
             Id = id,
             Name = $"Task {id}",
-            ProjectId = 1,
-            Status = TaskStatus.InProgress,
+            Description = "Description",
             Priority = TaskPriority.Medium,
-            CreatedAt = DateTime.Today,
-            Deadline = DateTime.Today.AddDays(7),
             Progress = 0,
+            Status = TaskStatus.InProgress,
+            ProjectId = 1,
+            CreatedAt = DateTime.Today,
+            Deadline = DateTime.Today.AddDays(7)
         };
     }
 
-    private List<TasksInfo> CreateTasks()
+    private List<TaskInfo> CreateTasks()
     {
         return new() { CreateTask(1), CreateTask(2), CreateTask(3) };
     }
@@ -92,25 +103,44 @@ public class ProjectViewModelTest
     {
         var tasks = CreateTasks();
 
-        _taskServiceMock.Setup(x => x.GetTasksCountAsync(1)).ReturnsAsync(tasks.Count);
+        _apiClientMock
+            .Setup(x => x.GetTasksCountAsync(1))
+            .ReturnsAsync(Result<int>.Success(tasks.Count));
 
-        _taskServiceMock
-            .Setup(x => x.GetTasksAsync(It.IsAny<TaskFilter>()))
-            .ReturnsAsync(Result<List<TasksInfo>>.Success(tasks));
+        _apiClientMock
+            .Setup(x =>
+                x.GetTasksAsync(
+                    1,
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                )
+            )
+            .ReturnsAsync(Result<List<TaskInfo>>.Success(tasks));
     }
 
     private void SetupErrorDialog()
     {
-        _dialogCoordinatorMock
-            .Setup(x =>
-                x.ShowMessageAsync(
-                    It.IsAny<ProjectViewModel>(),
-                    DialogTitles.Error,
-                    CommonErrors.UnexpectedError,
-                    MessageDialogStyle.Affirmative
-                )
+        _dialogServiceMock.Setup(x =>
+            x.ShowMessageAsync(
+                DialogTitles.Error,
+                CommonErrors.UnexpectedError,
+                MessageDialogStyle.Affirmative
             )
-            .ReturnsAsync(MessageDialogResult.Affirmative);
+        );
+    }
+
+    private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 2000)
+    {
+        var start = Environment.TickCount;
+        while (!condition())
+        {
+            if (Environment.TickCount - start > timeoutMs)
+                throw new TimeoutException("Condition was not met in time.");
+
+            await Task.Delay(10);
+        }
     }
 
     [Fact]
@@ -132,12 +162,23 @@ public class ProjectViewModelTest
 
         var vm = CreateViewModel();
 
-        Assert.Equal(3, vm.Tasks.Count);
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
+
         Assert.Equal(1, vm.CurrentPage);
         Assert.Equal(1, vm.TotalCountOfPages);
 
-        _taskServiceMock.Verify(x => x.GetTasksCountAsync(1), Times.Once);
-        _taskServiceMock.Verify(x => x.GetTasksAsync(It.IsAny<TaskFilter>()), Times.Once);
+        _apiClientMock.Verify(x => x.GetTasksCountAsync(1), Times.Once);
+        _apiClientMock.Verify(
+            x =>
+                x.GetTasksAsync(
+                    1,
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -145,14 +186,18 @@ public class ProjectViewModelTest
     {
         SetupErrorDialog();
 
-        _taskServiceMock.Setup(x => x.GetTasksCountAsync(1)).ThrowsAsync(new Exception());
+        _apiClientMock
+            .Setup(x => x.GetTasksCountAsync(1))
+            .ThrowsAsync(new Exception());
 
         var vm = CreateViewModel();
 
-        _dialogCoordinatorMock.Verify(
+        await WaitUntilAsync(() => true); // дать возможность отработать fire-and-forget
+        await Task.Delay(50);
+
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative
@@ -167,13 +212,24 @@ public class ProjectViewModelTest
         SetupTasks();
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
 
-        _taskServiceMock.Invocations.Clear();
+        _apiClientMock.Invocations.Clear();
 
         await vm.RefreshAsync();
 
-        _taskServiceMock.Verify(x => x.GetTasksCountAsync(1), Times.Once);
-        _taskServiceMock.Verify(x => x.GetTasksAsync(It.IsAny<TaskFilter>()), Times.Once);
+        _apiClientMock.Verify(x => x.GetTasksCountAsync(1), Times.Once);
+        _apiClientMock.Verify(
+            x =>
+                x.GetTasksAsync(
+                    1,
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                ),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -186,7 +242,6 @@ public class ProjectViewModelTest
         _navigationServiceMock.Verify(x => x.NavigateTo<MainWindowViewModel>(), Times.Once);
 
         Assert.Null(vm.CurrentProject);
-
         Assert.Null(vm.Tasks);
     }
 
@@ -198,7 +253,7 @@ public class ProjectViewModelTest
         await ((AsyncRelayCommand)vm.OpenDialogCommand).ExecuteAsync(null);
 
         _dialogServiceMock.Verify(
-            x => x.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(vm, 1),
+            x => x.ShowDialogAsync<TaskDialogView, CreateTaskViewModel>(1),
             Times.Once
         );
     }
@@ -210,7 +265,7 @@ public class ProjectViewModelTest
 
         var task = CreateTask(1);
 
-        await ((AsyncRelayCommandT<TasksInfo>)vm.OpenTaskCommand).ExecuteAsync(task);
+        await ((AsyncRelayCommandT<TaskInfo>)vm.OpenTaskCommand).ExecuteAsync(task);
 
         _navigationServiceMock.Verify(
             x => x.NavigateTo<TaskViewModel>(vm.CurrentProject, task),
@@ -224,6 +279,7 @@ public class ProjectViewModelTest
         SetupTasks();
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
 
         vm.Tasks[0].IsSelected = true;
         vm.Tasks[1].IsSelected = true;
@@ -231,12 +287,12 @@ public class ProjectViewModelTest
         await ((AsyncRelayCommand)vm.DeleteSelectedTasksCommand).ExecuteAsync(null);
 
         Assert.Single(vm.Tasks);
-        Assert.Contains(vm.Tasks, x => x.Id == 3);
-        Assert.DoesNotContain(vm.Tasks, x => x.Id == 1);
-        Assert.DoesNotContain(vm.Tasks, x => x.Id == 2);
+        Assert.Contains(vm.Tasks, x => x.Task.Id == 3);
+        Assert.DoesNotContain(vm.Tasks, x => x.Task.Id == 1);
+        Assert.DoesNotContain(vm.Tasks, x => x.Task.Id == 2);
 
-        _taskServiceMock.Verify(x => x.DeleteAsync(1), Times.Once);
-        _taskServiceMock.Verify(x => x.DeleteAsync(2), Times.Once);
+        _apiClientMock.Verify(x => x.DeleteAsync(1), Times.Once);
+        _apiClientMock.Verify(x => x.DeleteAsync(2), Times.Once);
     }
 
     [Fact]
@@ -245,12 +301,13 @@ public class ProjectViewModelTest
         SetupTasks();
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
 
         await ((AsyncRelayCommand)vm.DeleteSelectedTasksCommand).ExecuteAsync(null);
 
         Assert.Equal(3, vm.Tasks.Count);
 
-        _taskServiceMock.Verify(x => x.DeleteAsync(It.IsAny<int>()), Times.Never);
+        _apiClientMock.Verify(x => x.DeleteAsync(It.IsAny<int>()), Times.Never);
     }
 
     [Fact]
@@ -261,20 +318,20 @@ public class ProjectViewModelTest
         SetupTasks();
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
 
         vm.Tasks[0].IsSelected = true;
 
-        _taskServiceMock.Setup(x => x.DeleteAsync(1)).ThrowsAsync(new Exception());
+        _apiClientMock.Setup(x => x.DeleteAsync(1)).ThrowsAsync(new Exception());
 
         await ((AsyncRelayCommand)vm.DeleteSelectedTasksCommand).ExecuteAsync(null);
 
         Assert.Equal(3, vm.Tasks.Count);
-        Assert.Contains(vm.Tasks, x => x.Id == 1);
+        Assert.Contains(vm.Tasks, x => x.Task.Id == 1);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative
@@ -286,15 +343,26 @@ public class ProjectViewModelTest
     [Fact]
     public async Task NextPageCommand_WhenCanGoNext_LoadsNextPage()
     {
-        _taskServiceMock.Setup(x => x.GetTasksCountAsync(1)).ReturnsAsync(30);
+        _apiClientMock
+            .Setup(x => x.GetTasksCountAsync(1))
+            .ReturnsAsync(Result<int>.Success(30));
 
-        _taskServiceMock
-            .Setup(x => x.GetTasksAsync(It.Is<TaskFilter>(x => x.Page == 2)))
+        _apiClientMock
+            .Setup(x =>
+                x.GetTasksAsync(
+                    1,
+                    It.IsAny<string>(),
+                    2,
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                )
+            )
             .ReturnsAsync(
-                Result<List<TasksInfo>>.Success(new() { CreateTask(4), CreateTask(5) })
+                Result<List<TaskInfo>>.Success(new() { CreateTask(4), CreateTask(5) })
             );
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.TotalCountOfPages == 2);
 
         await ((AsyncRelayCommand)vm.NextPageCommand).ExecuteAsync(null);
 
@@ -306,17 +374,30 @@ public class ProjectViewModelTest
     [Fact]
     public async Task NextPageCommand_WhenLastPage_DoesNothing()
     {
-        _taskServiceMock.Setup(x => x.GetTasksCountAsync(1)).ReturnsAsync(10);
+        _apiClientMock
+            .Setup(x => x.GetTasksCountAsync(1))
+            .ReturnsAsync(Result<int>.Success(10));
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.TotalCountOfPages == 1);
 
-        _taskServiceMock.Invocations.Clear();
+        _apiClientMock.Invocations.Clear();
 
         await ((AsyncRelayCommand)vm.NextPageCommand).ExecuteAsync(null);
 
         Assert.Equal(1, vm.CurrentPage);
 
-        _taskServiceMock.Verify(x => x.GetTasksAsync(It.IsAny<TaskFilter>()), Times.Never);
+        _apiClientMock.Verify(
+            x =>
+                x.GetTasksAsync(
+                    It.IsAny<int>(),
+                    It.IsAny<string>(),
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                ),
+            Times.Never
+        );
     }
 
     [Fact]
@@ -325,15 +406,23 @@ public class ProjectViewModelTest
         SetupTasks();
 
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Tasks.Count == 3);
 
-        _taskServiceMock.Invocations.Clear();
+        _apiClientMock.Invocations.Clear();
 
         vm.SearchFilter = "test";
 
-        await Task.Delay(50);
+        await Task.Delay(100);
 
-        _taskServiceMock.Verify(
-            x => x.GetTasksAsync(It.Is<TaskFilter>(f => f.Seacrh == "test")),
+        _apiClientMock.Verify(
+            x =>
+                x.GetTasksAsync(
+                    1,
+                    "test",
+                    It.IsAny<int>(),
+                    It.IsAny<int>(),
+                    It.IsAny<List<TaskStatus>>()
+                ),
             Times.Once
         );
     }
@@ -346,7 +435,6 @@ public class ProjectViewModelTest
         vm.Dispose();
 
         Assert.Null(vm.CurrentProject);
-
         Assert.Null(vm.Tasks);
     }
 

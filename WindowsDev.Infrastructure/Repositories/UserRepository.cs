@@ -49,6 +49,13 @@ internal class UserRepository : IUserRepository
         return await dbContext.UsersInfo.FirstOrDefaultAsync(x => x.Login == login);
     }
 
+    public async Task<UserInfo?> GetByIdAsync(int id)
+    {
+        using var dbContext = _dbManager.Create();
+
+        return await dbContext.UsersInfo.FirstOrDefaultAsync(x => x.Id == id);
+    }
+
     public async Task UpdateAsync(UserInfo user)
     {
         using var dbContext = _dbManager.Create();

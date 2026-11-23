@@ -1,37 +1,36 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.ProjectsClient;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Projects;
+using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.Projects;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.ViewModels.Projects.Dialogs;
 
 namespace WindowsDev.Tests.ViewModels.Projects.Dialogs;
 
 public class CreateProjectDialogViewModelTest
 {
-    private readonly Mock<IProjectService> _projectServiceMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<IProjectsApiClient> _projectApiClientMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<ILogger<CreateProjectDialogViewModel>> _loggerMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
-    private readonly Mock<ICurrentUserService> _currentUserMock;
 
     private bool _completedEventWasRaised;
     private bool _closeEventWasRaised;
 
     public CreateProjectDialogViewModelTest()
     {
-        _projectServiceMock = new();
-        _dialogCoordinatorMock = new();
+        _projectApiClientMock = new();
+        _dialogServiceMock = new();
         _loggerMock = new();
         _languageChangerMock = new();
-        _currentUserMock = new();
-
-        _currentUserMock.SetupGet(x => x.UserId).Returns(1);
 
         _languageChangerMock
             .Setup(x => x.Translate(It.IsAny<string>()))
@@ -41,9 +40,8 @@ public class CreateProjectDialogViewModelTest
     private CreateProjectDialogViewModel CreateViewModel()
     {
         return new CreateProjectDialogViewModel(
-            _dialogCoordinatorMock.Object,
-            _currentUserMock.Object,
-            _projectServiceMock.Object,
+            _dialogServiceMock.Object,
+            _projectApiClientMock.Object,
             _loggerMock.Object,
             _languageChangerMock.Object
         );
@@ -77,28 +75,26 @@ public class CreateProjectDialogViewModelTest
         vm.ProjectName = "Test";
         vm.ProjectDescription = "Description";
 
-        ProjectsInfo? createdProject = null;
+        ProjectForm? capturedForm = null;
 
-        _projectServiceMock
-            .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
-            .Callback<ProjectsInfo>(x => createdProject = x)
-            .Returns(Task.CompletedTask);
+        _projectApiClientMock
+            .Setup(x => x.AddAsync(It.IsAny<ProjectForm>(), It.IsAny<CancellationToken>()))
+            .Callback<ProjectForm, CancellationToken>((form, _) => capturedForm = form)
+            .ReturnsAsync(Result<ProjectInfo>.Success(
+                new ProjectInfo(1, "Test", "Description", DateTime.UtcNow)));
 
         await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
 
         Assert.True(_completedEventWasRaised);
-
         Assert.True(_closeEventWasRaised);
+        Assert.NotNull(capturedForm);
 
-        Assert.NotNull(createdProject);
+        Assert.Equal("Test", capturedForm.Name);
+        Assert.Equal("Description", capturedForm.Description);
 
-        Assert.Equal("Test", createdProject.Name);
-
-        Assert.Equal("Description", createdProject.Description);
-
-        Assert.Equal(1, createdProject.UserId);
-
-        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
+        _projectApiClientMock.Verify(
+            x => x.AddAsync(It.IsAny<ProjectForm>(), It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Theory]
@@ -119,12 +115,11 @@ public class CreateProjectDialogViewModelTest
         Assert.False(_completedEventWasRaised);
         Assert.False(_closeEventWasRaised);
 
-        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Never);
+        _projectApiClientMock.Verify(x => x.AddAsync(It.IsAny<ProjectForm>()), Times.Never);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Warning,
                     CreateProjectWarnings.EnterName,
                     MessageDialogStyle.Affirmative
@@ -143,8 +138,8 @@ public class CreateProjectDialogViewModelTest
         vm.ProjectName = "Test";
         vm.ProjectDescription = "Description";
 
-        _projectServiceMock
-            .Setup(x => x.AddAsync(It.IsAny<ProjectsInfo>()))
+        _projectApiClientMock
+            .Setup(x => x.AddAsync(It.IsAny<ProjectForm>()))
             .ThrowsAsync(new Exception());
 
         await ((AsyncRelayCommand)vm.CreateProjectCommand).ExecuteAsync(null);
@@ -152,12 +147,11 @@ public class CreateProjectDialogViewModelTest
         Assert.False(_completedEventWasRaised);
         Assert.False(_closeEventWasRaised);
 
-        _projectServiceMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Once);
+        _projectApiClientMock.Verify(x => x.AddAsync(It.IsAny<ProjectForm>()), Times.Once);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative

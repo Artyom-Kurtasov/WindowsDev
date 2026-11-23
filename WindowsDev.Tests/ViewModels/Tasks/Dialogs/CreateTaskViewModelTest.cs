@@ -1,14 +1,16 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.TaskClient;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Tasks;
+using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
-using WindowsDev.Domain.Entities;
+using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.ViewModels.Tasks.Dialogs;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
@@ -16,8 +18,8 @@ namespace WindowsDev.Tests.ViewModels.Tasks.Dialogs;
 
 public class CreateTaskViewModelTest
 {
-    private readonly Mock<ITaskService> _taskServiceMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ITaskApiClient> _apiClientMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<ILogger<CreateTaskViewModel>> _loggerMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
 
@@ -26,8 +28,8 @@ public class CreateTaskViewModelTest
 
     public CreateTaskViewModelTest()
     {
-        _taskServiceMock = new Mock<ITaskService>();
-        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _apiClientMock = new Mock<ITaskApiClient>();
+        _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<CreateTaskViewModel>>();
         _languageChangerMock = new Mock<ILanguageChanger>();
 
@@ -40,8 +42,8 @@ public class CreateTaskViewModelTest
     {
         var vm = new CreateTaskViewModel(
             projectId,
-            _taskServiceMock.Object,
-            _dialogCoordinatorMock.Object,
+            _apiClientMock.Object,
+            _dialogServiceMock.Object,
             _loggerMock.Object,
             _languageChangerMock.Object
         );
@@ -80,8 +82,8 @@ public class CreateTaskViewModelTest
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             new CreateTaskViewModel(
                 0,
-                _taskServiceMock.Object,
-                _dialogCoordinatorMock.Object,
+                _apiClientMock.Object,
+                _dialogServiceMock.Object,
                 _loggerMock.Object,
                 _languageChangerMock.Object
             )
@@ -102,40 +104,41 @@ public class CreateTaskViewModelTest
     }
 
     [Fact]
-    public async Task CreateTask_WhenSuccessful_AddsTask_RaisesCompletedAndCloseEvents()
+    public async Task SubmitCommand_WhenSuccessful_AddsTask_RaisesCompletedAndCloseEvents()
     {
         var vm = CreateViewModel();
 
         SetupEvents(vm);
 
-        TasksInfo? createdTask = null;
+        TaskForm? capturedForm = null;
 
-        _taskServiceMock
-            .Setup(x => x.AddAsync(It.IsAny<TasksInfo>()))
-            .Callback<TasksInfo>(task => createdTask = task)
-            .Returns(Task.CompletedTask);
+        _apiClientMock
+            .Setup(x => x.AddAsync(It.IsAny<TaskForm>()))
+            .Callback<TaskForm, CancellationToken>((form, _) => capturedForm = form)
+            .ReturnsAsync(Result<TaskInfo>.Success(It.IsAny<TaskInfo>()));
 
-        await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
+        await ((AsyncRelayCommand)vm.SubmitCommand).ExecuteAsync(null);
 
         Assert.True(_completedEventWasRaised);
         Assert.True(_closeEventWasRaised);
 
-        Assert.NotNull(createdTask);
+        Assert.NotNull(capturedForm);
 
-        Assert.Equal("Test Task", createdTask.Name);
-        Assert.Equal("Test Description", createdTask.Description);
-        Assert.Equal(1, createdTask.ProjectId);
-        Assert.Equal(TaskPriority.Medium, createdTask.Priority);
-        Assert.Equal(TaskStatus.InProgress, createdTask.Status);
+        Assert.Equal("Test Task", capturedForm.Name);
+        Assert.Equal("Test Description", capturedForm.Description);
+        Assert.Equal(1, capturedForm.ProjectId);
+        Assert.Equal(TaskPriority.Medium, capturedForm.Priority);
+        Assert.Equal(TaskStatus.InProgress, capturedForm.Status);
+        Assert.Equal(0, capturedForm.Progress);
 
-        _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Once);
+        _apiClientMock.Verify(x => x.AddAsync(It.IsAny<TaskForm>()), Times.Once);
     }
 
     [Theory]
     [InlineData("")]
     [InlineData(null)]
     [InlineData(" ")]
-    public async Task CreateTask_WhenNameEmpty_ShowsWarning(string? name)
+    public async Task SubmitCommand_WhenNameEmpty_ShowsWarning(string? name)
     {
         var vm = CreateViewModel();
 
@@ -143,17 +146,16 @@ public class CreateTaskViewModelTest
 
         SetupEvents(vm);
 
-        await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
+        await ((AsyncRelayCommand)vm.SubmitCommand).ExecuteAsync(null);
 
         Assert.False(_completedEventWasRaised);
         Assert.False(_closeEventWasRaised);
 
-        _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Never);
+        _apiClientMock.Verify(x => x.AddAsync(It.IsAny<TaskForm>()), Times.Never);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Warning,
                     TaskDialogWarnings.EnterName,
                     MessageDialogStyle.Affirmative
@@ -163,27 +165,26 @@ public class CreateTaskViewModelTest
     }
 
     [Fact]
-    public async Task CreateTask_WhenServiceThrows_ShowsErrorDialog()
+    public async Task SubmitCommand_WhenServiceThrows_ShowsErrorDialog()
     {
         var vm = CreateViewModel();
 
         SetupEvents(vm);
 
-        _taskServiceMock
-            .Setup(x => x.AddAsync(It.IsAny<TasksInfo>()))
+        _apiClientMock
+            .Setup(x => x.AddAsync(It.IsAny<TaskForm>()))
             .ThrowsAsync(new Exception());
 
-        await ((AsyncRelayCommand)vm.CreateTaskCommand).ExecuteAsync(null);
+        await ((AsyncRelayCommand)vm.SubmitCommand).ExecuteAsync(null);
 
         Assert.False(_completedEventWasRaised);
         Assert.False(_closeEventWasRaised);
 
-        _taskServiceMock.Verify(x => x.AddAsync(It.IsAny<TasksInfo>()), Times.Once);
+        _apiClientMock.Verify(x => x.AddAsync(It.IsAny<TaskForm>()), Times.Once);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative

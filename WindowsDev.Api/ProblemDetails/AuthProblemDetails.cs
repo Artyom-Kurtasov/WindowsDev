@@ -8,4 +8,6 @@ public static class AuthProblemDetails
     public static string UsernameConflictDetail(string username) => $"This username {username} is already taken.";
     public const string InvalidCredentials = "Invalid Credentials";
     public const string InvalidCredentialsDetail = "Invalid username or password. Please try again.";
+    public const string RefreshTokenInvalid = "Authentication Required";
+    public const string RefreshTokenInvalidDetail = "Your session has expired or is no longer valid. Please sign in again.";
 }

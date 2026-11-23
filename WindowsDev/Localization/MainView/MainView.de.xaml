@@ -7,4 +7,5 @@
     <sys:String x:Key="MainWindow_Label_Settings">Einstellungen</sys:String>
     <sys:String x:Key="MainWindow_Label_Profile">Profil</sys:String>
 
+    <sys:String x:Key="MainWindow_Information_SessionExpired">Ihre Sitzung ist abgelaufen oder ungültig geworden. Bitte melden Sie sich erneut an.</sys:String>
 </ResourceDictionary>

@@ -22,6 +22,7 @@
 
   <ItemGroup>
 	<InternalsVisibleTo Include="WindowsDev.Tests" />
+	<InternalsVisibleTo Include="WindowsDev.IntegrationTests" />
   </ItemGroup>
 
 </Project>

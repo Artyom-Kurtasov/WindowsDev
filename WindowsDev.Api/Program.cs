@@ -1,9 +1,10 @@
+using WindowsDev.Api;
 using WindowsDev.Api.Mappings;
 using WindowsDev.Application;
 using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.JWT;
-using WindowsDev.Logging;
+using WindowsDev.Api.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +13,14 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.RegistrationApiServices();
 builder.Services.RegistrateApplication();
 builder.Services.AddJwt(builder.Configuration);
 builder.Services.RegistrateInfrastructure();
 builder.Services.RegistrateLogging();
 builder.Services.AddAutoMapper(cfg => { cfg.AddProfile<ApiMappingProfile>(); });
+
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 

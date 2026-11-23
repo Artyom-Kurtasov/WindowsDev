@@ -16,12 +16,18 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\WindowsDev.Api\WindowsDev.Api.csproj" />
     <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
+    <ProjectReference Include="..\WindowsDev.Infrastructure\WindowsDev.Infrastructure.csproj" />
     <ProjectReference Include="..\WindowsDev\WindowsDev.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Business\TaskService\Attachment\" />
   </ItemGroup>
 
 </Project>

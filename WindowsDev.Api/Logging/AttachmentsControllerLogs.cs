@@ -5,44 +5,44 @@ namespace WindowsDev.Api.Logging;
 internal static partial class AttachmentsControllerLogs
 {
     [LoggerMessage(
-        EventId = AttachmentsControllerEventId.AddFileSuccessful,
+        EventId = AttachmentsControllerEventId.UploadFileSuccessful,
         Level = LogLevel.Information,
-        Message = "Attachment was add successful. Attachment id: {attachmentId}, task id: {taskId}"
+        Message = "File was uploaded successfully. File name: {fileName}"
     )]
-    public static partial void AddFileSuccessful(ILogger logger, int attachmentId, int taskId);
+    public static partial void UploadFileSuccessful(ILogger logger, string fileName);
 
     [LoggerMessage(
         EventId = AttachmentsControllerEventId.FileNotSelected,
         Level = LogLevel.Warning,
-        Message = "File was not selected for task id {taskId}"
+        Message = "File was not selected for upload. File name: {fileName}"
     )]
-    public static partial void FileNotSelected(ILogger logger, int taskId);
+    public static partial void FileNotSelected(ILogger logger, string fileName);
 
     [LoggerMessage(
-        EventId = AttachmentsControllerEventId.GetAttachmentsSuccessful,
+        EventId = AttachmentsControllerEventId.GetFilesSuccessful,
         Level = LogLevel.Information,
-        Message = "The attachments were received successfully. Task id: {taskId}"
+        Message = "The file list was received successfully. Files count: {filesCount}"
     )]
-    public static partial void GetAttachmentsSuccessful(ILogger logger, int taskId);
+    public static partial void GetFilesSuccessful(ILogger logger, int filesCount);
 
     [LoggerMessage(
-        EventId = AttachmentsControllerEventId.OpenAttachmentSuccessful,
-        Level = LogLevel.Information,
-        Message = "Attachment was opened successfully. File path: {filePath}"
+        EventId = AttachmentsControllerEventId.GetFilesFailed,
+        Level = LogLevel.Error,
+        Message = "Failed to get the file list. Error: {error}"
     )]
-    public static partial void OpenAttachmentSuccessful(ILogger logger, string filePath);
+    public static partial void GetFilesFailed(ILogger logger, string? error);
 
     [LoggerMessage(
-        EventId = AttachmentsControllerEventId.GetAttachmentSuccessful,
+        EventId = AttachmentsControllerEventId.DownloadFileSuccessful,
         Level = LogLevel.Information,
-        Message = "The attachment was received successfully. Attachment id: {attachmentId}"
+        Message = "File was downloaded successfully. File name: {fileName}"
     )]
-    public static partial void GetAttachmentSuccessful(ILogger logger, int attachmentId);
+    public static partial void DownloadFileSuccessful(ILogger logger, string fileName);
 
     [LoggerMessage(
         EventId = AttachmentsControllerEventId.AttachmentNotFound,
         Level = LogLevel.Warning,
-        Message = "Attachment with id {attachmentId} not found"
+        Message = "Attachment was not found. File name: {fileName}"
     )]
-    public static partial void AttachmentNotFound(ILogger logger, int attachmentId);
+    public static partial void AttachmentNotFound(ILogger logger, string fileName);
 }

@@ -5,6 +5,5 @@
     <!-- Errors -->
     <sys:String x:Key="AppXaml_Error_Generic">Произошла непредвиденная ошибка. Попробуйте перезапустить приложение.</sys:String>
     <sys:String x:Key="AppXaml_Error_Shutdown">Произошла критическая ошибка. Приложение будет закрыто.</sys:String>
-    <sys:String x:Key="AppXaml_Error_DatabaseFatal">Не удалось подключиться к базе данных. Приложение будет закрыто.</sys:String>
 
 </ResourceDictionary>

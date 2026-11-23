@@ -7,4 +7,5 @@
     <sys:String x:Key="MainWindow_Label_Settings">設定</sys:String>
     <sys:String x:Key="MainWindow_Label_Profile">プロフィール</sys:String>
 
+    <sys:String x:Key="MainWindow_Information_SessionExpired">セッションの有効期限が切れたか、無効になりました。もう一度サインインしてください。</sys:String>
 </ResourceDictionary>

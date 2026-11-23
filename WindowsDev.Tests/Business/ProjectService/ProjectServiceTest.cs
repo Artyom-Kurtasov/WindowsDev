@@ -1,26 +1,29 @@
 using Moq;
 using WindowsDev.Application.Projects;
 using WindowsDev.Domain.Entities;
-using Service = WindowsDev.Application.Services.ProjectService;
 
 namespace WindowsDev.Tests.Business.ProjectService;
 
 public class ProjectServiceTest
 {
     private readonly Mock<IProjectRepository> _projectRepositoryMock;
-    private readonly ICurrentUserService _currentUser;
 
     public ProjectServiceTest()
     {
         _projectRepositoryMock = new Mock<IProjectRepository>();
-        _currentUser = new CurrentUserService();
-        _currentUser.SetUser(1, "testuser", "Test User");
     }
 
-    private Application.Projects.ProjectService CreateService()
-    {
-        return new Service.ProjectService(_projectRepositoryMock.Object, _currentUser);
-    }
+    private Application.Projects.ProjectService CreateService() =>
+        new Application.Projects.ProjectService(_projectRepositoryMock.Object);
+
+    private static ProjectsInfo CreateProject(int id = 0, int userId = 1, string name = "Test Project") =>
+        new ProjectsInfo
+        {
+            Id = id,
+            Name = name,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow,
+        };
 
     [Fact]
     public async Task AddAsync_WhenProjectIsNull_ThrowsArgumentNullException()
@@ -29,19 +32,17 @@ public class ProjectServiceTest
 
         await Assert.ThrowsAsync<ArgumentNullException>(() => service.AddAsync(null!));
 
-        _projectRepositoryMock.Verify(x => x.AddAsync(It.IsAny<ProjectsInfo>()), Times.Never);
+        _projectRepositoryMock.Verify(
+            x => x.AddAsync(It.IsAny<ProjectsInfo>()),
+            Times.Never
+        );
     }
 
     [Fact]
     public async Task AddAsync_WhenProjectIsValid_CallsRepositoryAdd()
     {
         var service = CreateService();
-        var project = new ProjectsInfo
-        {
-            Name = "Test Project",
-            UserId = _currentUser.UserId,
-            CreatedAt = DateTime.UtcNow,
-        };
+        var project = CreateProject(userId: 42);
 
         await service.AddAsync(project);
 
@@ -65,13 +66,7 @@ public class ProjectServiceTest
     public async Task UpdateAsync_WhenProjectIsValid_CallsRepositoryUpdate()
     {
         var service = CreateService();
-        var project = new ProjectsInfo
-        {
-            Id = 1,
-            Name = "Updated Project",
-            UserId = _currentUser.UserId,
-            CreatedAt = DateTime.UtcNow,
-        };
+        var project = CreateProject(id: 1, name: "Updated Project");
 
         await service.UpdateAsync(project);
 
@@ -93,20 +88,21 @@ public class ProjectServiceTest
     public async Task GetProjectsAsync_WithValidParams_CallsRepositoryWithCorrectParams()
     {
         var service = CreateService();
-        const int page = 1;
+        const int userId = 42;
+        const int page = 2;
         const int size = 10;
         const string searchFilter = "test";
         var expectedProjects = new List<ProjectsInfo>();
 
         _projectRepositoryMock
-            .Setup(x => x.GetProjectsAsync(page, size, _currentUser.UserId, searchFilter))
+            .Setup(x => x.GetProjectsAsync(page, size, userId, searchFilter))
             .ReturnsAsync(expectedProjects);
 
-        var result = await service.GetProjectsAsync(page, size, searchFilter);
+        var result = await service.GetProjectsAsync(userId, page, size, searchFilter);
 
-        Assert.Equal(expectedProjects, result);
+        Assert.Same(expectedProjects, result);
         _projectRepositoryMock.Verify(
-            x => x.GetProjectsAsync(page, size, _currentUser.UserId, searchFilter),
+            x => x.GetProjectsAsync(page, size, userId, searchFilter),
             Times.Once
         );
     }
@@ -115,6 +111,7 @@ public class ProjectServiceTest
     public async Task GetProjectsAsync_WhenPageLessThan1_SetsPageTo1()
     {
         var service = CreateService();
+        const int userId = 42;
         const int invalidPage = 0;
         const int size = 10;
         const int expectedPage = 1;
@@ -122,16 +119,15 @@ public class ProjectServiceTest
 
         _projectRepositoryMock
             .Setup(x =>
-                x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>())
+                x.GetProjectsAsync(expectedPage, size, userId, It.IsAny<string>())
             )
             .ReturnsAsync(expectedProjects);
 
-        var result = await service.GetProjectsAsync(invalidPage, size);
+        var result = await service.GetProjectsAsync(userId, invalidPage, size);
 
-        Assert.Equal(expectedProjects, result);
+        Assert.Same(expectedProjects, result);
         _projectRepositoryMock.Verify(
-            x =>
-                x.GetProjectsAsync(expectedPage, size, _currentUser.UserId, It.IsAny<string>()),
+            x => x.GetProjectsAsync(expectedPage, size, userId, It.IsAny<string>()),
             Times.Once
         );
     }
@@ -140,6 +136,7 @@ public class ProjectServiceTest
     public async Task GetProjectsAsync_WhenSizeLessThan1_SetsSizeTo1()
     {
         var service = CreateService();
+        const int userId = 42;
         const int page = 1;
         const int invalidSize = 0;
         const int expectedSize = 1;
@@ -147,16 +144,15 @@ public class ProjectServiceTest
 
         _projectRepositoryMock
             .Setup(x =>
-                x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>())
+                x.GetProjectsAsync(page, expectedSize, userId, It.IsAny<string>())
             )
             .ReturnsAsync(expectedProjects);
 
-        var result = await service.GetProjectsAsync(page, invalidSize);
+        var result = await service.GetProjectsAsync(userId, page, invalidSize);
 
-        Assert.Equal(expectedProjects, result);
+        Assert.Same(expectedProjects, result);
         _projectRepositoryMock.Verify(
-            x =>
-                x.GetProjectsAsync(page, expectedSize, _currentUser.UserId, It.IsAny<string>()),
+            x => x.GetProjectsAsync(page, expectedSize, userId, It.IsAny<string>()),
             Times.Once
         );
     }
@@ -165,17 +161,18 @@ public class ProjectServiceTest
     public async Task GetProjectsCountAsync_WhenCalled_ReturnsCount()
     {
         var service = CreateService();
+        const int userId = 42;
         const int expectedCount = 5;
 
         _projectRepositoryMock
-            .Setup(x => x.GetProjectsCountAsync(_currentUser.UserId))
+            .Setup(x => x.GetProjectsCountAsync(userId))
             .ReturnsAsync(expectedCount);
 
-        var result = await service.GetProjectsCountAsync();
+        var result = await service.GetProjectsCountAsync(userId);
 
         Assert.Equal(expectedCount, result);
         _projectRepositoryMock.Verify(
-            x => x.GetProjectsCountAsync(_currentUser.UserId),
+            x => x.GetProjectsCountAsync(userId),
             Times.Once
         );
     }
@@ -184,17 +181,46 @@ public class ProjectServiceTest
     public async Task GetProjectsCountAsync_WhenNoProjects_ReturnsZero()
     {
         var service = CreateService();
+        const int userId = 42;
 
         _projectRepositoryMock
-            .Setup(x => x.GetProjectsCountAsync(_currentUser.UserId))
+            .Setup(x => x.GetProjectsCountAsync(userId))
             .ReturnsAsync(0);
 
-        var result = await service.GetProjectsCountAsync();
+        var result = await service.GetProjectsCountAsync(userId);
 
         Assert.Equal(0, result);
         _projectRepositoryMock.Verify(
-            x => x.GetProjectsCountAsync(_currentUser.UserId),
+            x => x.GetProjectsCountAsync(userId),
             Times.Once
         );
+    }
+
+    [Fact]
+    public async Task GetProjectById_WhenExists_ReturnsProject()
+    {
+        var service = CreateService();
+        var project = CreateProject(id: 7);
+
+        _projectRepositoryMock
+            .Setup(x => x.GetProjectById(7))
+            .ReturnsAsync(project);
+
+        var result = await service.GetProjectById(7);
+
+        Assert.Same(project, result);
+        _projectRepositoryMock.Verify(x => x.GetProjectById(7), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetProjectById_WhenMissing_ThrowsArgumentNullException()
+    {
+        var service = CreateService();
+
+        _projectRepositoryMock
+            .Setup(x => x.GetProjectById(It.IsAny<int>()))
+            .ReturnsAsync((ProjectsInfo)null!);
+
+        await Assert.ThrowsAsync<ArgumentNullException>(() => service.GetProjectById(1));
     }
 }

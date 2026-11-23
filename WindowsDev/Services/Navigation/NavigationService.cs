@@ -27,5 +27,10 @@ internal class NavigationService : INavigationService
         }
 
         _navigationStore.CurrentViewModel = _viewModelFactory.Create<TViewModel>(args);
+
+        if (_navigationStore.CurrentViewModel is MainWindowViewModel main && main.Projects != null)
+        {
+            await main.Projects.RefreshAsync();
+        }
     }
 }

@@ -3,13 +3,13 @@ using Microsoft.Extensions.Logging;
 using System.Windows.Input;
 using WindowsDev.ApiClient.ProfileClient;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Identity;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Profiles;
+using WindowsDev.Contracts.UI.Profiles;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Success;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
@@ -19,19 +19,19 @@ namespace WindowsDev.ViewModels.Main.Tabs;
 
 internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
 {
+    private readonly ISecureTokenStorage _tokenStorage;
     private readonly INavigationService _navigationService;
     private readonly IDialogService _dialogService;
     private readonly IProfileApiClient _profileApiClient;
     private readonly ILogger<ProfileViewModel> _logger;
-    private readonly IUserSession _userSession;
 
     public ProfileViewModel(
+        ISecureTokenStorage tokenStorage,
         IProfileApiClient profileApiClient,
         IDialogService dialogService,
         INavigationService navigationService,
         ILogger<ProfileViewModel> logger,
-        ILanguageChanger languageChanger,
-        IUserSession userSession
+        ILanguageChanger languageChanger
     )
         : base(languageChanger)
     {
@@ -39,13 +39,13 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         _dialogService = dialogService;
         _navigationService = navigationService;
         _logger = logger;
-        _userSession = userSession;
+        _tokenStorage = tokenStorage;
 
         SaveNewPasswordCommand = new AsyncRelayCommand(SaveNewPasswordAsync);
         SaveNewUsernameCommand = new AsyncRelayCommand(SaveNewUsernameAsync);
         LogoutCommand = new AsyncRelayCommand(LogoutAsync);
 
-        SetUserData();
+        _ = SetUserData();
     }
 
     public ICommand SaveNewUsernameCommand { get; }
@@ -146,12 +146,10 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
     {
         try
         {
+            var profileData = await _profileApiClient.GetAsync();
+
             var result = await _profileApiClient.ChangeUsernameAsync(
-                new ChangeUsernameRequest
-                {
-                    CurrentUsername = _userSession.Username,
-                    NewUsername = Username,
-                },
+                new ChangeUsernameForm(profileData.Value.Username, Username),
                 CancellationToken.None
             );
 
@@ -166,6 +164,8 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
                 return;
             }
 
+            _tokenStorage.AccessToken = result.Value.AccessToken;
+
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Success),
                 Translate(ProfileSuccesses.UsernameChanged),
@@ -174,7 +174,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
         catch (Exception ex)
         {
-            ProfileLogs.UsernameChangeFailed(_logger, _userSession.UserId, ex);
+            ProfileLogs.UsernameChangeFailed(_logger, Id, ex);
 
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
@@ -189,13 +189,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         try
         {
             var result = await _profileApiClient.ChangePasswordAsync(
-                new ChangePasswordRequest
-                {
-                    CurrentPassword = CurrentPassword,
-                    NewPassword = NewPassword,
-                    ConfirmPassword = ConfirmPassword,
-                    Login = Login,
-                },
+                new ChangePasswordForm(CurrentPassword, NewPassword, ConfirmPassword, Login),
                 CancellationToken.None
             );
 
@@ -210,6 +204,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
                 return;
             }
 
+            _tokenStorage.AccessToken = result.Value.Token;
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Success),
                 $"{Translate(ProfileSuccesses.PasswordChanged)} {result.Value.RecoveryCode}",
@@ -218,7 +213,7 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         }
         catch (Exception ex)
         {
-            ProfileLogs.PasswordChangeFailed(_logger, _userSession.UserId, ex);
+            ProfileLogs.PasswordChangeFailed(_logger, Id, ex);
 
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Error),
@@ -233,15 +228,16 @@ internal class ProfileViewModel : LocalizedViewModelBase, IRefreshableViewModel
         await _navigationService.NavigateTo<AuthorizationViewModel>();
     }
 
-    private void SetUserData()
+    private async Task SetUserData()
     {
-        Id = _userSession.UserId;
-        Login = _userSession.Login ?? string.Empty;
-        Username = _userSession.Username ?? string.Empty;
+        var data = await _profileApiClient.GetAsync();
+        Id = data.Value.Id;
+        Login = data.Value.Login;
+        Username = data.Value.Username;
     }
 
     public async Task RefreshAsync()
     {
-        SetUserData();
+        await SetUserData();
     }
 }

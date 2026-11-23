@@ -4,10 +4,10 @@ using System.Windows.Input;
 using WindowsDev.ApiClient.TaskClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Tasks;
+using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs;
@@ -33,11 +33,11 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         _logger = logger;
         _apiClient = apiClient;
 
-        CreateTaskCommand = new AsyncRelayCommand(CreateTaskAsync);
+        SubmitCommand = new AsyncRelayCommand(CreateTaskAsync);
         CancelCommand = new AsyncRelayCommand(CancelAsync);
     }
 
-    public ICommand CreateTaskCommand { get; }
+    public override ICommand SubmitCommand { get; }
     public ICommand CancelCommand { get; }
 
     public event Func<Task>? CloseRequested;
@@ -53,17 +53,15 @@ internal class CreateTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 
         try
         {
-            await _apiClient.AddAsync(
-                new AddTaskRequest
-                {
-                    Name = Name,
-                    Description = Description,
-                    Priority = Priority,
-                    Progress = Progress,
-                    Status = Status,
-                    Deadline = DeadLine.ToUniversalTime(),
-                    ProjectId = _projectId,
-                }
+            var result = await _apiClient.AddAsync(
+                new TaskForm(
+                    Name,
+                    Description,
+                    Priority,
+                    Status,
+                    DeadLine.ToUniversalTime(),
+                    Progress,
+                    _projectId)
             );
 
             if (Completed != null)

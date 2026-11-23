@@ -81,12 +81,7 @@ internal class TaskRepository : ITaskRepository
 
         if (existingTask != null)
         {
-            existingTask.Name = task.Name;
-            existingTask.Description = task.Description;
-            existingTask.Progress = task.Progress;
-            existingTask.Priority = task.Priority;
-            existingTask.Status = task.Status;
-            existingTask.Deadline = task.Deadline;
+            dbContext.Entry(existingTask).CurrentValues.SetValues(task);
 
             await dbContext.SaveChangesAsync();
         }

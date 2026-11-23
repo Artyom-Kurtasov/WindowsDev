@@ -1,39 +1,47 @@
-﻿using System.Net;
+﻿using AutoMapper;
+using System.Net;
 using System.Net.Http.Json;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Projects;
+using WindowsDev.Contracts.UI.Projects;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.ApiClient.ProjectsClient;
 
-public class ProjectsApiClient : IProjectsApiClient
+public class ProjectsApiClient : ApiClientBase, IProjectsApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly ISecureTokenStorage _tokenStorage;
+    private readonly IMapper _mapper;
 
-    public ProjectsApiClient(HttpClient httpClient, ISecureTokenStorage tokenStorage)
+    public ProjectsApiClient(
+        HttpClient httpClient,
+        ISecureTokenStorage tokenStorage,
+        IMapper mapper
+    )
+        : base(httpClient, tokenStorage)
     {
-        _httpClient = httpClient;
-        _tokenStorage = tokenStorage;
+        _mapper = mapper;
     }
 
-    public async Task<Result<AddProjectResponse>> AddAsync(
-        AddProjectRequest request,
+    public async Task<Result<ProjectInfo>> AddAsync(
+        ProjectForm request,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
+        var apiRequest = _mapper.Map<AddProjectRequest>(request);
         using var response = await _httpClient.PostAsJsonAsync(
             "api/projects",
-            request,
+            apiRequest,
             cancellationToken
         );
 
         var result = await response.Content.ReadFromJsonAsync<AddProjectResponse>(
             cancellationToken: cancellationToken
         );
-        return Result<AddProjectResponse>.Success(result);
+
+        var projectInfo = _mapper.Map<ProjectInfo>(result);
+        return Result<ProjectInfo>.Success(projectInfo);
     }
 
     public async Task<Result<bool>> DeleteAsync(
@@ -41,19 +49,19 @@ public class ProjectsApiClient : IProjectsApiClient
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.DeleteAsync($"api/projects/{id}", cancellationToken);
 
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<UpdateProjectResponse>> UpdateAsync(
+    public async Task<Result<UpdateProjectInfo>> UpdateAsync(
         int id,
-        UpdateProjectRequest request,
+        UpdateProjectForm request,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.PatchAsJsonAsync(
             $"api/projects/{id}",
             request,
@@ -61,22 +69,24 @@ public class ProjectsApiClient : IProjectsApiClient
         );
 
         if (response.StatusCode == HttpStatusCode.NotFound)
-            return Result<UpdateProjectResponse>.Failure(ProjectsErrors.ProjectNotFound);
+            return Result<UpdateProjectInfo>.Failure(ProjectsErrors.ProjectNotFound);
 
         var result = await response.Content.ReadFromJsonAsync<UpdateProjectResponse>(
             cancellationToken: cancellationToken
         );
-        return Result<UpdateProjectResponse>.Success(result);
+
+        var info = _mapper.Map<UpdateProjectInfo>(result);
+        return Result<UpdateProjectInfo>.Success(info);
     }
 
-    public async Task<Result<List<GetProjectsResponse>>> GetProjectsAsync(
+    public async Task<Result<List<ProjectInfo>>> GetProjectsAsync(
         int page,
         int pageSize,
         string? searchFilter = "",
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         var search = Uri.EscapeDataString(searchFilter ?? string.Empty);
         var url = $"api/projects?page={page}&pageSize={pageSize}&searchFilter={search}";
 
@@ -85,39 +95,35 @@ public class ProjectsApiClient : IProjectsApiClient
         var result = await response.Content.ReadFromJsonAsync<List<GetProjectsResponse>>(
             cancellationToken: cancellationToken
         );
-        return Result<List<GetProjectsResponse>>.Success(result);
+
+        var info = _mapper.Map<List<ProjectInfo>>(result);
+        return Result<List<ProjectInfo>>.Success(info);
     }
 
-    public async Task<Result<GetProjectsCountResponse>> GetCountAsync(
-        CancellationToken cancellationToken = default
-    )
+    public async Task<Result<int>> GetCountAsync(CancellationToken cancellationToken = default)
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.GetAsync("api/projects/count", cancellationToken);
 
         var result = await response.Content.ReadFromJsonAsync<GetProjectsCountResponse>(
             cancellationToken: cancellationToken
         );
-        return Result<GetProjectsCountResponse>.Success(result);
+        return Result<int>.Success(result.TotalCount);
     }
 
-    public async Task<Result<GetProjectsResponse>> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+    public async Task<Result<ProjectInfo>> GetByIdAsync(
+        int id,
+        CancellationToken cancellationToken = default
+    )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.GetAsync($"api/projects/{id}", cancellationToken);
 
-        var result = await response.Content.ReadFromJsonAsync<GetProjectsResponse>(cancellationToken: cancellationToken);
-        return Result<GetProjectsResponse>.Success(result);
-    }
+        var result = await response.Content.ReadFromJsonAsync<GetProjectsResponse>(
+            cancellationToken: cancellationToken
+        );
 
-    private void AppendAuthorizationHeader()
-    {
-        _httpClient.DefaultRequestHeaders.Authorization = null;
-
-        if (_tokenStorage.IsAuthenticated)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenStorage.AccessToken);
-        }
+        var info = _mapper.Map<ProjectInfo>(result);
+        return Result<ProjectInfo>.Success(info);
     }
 }

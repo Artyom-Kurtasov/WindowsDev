@@ -5,8 +5,6 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using WindowsDev.Application.Identity.Cryptography;
-using WindowsDev.Application.Identity.Repositories;
-using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Infrastructure.JWT
@@ -14,14 +12,10 @@ namespace WindowsDev.Infrastructure.JWT
     internal class JwtService : IJwtService
     {
         private readonly JwtOptions _jwtOptions;
-        private readonly IUserRepository _userRepository;
-        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
-        public JwtService(IOptions<JwtOptions> jwtOptions, IUserRepository userRepository, IRefreshTokenRepository refreshTokenRepository)
+        public JwtService(IOptions<JwtOptions> jwtOptions)
         {
             _jwtOptions = jwtOptions.Value;
-            _userRepository = userRepository;
-            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public string GenerateToken(int id, string login, string username)
@@ -57,7 +51,8 @@ namespace WindowsDev.Infrastructure.JWT
             {
                 UserId = userId,
                 ExpiresAt = DateTime.UtcNow.AddDays(_jwtOptions.ExpirationRefreshTokenDays),
-                TokenHash = Convert.ToBase64String(RandomNumberGenerator.GetBytes(_jwtOptions.BytesSizeRefreshToken))
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(_jwtOptions.BytesSizeRefreshToken)),
+                IsRevoked = false
             };
         }
     }

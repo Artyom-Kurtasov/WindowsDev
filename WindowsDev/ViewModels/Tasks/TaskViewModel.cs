@@ -2,20 +2,21 @@ using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Input;
 using WindowsDev.ApiClient.AttachmentClient;
 using WindowsDev.ApiClient.CommentClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Api.Attachments;
-using WindowsDev.Contracts.Api.Comments;
-using WindowsDev.Contracts.Api.Projects;
-using WindowsDev.Contracts.Api.Tasks;
-using WindowsDev.Contracts.UI;
+using WindowsDev.Contracts.UI.Attachments;
+using WindowsDev.Contracts.UI.Comments;
+using WindowsDev.Contracts.UI.Projects;
+using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Interfaces;
@@ -32,12 +33,14 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     private readonly IAttachmentApiClient _attachmentApiClient;
     private readonly ICommentApiClient _commentApiClient;
     private readonly ILogger<TaskViewModel> _logger;
+    private readonly HashSet<string> _openedAttachments = new(StringComparer.OrdinalIgnoreCase);
+    private readonly AsyncRelayCommandT<string> _openAttachmentCommand;
 
     private bool disposedValue;
 
     public TaskViewModel(
-        GetProjectsResponse project,
-        GetTasksResponse currentTask,
+        ProjectInfo project,
+        TaskInfo currentTask,
         ICommentApiClient commentApiClient,
         IDialogService dialogService,
         INavigationService navigationService,
@@ -63,7 +66,8 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         EditTaskCommand = new AsyncRelayCommand(EditTask);
         SwitchToProjectCommand = new RelayCommand(SwitchToProject);
         AddAttachmentCommand = new AsyncRelayCommand(AddAttachment);
-        OpenAttachmentCommand = new AsyncRelayCommandT<string>(OpenAttachment);
+        _openAttachmentCommand = new AsyncRelayCommandT<string>(OpenAttachment, CanOpenAttachment);
+        OpenAttachmentCommand = _openAttachmentCommand;
 
         _ = LoadDetailsAsync();
     }
@@ -74,10 +78,10 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     public ICommand AddAttachmentCommand { get; }
     public ICommand OpenAttachmentCommand { get; }
 
-    public GetProjectsResponse? Project { get; private set; }
+    public ProjectInfo? Project { get; private set; }
 
-    private GetTasksResponse? _currentTask;
-    public GetTasksResponse? CurrentTask
+    private TaskInfo? _currentTask;
+    public TaskInfo? CurrentTask
     {
         get => _currentTask;
         set
@@ -90,9 +94,9 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         }
     }
 
-    public ObservableCollection<GetCommentResponse>? Comments { get; private set; } = new();
+    public ObservableCollection<CommentInfo>? Comments { get; private set; } = new();
 
-    public ObservableCollection<AttachmentInfo>? Attachments { get; private set; } = new();
+    public ObservableCollection<FileItem>? Attachments { get; private set; } = new();
 
     private string? _newComment;
     public string? NewComment
@@ -237,16 +241,16 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         {
             Attachments!.Clear();
 
-            var attachments = await _attachmentApiClient.GetAttachmentsAsync(CurrentTask.Id);
+            var result = await _attachmentApiClient.GetFilesAsync(CancellationToken.None);
 
-            foreach (var item in attachments.Value)
+            if (!result.IsSuccess || result.Value is null)
             {
-                Attachments.Add(new(item.FileExtension,
-                    item.FilePath,
-                    item.FileName,
-                    item.FileSize,
-                    item.TaskId));
+                await ShowErrorAsync(TaskErrors.LoadAttachmentsFailed);
+                return;
             }
+
+            foreach (var item in result.Value)
+                Attachments.Add(item);
         }
         catch (Exception ex)
         {
@@ -256,22 +260,57 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         }
     }
 
-    private async Task OpenAttachment(string filePath)
+    private bool _isOpeningAttachment;
+
+    private bool CanOpenAttachment(string fileName)
     {
+        return !_isOpeningAttachment && !_openedAttachments.Contains(fileName);
+    }
+
+    private async Task OpenAttachment(string fileName)
+    {
+        if (!CanOpenAttachment(fileName))
+            return;
+
+        _isOpeningAttachment = true;
+        _openAttachmentCommand.RaiseCanExecuteChanged();
         try
         {
-            await _attachmentApiClient.OpenAttachmentAsync(filePath);
+            var result = await _attachmentApiClient.DownloadFileAsync(
+                fileName,
+                CancellationToken.None
+            );
+
+            if (!result.IsSuccess || result.Value is null)
+            {
+                await ShowErrorAsync(result.Error);
+                return;
+            }
+
+            var dto = result.Value;
+            var tempPath = Path.Combine(Path.GetTempPath(), dto.FileName);
+
+            await using (var fileStream = File.Create(tempPath))
+            {
+                await dto.Content.CopyToAsync(fileStream);
+            }
+            await dto.Content.DisposeAsync();
+
+            var process = Process.Start(new ProcessStartInfo(tempPath) { UseShellExecute = true });
+            if (process is null)
+                throw new InvalidOperationException("The attachment process could not be started.");
+
+            _openedAttachments.Add(fileName);
         }
         catch (Exception ex)
         {
-            //AttachmentLogs.AttachmentOpenFailed(
-            //    _logger,
-            //    attachment.Id.ToString(),
-            //    attachment.FilePath,
-            //    ex
-            //);
-
+            AttachmentLogs.AttachmentLoadFailed(_logger, fileName, ex);
             await ShowErrorAsync(TaskErrors.OpenAttachmentFailed);
+        }
+        finally
+        {
+            _isOpeningAttachment = false;
+            _openAttachmentCommand.RaiseCanExecuteChanged();
         }
     }
 
@@ -283,18 +322,26 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
 
             if (file != null)
             {
-                var result = await _attachmentApiClient.AddFileAsync(new(file,
-                    CurrentTask.Id));
+                await using var stream = File.OpenRead(file);
+
+                var result = await _attachmentApiClient.UploadFileAsync(
+                    new UploadFileForm(
+                        Path.GetFileName(file),
+                        "application/octet-stream",
+                        stream
+                    ),
+                    CancellationToken.None
+                );
 
                 if (result.IsSuccess)
                 {
-                    Attachments!.Add(result.Value);
+                    await LoadAttachmentsAsync();
                     return;
                 }
 
                 AttachmentLogs.AttachmentUploadFailed(
                     _logger,
-                    "unknown",
+                    Path.GetFileName(file),
                     0,
                     new InvalidOperationException(result.Error)
                 );
@@ -318,24 +365,17 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         try
         {
             var result = await _commentApiClient.AddCommentAsync(
-                new AddCommentRequest { TaskId = CurrentTask!.Id, Text = NewComment },
+                new AddCommentForm(CurrentTask!.Id, NewComment),
                 CancellationToken.None
             );
 
             if (result.IsSuccess && result.Value is not null)
             {
-                Comments!.Add(
-                    new GetCommentResponse
-                    {
-                        Id = result.Value.Id,
-                        Text = result.Value.Text,
-                        CreatedAt = result.Value.CreatedAt,
-                        Author = result.Value.Author,
-                        TaskId = result.Value.TaskId,
-                    }
-                );
+                Comments!.Add(result.Value);
                 NewComment = string.Empty;
             }
+
+            await LoadCommentsAsync();
         }
         catch (Exception ex)
         {
@@ -348,6 +388,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
     private async Task EditTask()
     {
         await _dialogService.ShowDialogAsync<TaskDialogView, EditTaskViewModel>(CurrentTask!);
+        RefreshTask();
     }
 
     private void SwitchToProject()
@@ -391,6 +432,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
             {
                 Comments = null;
                 Attachments = null;
+                _openedAttachments.Clear();
                 _currentTask = null;
                 Project = null;
             }

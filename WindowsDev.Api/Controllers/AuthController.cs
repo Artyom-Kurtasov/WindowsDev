@@ -2,10 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.Logging;
 using WindowsDev.Api.ProblemDetails;
+using WindowsDev.Api.Urls;
 using WindowsDev.Application.Identity.Authentication;
-using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Identity.Registration;
 using WindowsDev.Contracts.Api.Identity;
+using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
 
@@ -16,25 +17,22 @@ namespace WindowsDev.Api.Controllers;
 [ApiController]
 public class AuthController : ApiControllerBase
 {
-    private readonly IJwtService _jwtService;
     private readonly IAuthentication _authentication;
     private readonly IRegistration _registration;
     private readonly ILogger<AuthController> _logger;
 
     public AuthController(
         IAuthentication authentication,
-        IRegistration regitration,
-        ILogger<AuthController> logger,
-        IJwtService jwtService
+        IRegistration registration,
+        ILogger<AuthController> logger
     )
     {
         _authentication = authentication;
-        _registration = regitration;
+        _registration = registration;
         _logger = logger;
-        _jwtService = jwtService;
     }
 
-    [HttpPost("register")]
+    [HttpPost(AuthUrls.Register)]
     public async Task<ActionResult<UserRegisterResponse>> RegisterAsync(UserRegisterRequest request)
     {
         var result = await _registration.Register(
@@ -53,7 +51,8 @@ public class AuthController : ApiControllerBase
                         StatusCodes.Status409Conflict,
                         AuthProblemDetails.LoginConflict,
                         AuthProblemDetails.LoginConflictDetail(request.Login),
-                        AuthDialogWarnings.LoginTaken);
+                        AuthDialogWarnings.LoginTaken
+                    );
 
                 case AuthDialogWarnings.UsernameTaken:
                     AuthControllerLogs.UsernameAlreadyExist(_logger, request.Username);
@@ -61,7 +60,8 @@ public class AuthController : ApiControllerBase
                         StatusCodes.Status409Conflict,
                         AuthProblemDetails.UsernameConflict,
                         AuthProblemDetails.UsernameConflictDetail(request.Username),
-                        AuthDialogWarnings.UsernameTaken);
+                        AuthDialogWarnings.UsernameTaken
+                    );
 
                 default:
                     AuthControllerLogs.RegistrationError(_logger, request.Login);
@@ -69,12 +69,14 @@ public class AuthController : ApiControllerBase
             }
         }
 
-        var response = new UserRegisterResponse { RecoveryCode = result.Value };
+        (int RecoveryCode, string JwtToken, UserRefreshToken RefreshToken) = result.Value;
+
+        var response = new UserRegisterResponse(RecoveryCode, JwtToken, RefreshToken);
         AuthControllerLogs.RegistrationSuccess(_logger, request.Login);
-        return Created(string.Empty, response);
+        return Ok(response);
     }
 
-    [HttpPost("login")]
+    [HttpPost(AuthUrls.Login)]
     public async Task<ActionResult<UserLoginResponse>> LoginAsync(UserLoginRequest request)
     {
         var result = await _authentication.Authenticate(request.Login, request.Password);
@@ -90,16 +92,67 @@ public class AuthController : ApiControllerBase
                         StatusCodes.Status401Unauthorized,
                         AuthProblemDetails.InvalidCredentials,
                         AuthProblemDetails.InvalidCredentialsDetail,
-                        AuthErrors.InvalidCredentials);
+                        result.Error
+                    );
 
                 default:
                     return StatusCode(StatusCodes.Status500InternalServerError);
             }
         }
 
-        var response = new UserLoginResponse { JwtToken = result.Value };
+        var response = new UserLoginResponse
+        {
+            AccessToken = result.Value.Item1,
+            RefreshToken = result.Value.Item2,
+        };
 
         AuthControllerLogs.LoginSuccess(_logger, request.Login);
         return Ok(response);
     }
+
+    [HttpPost(AuthUrls.RefreshToken)]
+    public async Task<ActionResult<UserLoginResponse>> RefreshAsync(RefreshTokenRequest request)
+    {
+        var result = await _authentication.RefreshAsync(request.RefreshToken);
+
+        if (result.IsFailure)
+        {
+            AuthControllerLogs.RefreshFailed(_logger);
+            return CustomProblem(
+                StatusCodes.Status401Unauthorized,
+                AuthProblemDetails.RefreshTokenInvalid,
+                AuthProblemDetails.RefreshTokenInvalidDetail,
+                result.Error
+                );
+        }
+
+        AuthControllerLogs.RefreshSuccess(_logger, request.RefreshToken.Id);
+        return Ok(
+            new UserLoginResponse
+            {
+                AccessToken = result.Value.Item1,
+                RefreshToken = result.Value.Item2,
+            }
+        );
+    }
+
+    [HttpPost(AuthUrls.IsUsernameAvailable)]
+    public async Task<ActionResult<IsUsernameAvailableResponse>> IsUsernameAvailableAsync(
+        IsUsernameAvailableRequest request
+    ) =>
+        Ok(
+            new IsUsernameAvailableResponse(
+                await _registration.IsUsernameAvailableAsync(request.Username)
+            )
+        );
+
+    [HttpPost(AuthUrls.IsLoginAvailable)]
+    public async Task<ActionResult<IsLoginAvailableResponse>> IsLoginAvailableAsync(
+        IsLoginAvailableRequest request
+    ) =>
+        Ok(
+            new IsLoginAvailableResponse(
+                await _registration.IsLoginAvailableAsync(request.Login)
+            )
+        );
 }

@@ -1,4 +1,4 @@
-using WindowsDev.Logging.Api;
+using WindowsDev.Api.Logging.EventId;
 
 namespace WindowsDev.Api.Logging;
 

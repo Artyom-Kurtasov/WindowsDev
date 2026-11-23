@@ -1,8 +1,9 @@
-using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.ProfileClient;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Users;
+using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Main.Tabs;
 
@@ -12,9 +13,9 @@ internal class TestProfileViewModel : ProfileViewModel
 {
     public TestProfileViewModel()
         : base(
-            Mock.Of<ICurrentUserService>(),
-            Mock.Of<IProfileService>(),
-            Mock.Of<IDialogCoordinator>(),
+            Mock.Of<ISecureTokenStorage>(),
+            Mock.Of<IProfileApiClient>(),
+            Mock.Of<IDialogService>(),
             Mock.Of<INavigationService>(),
             Mock.Of<ILogger<ProfileViewModel>>(),
             Mock.Of<ILanguageChanger>()

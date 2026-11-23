@@ -1,30 +1,30 @@
 ﻿using WindowsDev.Application.Primitives;
-using WindowsDev.Contracts.Api.Projects;
+using WindowsDev.Contracts.UI.Projects;
 
 namespace WindowsDev.ApiClient.ProjectsClient;
 
 public interface IProjectsApiClient
 {
-    Task<Result<AddProjectResponse>> AddAsync(
-        AddProjectRequest request,
+    Task<Result<ProjectInfo>> AddAsync(
+        ProjectForm request,
         CancellationToken cancellationToken = default
     );
     Task<Result<bool>> DeleteAsync(int id, CancellationToken cancellationToken = default);
-    Task<Result<UpdateProjectResponse>> UpdateAsync(
+    Task<Result<UpdateProjectInfo>> UpdateAsync(
         int id,
-        UpdateProjectRequest request,
+        UpdateProjectForm request,
         CancellationToken cancellationToken = default
     );
-    Task<Result<List<GetProjectsResponse>>> GetProjectsAsync(
+    Task<Result<List<ProjectInfo>>> GetProjectsAsync(
         int page,
         int pageSize,
         string? searchFilter = "",
         CancellationToken cancellationToken = default
     );
-    Task<Result<GetProjectsCountResponse>> GetCountAsync(
+    Task<Result<int>> GetCountAsync(
         CancellationToken cancellationToken = default
     );
-    Task<Result<GetProjectsResponse>> GetByIdAsync(
+    Task<Result<ProjectInfo>> GetByIdAsync(
         int id,
         CancellationToken cancellationToken = default
     );

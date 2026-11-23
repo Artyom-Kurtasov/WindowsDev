@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using WindowsDev.Application.Common.Localization;
+using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 
 namespace WindowsDev.Services.LanguageChanger;
 
@@ -24,7 +25,15 @@ internal class LanguageChanger : ILanguageChanger
 
     public string Translate(string key)
     {
-        return App.Current?.TryFindResource(key) as string ?? $"[{key}]";
+        if (!string.IsNullOrWhiteSpace(key))
+        {
+            var translation = App.Current?.TryFindResource(key) as string;
+            if (!string.IsNullOrWhiteSpace(translation))
+                return translation;
+        }
+
+        return App.Current?.TryFindResource(CommonErrors.UnexpectedError) as string
+            ?? "An unexpected error occurred.";
     }
 
     private ResourceDictionary? LoadDictionary(string languageCode)

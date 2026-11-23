@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.Logging;
+using WindowsDev.Api.ProblemDetails;
+using WindowsDev.Api.Urls;
 using WindowsDev.Application.Identity;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Users;
@@ -32,7 +34,7 @@ public class ProfilesController : ApiControllerBase
     }
 
     [Authorize]
-    [HttpPost("changePassword")]
+    [HttpPost(ProfileUrls.ChangePassword)]
     public async Task<ActionResult<ChangePasswordResponse>> ChangePasswordAsync(
         ChangePasswordRequest request
     )
@@ -50,33 +52,38 @@ public class ProfilesController : ApiControllerBase
             {
                 ProfileErrors.NewPasswordSameAsCurrent => CustomProblem(
                     StatusCodes.Status409Conflict,
-                    "Password Conflict",
-                    "The new password cannot be identical to the current one.",
+                    ProfileProblemDetails.ChangePasswordConflict,
+                    ProfileProblemDetails.ChangePasswordConflictDetail(_userSession.Login),
                     result.Error
                 ),
 
                 ProfileErrors.PasswordsDontMatch => CustomProblem(
                     StatusCodes.Status409Conflict,
-                    "Password Conflict",
-                    "The password and confirmation password do not match.",
+                    ProfileProblemDetails.ChangePasswordMismatch,
+                    ProfileProblemDetails.ChangePasswordMismatchDetail(_userSession.Login),
                     result.Error
                 ),
 
                 CommonErrors.UserNotFound => CustomProblem(
                     StatusCodes.Status404NotFound,
-                    "User Not Found",
-                    "The requested user profile was not found.",
+                    ProfileProblemDetails.UserNotFound,
+                    ProfileProblemDetails.UserNotFoundDetail(_userSession.Login),
                     result.Error
                 ),
 
                 ProfileErrors.InvalidCurrentPassword => CustomProblem(
                     StatusCodes.Status400BadRequest,
-                    "Invalid Current Password",
-                    "The current password you entered is incorrect.",
+                    ProfileProblemDetails.InvalidCurrentPassword,
+                    ProfileProblemDetails.InvalidCurrentPasswordDetail(_userSession.Login),
                     result.Error
                 ),
 
-                _ => throw new NotImplementedException(),
+                _ => CustomProblem(
+                    StatusCodes.Status500InternalServerError,
+                    ProfileProblemDetails.UnexpectedError,
+                    ProfileProblemDetails.UnexpectedErrorDetail(_userSession.Login),
+                    result.Error
+                ),
             };
         }
 
@@ -84,7 +91,7 @@ public class ProfilesController : ApiControllerBase
         var recoveryCode = result.Value.Item1;
         var response = new ChangePasswordResponse
         {
-            JwtToken = jwtToken,
+            Token = jwtToken,
             RecoveryCode = recoveryCode,
         };
 
@@ -93,7 +100,7 @@ public class ProfilesController : ApiControllerBase
     }
 
     [Authorize]
-    [HttpPost("changeUsername")]
+    [HttpPost(ProfileUrls.ChangeUsername)]
     public async Task<ActionResult<ChangeUsernameResponse>> ChangeUsernameAsync(
         ChangeUsernameRequest request
     )
@@ -110,26 +117,31 @@ public class ProfilesController : ApiControllerBase
             {
                 ProfileErrors.NewUsernameSameAsCurrent => CustomProblem(
                     StatusCodes.Status409Conflict,
-                    "Username Conflict",
-                    "The new username cannot be identical to the current one.",
+                    ProfileProblemDetails.ChangeUsernameConflict,
+                    ProfileProblemDetails.ChangeUsernameSameAsCurrentDetail(_userSession.Login),
                     result.Error
                 ),
 
-                ProfileErrors.UsernamAlreadyTaken => CustomProblem(
+                ProfileErrors.UsernameAlreadyTaken => CustomProblem(
                     StatusCodes.Status409Conflict,
-                    "Username Conflict",
-                    "The new username is already taken.",
+                    ProfileProblemDetails.ChangeUsernameConflict,
+                    ProfileProblemDetails.ChangeUsernameConflictDetail(_userSession.Login),
                     result.Error
                 ),
 
                 CommonErrors.UserNotFound => CustomProblem(
                     StatusCodes.Status404NotFound,
-                    "User Not Found",
-                    "The requested user profile was not found.",
+                    ProfileProblemDetails.UserNotFound,
+                    ProfileProblemDetails.UserNotFoundDetail(_userSession.Login),
                     result.Error
                 ),
 
-                _ => throw new NotImplementedException(),
+                _ => CustomProblem(
+                    StatusCodes.Status500InternalServerError,
+                    ProfileProblemDetails.UnexpectedError,
+                    ProfileProblemDetails.UnexpectedErrorDetail(_userSession.Login),
+                    result.Error
+                ),
             };
         }
 

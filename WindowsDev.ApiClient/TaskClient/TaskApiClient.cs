@@ -1,55 +1,63 @@
-﻿using System.Net.Http.Json;
+﻿using AutoMapper;
+using Microsoft.Extensions.Logging;
+using System.Net.Http.Json;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Common;
 using WindowsDev.Contracts.Api.Tasks;
+using WindowsDev.Contracts.UI.Tasks;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ApiClient.TaskClient;
 
-public class TaskApiClient : ITaskApiClient
+public class TaskApiClient : ApiClientBase, ITaskApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly ISecureTokenStorage _tokenStorage;
+    private readonly ILogger<TaskApiClient> _logger;
+    private readonly IMapper _mapper;
 
-    public TaskApiClient(HttpClient httpClient, ISecureTokenStorage secureTokenStorage)
+    public TaskApiClient(HttpClient httpClient, ISecureTokenStorage tokenStorage, IMapper mapper, ILogger<TaskApiClient> logger)
+        : base(httpClient, tokenStorage)
     {
-        _httpClient = httpClient;
-        _tokenStorage = secureTokenStorage;
+        _mapper = mapper;
+        _logger = logger;
     }
 
-    public async Task<AddTaskResponse> AddAsync(
-        AddTaskRequest request,
+    public async Task<Result<TaskInfo>> AddAsync(
+        TaskForm request,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
+        var apiRequest = _mapper.Map<AddTaskRequest>(request);
         using var response = await _httpClient.PostAsJsonAsync(
             "api/tasks",
-            request,
+            apiRequest,
             cancellationToken
         );
 
         var result = await response.Content.ReadFromJsonAsync<AddTaskResponse>(
             cancellationToken: cancellationToken
         );
-        return result;
+
+        var taskInfo = _mapper.Map<TaskInfo>(result);
+        return Result<TaskInfo>.Success(taskInfo);
     }
 
     public async Task<Result<bool>> DeleteAsync(int id, CancellationToken cancellationToken)
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         using var response = await _httpClient.DeleteAsync($"api/tasks/{id}", cancellationToken);
         return Result<bool>.Success(true);
     }
 
-    public async Task<Result<UpdateTaskResponse>> UpdateAsync(
+    public async Task<Result<UpdateTaskInfo>> UpdateAsync(
         int id,
-        UpdateTaskRequest request,
+        UpdateTaskForm form,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
+        var request = _mapper.Map<UpdateTaskRequest>(form);
         using var response = await _httpClient.PatchAsJsonAsync(
             $"api/tasks/{id}",
             request,
@@ -61,15 +69,18 @@ public class TaskApiClient : ITaskApiClient
             var result = await response.Content.ReadFromJsonAsync<UpdateTaskResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<UpdateTaskResponse>.Success(result);
+
+            var info = _mapper.Map<UpdateTaskInfo>(result);
+            return Result<UpdateTaskInfo>.Success(info);
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<UpdateTaskResponse>.Failure(errorCode);
+
+        return Result<UpdateTaskInfo>.Failure(errorCode);
     }
 
-    public async Task<Result<List<GetTasksResponse>>> GetTasksAsync(
+    public async Task<Result<List<TaskInfo>>> GetTasksAsync(
         int projectId,
         string? seacrh,
         int page,
@@ -78,7 +89,7 @@ public class TaskApiClient : ITaskApiClient
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         var statusParams = string.Join("", statuses.Select(s => $"&statuses={(int)s}"));
 
         using var response = await _httpClient.GetAsync(
@@ -87,28 +98,29 @@ public class TaskApiClient : ITaskApiClient
         var result = await response.Content.ReadFromJsonAsync<List<GetTasksResponse>>(
             cancellationToken: cancellationToken
         );
-        return Result<List<GetTasksResponse>>.Success(result);
+
+        var info = _mapper.Map<List<TaskInfo>>(result);
+        return Result<List<TaskInfo>>.Success(info);
     }
 
-    public async Task<Result<GetTasksCountResponse>> GetTasksCountAsync(
+    public async Task<Result<int>> GetTasksCountAsync(
         int projectId,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         var response = await _httpClient.GetAsync($"api/tasks/count?projectId={projectId}");
+
         var result = await response.Content.ReadFromJsonAsync<GetTasksCountResponse>(
             cancellationToken: cancellationToken
         );
-        return Result<GetTasksCountResponse>.Success(result);
+
+        return Result<int>.Success(result.TotalCount);
     }
 
-    public async Task<Result<GetTaskByIdResponse>> GetTaskAsync(
-        int id,
-        CancellationToken cancellationToken
-    )
+    public async Task<Result<TaskInfo>> GetTaskAsync(int id, CancellationToken cancellationToken)
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
         var response = await _httpClient.GetAsync($"api/tasks/{id}", cancellationToken);
 
         if (response.IsSuccessStatusCode)
@@ -116,24 +128,15 @@ public class TaskApiClient : ITaskApiClient
             var result = await response.Content.ReadFromJsonAsync<GetTaskByIdResponse>(
                 cancellationToken: cancellationToken
             );
-            return Result<GetTaskByIdResponse>.Success(result);
+
+            var info = _mapper.Map<TaskInfo>(result);
+            return Result<TaskInfo>.Success(info);
         }
 
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
             cancellationToken: cancellationToken
         );
         var error = problem?.GetErrorCode() ?? string.Empty;
-        return Result<GetTaskByIdResponse>.Failure(error);
-    }
-
-    private void AppendAuthorizationHeader()
-    {
-        _httpClient.DefaultRequestHeaders.Authorization = null;
-
-        if (_tokenStorage.IsAuthenticated)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenStorage.AccessToken);
-        }
+        return Result<TaskInfo>.Failure(error);
     }
 }

@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using WindowsDev.Application.Common.Events;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.PasswordRecovery;
@@ -29,7 +30,6 @@ public static class ApplicationRegistration
         // Tasks
         services.AddTransient<ITaskService, TaskService>();
         services.AddTransient<ICommentService, CommentsService>();
-        services.AddTransient<IAttachmentService, AttachmentService>();
 
         // Profile
         services.AddTransient<IProfileService, ProfileService>();

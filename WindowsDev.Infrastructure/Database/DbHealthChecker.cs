@@ -110,8 +110,9 @@ internal class DbHealthChecker : IDbHealthChecker
             {
                 rt.Id,
                 rt.UserId,
-                rt.TokenHash,
-                rt.ExpiresAt
+                rt.Token,
+                rt.ExpiresAt,
+                rt.IsRevoked
             }).
         FirstOrDefault();
     }

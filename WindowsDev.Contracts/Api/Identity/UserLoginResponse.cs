@@ -1,9 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Contracts.Api.Identity;
 
 public class UserLoginResponse
 {
-    [Required]
-    public string JwtToken { get; set; } = string.Empty;
+    public string AccessToken { get; set; } = string.Empty;
+    public UserRefreshToken RefreshToken { get; set; }
 }

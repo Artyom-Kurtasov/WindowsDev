@@ -10,6 +10,10 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="16.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.11" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.10" />
+	  <PackageReference Include="Serilog" Version="4.4.0" />
+	  <PackageReference Include="Serilog.Extensions.Logging" Version="10.0.0" />
+	  <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -17,7 +21,10 @@
 	  <ProjectReference Include="..\WindowsDev.Domain\WindowsDev.Domain.csproj" />
 	  <ProjectReference Include="..\WindowsDev.Application\WindowsDev.Application.csproj" />
 	  <ProjectReference Include="..\WindowsDev.Infrastructure\WindowsDev.Infrastructure.csproj" />
-	  <ProjectReference Include="..\WindowsDev.Logging\WindowsDev.Logging.csproj" />
   </ItemGroup>
+	
+<ItemGroup>
+	<InternalsVisibleTo Include="WindowsDev.Tests" />
+</ItemGroup>
 
 </Project>

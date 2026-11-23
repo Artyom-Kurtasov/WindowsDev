@@ -1,24 +1,24 @@
 ﻿using WindowsDev.Application.Primitives;
-using WindowsDev.Contracts.Api.Tasks;
+using WindowsDev.Contracts.UI.Tasks;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ApiClient.TaskClient;
 
 public interface ITaskApiClient
 {
-    Task<AddTaskResponse> AddAsync(
-        AddTaskRequest request,
+    Task<Result<TaskInfo>> AddAsync(
+        TaskForm request,
         CancellationToken cancellationToken = default
     );
 
     Task<Result<bool>> DeleteAsync(int id, CancellationToken cancellationToken = default);
-    Task<Result<UpdateTaskResponse>> UpdateAsync(
+    Task<Result<UpdateTaskInfo>> UpdateAsync(
         int id,
-        UpdateTaskRequest request,
+        UpdateTaskForm request,
         CancellationToken cancellationToken = default
     );
 
-    Task<Result<List<GetTasksResponse>>> GetTasksAsync(
+    Task<Result<List<TaskInfo>>> GetTasksAsync(
         int projectId,
         string? seacrh,
         int page,
@@ -27,12 +27,12 @@ public interface ITaskApiClient
         CancellationToken cancellationToken = default
     );
 
-    Task<Result<GetTasksCountResponse>> GetTasksCountAsync(
+    Task<Result<int>> GetTasksCountAsync(
         int projectId,
         CancellationToken cancellationToken = default
     );
 
-    Task<Result<GetTaskByIdResponse>> GetTaskAsync(
+    Task<Result<TaskInfo>> GetTaskAsync(
         int id,
         CancellationToken cancellationToken = default
     );

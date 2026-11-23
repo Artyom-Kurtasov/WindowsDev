@@ -1,18 +1,19 @@
 using Microsoft.Extensions.Logging;
 using System.Windows.Input;
+using WindowsDev.ApiClient.AuthClient;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.Identity;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization.Dialogs;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Registration;
 using WindowsDev.Views.Authorization.Dialogs;
-using WindowsDev.ApiClient.AuthClient;
-using WindowsDev.Infrastructure.Logging;
-using WindowsDev.Application.Common.Localization;
 
 
 namespace WindowsDev.ViewModels.Authorization;
@@ -112,7 +113,7 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
 
         try
         {
-            var result = await _authApiClient.LoginAsync(new(Login, Password));
+            var result = await _authApiClient.LoginAsync(new LoginForm(Login, Password));
 
             if (result.IsFailure)
             {
@@ -120,7 +121,8 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
                 return;
             }
 
-            _tokenStorage.AccessToken = result.Value.Token;
+            _tokenStorage.AccessToken = result.Value.AccessToken;
+            _tokenStorage.RefreshToken = result.Value.RefreshToken;
             await _navigationService.NavigateTo<MainWindowViewModel>();
         }
         catch (Exception ex)
@@ -136,10 +138,12 @@ internal class AuthorizationViewModel : LocalizedViewModelBase
 
     private async Task PasswordRecoveryAsync()
     {
+        var recoveryData = new PasswordRecoveryData();
+
         await _dialogService.ShowDialogAsync<
             RecoveryCodeDialogView,
             RecoveryCodeDialogViewModel
-        >(this);
+        >(recoveryData);
     }
 
 }

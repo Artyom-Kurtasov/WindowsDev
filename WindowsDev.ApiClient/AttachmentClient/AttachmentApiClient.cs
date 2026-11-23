@@ -1,120 +1,118 @@
-﻿using AutoMapper;
+﻿using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using AutoMapper;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Attachments;
 using WindowsDev.Contracts.Api.Common;
-using WindowsDev.Contracts.UI.Tasks;
+using WindowsDev.Contracts.UI.Attachments;
 
 namespace WindowsDev.ApiClient.AttachmentClient;
 
-public class AttachmentApiClient : IAttachmentApiClient
+public class AttachmentApiClient : ApiClientBase, IAttachmentApiClient
 {
-    private readonly HttpClient _httpClient;
-    private readonly ISecureTokenStorage _tokenStorage;
     private readonly IMapper _mapper;
 
-    public AttachmentApiClient(HttpClient httpClient, ISecureTokenStorage tokenStorage, IMapper mapper)
+    public AttachmentApiClient(
+        HttpClient httpClient,
+        ISecureTokenStorage tokenStorage,
+        IMapper mapper
+    )
+        : base(httpClient, tokenStorage)
     {
-        _httpClient = httpClient;
-        _tokenStorage = tokenStorage;
         _mapper = mapper;
     }
 
-    public async Task<Result<AttachmentInfo>> AddFileAsync(
-        AttachmentForm request,
+    public async Task<Result<string>> UploadFileAsync(
+        UploadFileForm request,
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
 
-        var attachment = _mapper.Map<AddAttachmentRequest>(request);
-        using var response = await _httpClient.PostAsJsonAsync(
+        using var multipart = new MultipartFormDataContent();
+        var fileContent = new StreamContent(request.Content);
+        fileContent.Headers.ContentType = new MediaTypeHeaderValue(request.ContentType);
+        multipart.Add(fileContent, "file", request.FileName);
+
+        using var response = await _httpClient.PostAsync(
             "api/attachments",
-            attachment,
+            multipart,
             cancellationToken
         );
 
         if (response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadFromJsonAsync<AddAttachmentResponse>(
+            var payload = await response.Content.ReadFromJsonAsync<UploadFileResponse>(
                 cancellationToken: cancellationToken
             );
 
-            var attachmentInfo = _mapper.Map<AttachmentInfo>(result);
-            return Result<AttachmentInfo>.Success(attachmentInfo);
+            return Result<string>.Success(payload?.FileName ?? string.Empty);
         }
-        
+
         var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
         var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<AttachmentInfo>.Failure(errorCode);
+        return Result<string>.Failure(errorCode);
     }
 
-    public async Task<Result<List<AttachmentInfo>>> GetAttachmentsAsync(
-        int taskId,
+    public async Task<Result<List<FileItem>>> GetFilesAsync(
         CancellationToken cancellationToken = default
     )
     {
-        AppendAuthorizationHeader();
-        using var response = await _httpClient.GetAsync(
-            $"api/attachments/task/{taskId}",
-            cancellationToken
-        );
+        await AppendAuthorizationHeaderAsync(cancellationToken);
 
-        var result = await response.Content.ReadFromJsonAsync<List<GetAttachmentResponse>>(
+        using var response = await _httpClient.GetAsync("api/attachments", cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
+                cancellationToken
+            );
+            var errorCode = problem?.GetErrorCode() ?? string.Empty;
+            return Result<List<FileItem>>.Failure(errorCode);
+        }
+
+        var files = await response.Content.ReadFromJsonAsync<List<FileListItemResponse>>(
             cancellationToken: cancellationToken
         );
 
-        var attachmentsInfo = _mapper.Map<List<AttachmentInfo>>(result);
-        return Result<List<AttachmentInfo>>.Success(attachmentsInfo);
+        var result = _mapper.Map<List<FileItem>>(files ?? []);
+        return Result<List<FileItem>>.Success(result);
     }
 
-    public async Task OpenAttachmentAsync(
-        string filePath,
-        CancellationToken cancellationToken = default
-    )
+    public async Task<Result<FileDownloadInfo>> DownloadFileAsync(
+    string fileName,
+    CancellationToken cancellationToken = default
+)
     {
-        AppendAuthorizationHeader();
+        await AppendAuthorizationHeaderAsync(cancellationToken);
+
+        var url = $"api/attachments/download?fileName={Uri.EscapeDataString(fileName)}";
+
         using var response = await _httpClient.GetAsync(
-            $"api/attachments/open?filePath={filePath}",
+            url,
+            HttpCompletionOption.ResponseHeadersRead,
             cancellationToken
         );
-        return;
-    }
 
-    public async Task<Result<AttachmentInfo>> GetAttachmentAsync(
-        int id,
-        CancellationToken cancellationToken = default
-    )
-    {
-        AppendAuthorizationHeader();
-        using var response = await _httpClient.GetAsync(
-            $"api/attachments/{id}",
-            cancellationToken);
-
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
-            var result = await response.Content.ReadFromJsonAsync<GetAttachmentResponse>(
-                cancellationToken: cancellationToken
+            var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(
+                cancellationToken
             );
-
-            var attachmentInfo = _mapper.Map<AttachmentInfo>(result);
-            return Result<AttachmentInfo>.Success(attachmentInfo);
+            var errorCode = problem?.GetErrorCode() ?? string.Empty;
+            return Result<FileDownloadInfo>.Failure(errorCode);
         }
 
-        var problem = await response.Content.ReadFromJsonAsync<ProblemDetails>(cancellationToken);
-        var errorCode = problem?.GetErrorCode() ?? string.Empty;
-        return Result<AttachmentInfo>.Failure(errorCode);
+        var contentType =
+            response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream";
+
+        var memoryStream = new MemoryStream();
+        await response.Content.CopyToAsync(memoryStream, cancellationToken);
+        memoryStream.Position = 0;
+
+        var result = new FileDownloadInfo(memoryStream, contentType, fileName);
+        return Result<FileDownloadInfo>.Success(result);
     }
 
-    private void AppendAuthorizationHeader()
-    {
-        _httpClient.DefaultRequestHeaders.Authorization = null;
-
-        if (_tokenStorage.IsAuthenticated)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _tokenStorage.AccessToken);
-        }
-    }
 }

@@ -1,27 +1,26 @@
+using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Factories;
+using WindowsDev.ViewModels.Authorization.Dialogs;
 using WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
 namespace WindowsDev.ViewModels.Auth.Dialogs.Factories;
 
 internal class RecoveryStepsFactory : IRecoveryStepsFactory
 {
-    private readonly FirstStepViewModel _firstStepViewModel;
-    private readonly SecondStepViewModel _secondStepViewModel;
-    private readonly ThirdStepViewModel _thirdStepViewModel;
+    private readonly IServiceProvider _serviceProvider;
 
-    public RecoveryStepsFactory(
-        FirstStepViewModel firstStepViewModel,
-        SecondStepViewModel secondStepViewModel,
-        ThirdStepViewModel thirdStepViewModel
-    )
+    public RecoveryStepsFactory(IServiceProvider serviceProvider)
     {
-        _firstStepViewModel = firstStepViewModel;
-        _secondStepViewModel = secondStepViewModel;
-        _thirdStepViewModel = thirdStepViewModel;
+        _serviceProvider = serviceProvider;
     }
 
-    public IReadOnlyList<object> CreateSteps()
+    public IReadOnlyList<object> CreateSteps(PasswordRecoveryData recoveryData)
     {
-        return [_firstStepViewModel, _secondStepViewModel, _thirdStepViewModel];
+        return
+        [
+            ActivatorUtilities.CreateInstance<FirstStepViewModel>(_serviceProvider, recoveryData),
+            ActivatorUtilities.CreateInstance<SecondStepViewModel>(_serviceProvider, recoveryData),
+            ActivatorUtilities.CreateInstance<ThirdStepViewModel>(_serviceProvider, recoveryData),
+        ];
     }
 }

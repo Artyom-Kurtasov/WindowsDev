@@ -4,11 +4,11 @@ using System.Windows.Input;
 using WindowsDev.ApiClient.ProjectsClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Projects;
+using WindowsDev.Contracts.UI.Projects;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Projects.Dialogs;
@@ -87,11 +87,7 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
         try
         {
             await _projectsApiClient.AddAsync(
-                new AddProjectRequest
-                {
-                    Name = ProjectName,
-                    Description = ProjectDescription
-                }
+                new ProjectForm(ProjectName, ProjectDescription)
             );
 
             if (Completed != null)

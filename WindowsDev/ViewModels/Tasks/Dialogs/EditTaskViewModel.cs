@@ -1,15 +1,13 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.Windows.Input;
 using WindowsDev.ApiClient.TaskClient;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
-using WindowsDev.Contracts.Api.Tasks;
-using WindowsDev.Contracts.Tasks;
+using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs;
@@ -18,10 +16,10 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 {
     private readonly ITaskApiClient _apiClient;
     private readonly ILogger<EditTaskViewModel> _logger;
-    private readonly GetTasksResponse _currentTask;
+    private readonly TaskInfo _currentTask;
 
     public EditTaskViewModel(
-        GetTasksResponse currentTask,
+        TaskInfo currentTask,
         ITaskApiClient apiClient,
         IDialogService dialogService,
         ILogger<EditTaskViewModel> logger,
@@ -33,13 +31,13 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         _logger = logger;
         _apiClient = apiClient;
 
-        EditTaskCommand = new AsyncRelayCommand(EditTaskAsync);
+        SubmitCommand = new AsyncRelayCommand(EditTaskAsync);
         CancelCommand = new AsyncRelayCommand(CloseAsync);
 
         SetEditDialog();
     }
 
-    public ICommand EditTaskCommand { get; }
+    public override ICommand SubmitCommand { get; }
     public ICommand CancelCommand { get; }
 
     public event Func<Task>? CloseRequested;
@@ -57,17 +55,15 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
         {
             UpdateTask();
 
-            var taskToUpdate = new UpdateTaskRequest
-            {
-                Name = _currentTask.Name,
-                Description = _currentTask.Description,
-                Deadline = _currentTask.Deadline,
-                Priority = _currentTask.Priority,
-                Status = _currentTask.Status,
-                Progress = _currentTask.Progress,
-            };
+            var taskToUpdate = new UpdateTaskForm(
+                Progress: _currentTask.Progress,
+                Name: _currentTask.Name,
+                Description: _currentTask.Description,
+                Priority: _currentTask.Priority,
+                Status: _currentTask.Status,
+                Deadline: _currentTask.Deadline
+            );
 
-            Debug.WriteLine(_currentTask.Id);
             await _apiClient.UpdateAsync(_currentTask.Id, taskToUpdate);
 
             if (Completed != null)
@@ -89,10 +85,10 @@ internal class EditTaskViewModel : TaskDialogViewModelBase, IDialogViewModel
 
     private void UpdateTask()
     {
+        _currentTask.Progress = Progress;
         _currentTask.Name = Name;
         _currentTask.Description = Description;
         _currentTask.Priority = Priority;
-        _currentTask.Progress = Progress;
         _currentTask.Status = Status;
         _currentTask.Deadline = DeadLine.ToUniversalTime();
     }

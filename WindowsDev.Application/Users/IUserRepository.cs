@@ -6,6 +6,7 @@ public interface IUserRepository
 {
     Task<bool> ExistsByLoginAsync(string login);
     Task<UserInfo?> GetByLoginAsync(string login);
+    Task<UserInfo?> GetByIdAsync(int id);
     Task<bool> ExistsByUsernameAsync(string username);
     Task AddAsync(UserInfo user);
     Task UpdateAsync(UserInfo user);

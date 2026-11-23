@@ -144,13 +144,9 @@
                                             <TextBlock Text="{Binding FileName}" 
                                                       FontWeight="Medium"
                                                       Margin="0,0,8,0"/>
-                                            <TextBlock Text="{Binding FileSize, Converter={StaticResource FileSizeConverter}}" 
+                                            <TextBlock Text="{Binding Size, Converter={StaticResource FileSizeConverter}}" 
                                                       FontSize="11"
                                                       Foreground="#757575"/>
-                                            <TextBlock Text="{Binding FileExtension}"
-                                                       Margin="10,0,0,0"
-                                                       FontSize="11"
-                                                       Foreground="#757575"/>
                                         </StackPanel>
 
                                         <!-- Open Button -->
@@ -160,8 +156,7 @@
                                                FontSize="14"
                                                ToolTip="{DynamicResource Task_Tooltip_Open}"
                                                Command="{Binding DataContext.OpenAttachmentCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                               CommandParameter="{Binding}"
-                                               >
+                                               CommandParameter="{Binding FileName}">
                                             <StackPanel>
                                                 <iconPacks:PackIconModern Kind="BookOpenTextImage"/>
                                             </StackPanel>

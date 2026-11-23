@@ -1,5 +1,6 @@
 using Moq;
 using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;
@@ -32,19 +33,26 @@ public class PasswordRecoveryServiceTest
     }
 
     [Fact]
-    public async Task IsRecoverCodeCorrectAsync_WhenUserNotFound_ThrowsException()
+    public async Task IsRecoverCodeCorrectAsync_WhenUserNotFound_ReturnsFailure()
     {
         var login = "unknown";
 
-        _userRepositoryMock.Setup(x => x.GetByLoginAsync(login)).ReturnsAsync((UserInfo?)null);
+        _userRepositoryMock
+            .Setup(x => x.GetByLoginAsync(login))
+            .ReturnsAsync((UserInfo?)null);
 
         var service = CreateService();
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() =>
-            service.IsRecoverCodeCorrectAsync(123456, login)
-        );
+        var result = await service.IsRecoverCodeCorrectAsync(123456, login);
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(PasswordRecoveryErrors.InvalidRecoveryCode, result.Error);
 
         _userRepositoryMock.Verify(x => x.GetByLoginAsync(login), Times.Once);
+        _hasherFactoryMock.Verify(
+            x => x.GetHashMethod(It.IsAny<HashMethod>()),
+            Times.Never
+        );
     }
 
     [Fact]
@@ -56,7 +64,6 @@ public class PasswordRecoveryServiceTest
         var user = CreateTestUser(login);
 
         var hasherMock = new Mock<IHasherBase>();
-
         ulong hash = 12345678;
 
         user.RecoveryCodeHash = hash.ToString("x16");
@@ -86,7 +93,6 @@ public class PasswordRecoveryServiceTest
         var code = 123456;
 
         var user = CreateTestUser(login);
-
         var hasherMock = new Mock<IHasherBase>();
 
         user.RecoveryCodeHash = "0000000000000000";
@@ -115,23 +121,32 @@ public class PasswordRecoveryServiceTest
         var login = "user";
         var password = "newPassword123!";
 
-        _passwordChangerMock.SetupSet(x => x.IsRecoveryMode = true);
+        var refreshToken = new UserRefreshToken
+        {
+            Id = 10,
+            UserId = 1,
+            Token = "refresh-token",
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+        };
 
         _passwordChangerMock
-            .Setup(x => x.ChangeUserPasswordAsync(login, password, ""))
-            .ReturnsAsync(Result<int>.Success(123456));
+            .Setup(x => x.ChangeUserPasswordAsync(login, password, It.IsAny<string>()))
+            .ReturnsAsync(Result<(int, string, UserRefreshToken)>.Success(
+                (123456, "jwt-token", refreshToken)
+            ));
 
         var service = CreateService();
 
         var result = await service.ChangePasswordAsync(login, password);
 
         Assert.True(result.IsSuccess);
-        Assert.Equal(123456, result.Value);
+        Assert.Equal(123456, result.Value.Item1);
+        Assert.Equal("jwt-token", result.Value.Item2);
+        Assert.Equal(refreshToken, result.Value.Item3);
 
         _passwordChangerMock.VerifySet(x => x.IsRecoveryMode = true, Times.Once);
-
         _passwordChangerMock.Verify(
-            x => x.ChangeUserPasswordAsync(login, password, ""),
+            x => x.ChangeUserPasswordAsync(login, password, It.IsAny<string>()),
             Times.Once
         );
     }
@@ -147,7 +162,8 @@ public class PasswordRecoveryServiceTest
 
         var result = await service.IsUserExistAsync(login);
 
-        Assert.True(result);
+        Assert.True(result.IsSuccess);
+        Assert.True(result.Value);
 
         _userRepositoryMock.Verify(x => x.ExistsByLoginAsync(login), Times.Once);
     }
@@ -163,7 +179,8 @@ public class PasswordRecoveryServiceTest
 
         var result = await service.IsUserExistAsync(login);
 
-        Assert.False(result);
+        Assert.True(result.IsSuccess);
+        Assert.False(result.Value);
     }
 
     private UserInfo CreateTestUser(string login)

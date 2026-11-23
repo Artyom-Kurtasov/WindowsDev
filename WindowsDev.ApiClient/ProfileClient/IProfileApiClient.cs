@@ -1,19 +1,19 @@
 ﻿using WindowsDev.Application.Primitives;
-using WindowsDev.Contracts.Api.Profiles;
+using WindowsDev.Contracts.UI.Profiles;
 
 namespace WindowsDev.ApiClient.ProfileClient;
 
 public interface IProfileApiClient
 {
-    Task<Result<ChangePasswordResponse>> ChangePasswordAsync(
-        ChangePasswordRequest request,
-        CancellationToken cancellationToken
+    Task<Result<ChangePasswordInfo>> ChangePasswordAsync(
+        ChangePasswordForm request,
+        CancellationToken cancellationToken = default
     );
 
-    Task<Result<ChangeUsernameResponse>> ChangeUsernameAsync(
-        ChangeUsernameRequest request,
-        CancellationToken cancellationToken
+    Task<Result<ChangeUsernameInfo>> ChangeUsernameAsync(
+        ChangeUsernameForm request,
+        CancellationToken cancellationToken = default
     );
 
-    Task<Result<GetProfileResponse>> GetAsync(CancellationToken cancellationToken);
+    Task<Result<ProfileInfo>> GetAsync(CancellationToken cancellationToken = default);
 }

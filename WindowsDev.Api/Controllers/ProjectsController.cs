@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.Logging;
+using WindowsDev.Api.Urls;
 using WindowsDev.Application.Identity;
 using WindowsDev.Application.Projects;
 using WindowsDev.Contracts.Api.Projects;
@@ -11,7 +12,7 @@ namespace WindowsDev.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProjectsController : ControllerBase
+public class ProjectsController : ApiControllerBase
 {
     private readonly IProjectService _projectService;
     private readonly ILogger<ProjectsController> _logger;
@@ -48,7 +49,7 @@ public class ProjectsController : ControllerBase
     }
 
     [Authorize]
-    [HttpDelete("{id:int}")]
+    [HttpDelete(ProjectUrls.DeleteProject)]
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         await _projectService.DeleteAsync(id);
@@ -58,21 +59,15 @@ public class ProjectsController : ControllerBase
     }
 
     [Authorize]
-    [HttpPatch("{id:int}")]
+    [HttpPatch(ProjectUrls.UpdateProject)]
     public async Task<ActionResult<UpdateProjectResponse>> UpdateAsync(
         [FromRoute] int id,
         [FromBody] UpdateProjectRequest request
     )
     {
         var project = await _projectService.GetProjectById(id);
-        if (project is null)
-        {
-            ProjectsControllerLogs.ProjectNotFound(_logger, id);
-            return NotFound();
-        }
 
         _mapper.Map(request, project);
-
         await _projectService.UpdateAsync(project);
 
         var response = _mapper.Map<UpdateProjectResponse>(project);
@@ -112,7 +107,7 @@ public class ProjectsController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("count")]
+    [HttpGet(ProjectUrls.GetCount)]
     public async Task<ActionResult<GetProjectsCountResponse>> GetCountAsync()
     {
         var result = await _projectService.GetProjectsCountAsync(_userSession.UserId);
@@ -124,13 +119,11 @@ public class ProjectsController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("{id:int}")]
+    [HttpGet(ProjectUrls.GetProjectById)]
     [ActionName(nameof(GetByIdAsync))]
     public async Task<ActionResult<GetProjectByIdResponse>> GetByIdAsync(int id)
     {
         var project = await _projectService.GetProjectById(id);
-        if (project is null)
-            return NotFound();
 
         var response = _mapper.Map<GetProjectByIdResponse>(project);
 

@@ -1,5 +1,6 @@
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
+using WpfApplication = System.Windows.Application;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Factories;
 using WindowsDev.ViewModels.Interfaces;
@@ -64,7 +65,8 @@ internal class DialogService : IDialogService
     {
         await _dialogCoordinator.ShowMessageAsync(
             _contextProvider.Context,
-            DialogTitles.Error,
+            WpfApplication.Current.TryFindResource(DialogTitles.Error) as string
+                ?? DialogTitles.Error,
             message,
             MessageDialogStyle.Affirmative
         );

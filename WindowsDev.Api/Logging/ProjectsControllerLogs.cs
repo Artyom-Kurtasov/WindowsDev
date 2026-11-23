@@ -37,13 +37,6 @@ internal static partial class ProjectsControllerLogs
     public static partial void UpdateSuccessful(ILogger logger, int projectId);
 
     [LoggerMessage(
-        EventId = ProjectsControllerEventId.ProjectNotFound,
-        Level = LogLevel.Warning,
-        Message = "Project with id {projectId} not found"
-    )]
-    public static partial void ProjectNotFound(ILogger logger, int projectId);
-
-    [LoggerMessage(
         EventId = ProjectsControllerEventId.GetProjectsUnauthorized,
         Level = LogLevel.Error,
         Message = "Unauthorized request. Unable to recover user data. UserId: {rawUserId}"

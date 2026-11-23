@@ -12,5 +12,5 @@ public class ProblemDetails
     public string? ErrorMessageCode { get; set; }
 
     [JsonExtensionData]
-    public Dictionary<string, object?> Extensions {  get; set; }
+    public Dictionary<string, object?> Extensions { get; set; }
 }

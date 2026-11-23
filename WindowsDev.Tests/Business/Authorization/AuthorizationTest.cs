@@ -2,23 +2,27 @@ using Moq;
 using System.Text;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Identity.Cryptography;
+using WindowsDev.Application.Identity.Repositories;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
+using WindowsDev.Infrastructure.Security;
 
 namespace WindowsDev.Tests.Business.Auth;
 
 public class AuthorizationTest
 {
+    private readonly Mock<IRefreshTokenRepository> _refreshTokenRepositoryMock;
     private readonly Mock<IUserRepository> _userRepositoryMock;
-    private readonly Mock<ICurrentUserService> _currentUserServiceMock;
+    private readonly Mock<IJwtService> _jwtServiceMock;
     private readonly IHasherFactory _hasherFactory;
 
     public AuthorizationTest()
     {
+        _refreshTokenRepositoryMock = new Mock<IRefreshTokenRepository>();
         _userRepositoryMock = new Mock<IUserRepository>();
-        _currentUserServiceMock = new Mock<ICurrentUserService>();
+        _jwtServiceMock = new Mock<IJwtService>();
 
         var defaultHasher = new DefaultHasher();
         var simpleHasher = new SimpleHasher();
@@ -29,9 +33,10 @@ public class AuthorizationTest
     private Authentication CreateService()
     {
         return new Authentication(
+            _refreshTokenRepositoryMock.Object,
             _userRepositoryMock.Object,
-            _currentUserServiceMock.Object,
-            _hasherFactory
+            _hasherFactory,
+            _jwtServiceMock.Object
         );
     }
 
@@ -40,7 +45,7 @@ public class AuthorizationTest
     [InlineData("login", "")]
     [InlineData(" ", "password")]
     [InlineData("login", " ")]
-    public async Task Authorize_WhenInputEmpty_ReturnsFailure(string login, string password)
+    public async Task Authenticate_WhenInputEmpty_ReturnsFailure(string login, string password)
     {
         var auth = CreateService();
 
@@ -50,15 +55,18 @@ public class AuthorizationTest
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
         _userRepositoryMock.Verify(x => x.GetByLoginAsync(It.IsAny<string>()), Times.Never);
-
-        _currentUserServiceMock.Verify(
-            x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+        _jwtServiceMock.Verify(
+            x => x.GenerateToken(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never
+        );
+        _refreshTokenRepositoryMock.Verify(
+            x => x.AddAsync(It.IsAny<UserRefreshToken>()),
             Times.Never
         );
     }
 
     [Fact]
-    public async Task Authorize_WhenUserNotFound_ReturnsFailure()
+    public async Task Authenticate_WhenUserNotFound_ReturnsFailure()
     {
         _userRepositoryMock
             .Setup(x => x.GetByLoginAsync("login"))
@@ -72,15 +80,14 @@ public class AuthorizationTest
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
         _userRepositoryMock.Verify(x => x.GetByLoginAsync("login"), Times.Once);
-
-        _currentUserServiceMock.Verify(
-            x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+        _jwtServiceMock.Verify(
+            x => x.GenerateToken(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
             Times.Never
         );
     }
 
     [Fact]
-    public async Task Authorize_WhenPasswordIncorrect_ReturnsFailure()
+    public async Task Authenticate_WhenPasswordIncorrect_ReturnsFailure()
     {
         var salt = Encoding.UTF8.GetBytes("salt");
 
@@ -106,14 +113,18 @@ public class AuthorizationTest
         Assert.False(result.IsSuccess);
         Assert.Equal(AuthErrors.InvalidCredentials, result.Error);
 
-        _currentUserServiceMock.Verify(
-            x => x.SetUser(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+        _jwtServiceMock.Verify(
+            x => x.GenerateToken(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>()),
+            Times.Never
+        );
+        _refreshTokenRepositoryMock.Verify(
+            x => x.AddAsync(It.IsAny<UserRefreshToken>()),
             Times.Never
         );
     }
 
     [Fact]
-    public async Task Authorize_WhenCorrect_CompletesSuccessfully()
+    public async Task Authenticate_WhenCorrect_ReturnsTokenAndSavesRefreshToken()
     {
         var salt = Encoding.UTF8.GetBytes("salt");
 
@@ -130,18 +141,36 @@ public class AuthorizationTest
             HashMethod = HashMethod.Default,
         };
 
+        var jwt = "jwt-token";
+        var refresh = new UserRefreshToken
+        {
+            Id = 10,
+            UserId = user.Id,
+            Token = "refresh-token",
+            ExpiresAt = DateTime.UtcNow.AddDays(7),
+        };
+
         _userRepositoryMock.Setup(x => x.GetByLoginAsync("admin")).ReturnsAsync(user);
+        _jwtServiceMock
+            .Setup(x => x.GenerateToken(user.Id, user.Login, user.Username))
+            .Returns(jwt);
+        _jwtServiceMock
+            .Setup(x => x.GenerateRefreshToken(user.Id))
+            .Returns(refresh);
 
         var auth = CreateService();
 
         var result = await auth.Authenticate("admin", "password");
 
         Assert.True(result.IsSuccess);
-        Assert.True(result.Value);
+        Assert.Equal(jwt, result.Value.Item1);
+        Assert.Equal(refresh, result.Value.Item2);
 
-        _currentUserServiceMock.Verify(
-            x => x.SetUser(user.Id, user.Login, user.Username),
+        _jwtServiceMock.Verify(
+            x => x.GenerateToken(user.Id, user.Login, user.Username),
             Times.Once
         );
+        _jwtServiceMock.Verify(x => x.GenerateRefreshToken(user.Id), Times.Once);
+        _refreshTokenRepositoryMock.Verify(x => x.AddAsync(refresh), Times.Once);
     }
 }

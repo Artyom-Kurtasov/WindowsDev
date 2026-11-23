@@ -1,13 +1,16 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.ProfileClient;
 using WindowsDev.Application.Common.Localization;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
-using WindowsDev.Application.Users;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.Profiles;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Success;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main.Tabs;
@@ -16,40 +19,41 @@ namespace WindowsDev.Tests.ViewModels.Main.Tabs;
 
 public class ProfileViewModelTest
 {
-    private readonly Mock<IProfileService> _profileServiceMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<ISecureTokenStorage> _tokenStorageMock;
+    private readonly Mock<IProfileApiClient> _profileApiClientMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<INavigationService> _navigationServiceMock;
     private readonly Mock<ILogger<ProfileViewModel>> _loggerMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
 
-    private readonly CurrentUserService _currentUser;
-
     public ProfileViewModelTest()
     {
-        _profileServiceMock = new Mock<IProfileService>();
-        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _tokenStorageMock = new Mock<ISecureTokenStorage>();
+        _profileApiClientMock = new Mock<IProfileApiClient>();
+        _dialogServiceMock = new Mock<IDialogService>();
         _navigationServiceMock = new Mock<INavigationService>();
         _loggerMock = new Mock<ILogger<ProfileViewModel>>();
         _languageChangerMock = new Mock<ILanguageChanger>();
 
-        _currentUser = new CurrentUserService
-        {
-            UserId = 1,
-            Login = "admin",
-            Username = "Artyom",
-        };
-
         _languageChangerMock
             .Setup(x => x.Translate(It.IsAny<string>()))
             .Returns((string key) => key);
+
+        _profileApiClientMock
+            .Setup(x => x.GetAsync())
+            .ReturnsAsync(
+                Result<ProfileInfo>.Success(
+                    new ProfileInfo (1, "admin", "Artyom")
+                )
+            );
     }
 
     private ProfileViewModel CreateViewModel()
     {
         return new ProfileViewModel(
-            _currentUser,
-            _profileServiceMock.Object,
-            _dialogCoordinatorMock.Object,
+            _tokenStorageMock.Object,
+            _profileApiClientMock.Object,
+            _dialogServiceMock.Object,
             _navigationServiceMock.Object,
             _loggerMock.Object,
             _languageChangerMock.Object
@@ -57,9 +61,11 @@ public class ProfileViewModelTest
     }
 
     [Fact]
-    public void Constructor_SetsUserData()
+    public async Task Constructor_SetsUserData()
     {
         var vm = CreateViewModel();
+
+        await WaitUntilAsync(() => vm.Id == 1);
 
         Assert.Equal(1, vm.Id);
         Assert.Equal("admin", vm.Login);
@@ -70,19 +76,26 @@ public class ProfileViewModelTest
     public async Task SaveNewUsernameCommand_WhenSuccessful_ShowsSuccessDialog()
     {
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Id == 1);
 
         vm.Username = "NewUsername";
 
-        _profileServiceMock
-            .Setup(x => x.ChangeUsernameAsync("Artyom", "NewUsername"))
-            .ReturnsAsync(Result<bool>.Success(true));
+        _profileApiClientMock
+            .Setup(x =>
+                x.ChangeUsernameAsync(
+                    It.Is<ChangeUsernameForm>(f =>
+                        f.CurrentUsername == "Artyom" && f.NewUsername == "NewUsername"
+                    ),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(Result<ChangeUsernameInfo>.Success(new ChangeUsernameInfo("token")));
 
         await ((AsyncRelayCommand)vm.SaveNewUsernameCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Success,
                     ProfileSuccesses.UsernameChanged,
                     MessageDialogStyle.Affirmative
@@ -100,16 +113,29 @@ public class ProfileViewModelTest
         vm.NewPassword = "NewPassword1!";
         vm.ConfirmPassword = "NewPassword1!";
 
-        _profileServiceMock
-            .Setup(x => x.ChangePasswordAsync("OldPassword", "NewPassword1!", "NewPassword1!"))
-            .ReturnsAsync(Result<int>.Success(123456));
+        _profileApiClientMock
+            .Setup(x =>
+                x.ChangePasswordAsync(
+                    It.Is<ChangePasswordForm>(f =>
+                        f.CurrentPassword == "OldPassword"
+                        && f.NewPassword == "NewPassword1!"
+                        && f.ConfirmPassword == "NewPassword1!"
+                        && f.Login == "admin"
+                    ),
+                    It.IsAny<CancellationToken>()
+                )
+            )
+            .ReturnsAsync(
+                Result<ChangePasswordInfo>.Success(
+                    new ChangePasswordInfo(123456, "token")
+                )
+            );
 
         await ((AsyncRelayCommand)vm.SaveNewPasswordCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Success,
                     $"{ProfileSuccesses.PasswordChanged} 123456",
                     MessageDialogStyle.Affirmative
@@ -122,19 +148,19 @@ public class ProfileViewModelTest
     public async Task SaveNewUsernameCommand_WhenException_ShowsErrorDialog()
     {
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Id == 1);
 
         vm.Username = "NewUsername";
 
-        _profileServiceMock
-            .Setup(x => x.ChangeUsernameAsync(It.IsAny<string>(), It.IsAny<string>()))
+        _profileApiClientMock
+            .Setup(x => x.ChangeUsernameAsync(It.IsAny<ChangeUsernameForm>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception());
 
         await ((AsyncRelayCommand)vm.SaveNewUsernameCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative
@@ -152,22 +178,15 @@ public class ProfileViewModelTest
         vm.NewPassword = "NewPassword1!";
         vm.ConfirmPassword = "NewPassword1!";
 
-        _profileServiceMock
-            .Setup(x =>
-                x.ChangePasswordAsync(
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()
-                )
-            )
+        _profileApiClientMock
+            .Setup(x => x.ChangePasswordAsync(It.IsAny<ChangePasswordForm>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception());
 
         await ((AsyncRelayCommand)vm.SaveNewPasswordCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Error,
                     CommonErrors.UnexpectedError,
                     MessageDialogStyle.Affirmative
@@ -190,21 +209,19 @@ public class ProfileViewModelTest
     public async Task SaveNewUsernameCommand_WhenUsernameChangeFails_ShowsWarningDialog()
     {
         var vm = CreateViewModel();
+        await WaitUntilAsync(() => vm.Id == 1);
 
         vm.Username = "NewUsername";
 
-        _profileServiceMock
-            .Setup(x => x.ChangeUsernameAsync("Artyom", "NewUsername"))
-            .ReturnsAsync(Result<bool>.Failure(It.IsAny<string>()));
+        _profileApiClientMock
+            .Setup(x => x.ChangeUsernameAsync(It.IsAny<ChangeUsernameForm>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<ChangeUsernameInfo>.Failure("some error"));
 
         await ((AsyncRelayCommand)vm.SaveNewUsernameCommand).ExecuteAsync(null);
 
-        // NOTE: I use "It.IsAny<string> because all possible errors are checked
-        // in ProfileServiceTest.
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Warning,
                     It.IsAny<string>(),
                     MessageDialogStyle.Affirmative
@@ -212,10 +229,9 @@ public class ProfileViewModelTest
             Times.Once
         );
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Success,
                     ProfileSuccesses.UsernameChanged,
                     MessageDialogStyle.Affirmative
@@ -233,18 +249,15 @@ public class ProfileViewModelTest
         vm.NewPassword = "NewPassword1!";
         vm.ConfirmPassword = "NewPassword1!";
 
-        _profileServiceMock
-            .Setup(x => x.ChangePasswordAsync("OldPassword", "NewPassword1!", "NewPassword1!"))
-            .ReturnsAsync(Result<int>.Failure(It.IsAny<string>()));
+        _profileApiClientMock
+            .Setup(x => x.ChangePasswordAsync(It.IsAny<ChangePasswordForm>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<ChangePasswordInfo>.Failure("some error"));
 
         await ((AsyncRelayCommand)vm.SaveNewPasswordCommand).ExecuteAsync(null);
 
-        // NOTE: I use "It.IsAny<string> because all possible errors are checked
-        // in ProfileServiceTest.
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Warning,
                     It.IsAny<string>(),
                     MessageDialogStyle.Affirmative
@@ -252,15 +265,26 @@ public class ProfileViewModelTest
             Times.Once
         );
 
-        _dialogCoordinatorMock.Verify(
+        _dialogServiceMock.Verify(
             x =>
                 x.ShowMessageAsync(
-                    vm,
                     DialogTitles.Success,
                     ProfileSuccesses.PasswordChanged,
                     MessageDialogStyle.Affirmative
                 ),
             Times.Never
         );
+    }
+
+    private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 2000)
+    {
+        var start = Environment.TickCount;
+        while (!condition())
+        {
+            if (Environment.TickCount - start > timeoutMs)
+                throw new TimeoutException("Condition was not met in time.");
+
+            await Task.Delay(10);
+        }
     }
 }

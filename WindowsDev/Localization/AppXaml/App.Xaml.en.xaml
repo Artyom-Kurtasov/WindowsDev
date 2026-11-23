@@ -5,6 +5,5 @@
     <!-- Errors -->
     <sys:String x:Key="AppXaml_Error_Generic">An unexpected error occurred. Please restart the application.</sys:String>
     <sys:String x:Key="AppXaml_Error_Shutdown">A critical error occurred. The application will be closed.</sys:String>
-    <sys:String x:Key="AppXaml_Error_DatabaseFatal">Failed to connect to the database. The application will be closed.</sys:String>
 
 </ResourceDictionary>

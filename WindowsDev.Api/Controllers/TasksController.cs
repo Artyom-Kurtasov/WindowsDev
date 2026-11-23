@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WindowsDev.Api.Logging;
+using WindowsDev.Api.ProblemDetails;
+using WindowsDev.Api.Urls;
 using WindowsDev.Application.Tasks;
 using WindowsDev.Contracts.Api.Tasks;
 using WindowsDev.Domain.Entities;
@@ -44,7 +46,7 @@ public class TasksController : ApiControllerBase
         return CreatedAtAction(nameof(GetTaskByIdAsync), new { id = entity.Id }, response);
     }
 
-    [HttpDelete("{id:int}")]
+    [HttpDelete(TaskUrls.DeleteTask)]
     public async Task<IActionResult> DeleteAsync([FromRoute] int id)
     {
         await _taskService.DeleteAsync(id);
@@ -53,7 +55,7 @@ public class TasksController : ApiControllerBase
         return NoContent();
     }
 
-    [HttpPatch("{id:int}")]
+    [HttpPatch(TaskUrls.UpdateTask)]
     public async Task<ActionResult<UpdateTaskResponse>> UpdateAsync(
         [FromRoute] int id,
         [FromBody] UpdateTaskRequest request
@@ -65,8 +67,8 @@ public class TasksController : ApiControllerBase
             TasksControllerLogs.TaskNotFound(_logger, id);
             return CustomProblem(
                 StatusCodes.Status404NotFound,
-                "Task Not Found",
-                $"The requested task (ID: {id}) does not exist. Could it have been deleted?",
+                TaskProblemDetails.TaskNotFound,
+                TaskProblemDetails.TaskNotFoundDetail(id),
                 TaskErrors.TaskNotFound
             );
         }
@@ -105,7 +107,7 @@ public class TasksController : ApiControllerBase
         return Ok(response);
     }
 
-    [HttpGet("count")]
+    [HttpGet(TaskUrls.GetTaskCount)]
     public async Task<ActionResult<GetTasksCountResponse>> GetTasksCountAsync(
         [FromQuery] int projectId
     )
@@ -117,7 +119,7 @@ public class TasksController : ApiControllerBase
         return Ok(response);
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet(TaskUrls.GetTaskById)]
     [ActionName("GetTaskByIdAsync")]
     public async Task<ActionResult<GetTaskByIdResponse>> GetTaskByIdAsync(int id)
     {
@@ -127,8 +129,8 @@ public class TasksController : ApiControllerBase
             TasksControllerLogs.TaskNotFound(_logger, id);
             return CustomProblem(
                 StatusCodes.Status404NotFound,
-                "Task Not Found",
-                $"The requested task (ID: {id}) does not exist. Could it have been deleted?",
+                TaskProblemDetails.TaskNotFound,
+                TaskProblemDetails.TaskNotFoundDetail(id),
                 TaskErrors.TaskNotFound
             );
         }

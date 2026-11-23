@@ -1,15 +1,18 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 using System.Windows.Input;
 using WindowsDev.ApiClient.AuthClient;
 using WindowsDev.Application.Common.DebounceService;
 using WindowsDev.Application.Common.Localization;
+using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Business.Services.Registration.Validation;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.Identity;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
-using WindowsDev.Infrastructure.Logging;
+using WindowsDev.Logging;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.ViewModels.Authorization;
@@ -19,6 +22,7 @@ namespace WindowsDev.ViewModels.Registration;
 
 internal class RegistrationViewModel : LocalizedViewModelBase
 {
+    private readonly ISecureTokenStorage _tokenStorage;
     private readonly IAuthApiClient _authApiClient;
     private readonly ILogger<RegistrationViewModel> _logger;
     private readonly IDialogService _dialogService;
@@ -33,7 +37,8 @@ internal class RegistrationViewModel : LocalizedViewModelBase
         IDialogService dialogService,
         ILogger<RegistrationViewModel> logger,
         IDebounceService debounceService,
-        ILanguageChanger languageChanger
+        ILanguageChanger languageChanger,
+        ISecureTokenStorage secureTokenStorage
     )
         : base(languageChanger)
     {
@@ -42,6 +47,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
         _logger = logger;
         _debounceService = debounceService;
         _authApiClient = authApiClient;
+        _tokenStorage = secureTokenStorage;
 
         SignUpCommand = new AsyncRelayCommand(SignUpAsync);
         SwitchToAuthViewCommand = new AsyncRelayCommand(SwitchToAuthViewAsync);
@@ -64,7 +70,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 
             OnPropertyChanged();
 
-            //_ = CheckLoginAvailabilityAsync();
+            _ = CheckLoginAvailabilityAsync();
             UpdateState();
         }
     }
@@ -83,7 +89,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 
             OnPropertyChanged();
 
-            //_ = CheckUsernameAvailabilityAsync();
+            _ = CheckUsernameAvailabilityAsync();
             UpdateState();
         }
     }
@@ -198,7 +204,7 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 
         try
         {
-            var result = await _authApiClient.RegisterAsync(new(Login, Password, Username));
+            var result = await _authApiClient.RegisterAsync(new RegisterForm(Login, Password, Username));
 
             if (result.IsFailure)
             {
@@ -208,10 +214,12 @@ internal class RegistrationViewModel : LocalizedViewModelBase
 
             await _dialogService.ShowMessageAsync(
                 Translate(DialogTitles.Information),
-                $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value}",
+                $"{Translate(PasswordRecoveryInformations.RecoveryCodeMessage)}\n\n{result.Value.RecoveryCode}",
                 MessageDialogStyle.Affirmative
             );
 
+            _tokenStorage.AccessToken = result.Value.JwtToken;
+            _tokenStorage.RefreshToken = result.Value.RefreshToken;
             await _navigationService.NavigateTo<MainWindowViewModel>();
         }
         catch (Exception ex)
@@ -240,22 +248,30 @@ internal class RegistrationViewModel : LocalizedViewModelBase
             && PasswordValidator.IsValid(Password);
     }
 
-    //private async Task CheckLoginAvailabilityAsync()
-    //{
-    //    await CheckFieldAvailabilityAsync(
-    //        async () => IsLoginAvailable = await _registration.IsLoginAvailableAsync(LoginAsync),
-    //        ex => AuthLogs.LoginAvailabilityCheckFailed(_logger, ex)
-    //    );
-    //}
+    private async Task CheckLoginAvailabilityAsync()
+    {
+        await CheckFieldAvailabilityAsync(
+            async () =>
+            {
+                var result = await _authApiClient.IsLoginAvailableAsync(new LoginAvailabilityForm(Login));
+                IsLoginAvailable = result.Value.Result;
+            },
+            ex => AuthLogs.LoginAvailabilityCheckFailed(_logger, ex)
+        );
+        Debug.Write(IsLoginAvailable);
+    }
 
-    //private async Task CheckUsernameAvailabilityAsync()
-    //{
-    //    await CheckFieldAvailabilityAsync(
-    //        async () =>
-    //            IsUsernameAvailable = await _registration.IsUsernameAvailableAsync(Username),
-    //        ex => AuthLogs.UsernameAvailabilityCheckFailed(_logger, ex)
-    //    );
-    //}
+    private async Task CheckUsernameAvailabilityAsync()
+    {
+        await CheckFieldAvailabilityAsync(
+            async () =>
+            {
+                var result = await _authApiClient.IsUsernameAvailableAsync(new UsernameAvailabilityForm(Username));
+                IsUsernameAvailable = result.Value.Result;
+            },
+            ex => AuthLogs.UsernameAvailabilityCheckFailed(_logger, ex)
+        );
+    }
 
     private async Task CheckFieldAvailabilityAsync(Func<Task> action, Action<Exception> log)
     {

@@ -1,27 +1,55 @@
+using System.Windows;
+using MahApps.Metro.Controls.Dialogs;
 using Moq;
+using WindowsDev.Application.Common.Events;
+using WindowsDev.Application.Common.Localization;
 using WindowsDev.Factories;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.Tests.ViewModels.Main.TestViewModels;
-using WindowsDev.ViewModels;
+using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Main.Tabs;
+using Xunit;
 
 namespace WindowsDev.Tests.ViewModels.Main;
 
 public class MainWindowViewModelTest
 {
+    private readonly Mock<IDialogContextProvider> _dialogContextProviderMock;
     private readonly Mock<IViewModelFactory> _factoryMock;
+    private readonly Mock<ISessionEvent> _sessionEventMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
+    private readonly Mock<INavigationService> _navigationServiceMock;
+    private readonly Mock<ILanguageChanger> _languageChangerMock;
     private readonly NavigationStore _navigationStore;
 
     public MainWindowViewModelTest()
     {
         _factoryMock = new Mock<IViewModelFactory>();
         _navigationStore = new NavigationStore();
+        _dialogContextProviderMock = new Mock<IDialogContextProvider>();
+
+        _sessionEventMock = new Mock<ISessionEvent>();
+        _dialogServiceMock = new Mock<IDialogService>();
+        _navigationServiceMock = new Mock<INavigationService>();
+        _languageChangerMock = new Mock<ILanguageChanger>();
+
+        _languageChangerMock
+            .Setup(x => x.Translate(It.IsAny<string>()))
+            .Returns((string key) => key);
     }
 
     private MainWindowViewModel CreateVm()
     {
-        return new MainWindowViewModel(_navigationStore, _factoryMock.Object);
+        return new MainWindowViewModel(
+            _navigationStore,
+            _factoryMock.Object,
+            _dialogContextProviderMock.Object,
+            _sessionEventMock.Object,
+            _dialogServiceMock.Object,
+            _navigationServiceMock.Object,
+            _languageChangerMock.Object);
     }
 
     [Fact]
@@ -36,7 +64,7 @@ public class MainWindowViewModelTest
                 raised = true;
         };
 
-        _navigationStore.CurrentViewModel = new ViewModelBase();
+        _navigationStore.CurrentViewModel = new TestSettingsViewModel();
 
         Assert.True(raised);
     }
@@ -45,7 +73,7 @@ public class MainWindowViewModelTest
     public void CurrentViewModel_WhenNavigationStoreChanges_ReturnsUpdatedValue()
     {
         var vm = CreateVm();
-        var expected = new ViewModelBase();
+        var expected = new TestSettingsViewModel();
 
         _navigationStore.CurrentViewModel = expected;
 
@@ -178,19 +206,13 @@ public class MainWindowViewModelTest
         var profile = new TestProfileViewModel();
 
         _factoryMock.Setup(x => x.Create<ProjectsViewModel>()).Returns(projects);
-
         _factoryMock.Setup(x => x.Create<SettingsViewModel>()).Returns(settings);
-
         _factoryMock.Setup(x => x.Create<ProfileViewModel>()).Returns(profile);
 
         var vm = CreateVm();
 
         vm.SelectedTabIndex = 1;
         vm.SelectedTabIndex = 2;
-
-        var projectsBefore = vm.Projects;
-        var settingsBefore = vm.Settings;
-        var profileBefore = vm.Profile;
 
         Assert.NotNull(vm.Projects);
         Assert.NotNull(vm.Settings);
@@ -214,4 +236,5 @@ public class MainWindowViewModelTest
 
         Assert.Null(exception);
     }
+
 }

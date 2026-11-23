@@ -1,22 +1,25 @@
 using MahApps.Metro.Controls.Dialogs;
 using Microsoft.Extensions.Logging;
 using Moq;
+using WindowsDev.ApiClient.PasswordRecovery;
 using WindowsDev.Application.Common.Localization;
-using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
+using WindowsDev.Contracts.UI.PasswordRecovery;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Informations;
 using WindowsDev.Factories;
+using WindowsDev.Services.Dialogs;
 using WindowsDev.ViewModels.Authorization.Dialogs;
+using Xunit;
 
 namespace WindowsDev.Tests.ViewModels.Authorization.Dialogs;
 
 public class RecoveryCodeDialogViewModelTest
 {
-    private readonly Mock<IPasswordRecoveryService> _passwordRecoveryServiceMock;
-    private readonly Mock<IDialogCoordinator> _dialogCoordinatorMock;
+    private readonly Mock<IPasswordRecoveryApiClient> _passwordRecoveryApiMock;
+    private readonly Mock<IDialogService> _dialogServiceMock;
     private readonly Mock<ILogger<RecoveryCodeDialogViewModel>> _loggerMock;
     private readonly Mock<ILanguageChanger> _languageChangerMock;
     private readonly Mock<IRecoveryStepsFactory> _recoveryStepsFactoryMock;
@@ -27,8 +30,8 @@ public class RecoveryCodeDialogViewModelTest
 
     public RecoveryCodeDialogViewModelTest()
     {
-        _passwordRecoveryServiceMock = new Mock<IPasswordRecoveryService>();
-        _dialogCoordinatorMock = new Mock<IDialogCoordinator>();
+        _passwordRecoveryApiMock = new Mock<IPasswordRecoveryApiClient>();
+        _dialogServiceMock = new Mock<IDialogService>();
         _loggerMock = new Mock<ILogger<RecoveryCodeDialogViewModel>>();
         _languageChangerMock = new Mock<ILanguageChanger>();
         _recoveryStepsFactoryMock = new Mock<IRecoveryStepsFactory>();
@@ -40,15 +43,15 @@ public class RecoveryCodeDialogViewModelTest
             .Returns((string key) => key);
 
         _recoveryStepsFactoryMock
-            .Setup(x => x.CreateSteps())
+            .Setup(x => x.CreateSteps(It.IsAny<PasswordRecoveryData>()))
             .Returns(new List<object> { new object(), new object(), new object() });
     }
 
     private RecoveryCodeDialogViewModel CreateViewModel()
     {
         return new RecoveryCodeDialogViewModel(
-            _passwordRecoveryServiceMock.Object,
-            _dialogCoordinatorMock.Object,
+            _passwordRecoveryApiMock.Object,
+            _dialogServiceMock.Object,
             _loggerMock.Object,
             _languageChangerMock.Object,
             _recoveryStepsFactoryMock.Object,
@@ -74,6 +77,17 @@ public class RecoveryCodeDialogViewModelTest
 
         Assert.Equal(0, vm.CurrentStep);
         Assert.NotNull(vm.CurrentStepView);
+    }
+
+    [Fact]
+    public void Constructor_CallsCreateStepsWithPasswordRecoveryData()
+    {
+        var vm = CreateViewModel();
+
+        _recoveryStepsFactoryMock.Verify(
+            x => x.CreateSteps(_passwordRecoveryData),
+            Times.Once
+        );
     }
 
     [Fact]
@@ -117,7 +131,7 @@ public class RecoveryCodeDialogViewModelTest
     }
 
     [Fact]
-    public void NextStepCommand_WhenCurrentStepGreaterZenStepsCount_DoesNothing()
+    public void NextStepCommand_WhenCurrentStepGreaterThanStepsCount_DoesNothing()
     {
         var vm = CreateViewModel();
 
@@ -136,6 +150,54 @@ public class RecoveryCodeDialogViewModelTest
         ((RelayCommand)vm.NextStepCommand).Execute(null);
 
         Assert.Equal(1, vm.CurrentStep);
+    }
+
+    [Fact]
+    public void CanNextStep_WhenStepZeroAndUserNotExist_ReturnsFalse()
+    {
+        _passwordRecoveryData.IsUserExist = false;
+        var vm = CreateViewModel();
+
+        vm.CurrentStep = 0;
+
+        Assert.False(vm.CanNextStep());
+    }
+
+    [Fact]
+    public void CanNextStep_WhenStepZeroAndUserExists_ReturnsTrue()
+    {
+        _passwordRecoveryData.IsUserExist = true;
+        var vm = CreateViewModel();
+
+        vm.CurrentStep = 0;
+
+        Assert.True(vm.CanNextStep());
+    }
+
+    [Fact]
+    public void CanNextStep_WhenStepTwoAndPasswordsMatch_ReturnsTrue()
+    {
+        var vm = CreateViewModel();
+
+        _passwordRecoveryData.NewPassword = "Password123!";
+        _passwordRecoveryData.ConfirmPassword = "Password123!";
+
+        vm.CurrentStep = 2;
+
+        Assert.True(vm.CanNextStep());
+    }
+
+    [Fact]
+    public void CanNextStep_WhenStepTwoAndPasswordsDoNotMatch_ReturnsFalse()
+    {
+        var vm = CreateViewModel();
+
+        _passwordRecoveryData.NewPassword = "Password123!";
+        _passwordRecoveryData.ConfirmPassword = "Different123!";
+
+        vm.CurrentStep = 2;
+
+        Assert.False(vm.CanNextStep());
     }
 
     [Fact]
@@ -163,26 +225,79 @@ public class RecoveryCodeDialogViewModelTest
 
         vm.CurrentStep = 2;
 
-        _passwordRecoveryServiceMock
-            .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(Result<int>.Success(123456));
+        var recoveryCode = new ResetPasswordInfo(123456);
+
+        _passwordRecoveryApiMock
+            .Setup(x => x.ChangePasswordAsync(
+                It.IsAny<ResetPasswordForm>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<ResetPasswordInfo>.Success(recoveryCode));
 
         Assert.True(vm.ChangePasswordCommand.CanExecute(null));
 
         await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
-            x =>
-                x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Information,
-                    $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
-                    MessageDialogStyle.Affirmative
-                ),
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Information,
+                $"{PasswordRecoveryInformations.RecoveryCodeMessage}\n\n123456",
+                MessageDialogStyle.Affirmative
+            ),
             Times.Once
         );
 
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Error,
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>()
+            ),
+            Times.Never
+        );
+
         Assert.True(_closeRequested);
+    }
+
+    [Fact]
+    public async Task ChangePassword_WhenApiReturnsFailure_ShowsErrorDialogAndDoesNotClose()
+    {
+        var vm = CreateViewModel();
+
+        SetupEvents(vm);
+
+        _passwordRecoveryData.Login = "test";
+        _passwordRecoveryData.NewPassword = "Password123!";
+        _passwordRecoveryData.ConfirmPassword = "Password123!";
+
+        vm.CurrentStep = 2;
+
+        _passwordRecoveryApiMock
+            .Setup(x => x.ChangePasswordAsync(
+                It.IsAny<ResetPasswordForm>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Result<ResetPasswordInfo>.Failure(CommonErrors.UnexpectedError));
+
+        await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
+
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Error,
+                CommonErrors.UnexpectedError,
+                MessageDialogStyle.Affirmative
+            ),
+            Times.Once
+        );
+
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Information,
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>()
+            ),
+            Times.Never
+        );
+
+        Assert.False(_closeRequested);
     }
 
     [Fact]
@@ -196,23 +311,32 @@ public class RecoveryCodeDialogViewModelTest
 
         vm.CurrentStep = 2;
 
-        _passwordRecoveryServiceMock
-            .Setup(x => x.ChangePasswordAsync(It.IsAny<string>(), It.IsAny<string>()))
-            .ThrowsAsync(new Exception());
+        _passwordRecoveryApiMock
+            .Setup(x => x.ChangePasswordAsync(
+                It.IsAny<ResetPasswordForm>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new Exception("boom"));
 
         Assert.True(vm.ChangePasswordCommand.CanExecute(null));
 
         await ((AsyncRelayCommand)vm.ChangePasswordCommand).ExecuteAsync(null);
 
-        _dialogCoordinatorMock.Verify(
-            x =>
-                x.ShowMessageAsync(
-                    vm,
-                    DialogTitles.Error,
-                    CommonErrors.UnexpectedError,
-                    MessageDialogStyle.Affirmative
-                ),
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Error,
+                CommonErrors.UnexpectedError,
+                MessageDialogStyle.Affirmative
+            ),
             Times.Once
+        );
+
+        _dialogServiceMock.Verify(
+            x => x.ShowMessageAsync(
+                DialogTitles.Information,
+                It.IsAny<string>(),
+                It.IsAny<MessageDialogStyle>()
+            ),
+            Times.Never
         );
     }
 }

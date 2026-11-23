@@ -1,6 +1,6 @@
 using WindowsDev.ApiClient.PasswordRecovery;
 using WindowsDev.Application.Common.DebounceService;
-using WindowsDev.Contracts.PasswordRecovery;
+using WindowsDev.Contracts.UI.PasswordRecovery;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
@@ -65,15 +65,11 @@ internal class SecondStepViewModel : ViewModelBase
                 }
 
                 var result = await _passwordRecoveryApiClient.IsRecoveryCodeCorrectAsync(
-                    new VerifyRecoveryCodeRequest
-                    {
-                        recoveryCode = code,
-                        login = _passwordRecoveryData.Login,
-                    },
+                    new VerifyRecoveryCodeForm(code, _passwordRecoveryData.Login),
                     CancellationToken.None
                 );
 
-                IsRecoveryCodeCorrect = result.IsSuccess;
+                IsRecoveryCodeCorrect = result.IsSuccess && result.Value.IsValid;
             },
             TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
         );

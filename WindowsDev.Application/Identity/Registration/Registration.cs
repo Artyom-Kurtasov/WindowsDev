@@ -1,5 +1,6 @@
 ﻿using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Identity.PasswordChanger;
+using WindowsDev.Application.Identity.Repositories;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
@@ -10,6 +11,8 @@ namespace WindowsDev.Application.Identity.Registration;
 
 internal class Registration : IRegistration
 {
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
+    private readonly IJwtService _jwtService;
     private readonly IUserRepository _userRepository;
     private readonly IDefaultHasher _defaultHasher;
     private readonly IPasswordChanger _passwordChanger;
@@ -19,21 +22,25 @@ internal class Registration : IRegistration
     public Registration(
         IUserRepository userRepository,
         IDefaultHasher defaultHasher,
-        IPasswordChanger passwordChanger
+        IPasswordChanger passwordChanger,
+        IJwtService jwtService,
+        IRefreshTokenRepository refreshTokenRepository
     )
     {
         _userRepository = userRepository;
         _defaultHasher = defaultHasher;
         _passwordChanger = passwordChanger;
+        _jwtService = jwtService;
+        _refreshTokenRepository = refreshTokenRepository;
     }
 
-    public async Task<Result<int>> Register(string password, string login, string username)
+    public async Task<Result<(int, string, UserRefreshToken)>> Register(string password, string login, string username)
     {
         if (!await IsLoginAvailableAsync(login))
-            return Result<int>.Failure(AuthDialogWarnings.LoginTaken);
+            return Result<(int, string, UserRefreshToken)>.Failure(AuthDialogWarnings.LoginTaken);
 
         if (!await IsUsernameAvailableAsync(username))
-            return Result<int>.Failure(AuthDialogWarnings.UsernameTaken);
+            return Result<(int, string, UserRefreshToken)>.Failure(AuthDialogWarnings.UsernameTaken);
 
         var (passwordHash, passwordSalt) = HashPassword(password);
 
@@ -53,7 +60,11 @@ internal class Registration : IRegistration
 
         await _userRepository.AddAsync(user);
 
-        return Result<int>.Success(recoveryCode);
+        var JwtToken = _jwtService.GenerateToken(user.Id, login, username);
+        var RefreshToken = _jwtService.GenerateRefreshToken(user.Id);
+        await _refreshTokenRepository.AddAsync(RefreshToken);
+
+        return Result<(int, string, UserRefreshToken)>.Success((recoveryCode, JwtToken, RefreshToken));
     }
 
     public async Task<bool> IsLoginAvailableAsync(string login) =>

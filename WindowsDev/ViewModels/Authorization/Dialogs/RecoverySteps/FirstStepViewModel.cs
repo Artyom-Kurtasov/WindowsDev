@@ -1,6 +1,6 @@
 using WindowsDev.ApiClient.PasswordRecovery;
 using WindowsDev.Application.Common.DebounceService;
-using WindowsDev.Application.DTO.PasswordRecovery;
+using WindowsDev.Contracts.UI.PasswordRecovery;
 
 namespace WindowsDev.ViewModels.Authorization.Dialogs.RecoverySteps;
 
@@ -62,10 +62,10 @@ internal class FirstStepViewModel : ViewModelBase
                     !string.IsNullOrWhiteSpace(Login)
                     && (
                         await _passwordRecoveryApiClient.IsUserExistAsync(
-                            new(Login),
+                            new IsUserExistForm(Login),
                             CancellationToken.None
                         )
-                    ).isExist;
+                    ).Value.IsExist;
             },
             TimeSpan.FromMilliseconds(DebounceDelayMilliseconds)
         );

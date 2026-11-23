@@ -7,4 +7,5 @@
     <sys:String x:Key="MainWindow_Label_Settings">Settings</sys:String>
     <sys:String x:Key="MainWindow_Label_Profile">Profile</sys:String>
 
+    <sys:String x:Key="MainWindow_Information_SessionExpired">Your session has expired or is no longer valid. Please sign in again.</sys:String>
 </ResourceDictionary>

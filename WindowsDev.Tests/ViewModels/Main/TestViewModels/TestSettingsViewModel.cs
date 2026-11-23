@@ -9,10 +9,7 @@ internal sealed class TestSettingsViewModel : SettingsViewModel
 {
     public TestSettingsViewModel()
         : base(
-            Mock.Of<IDbHealthChecker>(),
-            Mock.Of<IDialogCoordinator>(),
-            Mock.Of<ILanguageChanger>(),
-            Mock.Of<IDatabaseConfig>()
+            Mock.Of<ILanguageChanger>()
         )
     { }
 }

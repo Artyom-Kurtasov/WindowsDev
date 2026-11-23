@@ -7,5 +7,4 @@
     <sys:String x:Key="DialogTitles_Warning">Warning</sys:String>
     <sys:String x:Key="DialogTitles_Information">Information</sys:String>
     <sys:String x:Key="DialogTitles_Success">Success</sys:String>
-
 </ResourceDictionary>

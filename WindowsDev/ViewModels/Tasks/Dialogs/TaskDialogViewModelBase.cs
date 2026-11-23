@@ -1,4 +1,5 @@
 using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Input;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Domain.Messages;
@@ -8,7 +9,7 @@ using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.ViewModels.Tasks.Dialogs;
 
-internal class TaskDialogViewModelBase : LocalizedViewModelBase
+internal abstract class TaskDialogViewModelBase : LocalizedViewModelBase
 {
     protected readonly IDialogService _dialogService;
 
@@ -17,6 +18,9 @@ internal class TaskDialogViewModelBase : LocalizedViewModelBase
     {
         _dialogService = dialogService;
     }
+
+    public abstract ICommand SubmitCommand { get; }
+
 
     private bool _isEditMode;
     public bool IsEditMode

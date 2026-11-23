@@ -1,6 +1,5 @@
-﻿namespace WindowsDev.Contracts.Api.Identity;
+﻿using WindowsDev.Domain.Entities;
 
-public class UserRegisterResponse
-{
-    public required int RecoveryCode { get; set; }
-}
+namespace WindowsDev.Contracts.Api.Identity;
+
+public record UserRegisterResponse(int RecoveryCode, string JwtToken, UserRefreshToken RefreshToken);
