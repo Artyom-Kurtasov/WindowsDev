@@ -1,8 +1,8 @@
-using System.Net;
-using System.Net.Http.Json;
 using AutoMapper;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Net.Http.Json;
 using WindowsDev.ApiClient.AttachmentClient;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Attachments;
@@ -47,7 +47,7 @@ public class AttachmentApiClientTests
         SetupHttpResponse(HttpStatusCode.Created, new UploadFileResponse("test.txt"));
         var request = new UploadFileForm("test.txt", "text/plain", new MemoryStream("content"u8.ToArray()));
 
-        var result = await _client.UploadFileAsync(request);
+        var result = await _client.UploadFileAsync(request, 1);
 
         Assert.True(result.IsSuccess);
         Assert.Equal("test.txt", result.Value);
@@ -67,7 +67,7 @@ public class AttachmentApiClientTests
         SetupHttpResponse(HttpStatusCode.OK, response);
         _mapperMock.Setup(x => x.Map<List<FileItem>>(It.IsAny<List<FileListItemResponse>>())).Returns(files);
 
-        var result = await _client.GetFilesAsync();
+        var result = await _client.GetFilesAsync(1);
 
         Assert.True(result.IsSuccess);
         Assert.Same(files, result.Value);

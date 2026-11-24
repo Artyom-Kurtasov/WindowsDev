@@ -43,7 +43,7 @@ public class ProfileViewModelTest
             .Setup(x => x.GetAsync())
             .ReturnsAsync(
                 Result<ProfileInfo>.Success(
-                    new ProfileInfo (1, "admin", "Artyom")
+                    new ProfileInfo(1, "admin", "Artyom")
                 )
             );
     }

@@ -1,16 +1,15 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Net.Http.Json;
 using WindowsDev.ApiClient.TaskClient;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Common;
 using WindowsDev.Contracts.Api.Tasks;
 using WindowsDev.Contracts.UI.Tasks;
 using WindowsDev.Domain.Enums;
-using Xunit;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.ApiClient;

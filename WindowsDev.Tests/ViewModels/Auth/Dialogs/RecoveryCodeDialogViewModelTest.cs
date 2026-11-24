@@ -12,7 +12,6 @@ using WindowsDev.Domain.Messages.DialogsMessages.Informations;
 using WindowsDev.Factories;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.ViewModels.Authorization.Dialogs;
-using Xunit;
 
 namespace WindowsDev.Tests.ViewModels.Authorization.Dialogs;
 

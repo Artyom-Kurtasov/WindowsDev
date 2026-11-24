@@ -27,10 +27,13 @@ public class AttachmentsController : ApiControllerBase
         _logger = logger;
     }
 
-    [HttpPost]
-    public async Task<IActionResult> UploadFileAsync([FromForm] IFormFile file)
+    [HttpPost(AttachmentUrls.UploadFileUrl)]
+    public async Task<IActionResult> UploadFileAsync(
+        [FromForm] IFormFile file,
+        [FromRoute] int taskId
+    )
     {
-        var result = await _attachmentService.UploadFileAsync(file);
+        var result = await _attachmentService.UploadFileAsync(file, taskId);
 
         if (!result.IsSuccess)
         {
@@ -50,10 +53,10 @@ public class AttachmentsController : ApiControllerBase
         return CreatedAtAction(DownloadAttachmentActionName, new { fileName = safeName }, response);
     }
 
-    [HttpGet]
-    public ActionResult<List<FileListItemResponse>> GetFiles()
+    [HttpGet(AttachmentUrls.GetFilesUrl)]
+    public ActionResult<List<FileListItemResponse>> GetFiles([FromRoute] int taskId)
     {
-        var result = _attachmentService.GetFiles();
+        var result = _attachmentService.GetFiles(taskId);
 
         if (!result.IsSuccess)
         {

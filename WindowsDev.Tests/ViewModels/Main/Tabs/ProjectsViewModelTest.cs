@@ -285,6 +285,16 @@ public class ProjectsViewModelTest
     [Fact]
     public async Task OpenDialogCommand_WhenExecuted_ShowsCreateProjectDialog()
     {
+        _dialogServiceMock
+            .Setup(x => x.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>())
+            .ReturnsAsync(
+                new CreateProjectDialogViewModel(
+                    _dialogServiceMock.Object,
+                    _projectApiClientMock.Object,
+                    new Mock<ILogger<CreateProjectDialogViewModel>>().Object,
+                    _languageChangerMock.Object
+                )
+            );
         var vm = CreateViewModel();
 
         await ((AsyncRelayCommand)vm.OpenDialogCommand).ExecuteAsync(null);
@@ -441,7 +451,7 @@ public class ProjectsViewModelTest
                 ),
             Times.Once
         );
-            
+
         _projectApiClientMock.Verify(x => x.DeleteAsync(1), Times.Once);
         _projectApiClientMock.Verify(x => x.DeleteAsync(2), Times.Once);
         _projectApiClientMock.Verify(x => x.DeleteAsync(3), Times.Once);

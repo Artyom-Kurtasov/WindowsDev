@@ -1,14 +1,11 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Net.Http.Json;
 using WindowsDev.ApiClient.PasswordRecovery;
-using WindowsDev.Application.Primitives;
-using WindowsDev.Contracts.Api.Common;
 using WindowsDev.Contracts.Api.PasswordRecovery;
 using WindowsDev.Contracts.UI.PasswordRecovery;
-using Xunit;
 
 namespace WindowsDev.Tests.ApiClient;
 

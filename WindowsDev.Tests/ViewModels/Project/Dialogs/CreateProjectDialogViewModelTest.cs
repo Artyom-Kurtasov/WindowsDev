@@ -6,7 +6,6 @@ using WindowsDev.Application.Common.Localization;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Command;
 using WindowsDev.Contracts.UI.Projects;
-using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
 using WindowsDev.Domain.Messages.DialogsMessages.Warnings;

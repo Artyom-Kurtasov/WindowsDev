@@ -1,12 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using WindowsDev.Application.Common.Events;
 using WindowsDev.Application.Identity.Authentication;
 using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.PasswordRecovery;
 using WindowsDev.Application.Identity.Registration;
 using WindowsDev.Application.Projects;
 using WindowsDev.Application.Tasks;
-using WindowsDev.Application.Tasks.Attachment;
 using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Application.Users;
 

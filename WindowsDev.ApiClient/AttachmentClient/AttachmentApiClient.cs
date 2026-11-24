@@ -1,6 +1,6 @@
-﻿using System.Net.Http.Headers;
+﻿using AutoMapper;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using AutoMapper;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.Attachments;
@@ -25,6 +25,7 @@ public class AttachmentApiClient : ApiClientBase, IAttachmentApiClient
 
     public async Task<Result<string>> UploadFileAsync(
         UploadFileForm request,
+        int taskId,
         CancellationToken cancellationToken = default
     )
     {
@@ -36,7 +37,7 @@ public class AttachmentApiClient : ApiClientBase, IAttachmentApiClient
         multipart.Add(fileContent, "file", request.FileName);
 
         using var response = await _httpClient.PostAsync(
-            "api/attachments",
+            $"api/attachments/{taskId}",
             multipart,
             cancellationToken
         );
@@ -56,12 +57,13 @@ public class AttachmentApiClient : ApiClientBase, IAttachmentApiClient
     }
 
     public async Task<Result<List<FileItem>>> GetFilesAsync(
+        int taskId,
         CancellationToken cancellationToken = default
     )
     {
         await AppendAuthorizationHeaderAsync(cancellationToken);
 
-        using var response = await _httpClient.GetAsync("api/attachments", cancellationToken);
+        using var response = await _httpClient.GetAsync($"api/attachments/{taskId}", cancellationToken);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -76,7 +78,7 @@ public class AttachmentApiClient : ApiClientBase, IAttachmentApiClient
             cancellationToken: cancellationToken
         );
 
-        var result = _mapper.Map<List<FileItem>>(files ?? []);
+        var result = _mapper.Map<List<FileItem>>(files);
         return Result<List<FileItem>>.Success(result);
     }
 

@@ -57,7 +57,8 @@ public class EditTaskViewModelTest
         string description = "Test Description"
     )
     {
-        return new TaskInfo {
+        return new TaskInfo
+        {
             Id = id,
             Name = name,
             Description = description,

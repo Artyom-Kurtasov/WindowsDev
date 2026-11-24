@@ -241,7 +241,7 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
         {
             Attachments!.Clear();
 
-            var result = await _attachmentApiClient.GetFilesAsync(CancellationToken.None);
+            var result = await _attachmentApiClient.GetFilesAsync(CurrentTask!.Id, CancellationToken.None);
 
             if (!result.IsSuccess || result.Value is null)
             {
@@ -297,8 +297,6 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
             await dto.Content.DisposeAsync();
 
             var process = Process.Start(new ProcessStartInfo(tempPath) { UseShellExecute = true });
-            if (process is null)
-                throw new InvalidOperationException("The attachment process could not be started.");
 
             _openedAttachments.Add(fileName);
         }
@@ -325,11 +323,8 @@ internal class TaskViewModel : LocalizedViewModelBase, IRefreshableViewModel, ID
                 await using var stream = File.OpenRead(file);
 
                 var result = await _attachmentApiClient.UploadFileAsync(
-                    new UploadFileForm(
-                        Path.GetFileName(file),
-                        "application/octet-stream",
-                        stream
-                    ),
+                    new UploadFileForm(Path.GetFileName(file), "application/octet-stream", stream),
+                    CurrentTask!.Id,
                     CancellationToken.None
                 );
 

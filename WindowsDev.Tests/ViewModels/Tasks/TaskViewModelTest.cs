@@ -66,7 +66,7 @@ public class TaskViewModelTest
             .ReturnsAsync(Result<List<CommentInfo>>.Success(new List<CommentInfo>()));
 
         _attachmentApiClientMock
-            .Setup(x => x.GetFilesAsync(It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetFilesAsync(taskId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<List<FileItem>>.Success(new List<FileItem>()));
     }
 
@@ -82,7 +82,8 @@ public class TaskViewModelTest
 
     private TaskInfo CreateTask()
     {
-        return new TaskInfo {
+        return new TaskInfo
+        {
             Id = 1,
             Name = "Task",
             Status = TaskStatus.InProgress,
@@ -133,7 +134,7 @@ public class TaskViewModelTest
             .ThrowsAsync(new Exception());
 
         _attachmentApiClientMock
-            .Setup(x => x.GetFilesAsync(It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetFilesAsync(task.Id, It.IsAny<CancellationToken>()))
             .ReturnsAsync(Result<List<FileItem>>.Success(new List<FileItem>()));
 
         var vm = CreateViewModel(task: task);
@@ -161,7 +162,7 @@ public class TaskViewModelTest
             .ReturnsAsync(Result<List<CommentInfo>>.Success(new List<CommentInfo>()));
 
         _attachmentApiClientMock
-            .Setup(x => x.GetFilesAsync(It.IsAny<CancellationToken>()))
+            .Setup(x => x.GetFilesAsync(task.Id, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new Exception());
 
         var vm = CreateViewModel(task: task);

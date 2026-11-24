@@ -10,7 +10,6 @@ using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;
 using WindowsDev.Contracts.Api.Profiles;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using Xunit;
 
 namespace WindowsDev.Tests.Api;
 

@@ -1,7 +1,9 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Moq;
 using WindowsDev.Api.Attachment;
+using WindowsDev.Application.Tasks.Attachment;
+using WindowsDev.Domain.Entities;
 
 namespace WindowsDev.Tests.Api;
 
@@ -14,7 +16,7 @@ public class AttachmentServiceTests
 
         try
         {
-            var result = await service.UploadFileAsync(null!);
+            var result = await service.UploadFileAsync(null!, 1);
 
             Assert.False(result.IsSuccess);
         }
@@ -33,7 +35,7 @@ public class AttachmentServiceTests
 
         try
         {
-            var result = await service.UploadFileAsync(file);
+            var result = await service.UploadFileAsync(file, 1);
 
             Assert.True(result.IsSuccess);
             Assert.Equal("test.txt", result.Value);
@@ -92,7 +94,7 @@ public class AttachmentServiceTests
 
         try
         {
-            var result = service.GetFiles();
+            var result = service.GetFiles(1);
 
             Assert.True(result.IsSuccess);
             var file = Assert.Single(result.Value);
@@ -109,7 +111,23 @@ public class AttachmentServiceTests
         root = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         var environmentMock = new Mock<IWebHostEnvironment>();
         environmentMock.SetupGet(x => x.WebRootPath).Returns(root);
+        var attachmentRepositoryMock = new Mock<IAttachmentRepository>();
+        attachmentRepositoryMock
+            .Setup(x => x.GetAttachmentsAsync(It.IsAny<int>()))
+            .ReturnsAsync([
+                new TaskAttachment
+                {
+                    FileExtension = ".txt",
+                    FileName = "test.txt",
+                    FilePath = Path.Combine(root, "uploads", "test.txt"),
+                    FileSize = 7,
+                    TaskId = 1
+                }
+            ]);
+        attachmentRepositoryMock
+            .Setup(x => x.AddFileInfoToDatabase(It.IsAny<TaskAttachment>()))
+            .Returns(Task.CompletedTask);
 
-        return new AttachmentService(environmentMock.Object);
+        return new AttachmentService(environmentMock.Object, attachmentRepositoryMock.Object);
     }
 }

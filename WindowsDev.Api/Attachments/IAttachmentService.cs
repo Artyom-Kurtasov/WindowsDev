@@ -5,7 +5,7 @@ namespace WindowsDev.Api.Attachments;
 
 public interface IAttachmentService
 {
-    Task<Result<string>> UploadFileAsync(IFormFile file);
+    Task<Result<string>> UploadFileAsync(IFormFile file, int taskId);
     Result<DownloadFileResponse> DownloadFile(string fileName);
-    Result<List<FileListItemResponse>> GetFiles();
+    Result<List<FileListItemResponse>> GetFiles(int taskId);
 }

@@ -1,4 +1,3 @@
-using MahApps.Metro.Controls.Dialogs;
 using Moq;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.ViewModels.Main.Tabs;

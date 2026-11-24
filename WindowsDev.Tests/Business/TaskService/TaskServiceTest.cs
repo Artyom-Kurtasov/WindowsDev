@@ -1,8 +1,8 @@
 using Moq;
+using WindowsDev.Application.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
-using WindowsDev.Application.Tasks;
 
 namespace WindowsDev.Tests.Business.TaskService;
 

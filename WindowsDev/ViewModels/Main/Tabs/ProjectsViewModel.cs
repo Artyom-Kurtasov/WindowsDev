@@ -107,7 +107,8 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
                 await _dialogService.ShowMessageAsync(
                     DialogTitles.Error,
                     result.Error,
-                    MessageDialogStyle.Affirmative);
+                    MessageDialogStyle.Affirmative
+                );
                 return;
             }
 
@@ -162,11 +163,32 @@ internal class ProjectsViewModel : LocalizedViewModelBase, IRefreshableViewModel
 
     private async Task ShowCreateProjectDialogAsync()
     {
-        await _dialogService.ShowDialogAsync<CreateProjectDialogView, CreateProjectDialogViewModel>(
-        );
+        var dialogVm = await _dialogService.ShowDialogAsync<
+            CreateProjectDialogView,
+            CreateProjectDialogViewModel
+        >();
 
-        await LoadProjectsAsync();
+        if (!dialogVm.IsCompleted || dialogVm.CreatedProject is null)
+            return;
+
+        _totalCountOfProjects++;
+        OnPropertyChanged(nameof(TotalCountOfPages));
+
+        if (CurrentPage == 1 && string.IsNullOrWhiteSpace(SearchFilter))
+        {
+            Projects.Insert(0, new SelectablelProjectViewModel(dialogVm.CreatedProject));
+
+            if (Projects.Count > PageSize)
+            {
+                Projects.RemoveAt(Projects.Count - 1);
+            }
+        }
+        else
+        {
+            await GetPageAsync(SearchFilter);
+        }
     }
+
 
     private async Task NextPageAsync()
     {

@@ -2,7 +2,6 @@ using Moq;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Application.Identity.PasswordChanger;
 using WindowsDev.Application.Identity.Repositories;
-using WindowsDev.Application.Primitives;
 using WindowsDev.Application.Users;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;

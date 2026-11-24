@@ -1,13 +1,12 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Net.Http.Json;
 using WindowsDev.ApiClient.CommentClient;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Comments;
 using WindowsDev.Contracts.UI.Comments;
-using Xunit;
 
 namespace WindowsDev.Tests.ApiClient;
 

@@ -1,14 +1,13 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 using System.Net.Http.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Identity;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
 using WindowsDev.Infrastructure.Database.Interfaces;
-using WindowsDev.IntegrationTests.Infrastructure;
 using WindowsDev.Infrastructure.Security;
+using WindowsDev.IntegrationTests.Infrastructure;
 
 namespace WindowsDev.IntegrationTests;
 
@@ -176,7 +175,7 @@ public class AuthControllerTests : BaseIntegrationTest
         var loginBody = await loginResponse.Content.ReadFromJsonAsync<UserLoginResponse>();
         Assert.NotNull(loginBody);
 
-        var refreshRequest = new RefreshTokenRequest { RefreshToken = loginBody.RefreshToken.Token};
+        var refreshRequest = new RefreshTokenRequest { RefreshToken = loginBody.RefreshToken };
         var response = await Client.PostAsJsonAsync("api/auth/refresh", refreshRequest);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -190,7 +189,10 @@ public class AuthControllerTests : BaseIntegrationTest
     [Fact]
     public async Task Refresh_WhenTokenInvalid_ReturnUnauthorized()
     {
-        var request = new RefreshTokenRequest { RefreshToken = "invalid-token" };
+        var request = new RefreshTokenRequest
+        {
+            RefreshToken = new UserRefreshToken { Token = "invalid-token" }
+        };
 
         var response = await Client.PostAsJsonAsync("api/auth/refresh", request);
 
@@ -200,7 +202,10 @@ public class AuthControllerTests : BaseIntegrationTest
     [Fact]
     public async Task Refresh_WhenTokenEmpty_ReturnUnauthorized()
     {
-        var request = new RefreshTokenRequest { RefreshToken = string.Empty };
+        var request = new RefreshTokenRequest
+        {
+            RefreshToken = new UserRefreshToken { Token = string.Empty }
+        };
 
         var response = await Client.PostAsJsonAsync("api/auth/refresh", request);
 
@@ -210,7 +215,7 @@ public class AuthControllerTests : BaseIntegrationTest
     [Fact]
     public async Task IsUsernameAvailable_WhenFree_ReturnTrue()
     {
-        var request = new IsUsernameAvailableRequest ("FreeUsername");
+        var request = new IsUsernameAvailableRequest("FreeUsername");
 
         var response = await Client.PostAsJsonAsync("api/auth/isUsernameAvailable", request);
 
@@ -225,7 +230,7 @@ public class AuthControllerTests : BaseIntegrationTest
     {
         await SeedUserAsync();
 
-        var request = new IsUsernameAvailableRequest (TestUsername);
+        var request = new IsUsernameAvailableRequest(TestUsername);
 
         var response = await Client.PostAsJsonAsync("api/auth/isUsernameAvailable", request);
 
@@ -238,7 +243,7 @@ public class AuthControllerTests : BaseIntegrationTest
     [Fact]
     public async Task IsLoginAvailable_WhenFree_ReturnTrue()
     {
-        var request = new IsLoginAvailableRequest("FreeLogin" );
+        var request = new IsLoginAvailableRequest("FreeLogin");
 
         var response = await Client.PostAsJsonAsync("api/auth/isLoginAvailable", request);
 

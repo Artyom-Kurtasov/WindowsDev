@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="Attachment_Error_FileNotSelected">File not selected.</sys:String>
+    <sys:String x:Key="Attachment_Error_InvalidFileName">Invalid file name.</sys:String>
+    <sys:String x:Key="Attachment_Error_FileNameEmpty">File name cannot be empty.</sys:String>
+    <sys:String x:Key="Attachment_Error_FileNotFound">File does not exist.</sys:String>
+    <sys:String x:Key="Attachment_Error_UploadsDirectoryNotFound">Uploads directory not found.</sys:String>
+
+</ResourceDictionary>

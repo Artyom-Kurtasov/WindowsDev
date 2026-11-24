@@ -1,10 +1,10 @@
 using WindowsDev.Api;
+using WindowsDev.Api.Logging;
 using WindowsDev.Api.Mappings;
 using WindowsDev.Application;
 using WindowsDev.Application.Database;
 using WindowsDev.Infrastructure;
 using WindowsDev.Infrastructure.JWT;
-using WindowsDev.Api.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 

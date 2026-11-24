@@ -34,10 +34,10 @@ public class AttachmentsControllerTests
     {
         var file = new FormFile(new MemoryStream("content"u8.ToArray()), 0, 7, "file", "test.txt");
         _attachmentServiceMock
-            .Setup(x => x.UploadFileAsync(file))
+            .Setup(x => x.UploadFileAsync(file, 1))
             .ReturnsAsync(Result<string>.Success("test.txt"));
 
-        var result = await CreateController().UploadFileAsync(file);
+        var result = await CreateController().UploadFileAsync(file, 1);
 
         var created = Assert.IsType<CreatedAtActionResult>(result);
         var response = Assert.IsType<UploadFileResponse>(created.Value);
@@ -48,10 +48,10 @@ public class AttachmentsControllerTests
     public async Task UploadFileAsync_WhenFailed_ReturnsBadRequest()
     {
         _attachmentServiceMock
-            .Setup(x => x.UploadFileAsync(null!))
+            .Setup(x => x.UploadFileAsync(null!, 1))
             .ReturnsAsync(Result<string>.Failure("error"));
 
-        var result = await CreateController().UploadFileAsync(null!);
+        var result = await CreateController().UploadFileAsync(null!, 1);
 
         var response = Assert.IsType<ObjectResult>(result);
         Assert.Equal(StatusCodes.Status400BadRequest, response.StatusCode);
@@ -61,11 +61,11 @@ public class AttachmentsControllerTests
     public void GetFiles_WhenSuccessful_ReturnsOk()
     {
         _attachmentServiceMock
-            .Setup(x => x.GetFiles())
+            .Setup(x => x.GetFiles(1))
             .Returns(Result<List<FileListItemResponse>>.Success(
                 [new FileListItemResponse("test.txt", 7, DateTime.UtcNow)]));
 
-        var result = CreateController().GetFiles();
+        var result = CreateController().GetFiles(1);
 
         var response = Assert.IsType<OkObjectResult>(result.Result);
         Assert.Single(Assert.IsType<List<FileListItemResponse>>(response.Value));

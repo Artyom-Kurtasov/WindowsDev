@@ -10,7 +10,6 @@ using WindowsDev.Application.Tasks.Comment;
 using WindowsDev.Contracts.Api.Comments;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using Xunit;
 
 namespace WindowsDev.Tests.Api;
 

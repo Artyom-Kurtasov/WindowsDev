@@ -1,14 +1,13 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using AutoMapper;
+﻿using AutoMapper;
 using Moq;
 using Moq.Protected;
+using System.Net;
+using System.Net.Http.Json;
 using WindowsDev.ApiClient.ProjectsClient;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Projects;
 using WindowsDev.Contracts.UI.Projects;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using Xunit;
 
 namespace WindowsDev.Tests.ApiClient;
 

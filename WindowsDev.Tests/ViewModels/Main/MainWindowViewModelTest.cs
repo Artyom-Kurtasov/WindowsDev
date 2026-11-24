@@ -1,5 +1,3 @@
-using System.Windows;
-using MahApps.Metro.Controls.Dialogs;
 using Moq;
 using WindowsDev.Application.Common.Events;
 using WindowsDev.Application.Common.Localization;
@@ -7,10 +5,8 @@ using WindowsDev.Factories;
 using WindowsDev.Services.Dialogs;
 using WindowsDev.Services.Navigation;
 using WindowsDev.Tests.ViewModels.Main.TestViewModels;
-using WindowsDev.ViewModels.Authorization;
 using WindowsDev.ViewModels.Main;
 using WindowsDev.ViewModels.Main.Tabs;
-using Xunit;
 
 namespace WindowsDev.Tests.ViewModels.Main;
 

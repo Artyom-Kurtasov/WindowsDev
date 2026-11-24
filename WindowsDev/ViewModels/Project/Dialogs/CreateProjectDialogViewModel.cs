@@ -54,6 +54,8 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
     }
 
     private string _projectDescription = string.Empty;
+    public ProjectInfo? CreatedProject { get; private set; }
+    public bool IsCompleted { get; private set; }
 
     public string ProjectDescription
     {
@@ -86,9 +88,12 @@ internal class CreateProjectDialogViewModel : LocalizedViewModelBase, IDialogVie
 
         try
         {
-            await _projectsApiClient.AddAsync(
+            var response = await _projectsApiClient.AddAsync(
                 new ProjectForm(ProjectName, ProjectDescription)
             );
+
+            CreatedProject = response.Value;
+            IsCompleted = true;
 
             if (Completed != null)
                 await Completed.Invoke();

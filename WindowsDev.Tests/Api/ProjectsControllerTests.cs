@@ -8,7 +8,6 @@ using WindowsDev.Application.Identity;
 using WindowsDev.Application.Projects;
 using WindowsDev.Contracts.Api.Projects;
 using WindowsDev.Domain.Entities;
-using Xunit;
 
 namespace WindowsDev.Tests.Api;
 

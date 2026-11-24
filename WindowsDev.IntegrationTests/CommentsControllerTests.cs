@@ -1,7 +1,7 @@
-﻿using System.Net;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
 using WindowsDev.Application.Identity.Cryptography;
 using WindowsDev.Contracts.Api.Comments;
 using WindowsDev.Contracts.Api.Identity;

@@ -1,5 +1,5 @@
-using System.Windows.Input;
 using MahApps.Metro.Controls.Dialogs;
+using System.Windows.Input;
 using WindowsDev.Application.Common.Events;
 using WindowsDev.Application.Common.Localization;
 using WindowsDev.Command;
@@ -113,20 +113,20 @@ internal class MainWindowViewModel : LocalizedViewModelBase, IDisposable
         switch (tabIndex)
         {
             case 1:
-            {
-                if (_settings == null)
-                    Settings = _factory.Create<SettingsViewModel>();
-                break;
-            }
+                {
+                    if (_settings == null)
+                        Settings = _factory.Create<SettingsViewModel>();
+                    break;
+                }
             case 2:
-            {
-                if (_profile == null)
-                    Profile = _factory.Create<ProfileViewModel>();
+                {
+                    if (_profile == null)
+                        Profile = _factory.Create<ProfileViewModel>();
 
-                if (Profile is IRefreshableViewModel)
-                    await Profile.RefreshAsync();
-                break;
-            }
+                    if (Profile is IRefreshableViewModel)
+                        await Profile.RefreshAsync();
+                    break;
+                }
         }
     }
 

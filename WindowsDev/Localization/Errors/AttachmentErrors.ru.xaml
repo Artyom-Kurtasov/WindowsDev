@@ -1,0 +1,11 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <sys:String x:Key="Attachment_Error_FileNotSelected">Файл не выбран.</sys:String>
+    <sys:String x:Key="Attachment_Error_InvalidFileName">Некорректное имя файла.</sys:String>
+    <sys:String x:Key="Attachment_Error_FileNameEmpty">Имя файла не может быть пустым.</sys:String>
+    <sys:String x:Key="Attachment_Error_FileNotFound">Файл не найден.</sys:String>
+    <sys:String x:Key="Attachment_Error_UploadsDirectoryNotFound">Директория загрузок не найдена.</sys:String>
+
+</ResourceDictionary>

@@ -10,8 +10,6 @@ using WindowsDev.Application.Tasks;
 using WindowsDev.Contracts.Api.Tasks;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Enums;
-using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using Xunit;
 using TaskStatus = WindowsDev.Domain.Enums.TaskStatus;
 
 namespace WindowsDev.Tests.Api;

@@ -1,9 +1,9 @@
 using MahApps.Metro.Controls.Dialogs;
 using System.Windows.Controls;
-using WpfApplication = System.Windows.Application;
 using WindowsDev.Domain.Messages;
 using WindowsDev.Factories;
 using WindowsDev.ViewModels.Interfaces;
+using WpfApplication = System.Windows.Application;
 
 namespace WindowsDev.Services.Dialogs;
 
@@ -24,17 +24,18 @@ internal class DialogService : IDialogService
         _contextProvider = contextProvider;
     }
 
-    public async Task ShowDialogAsync<TView, TViewModel>(params object[] args)
-        where TView : UserControl, new()
-        where TViewModel : class, IDialogViewModel
+    public async Task<TViewModel> ShowDialogAsync<TView, TViewModel>(params object[] args)
+    where TView : UserControl, new()
+    where TViewModel : class, IDialogViewModel
     {
         var view = new TView();
         var viewModel = _viewModelFactory.Create<TViewModel>(args);
         var context = _contextProvider.Context;
 
         var dialog = new CustomDialog { Content = view };
-
         view.DataContext = viewModel;
+
+        var tcs = new TaskCompletionSource<TViewModel>();
 
         Func<Task>? completedHandler = null;
         Func<Task>? closeHandler = null;
@@ -45,21 +46,26 @@ internal class DialogService : IDialogService
             {
                 await refreshable.RefreshAsync();
             }
-
             viewModel.Completed -= completedHandler;
         };
 
         closeHandler = async () =>
         {
-            await _dialogCoordinator.HideMetroDialogAsync(context, dialog);
             viewModel.CloseRequested -= closeHandler;
+            viewModel.Completed -= completedHandler;
+
+            await _dialogCoordinator.HideMetroDialogAsync(context, dialog);
+            tcs.TrySetResult(viewModel);
         };
 
         viewModel.Completed += completedHandler;
         viewModel.CloseRequested += closeHandler;
 
         await _dialogCoordinator.ShowMetroDialogAsync(context, dialog);
+
+        return await tcs.Task; 
     }
+
 
     public async Task ShowErrorDialogAsync(string message, params object[] args)
     {

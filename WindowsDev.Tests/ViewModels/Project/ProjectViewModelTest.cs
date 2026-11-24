@@ -81,7 +81,8 @@ public class ProjectViewModelTest
 
     private TaskInfo CreateTask(int id)
     {
-        return new TaskInfo {
+        return new TaskInfo
+        {
             Id = id,
             Name = $"Task {id}",
             Description = "Description",

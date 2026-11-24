@@ -7,10 +7,11 @@ public interface IAttachmentApiClient
 {
     Task<Result<string>> UploadFileAsync(
         UploadFileForm request,
+        int taskId,
         CancellationToken cancellationToken = default
     );
 
-    Task<Result<List<FileItem>>> GetFilesAsync(CancellationToken cancellationToken = default);
+    Task<Result<List<FileItem>>> GetFilesAsync(int taskId, CancellationToken cancellationToken = default);
 
     Task<Result<FileDownloadInfo>> DownloadFileAsync(
         string fileName,

@@ -9,7 +9,6 @@ using WindowsDev.Application.Primitives;
 using WindowsDev.Contracts.Api.PasswordRecovery;
 using WindowsDev.Domain.Entities;
 using WindowsDev.Domain.Messages.DialogsMessages.Errors;
-using Xunit;
 
 namespace WindowsDev.Tests.Api;
 
